@@ -4,12 +4,18 @@ import Component from "/apogeeapp/component/Component.js";
 export default class JsonTableComponent extends Component {
     
         
-    constructor(member,modelManager) {
+    constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
         //extend edit component
-        super(member,modelManager);
+        super(member,modelManager,instanceToCopy,keepUpdatedFixed);
 
-        //default view
-        this.setField("dataView",JsonTableComponent.DEFAULT_DATA_VIEW)
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            //default view
+            this.setField("dataView",JsonTableComponent.DEFAULT_DATA_VIEW);
+        }
     };
 
     getDataView() {

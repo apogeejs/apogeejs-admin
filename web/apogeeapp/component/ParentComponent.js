@@ -9,25 +9,27 @@ import { DOMParser, Node as ProseMirrorNode }  from "/prosemirror/lib/prosemirro
  * It extends the component class. */
 export default class ParentComponent extends Component {
 
-    constructor(member,modelManager) {
+    constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
         //base constructor
-        super(member,modelManager);
+        super(member,modelManager,instanceToCopy,keepUpdatedFixed);
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
         //the schema should only be created once
-        let schema = createFolderSchema(modelManager.getApp(),member.getId());
-        this.setField("schema",schema);
-        //initialize with an empty document
-        let document = this._createEmptyDocument(schema);
-        this.setField("document",document);
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        if(!instanceToCopy) {
+            let schema = createFolderSchema(modelManager.getApp(),member.getId());
+            this.setField("schema",schema);
+            //initialize with an empty document
+            let document = this._createEmptyDocument(schema);
+            this.setField("document",document);
+        }
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //Working
-        //temporar fields in the parent component
+        //==============
+        //Working variables
+        //==============
         this.tempEditorStateInfo = null;
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
  
     }
 

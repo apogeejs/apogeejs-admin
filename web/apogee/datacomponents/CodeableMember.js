@@ -23,26 +23,28 @@ import DependentMember from "/apogee/datacomponents/DependentMember.js"
 export default class CodeableMember extends DependentMember {
 
     /** This initializes the component. argList is the arguments for the object function. */
-    constructor(name,parent) {
-        super(name,parent);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed);
 
         //mixin init where needed. This is not a scoep root. Parent scope is inherited in this object
         this.contextHolderMixinInit(false); 
         
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        //arguments of the member function
-        this.setField("argList",[]);
-        //"functionBody";
-        //"supplementalCode";
-        //"compiledInfo"
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            //arguments of the member function
+            this.setField("argList",[]);
+            //"functionBody";
+            //"supplementalCode";
+            //"compiledInfo"
+        }
         
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //WORKING FIELDS
-        //fields used in calculation
+        //==============
+        //Working variables
+        //==============
         this.dependencyInitInProgress = false;
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
 
     /** This property tells if this object is a codeable.

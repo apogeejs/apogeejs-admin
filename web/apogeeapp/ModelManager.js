@@ -1,31 +1,32 @@
 import base from "/apogeeutil/base.js";
 import { Model, doAction } from "/apogee/apogeeCoreLib.js";
 import FieldObject from "/apogeeutil/FieldObject.js";
-import EventManager from "/apogeeutil/EventManager.js";
 
 /** This class manages the user interface for a model object. */
 export default class ModelManager  extends FieldObject {
 
-    constructor(workspaceManager) {
-        super("modelManager");
+    constructor(app,instanceToCopy,keepUpdatedFixed) {
+        super("modelManager",instanceToCopy,keepUpdatedFixed);
 
         //mixin initialization
         this.eventManagerMixinInit();
 
-        this.app = workspaceManager.getApp();
+        this.app = app;
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        this.setField("workspaceManager",workspaceManager); 
-        this.setField("model",null);
-        this.setField("componentMap",{});
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            this.setField("model",null);
+            this.setField("componentMap",{});
+        }
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //Working
+        //==============
+        //Working variables
+        //==============
         this.viewStateCallback = null;
         this.cachedViewState = null;
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       
     }
 
@@ -38,10 +39,6 @@ export default class ModelManager  extends FieldObject {
         return this.app;
     }
 
-    getWorkspaceManager() {
-        return this.getField("workspaceManager");
-    }
-
     setViewStateCallback(viewStateCallback) {
         this.viewStateCallback = viewStateCallback;
     }
@@ -51,7 +48,7 @@ export default class ModelManager  extends FieldObject {
     }
 
      /** This method loads the model data and model components from the json. */
-    load(json) {
+    load(workspaceManager,json) {
 
         let modelJson; 
         let componentsJson;
@@ -71,13 +68,15 @@ export default class ModelManager  extends FieldObject {
         if(!componentsJson) componentsJson = ModelManager.EMPTY_MODEL_COMPONENT_JSON;
 
         //create model
-        let model = new Model();
+        let model = new Model(workspaceManager.getModelRunContext());
         this.setField("model",model);
         
         //add listeners
         //model.addListener("created", eventInfo => this.objectCreated(eventInfo));
         model.addListener("updated", eventInfo => this.objectUpdated(eventInfo));
         model.addListener("deleted", eventInfo => this.objectDeleted(eventInfo));
+        model.addListener("actionStarted", eventInfo => this.actionStarted(eventInfo));
+        model.addListener("actionCompleted", eventInfo => this.actionCompleted(eventInfo));
 
         //load the model
         let loadAction = {};
@@ -89,10 +88,9 @@ export default class ModelManager  extends FieldObject {
         let commandResult = {};
 
         if(actionResult.actionDone) {
-            commandResult.action = "updated";
+            commandResult.eventAction = "updated";
             commandResult.cmdDone = true;
             commandResult.target = this;
-            commandResult.dispatcher = this;
 
             //create the children
             let childCommandResults = [];
@@ -187,12 +185,9 @@ export default class ModelManager  extends FieldObject {
      * If the member is not the main member assoicated with component but instead an included
      * member, the main componentMember should be passed in also. Otherwise it should be left 
      * undefined. */
-    registerMember(member,component,mainComponentMember) {
+    registerMember(memberId,component,isMain) {
 
         let oldComponentMap = this.getField("componentMap");
-
-        //store the ui object
-        var memberId = member.getId();
 
         if(oldComponentMap[memberId]) {
             //already exists! (we need to catch this earlier if we want it to not be fatal. But we should catch it here too.)
@@ -205,9 +200,9 @@ export default class ModelManager  extends FieldObject {
 
         //add the new info
         var componentInfo = {};
-        componentInfo.member = member;
+        componentInfo.memberId = memberId;
         componentInfo.component = component;
-        if(mainComponentMember) componentInfo.componentMember = mainComponentMember;
+        componentInfo.isMain = isMain;
 
         newComponentMap[memberId] = componentInfo;
 
@@ -258,9 +253,8 @@ export default class ModelManager  extends FieldObject {
         }
         else {
             commandResult.target = component;
-            commandResult.dispatcher = this;
             commandResult.cmdDone = true;
-            commandResult.action = "created";
+            commandResult.eventAction = "created";
 
             //load the children, after the component load is completed
             if(component.loadChildrenFromJson) {
@@ -312,7 +306,7 @@ export default class ModelManager  extends FieldObject {
         //all changes kept in model
     }
 
-    /** This method responds to a "new" menu event. */
+    /** This method responds to a delete menu event. */
     memberDeleted(member) {
         let memberId = member.getId();
         let oldComponentMap = this.getField("componentMap");
@@ -333,6 +327,14 @@ export default class ModelManager  extends FieldObject {
                 componentInfo.component.onDelete();
             }
         }
+    }
+
+    actionStarted(eventInfo) {
+
+    }
+
+    actionCompleted(eventInfo) {
+        
     }
 
     //====================================
@@ -391,49 +393,50 @@ export default class ModelManager  extends FieldObject {
     }
 
     createDependencies() {
-        let model = this.getField("model");
-        var memberInfo = {};
+        throw new Error("This needs to be rewritten, probably in Model rather than here.")
+        //for one thing I removed the model instance from componentInfo in the component map
+        //instead I should just read all the members from the model.
 
-        let componentMap = this.getField("componentMap");
+        // let model = this.getField("model");
+        // var memberInfo = {};
 
-        for(var key in componentMap) {
-            var componentInfo = componentMap[key];
-            if((componentInfo)&&(componentInfo.member)) {
+        // let componentMap = this.getField("componentMap");
+
+        // for(var key in componentMap) {
+        //     var componentInfo = componentMap[key];
+        //     if((componentInfo)&&(componentInfo.member)) {
 
 
-                var member = componentInfo.member;
+        //         var member = componentInfo.member;
 
-                var memberStruct = {};
-                memberStruct.type = member.constructor.generator.type;
-                var parentMember = member.getParentMember(model);
-                memberStruct.parent = parentMember ? parentMember.getFullName(model) : null;
+        //         var memberStruct = {};
+        //         memberStruct.type = member.constructor.generator.type;
+        //         var parentMember = member.getParentMember(model);
+        //         memberStruct.parent = parentMember ? parentMember.getFullName(model) : null;
 
-                if(member.isDependent) {
-                    let depList = [];
-                    let dependsOnMap = member.getDependsOn();
-                    for(var idString in dependsOnMap) {
-                        dependencyType = dependsOnMap[idString];
-                        if(dependencyType == apogeeutil.NORMAL_DEPENDENCY) {
-                            let dependency = model.lookupMemberById(idString);
-                            depList.push(dependency.getFullName(model));
-                        }
-                    }
-                    if(depList.length > 0) {
-                        memberStruct.dep = depList;
-                    }
-                }
+        //         if(member.isDependent) {
+        //             let depList = [];
+        //             let dependsOnMap = member.getDependsOn();
+        //             for(var idString in dependsOnMap) {
+        //                 dependencyType = dependsOnMap[idString];
+        //                 if(dependencyType == apogeeutil.NORMAL_DEPENDENCY) {
+        //                     let dependency = model.lookupMemberById(idString);
+        //                     depList.push(dependency.getFullName(model));
+        //                 }
+        //             }
+        //             if(depList.length > 0) {
+        //                 memberStruct.dep = depList;
+        //             }
+        //         }
 
-                memberInfo[member.getFullName(model)] = memberStruct;
-            }
-        }
+        //         memberInfo[member.getFullName(model)] = memberStruct;
+        //     }
+        // }
 
-        return memberInfo;
+        // return memberInfo;
     }
 
 }
-
-//add mixins to this class
-base.mixin(ModelManager,EventManager);
 
 //this is the json for an empty model
 ModelManager.EMPTY_MODEL_COMPONENT_JSON = {

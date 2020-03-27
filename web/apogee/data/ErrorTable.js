@@ -6,8 +6,8 @@ import Member from "/apogee/datacomponents/Member.js";
  * is intended to be used as a placeholder when a table generator is not found. */
 export default class ErrorTable extends Member {
 
-    constructor(name,parent) {
-        super(name,parent);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed);
 
         var dummyData = "";
         this.setData(dummyData);

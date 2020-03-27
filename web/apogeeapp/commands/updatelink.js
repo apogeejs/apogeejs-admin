@@ -35,53 +35,16 @@ updatelink.createUndoCommand = function(workspaceManager,commandData) {
     return undoCommandJson;
 }
 
-updatelink.executeCommand = function(workspaceManager,commandData,asynchOnComplete) {
-    
-    var synchcommandResult = {};
-    var referenceManager = workspaceManager.getReferenceManager();
-    
-    //lookup entry for this reference
-    var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.oldUrl);
-    
-    if(referenceEntry) {
-        //update entry
-        let url = (commandData.newUrl !== undefined) ? commandData.newUrl : referenceEntry.getUrl();
-        let nickname = (commandData.newNickname !== undefined) ? commandData.newNickname : referenceEntry.getNickname();
-        let updatePromise = referenceEntry.updateData(url,nickname);
-
-        updatePromise.then( asynchCommandResult => {
-            if(asynchOnComplete) {
-                asynchOnComplete(asynchCommandResult);
-            }
-        })
-        .catch( errorMsg => {
-            if(asynchOnComplete) {
-                let asynchCommandResult = {};
-                asynchCommandResult.alertMsg = "Unkonwn error updating link: " + errorMsg;
-                asynchCommandResult.cmdDone = false;
-                asynchOnComplete(asynchCommandResult);
-            }
-        });
-        
-        synchcommandResult.cmdDone = true;
-        synchcommandResult.target = referenceEntry;
-        synchcommandResult.dispatcher = referenceEntry;
-        synchcommandResult.action = "updated";
-    }
-    else {
-        //entry not found
-        synchcommandResult.alertMsg = "Link entry to update not found!";
-        synchcommandResult.cmdDone = false;
-    }
-    
-    return synchcommandResult;
+updatelink.executeCommand = function(workspaceManager,commandData) {
+    let referenceManager = workspaceManager.getReferenceManager();
+    let commandResult = referenceManager.updateEntry(commandData.entryType,commandData.oldUrl,commandData);
+    return commandResult;
 }
 
 updatelink.commandInfo = {
     "type": "updateLink",
     "targetType": "component",
-    "event": "updated",
-    "isAsynch": true
+    "event": "updated"
 }
 
 CommandManager.registerCommand(updatelink);

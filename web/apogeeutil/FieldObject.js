@@ -4,14 +4,35 @@
 export default class FieldObject {
 
     /** constructor.
-     * The object type should be a text only string.
+     * - objectType - a text only string giving the name of the object type. This
+     * is used in the id string.
+     * - instanceToCopy - if this argument is defined, the created instance will be a shallow copy
+     * of the this passed instance. By default it will have the updated fields flag cleared, but this
+     * can be changed with the "keepUpdatedFixed" flag The new instance will be unlocked.
+     * - keepUpdatedFixed - This should only be used when an instance is copied. If this is true
+     * the copied instance will keep the same fields updated flags. Otherwise they will be cleared.
      */
-    constructor(objectType) {
-        this.id = _createId(objectType);
-        this.objectType = objectType;
+    constructor(objectType,instanceToCopy,keepUpdatedFixed) {
+        if(!instanceToCopy) {
+            this.id = _createId(objectType);
+            this.objectType = objectType;
+        }
+        else {
+            this.id = instanceToCopy.id;
+            this.objectType = instanceToCopy.objectType;
+
+        }
 
         this.fieldMap = {};
+        if(instanceToCopy) {
+            Object.assign(this.fieldMap,instanceToCopy.fieldMap);
+        }
+
         this.updated = {};
+        if(keepUpdatedFixed) {
+            Object.assign(this.updated,instanceToCopy.updated);
+        }
+
         this.isLocked = false;
     }
 

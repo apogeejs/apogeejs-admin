@@ -1,32 +1,29 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import base from "/apogeeutil/base.js";
 import FieldObject from "/apogeeutil/FieldObject.js";
-import EventManager from "/apogeeutil/EventManager.js";
 
 /** This is the base functionality for a component. */
 export default class Component extends FieldObject {
 
-    constructor(member,modelManager) {
-        super("component");
-
-        //mixin initialization
-        this.eventManagerMixinInit();
+    constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
+        super("component",instanceToCopy,keepUpdatedFixed);
 
         //inheriting objects can pass functions here to be called on cleanup, save, etc
         this.cleanupActions = [];
         
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        this.setField("member",member);
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    
-        modelManager.registerMember(member,this);
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            this.setField("member",member);
+            modelManager.registerMember(member.getId(),this,true);
+        }
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //Working
+        //==============
+        //Working variables
+        //==============
         this.viewStateCallback = null;
         this.cachedViewState = null;
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
 
     /** If an extending object has any cleanup actions, a callback should be passed here.
@@ -287,9 +284,6 @@ export default class Component extends FieldObject {
         return newPropertyValues;
     }
 }
-
-//add mixins to this class
-base.mixin(Component,EventManager);
 
 //======================================
 // All components should have a generator to create the component

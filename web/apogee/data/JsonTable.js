@@ -6,8 +6,8 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 /** This class encapsulatees a data table for a JSON object */
 export default class JsonTable extends CodeableMember {
 
-    constructor(name,parent) {
-        super(name,parent);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed);
     }
 
     //------------------------------

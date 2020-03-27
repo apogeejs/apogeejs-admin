@@ -22,7 +22,8 @@ import {addActionInfo} from "/apogee/actions/action.js";
 /** Delete member action function */
 function deleteMember(model,actionData) {
     
-    var member = model.lookupMemberById(actionData.memberId);
+    //get a new instance in case any changes are made during delete
+    let member = model.getMutableMember(actionData.memberId);
     if(!member) {
         let actionResult = {};
         actionResult.actionDone = false;
@@ -65,7 +66,8 @@ function doDelete(model, member) {
     }
     
     //delete member
-    let parent = member.getParent(model);
+    let parentId = member.getParentId();
+    let parent = model.getMutableMember(parentId);
     if(parent) {
         parent.removeChild(model,member);
     }

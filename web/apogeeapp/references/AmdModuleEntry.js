@@ -16,50 +16,26 @@ export default class AmdModuleEntry extends ReferenceEntry {
 
     }
 
-    /** This method loads the link onto the page. It returns a promise that
-     * resolves when the link is loaded. */
-    loadEntry() {
+    /** This method loads the actual module. */
+    implementationLoadEntry(onLoad,onError) {
 
-        var promiseFunction = (resolve,reject) => {
-
-            this.setPendingState();
-            
-            let commandResult = {};
-            commandResult.target = this;
-            commandResult.dispatcher = this;
-            commandResult.action = "updated";
-
-            //add event handlers
-            var onLoad = () => {
-                commandResult.cmdDone = true;
-
-                this.setClearState();
-                resolve(commandResult);
-            }
-            var onError = (error) => {
-                var errorMsg = "Failed to load link '" + this.url + "':" + error;
-                //accept the error and keep going - it will be flagged in UI
-                commandResult.cmdDone = true;
-                commandResult.errorMsg = errorMsg;
-
-                this.setError(errorMsg);
-                resolve(commandResult);
-            }
-
-            this.setPendingState();
-            require([this.url],onLoad,onError);
+        //create local callbacks that make the callbacks asynchronous!
+        let localOnLoad = () => {
+            setTimeout(onLoad,0);
+        }
+        let localOnError = error => {
+            setTimeout(() => onError(error),0);
         }
 
-        //return promise to track loading finish
-        return new Promise(promiseFunction);
+        //synchronous loading
+        require([this.getUrl()],localOnLoad,localOnError);
+        
     }
     
-    /** This method removes the link. */
-    remove() {
+    /** This method removes the module. */
+    implementationRemoveEntry() {
         //allow for an optional module remove step
-        if((this.module)&&(this.module.removeApogeeModule)) this.module.removeApogeeModule(apogee,apogeeapp,apogeeutil);
         require.undef(this.url);
-        return true;
     }
     
 }

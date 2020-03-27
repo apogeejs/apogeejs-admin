@@ -11,46 +11,17 @@ export default class CssEntry extends ReferenceEntry {
     constructor(referenceList,referenceData) {
         super(referenceList,referenceData,CssEntry.REFERENCE_TYPE_INFO);
     }
-    
-    /** This method loads the link onto the page. It returns a promise that
-     * resolves when the link is loaded. 
-     * This is a command method. The promise returns a command result. */
-    loadEntry() {
 
-        var promiseFunction = (resolve,reject) => {
 
-            let commandResult = {};
-            commandResult.target = this;
-            commandResult.dispatcher = this;
-            commandResult.action = "updated";
-
-            //add event handlers
-            var onLoad = () => {
-                commandResult.cmdDone = true;
-
-                this.setClearState();
-                resolve(commandResult);
-            }
-            var onError = (error) => {
-                var errorMsg = "Failed to load link '" + this.url + "':" + error;
-                //accept the error and keep going - it will be flagged in UI
-                commandResult.cmdDone = true;
-                commandResult.errorMsg = errorMsg;
-
-                this.setError(errorMsg);
-                resolve(commandResult);
-            }
-
-            this.linkCallerId = getLinkLoader().createLinkCallerId();
-            getLinkLoader().addLinkElement("css",this.url,this.linkCallerId,onLoad,onError);
-        }
-
-        //return promise to track loading finish
-        return new Promise(promiseFunction);
+    /** This method loads the actual link. */
+    implementationLoadEntry(onLoad,onError) {
+        this.linkCallerId = getLinkLoader().createLinkCallerId();
+        getLinkLoader().addLinkElement("css",this.url,this.linkCallerId,onLoad,onError);
     }
+
     
     /** This method removes the link. It returns true if the link is removed. */
-    remove() {
+    implementationRemoveEntry() {
         getLinkLoader().removeLinkElement("css",this.url,this.linkCallerId);
         return true;
     }

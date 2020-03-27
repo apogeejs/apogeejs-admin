@@ -5,47 +5,82 @@ import ContextManager from "/apogee/lib/ContextManager.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import Parent from "/apogee/datacomponents/Parent.js";
 
-/** This is the model. Typically parent should be null. It
- * is used for creating virtual models. 
- * - optionalJson - For new models this can be empty. If we are deserializing an existing
- * model, the json for it goes here.
- * - optionalContextParent - This is used if the model should be placed in a context. This is 
- * used for the virtual model created for folder functions, so the folder function can 
- * access variables from the larger model.
+/** This is the model. 
+ * -instanceToCopy - if the new instance should be a copy of an existing instance, this
+ * argument should be populated. The copy will have the same field values but it will be unlocked 
+ * and by default the update fields will be cleared. The event listeners are also cleared.
+ * - keepUpdatedFixed - If this argument is set to true, the updated field values will be maintained.
  * */
 export default class Model extends FieldObject {
 
-    constructor() {
+    constructor(runContext,instanceToCopy,keepUpdatedFixed) {
         //base init
-        super("model");
+        super("model",instanceToCopy,keepUpdatedFixed);
 
         //mixin initialization
         this.eventManagerMixinInit();
         //this is a root for the context
         this.contextHolderMixinInit(true);
-        this.parentMixinInit();
-        
+        this.parentMixinInit(instanceToCopy);
+
+        this.runContext = runContext;
+
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            this.setField("name",Model.DEFAULT_MODEL_NAME);
+            this.setField("impactsMap",{});
+            //create the member map, with the model included
+            let memberMap = {};
+            memberMap[this.getId()] = this;
+            this.setField("memberMap",memberMap);
+        }
+
+        //==============
+        //Working variables
+        //==============
+        this.workingImpactsMap = null;
+        this.workingMemberMap = null;
+
         // This is a queue to hold actions while one is in process.
         this.actionInProgress = false;
         this.messengerActionList = [];
         this.consecutiveActionCount = 0;
         this.activeConsecutiveActionLimit = Model.CONSECUTIVE_ACTION_INITIAL_LIMIT;
+    }
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //fields
-        this.setField("name",Model.DEFAULT_MODEL_NAME);
-        this.setField("impactsMap",{});
-        //create the member map, with the model included
-        let memberMap = {};
-        memberMap[this.getId()] = this;
-        this.setField("memberMap",memberMap);
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    /** This method returns a mutable copy of this instance. If the instance is already mutable
+     * it will be returned rather than making a new one.  */
+    getMutableModel() {
+        if(this.getIsLocked()) {
+            //create a new instance that is a copy of this one
+            return this.constructor(this);
+        }
+        else {
+            //return this instance since it si already unlocked
+            return this;
+        }
+    }
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //Working
-        this.workingImpactsMap = null;
-        this.workingMemberMap = null;
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    /** This method locks all member instances and the model instance. */
+    lockAll() {
+        //member map includes all members and the model
+        let memberMap = this.getField("memberMap");
+        for(let id in memberMap) {
+            //this will lock the model too
+            //we maybe shouldn't be modifying the members in place, but we will do it anyway
+            memberMap[id].lock();
+        }
+    }
+
+    /** This function should be used to execute any action that is run asynchronously with the current
+     * action. The action is run on a model and it is uncertain whether the existing model will still be 
+     * current when this new action is run. An example of when this is used is to populate a data table in
+     * response to a json request completing.  */
+    doFutureAction(actionData) {
+        this.runContext.doFutureAction(this.getId(),actionData);
     }
 
     /** This method returns the root object - implemented from RootHolder.  */
@@ -178,6 +213,24 @@ export default class Model extends FieldObject {
     lookupMemberById(memberId) {
         let memberMap = this._getMemberMap()
         return memberMap[memberId];
+    }
+
+    /** This method returns a mutable member for the given ID. If the member is already unlocked, that member will be
+     * returned. Otherwise a copy of the member will be made and stored as the active instance for the member ID.  */
+    getMutableMember(memberId) {
+        if(this.getIsLocked()) throw new Error("The model must be unlocked to get a mutable member.");
+
+        let member = this.lookupMemberById(memberId);
+        if(member.getIsLocked()) {
+            //create a unlocked copy of the member
+            let newMember = member.constructor(member.getName(),member.getParentId(),member);
+            //update the saved copy of this member in the member map
+            this.registerMember(newMember);
+            return newMember;
+        }
+        else {
+            return member;
+        }
     }
 
     registerMember(member) {

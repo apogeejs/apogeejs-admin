@@ -49,8 +49,7 @@ savemembercode.executeCommand = function(workspaceManager,commandData) {
     if((actionResult.actionDone)&&(component)) {
         commandResult.cmdDone = true;
         commandResult.target = component;
-        commandResult.dispatcher = modelManager;
-        commandResult.action = "updated";
+        commandResult.eventAction = "updated";
     }
     else {
         commandResult.cmdDone = false;

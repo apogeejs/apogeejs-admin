@@ -24,45 +24,32 @@ addlink.createUndoCommand = function(workspaceManager,commandData) {
     return undoCommandJson;
 }
 
-addlink.executeCommand = function(workspaceManager,commandData,asynchOnComplete) {
+addlink.executeCommand = function(workspaceManager,commandData) {
     
-    var synchCommandResult = {};
+    var commandResult = {};
 
     try {
+        //synchronous reference entry creation
         var referenceManager = workspaceManager.getReferenceManager();
-        synchCommandResult = referenceManager.createEntry(commandData);
+        commandResult = referenceManager.createEntry(commandData);
         var referenceEntry = synchCommandResult.target;
-        var promise = referenceEntry.loadEntry(commandData);
 
-        promise.then( asynchCommandResult => {
-                if(asynchOnComplete) {
-                    asynchOnComplete(asynchCommandResult);
-                }
-            })
-            .catch( errorMsg => {
-                if(asynchOnComplete) {
-                    //unknown exception - this hopefully won't happen
-                    let asynchCommandResult = {};
-                    asynchCommandResult.alertMsg = "Unknown exception in link processing: " + errorMsg;
-                    asynchCommandResult.cmdDone = false;
-                    asynchOnComplete(asynchCommandResult);
-                }
-            });
+        //this will trigger an asynchrnous command to update the status on loading the ref entry
+        referenceEntry.loadEntry(workpaceManager);
     }
     catch(error) {
         //unknown exception
-        synchCommandResult.errorMsg = "Unknown exception in creating link: " + error.message;
-        synchCommandResult.cmdDone = false;
+        commandResult.errorMsg = "Unknown exception in creating link: " + error.message;
+        commandResult.cmdDone = false;
     }
     
-    return synchCommandResult;
+    return commandResult;
 }
 
 addlink.commandInfo = {
     "type": "addLink",
     "targetType": "link",
-    "event": "created",
-    "isAsynch": true
+    "event": "created"
 }
 
 CommandManager.registerCommand(addlink);

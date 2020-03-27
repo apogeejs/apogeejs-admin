@@ -9,29 +9,32 @@ import Component from "/apogeeapp/component/Component.js";
  * data value, you can use the dynmaic form. */
 export default class FormDataComponent extends Component {
 
-    constructor(member,modelManager) {
+    constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
         //extend edit component
-        super(member,modelManager);
+        super(member,modelManager,instanceToCopy,keepUpdatedFixed);
         
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         folder.setChildrenWriteable(false);
         
         let model = modelManager.getModel();
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        //internal tables
-        let dataMember = folder.lookupChild(model,"data");
-        this.setField("member.data",dataMember);
-        modelManager.registerMember(dataMember,this,folder);
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            //internal tables
+            let dataMember = folder.lookupChild(model,"data");
+            this.setField("member.data",dataMember);
+            modelManager.registerMember(dataMember.getId(),this,false);
 
-        let layoutFunctionMember = folder.lookupChild(model,"layout");
-        this.setField("member.layout",layoutFunctionMember);
-        modelManager.registerMember(layoutFunctionMember,this,folder);
+            let layoutFunctionMember = folder.lookupChild(model,"layout");
+            this.setField("member.layout",layoutFunctionMember);
+            modelManager.registerMember(layoutFunctionMember.getId(),this,false);
 
-        let isInputValidFunctionMember = folder.lookupChild(model,"isInputValid");
-        this.setField("member.isInputValid",isInputValidFunctionMember);
-        modelManager.registerMember(isInputValidFunctionMember,this,folder);
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+            let isInputValidFunctionMember = folder.lookupChild(model,"isInputValid");
+            this.setField("member.isInputValid",isInputValidFunctionMember);
+            modelManager.registerMember(isInputValidFunctionMember.getId(),this,false);
+        }
     };
 
 }

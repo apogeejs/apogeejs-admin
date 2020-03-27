@@ -12,13 +12,17 @@ let Parent = {};
 export {Parent as default};
 
 /** This initializes the component.
+ * - isCopy - this should be set to true (or another value that evaluates to true) if this parent is being initialized
+ * as a copy of aother instance.
  */
-Parent.parentMixinInit = function() {
+Parent.parentMixinInit = function(isCopy) {
     //default value. Can be reconfigured
     this.childrenWriteable = true
 
-    //initialize the child mape
-    this.setField("childIdMap",{});
+    if(!isCopy) {
+        //initialize the child mape
+        this.setField("childIdMap",{});
+    }
 }
 
 Parent.isParent = true;

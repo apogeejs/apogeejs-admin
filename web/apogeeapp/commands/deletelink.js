@@ -39,35 +39,7 @@ deletelink.executeCommand = function(workspaceManager,commandData) {
 
     try {
         var referenceManager = workspaceManager.getReferenceManager();
-        
-        //lookup entry for this reference
-        var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.url);
-        if(referenceEntry) {
-            //update entry
-            let isRemoved = referenceEntry.remove();
-
-            if(isRemoved) {
-                referenceEntry.getReferenceList().removeEntry(referenceEntry);
-            }
-
-            commandResult = {}
-            commandResult.cmdDone = isRemoved;
-            if(isRemoved) {
-                commandResult.targetId = referenceEntry.getId();
-                commandResult.targetType = referenceEntry.getType();
-                commandResult.dispatcher = referenceEntry.getReferenceList();
-                commandResult.action = "deleted";
-            }
-            else {
-                commandResult.errorMsg = "Unknown Error removing link entry!";
-            }
-        }
-        else {
-            //entry not found
-            commandResult = {}
-            commandResult.errorMsg = "Link entry to update not found!";
-            commandResult.cmdDone = false;
-        }
+        commandResult = referenceManager.removeEntry(commandData.entryType,commandData.url);
     }
     catch(error) {
         if(error.stack) console.error(error.stack);

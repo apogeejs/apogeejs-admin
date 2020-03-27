@@ -41,7 +41,7 @@ function updateCode(model,actionData) {
     let actionResult = {};
     actionResult.event = ACTION_EVENT;
     
-    var member = model.lookupMemberById(actionData.memberId);
+    var member = model.getMutableMember(actionData.memberId);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member code";
@@ -54,12 +54,6 @@ function updateCode(model,actionData) {
         actionResult.errorMsg = "can not set code on member: " + member.getFullName(model);
         return;
     }
-
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-    // apply code
-    // - modify the member
-    // - modify parent and all parents up to model
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
           
     member.applyCode(actionData.argList,
         actionData.functionBody,
@@ -78,7 +72,7 @@ function updateData(model,actionData) {
     let actionResult = {};
     actionResult.event = ACTION_EVENT;
     
-    var member = model.lookupMemberById(actionData.memberId);
+    var member = model.getMutableMember(actionData.memberId);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member data";
@@ -93,12 +87,6 @@ function updateData(model,actionData) {
     }
         
     var data = actionData.data;
-
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-    // member set data
-    // - modify the member
-    // - modify parent and all parents up to model
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     //see if there were any dependents, to know if we need to update them
     //on setting data there will be none.

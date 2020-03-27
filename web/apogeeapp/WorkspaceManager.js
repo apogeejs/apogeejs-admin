@@ -1,27 +1,42 @@
-import EventManager from "/apogeeutil/EventManagerClass.js";
+import FieldObject from "/apogeeutil/FieldObject.js";
 
 import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
 import ModelManager from "/apogeeapp/ModelManager.js";
 
 
 /** This class manages the workspace. */
-export default class WorkspaceManager extends EventManager {
+export default class WorkspaceManager extends FieldObject {
 
-    constructor(app) {
-        super();
+    constructor(app,instanceToCopy,keepUpdatedFixed) {
+        super("workspace",instanceToCopy,keepUpdatedFixed);
 
         this.app = app;
         
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            let modelManager = new ModelManager(this.app);
+            this.setField("modelManager",modelManager);
+
+            let referenceManager = new ReferenceManager(this.app);
+            this.setField("referenceManager",referenceManager);
+        }
+        
+        //==============
+        //Working variables
+        //==============
+        //I am calling this working even though it has an extended lifetime
+        //this will be updated when the file changes
+        //TBR when we work more on file saving
         this.fileMetadata = null;
-        this.modelManager = null;
-        this.referenceManager = null;
 
         this.viewStateCallback = null;
         this.cachedViewState = null;
 
-        this.init();
-
-        app.setWorkspaceManager(this);
+        //listen to the workspace dirty event from the app
+        this.app.addListener("workspaceDirty",() => this.setIsDirty());
     }
 
     //====================================
@@ -34,11 +49,11 @@ export default class WorkspaceManager extends EventManager {
     }
 
     getReferenceManager() {
-        return this.referenceManager;
+        return this.getField("referenceManager");
     }
 
     getModelManager() {
-        return this.modelManager;
+        return this.getField("modelManager");
     }
 
     setViewStateCallback(viewStateCallback) {
@@ -73,41 +88,53 @@ export default class WorkspaceManager extends EventManager {
         //store the file metadata
         this.fileMetadata = fileMetadata;
 
-        let synchCommandResult = {};
-        synchCommandResult.cmdDone = true;
-        synchCommandResult.target = this;
-        synchCommandResult.dispatcher = this.app;
-        synchCommandResult.action = "created";
+        let commandResult = {};
+        commandResult.cmdDone = true;
+        commandResult.target = this;
+        synchCommandResult.eventAction = "created";
 
         //set the view state
         if(json.viewState !== undefined) {
             this.cachedViewState = json.viewState;
         }
 
-        //open the reference entries - this has a synch and asynch part.
-        let loadLinksPromise;
+        //check for references. If we have references we must load these before loading the model
         if(json.references) {
-            let {referenceCommandResults,referencesOpenPromise} = this.referenceManager.load(json.references);
+            //if there are references, load these before loading the model.
+            //this is asynchronous so we must load the model in a future command
+            let onReferencesLoaded = referenceLoadCommandResult => {
+                //load references regardless of success or failure in loading references
+                let loadModelCommand = {};
+                loadModelCommand.type = "loadModelManager";
+                loadModelCommand.json = json.code;
+                this.runFutureCommand(loadModelCommand);
+            }
+
+            let referenceCommandResults = this.referenceManager.load(this,json.references,onReferencesLoaded);
             if((referenceCommandResults)&&(referenceCommandResults.length > 0)) {
                 //save the entries create results to the synchronous command result
-                synchCommandResult.childCommandResults = referenceCommandResults;
+                commandResult.childCommandResults = referenceCommandResults;
             }
-            loadLinksPromise = referencesOpenPromise;
+        }
+        else {
+            //if there are not references we can load the model directly.
+            let modelManager = this.getModelManager();
+            let loadModelCommandResult = modelManager.load(this,json.code);
+            commandResult.childCommandResults = [loadModelCommandResult];
         }
 
-        //return a code load function, to be run after the references load
-		let codeLoadFunction = () => this.modelManager.load(json.code);
-
-        return {synchCommandResult,loadLinksPromise,codeLoadFunction}
+        return commandResult
     }
 
     /** This method closes the workspace object. */
     close() {
         //close model manager
-        this.modelManager.close();
+        let modelManager = this.getModelManager();
+        modelManager.close();
 
         //close reference manager
-        this.referenceManager.close();
+        let referenceManager = this.getReferenceManager();
+        referenceManager.close();
     }
     
     getIsDirty() {
@@ -124,23 +151,32 @@ export default class WorkspaceManager extends EventManager {
     }
 
     //====================================
+    // asynch run context methods
+    //====================================
+    runFutureCommand(commandData) {
+        let activeWorkspaceManager = this.app.getWorkspaceManager();
+        this.app.executeCommand(activeWorkspaceManager,commandData);
+    }
+
+    getModelRunContext() {
+        let modelRunContext = {};
+        modelRunContext.runFutureAction = function(modelId,action) {
+            //create a command to run this action
+            let modelActionCommand = {};
+            modelActionCommand.type = "modelActionCommand";
+            modelActionCommand.modelId = modelId;
+            modelActionCommand.action = action;
+
+            //execut this command as a future command
+            this.runFutureCommand(modelActionCommand);
+        }
+
+        return modelRunContext;
+    }
+
+    //====================================
     // open and save methods
     //====================================
-
-    /** This sets the application. It must be done before the workspace manager is opened. */
-    init() {
-        //create the model manager
-        this.modelManager = new ModelManager(this);
-
-        //create the reference manager
-        this.referenceManager = new ReferenceManager(this.app);
-
-        //initial - creating reference lists
-        this.referenceManager.initReferenceLists(this.app.getReferenceClassArray());
-        
-        //listen to the workspace dirty event from the app
-        this.app.addListener("workspaceDirty",() => this.setIsDirty());
-    }
 
     /** This retrieves the file metadata used to save the file. */
     getFileMetadata() {
@@ -160,9 +196,9 @@ export default class WorkspaceManager extends EventManager {
 
         json.version = WorkspaceManager.FILE_VERSION;
 
-        json.references = this.referenceManager.toJson();
+        json.references = this.getReferenceManager().toJson();
 
-        json.code = this.modelManager.toJson(optionalSavedRootFolder);
+        json.code = this.getModelManager().toJson(optionalSavedRootFolder);
 
         if(this.viewStateCallback) {
             this.cachedViewState = this.viewStateCallback();
@@ -204,3 +240,40 @@ export default class WorkspaceManager extends EventManager {
 }
 
 WorkspaceManager.FILE_VERSION = "0.50";
+
+
+//=====================================
+// Command Object
+//=====================================
+
+/*** 
+ * This command loads the model manager. It is a follow on command to opening a workspace,
+ * if there are references present, which must be loaded first.
+ * 
+ * commandData.type = "loadModelManager"
+ * commandData.json = (json for the model/model manager)
+ */
+
+let loadmodelmanager = {};
+
+//There is no undo command since this is a follow on to opening a workspace
+//loadmodelmanager.createUndoCommand = function(workspaceManager,commandData) {
+
+/** This method loads an existing, unpopulated model manager. It is intended only as
+ * a asynchronous follow on command to opening a workspace, once any references have
+ * been loaded.
+ */
+loadmodelmanager.executeCommand = function(workspaceManager,commandData) {
+    
+    let modelManager = workspaceManager.getModelManager();
+    
+    return modelManager.load(commandData.json);
+}
+
+loadmodelmanager.commandInfo = {
+    "type": "loadModelManager",
+    "targetType": "modelManager",
+    "event": "updated"
+}
+
+CommandManager.registerCommand(loadmodelmanager);

@@ -69,7 +69,7 @@ export default class Apogee extends EventManager {
         this.referenceManager = new ReferenceManager(this);
         
         //command manager
-        this.commandManager = new CommandManager(this,this);
+        this.commandManager = new CommandManager(this);
         
         //load the standard component generators
         //(for now this is not configurable. This is called first so loaded modules
@@ -143,7 +143,7 @@ export default class Apogee extends EventManager {
         return this.additionalComponents;
     }
 
-    getcomponentClasses() {
+    getComponentClasses() {
         return this.componentClasses;
     }
 

@@ -44,9 +44,8 @@ movecomponent.executeCommand = function(workspaceManager,commandData) {
     let commandResult = {};
     if((actionResult.actionDone)&&(component)) {
         commandResult.cmdDone = true;
-        commandResult.action = "updated";
+        commandResult.eventAction = "updated";
         commandResult.target = component;
-        commandResult.dispatcher = modelManager;
     }
     else {
         commandResult.cmdDone = false;

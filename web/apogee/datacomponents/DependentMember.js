@@ -12,19 +12,22 @@ import Member from "/apogee/datacomponents/Member.js";
 export default class DependentMember extends Member {
 
     /** This initializes the component */
-    constructor(name,parent) {
-        super(name,parent);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed);
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        //this is the list of dependencies
-        this.setField("dependsOnMap",{});
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            //this is the list of dependencies
+            this.setField("dependsOnMap",{});
+        }
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //WORKING FIELDS
+        //==============
+        //Working variables
+        //==============
         this.calcPending = false;
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     }
 
     /** This property tells if this object is a dependent.

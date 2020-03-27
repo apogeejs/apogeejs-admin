@@ -1,5 +1,5 @@
 import {bannerConstants} from "/apogeeview/componentdisplay/banner.js"; 
-import EventManager from "/apogeeutil/EventManagerClass.js";
+import FieldObject from "/apogeeutil/FieldObject.js";
 
 /** This class manages links and other reference entries, loading the references and
  * creating the UI tree elements for display of the references.
@@ -7,10 +7,10 @@ import EventManager from "/apogeeutil/EventManagerClass.js";
  * Any links needed for the page are managed externally by the Link Loader, which
  * allows multiple users to request the same link.
  */
-export default class ReferenceList extends EventManager {
+export default class ReferenceList extends FieldObject {
 
-    constructor(referenceEntryClass) {
-        super();
+    constructor(referenceEntryClass,instanceToCopy,keepUpdatedFixed) {
+        super("referenceList",instanceToCopy,keepUpdatedFixed);
 
         this.referenceEntryType = referenceEntryClass.REFERENCE_TYPE;
         this.referenceEntryClass = referenceEntryClass;
@@ -42,8 +42,7 @@ export default class ReferenceList extends EventManager {
         return {
             cmdDone: true,
             target: referenceEntry,
-            dispatcher: this,
-            action: "created"
+            eventAction: "created"
         }
     }
     
@@ -67,9 +66,15 @@ export default class ReferenceList extends EventManager {
         return this.referenceEntries.map(refEntry => refEntry.saveEntry());
     }
 
-    load(json) {
+    /** This method loads the reference list. It returns a list of command results
+     * for the initial creation of the entries in the list. 
+     * In onListLoadCompleted is passed, it will be called with a list of the command results 
+     * for each entry when all entries commplete loading. */
+    load(workspaceManager,json,onListLoadCompleted) {
         let listCommandResults = [];
         let listLoadPromises = [];
+
+        //construct the load function
         let loadEntry = entryJson => {
             
             //load this url if it doesn't exist
@@ -78,12 +83,19 @@ export default class ReferenceList extends EventManager {
                 let commandResult =this.createEntry(entryJson);
                 listCommandResults.push(commandResult);
 
-                //load the entry - this will be asynchronous
-                let referenceEntry = commandResult.target;
-                var promise = referenceEntry.loadEntry();
-                listLoadPromises.push(promise);
+                //construct a promise from the callback and store it
+                let entryPromiseFunction = (resolve,reject) => {
+                    let onLoadComplete = loadCompleteCommandResult => resolve(loadCompleteCommandResult);
+                
+                    //load the entry - this will be asynchronous
+                    let referenceEntry = commandResult.target;
+                    referenceEntry.loadEntry(workspaceManager,onLoadComplete);
+                }
+                listLoadPromises.push(new Promise(entryPromiseFunction));
             }
         }
+
+        //load each entry
         json.entries.forEach(loadEntry);
 
         //set the view state
@@ -91,7 +103,11 @@ export default class ReferenceList extends EventManager {
             this.cachedViewState = json.viewState;
         }
 
-        return {listCommandResults,listLoadPromises};
+        if(onListLoadCompleted) {
+            listLoadPromises.all().then(onListLoadCompleted)
+        }
+
+        return listCommandResults;
     }
 
     toJson() {

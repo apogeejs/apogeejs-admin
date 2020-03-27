@@ -10,19 +10,33 @@ import Parent from "/apogee/datacomponents/Parent.js";
  * that is expanded into data objects. */
 export default class FolderFunction extends DependentMember {
 
-    constructor(name,parent) {
-        super(name,parent);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed);
 
         //mixin init where needed
         //this is a root for the context. Internal members can NOT see what is outside.
         //Any external values must be passed in as arguments.
         this.contextHolderMixinInit(true);
-        this.parentMixinInit();
+        this.parentMixinInit(instanceToCopy);
 
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //set to an empty function
-        this.setData(function(){});
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            //set to an empty function
+            this.setData(function(){});
+        }
+
+        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        this.temporaryVirtualModelRunContext = {
+            doFutureAction: function(modelId,actionData) {
+                let msg = "NOT IPLEMENTED: Asynchronous actions in folder function!"
+                alert(msg);
+                throw new Error(msg);
+            }
+        }
+        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     }
 
     /** This gets the internal forlder for the folderFunction. */
@@ -299,7 +313,7 @@ export default class FolderFunction extends DependentMember {
         let internalFolder = this.getInternalFolder(model);
         var folderJson = internalFolder.toJson(model);
         var modelJson = Model.createModelJsonFromFolderJson(this.getName(),folderJson);
-        var virtualModel = new Model();
+        var virtualModel = new Model(this.temporaryVirtualModelRunContext);
 
         //load the model
         let loadAction = {};

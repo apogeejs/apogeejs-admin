@@ -10,16 +10,19 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
  * confugred with initialization data from the model. */
 export default class CustomComponent extends Component {
 
-    constructor(member,modelManager) {
-        super(member,modelManager);
+    constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
+        super(member,modelManager,instanceToCopy,keepUpdatedFixed);
         
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        this.setField("destroyOnInactive",false); //default to keep alive
-        this.setField("html","");
-        this.setField("css","");
-        this.setField("uiCode","");
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            this.setField("destroyOnInactive",false); //default to keep alive
+            this.setField("html","");
+            this.setField("css","");
+            this.setField("uiCode","");
+        }
     };
 
     //==============================
@@ -238,8 +241,7 @@ customComponentUpdateData.executeCommand = function(workspaceManager,commandData
 
             commandResult.cmdDone = true;
             commandResult.target = component;
-            commandResult.dispatcher = modelManager;
-            commandResult.action = "updated";
+            commandResult.eventAction = "updated";
         }
         catch(error) {
             let msg = error.message ? error.message : error;

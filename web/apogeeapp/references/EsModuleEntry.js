@@ -14,51 +14,26 @@ export default class EsModuleEntry extends ReferenceEntry {
     constructor(referenceList,referenceData) {
         super(referenceList,referenceData,EsModuleEntry.REFERENCE_TYPE_INFO);
     }
-
-    /** This method loads the link onto the page. It returns a promise that
-     * resolves when the link is loaded. */
-    loadEntry() {
-
-        
-        let commandResult = {};
-            commandResult.target = this;
-            commandResult.dispatcher = this;
-            commandResult.action = "updated";
             
-        var onLoad = (module) => {
-            //store the module return, if there is one
-            //this is only used for cleanup
-            this.module = module;
+    /** This method loads the actual link. */
+    implementationLoadEntry(onLoad,onError) {
+        let localOnLoad = (module) => {
             if((module)&&(module.initApogeeModule)) module.initApogeeModule(apogee,apogeeapp,apogeeutil);
-            
-            commandResult.cmdDone = true;
-            this.setClearState();
-            return commandResult;
+            this.setField("module",module);
         }
 
-        var onError = (error) => {
-            //I should read the error passed in for a better message!!!
-            if(error.stack) console.error(error.stack);
-            var errorMsg = error.message ? error.message : "Failed to load module " + this.url;
-            //accept the error and keep going - it will be flagged in UI
-            commandResult.cmdDone = true;
-            commandResult.errorMsg = errorMsg;
-
-            this.setError(errorMsg);
-            return commandResult;
-        }
-            
-        this.setPendingState();
-        var moduleLoadPromise = import(this.url).then(onLoad).catch(onError);
-
-        //return promise to track loading finish
-        return moduleLoadPromise;
+        //load the module
+        var moduleLoadPromise = import(this.url).then(localOnLoad).catch(onError);
     }
     
     /** This method removes the link. This returns a command result for the removed link. */
-    remove() {
+    implementationRemoveEntry() {
         //allow for an optional module remove step
-        if((this.module)&&(this.module.removeApogeeModule)) this.module.removeApogeeModule(apogee,apogeeapp,apogeeutil);
+        let module = this.getField("module");
+        if(module) {
+            if(module.removeApogeeModule) module.removeApogeeModule(apogee,apogeeapp,apogeeutil);
+            this.clearField("module");
+        }
         return true;
     }
     

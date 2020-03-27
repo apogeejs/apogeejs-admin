@@ -15,30 +15,33 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
  * confugred with initialization data from the model. */
 export default class CustomDataComponent extends Component {
 
-    constructor(member,modelManager) {
+    constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
         //extend edit component
-        super(member,modelManager);
+        super(member,modelManager,instanceToCopy,keepUpdatedFixed);
         
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
         member.setChildrenWriteable(false);
 
         let model = modelManager.getModel();
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        //internal tables
-        let dataMember = member.lookupChild(model,"data");
-        this.setField("member.data",dataMember);
-        modelManager.registerMember(dataMember,this,folder);
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            //internal tables
+            let dataMember = member.lookupChild(model,"data");
+            this.setField("member.data",dataMember);
+            modelManager.registerMember(dataMember.getId(),this,false);
 
-        let inputMember = member.lookupChild(model,"input");
-        this.setField("member.input",inputMember);
-        modelManager.registerMember(inputMember,this,folder);
+            let inputMember = member.lookupChild(model,"input");
+            this.setField("member.input",inputMember);
+            modelManager.registerMember(inputMember.getId(),this,false);
 
-        this.setField("destroyOnInactive",false); //default to keep alive
-        this.setField("html","");
-        this.setField("css","");
-        this.setField("uiCode","");
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+            this.setField("destroyOnInactive",false); //default to keep alive
+            this.setField("html","");
+            this.setField("css","");
+            this.setField("uiCode","");
+        }
     };
 
     //==============================
@@ -276,8 +279,7 @@ customDataComponentUpdateData.executeCommand = function(workspaceManager,command
 
             commandResult.cmdDone = true;
             commandResult.target = component;
-            commandResult.dispatcher = modelManager;
-            commandResult.action = "updated";
+            commandResult.eventAction = "updated";
         }
         catch(error) {
             let msg = error.message ? error.message : error;

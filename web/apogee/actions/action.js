@@ -67,7 +67,8 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
 let actionInfoMap = {
 }
 
-/** This method is used to execute an action for the data model. */
+/** This method is used to execute an action for the data model. The model object passed in should be 
+ * an unlocked. At the completion of the action, before returning, the model will be locked, meaning it cn not longer be changed. */
 export function doAction(model,actionData) {
     
     let changeMap;
@@ -84,11 +85,7 @@ export function doAction(model,actionData) {
     }
     
     //flag action in progress
-    model.setActionInProgress(true);
-
-//##########################################
-//FIRE ACTION START EVENT HERE
-//##########################################    
+    model.setActionInProgress(true);  
 
     try {   
         
@@ -108,6 +105,8 @@ export function doAction(model,actionData) {
             model.clearCommandQueue();
             model.setActionInProgress(false);
             
+            model.lockAll();
+            model.dispatchEvent("actionCompleted",changeResult);
             return changeResult;
         }
 
@@ -152,6 +151,9 @@ export function doAction(model,actionData) {
         
         model.clearCommandQueue();
         model.setActionInProgress(false);
+
+        model.lockAll();
+        model.dispatchEvent("actionCompleted",changeResult);
         return changeResult;
         
     }
@@ -175,12 +177,14 @@ export function doAction(model,actionData) {
 
                 model.setCalculationCanceled();
 
+                model.lockAll();
+                model.dispatchEvent("actionCompleted",changeResult);
                 return changeResult;         
             }
         }
 
         if(runQueuedAction) {
-            //FOR NOW WE WILL RUN SYNCHRONOUSLY!!!
+            //this action is run synchronously
             let childActionChangeResult = doAction(model,savedMessengerAction);
 
             //merge this child return value into our main
@@ -194,21 +198,22 @@ export function doAction(model,actionData) {
                 
                 model.clearCommandQueue();
 
+                model.lockAll();
+                model.dispatchEvent("actionCompleted",changeResult);
                 return changeResult;
             }  
         }
     }
     else {
         model.clearConsecutiveQueuedTracking();
-    }
-
-//##########################################
-//FIRE ACTION COMPLETED EVENT HERE
-//##########################################   
+    } 
     
     let changeResult = {};
     changeResult.actionDone = true;
     changeResult.changeList = changeMapToChangeList(changeMap);
+
+    model.lockAll();
+    model.dispatchEvent("actionCompleted",changeResult);
     return changeResult;
 }
 

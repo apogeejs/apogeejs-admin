@@ -5,9 +5,9 @@ import Component from "/apogeeapp/component/Component.js";
 /** This component represents a table object. */
 export default class FunctionComponent extends Component {
 
-    constructor(member,modelManager) {
+    constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
         //extend edit component
-        super(member,modelManager);
+        super(member,modelManager,instanceToCopy,keepUpdatedFixed);
     };
 
     /** This overrides the get title method of member to return the function declaration. */

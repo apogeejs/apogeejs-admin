@@ -18,17 +18,20 @@ import FieldObject from "/apogeeutil/FieldObject.js";
  * the hierarchy (maybe the model). */
 export default class Member extends FieldObject {
 
-    constructor(name,parentId) {
-        super("member");
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
+        super("member",instanceToCopy,keepUpdatedFixed);
         
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        this.setField("name",name);
-        this.setField("parentId",parentId);
-        //"data"
-        //"pendingPromise"
-        //"state"
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            this.setField("name",name);
+            this.setField("parentId",parentId);
+            //"data"
+            //"pendingPromise"
+            //"state"
+        }
     }
 
     /** This property tells if this object is a member. */
@@ -279,7 +282,7 @@ export default class Member extends FieldObject {
             actionData.memberId = this.getId();
             actionData.sourcePromise = promise;
             actionData.data = memberValue;
-            doAction(model,actionData);
+            model.doFutureAction(actionData);
         }
         var asynchErrorCallback = errorMsg => {
             let actionData = {};
@@ -287,7 +290,7 @@ export default class Member extends FieldObject {
             actionData.memberId = this.getId();
             actionData.sourcePromise = promise;
             actionData.data = new Error(errorMsg);
-            doAction(model,actionData);
+            model.doFutureAction(actionData);
         }
 
         //call appropriate action when the promise completes

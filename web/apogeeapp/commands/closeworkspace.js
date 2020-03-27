@@ -14,10 +14,9 @@ closeworkspace.executeCommand = function(workspaceManager,commandData) {
     let model = modelManager.getModel();
 
     let commandResult = {};
-    commandResult.action = "deleted";
+    commandResult.eventAction = "deleted";
     commandResult.targetId = workspaceManager.getId();
     commandResult.targetType = workspaceManager.getType();
-    commandResult.dispatcher = workspaceManager.getApp();
     
     try {
         workspaceManager.getApp().clearWorkspaceManager();

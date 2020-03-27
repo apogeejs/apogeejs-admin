@@ -8,18 +8,13 @@ import Parent from "/apogee/datacomponents/Parent.js";
 /** This is a folder. */
 export default class Folder extends DependentMember {
 
-    constructor(name,parent) {
-        super(name,parent);
+    constructor(name,parent,instanceToCopy,keepUpdatedFixed) {
+        super(name,parent,instanceToCopy,keepUpdatedFixed);
 
         //mixin init where needed
         //This is not a root. Scope is inherited from the parent.
         this.contextHolderMixinInit(false);
-        this.parentMixinInit();
-
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        //non defined locally
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        this.parentMixinInit(instanceToCopy);
 
         //make sure the data map is frozen
         let dataMap = {};

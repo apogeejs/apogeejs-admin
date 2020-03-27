@@ -43,11 +43,10 @@ import CommandHistory from "./CommandHistory.js";
  *
  */
 export default class CommandManager {
-    constructor(app,eventManager) {
+    constructor(app) {
         this.app = app;
-        this.eventManager = eventManager;
 
-        this.commandHistory = new CommandHistory(this,eventManager);
+        this.commandHistory = new CommandHistory(this,app);
     }
     
     /** This method executes the given command and, if applicable, adds it to the queue. 
@@ -59,20 +58,10 @@ export default class CommandManager {
         let commandResult;
         
         var commandObject = CommandManager.getCommandObject(command.type);
-        let asynchOnComplete;
         let undoCommand;
         let description;
 
         if(commandObject) {
-
-            //for asynch transactions, pass a callback for handling any asynch result
-            if(commandObject.commandInfo.isAsynch) {
-                asynchOnComplete = commandResult => {
-                    //process command result ad publish events
-                    let changeResult = this._createChangeResult(commandResult);
-                    this._publishEvents(changeResult);
-                }
-            }
 
             //create undo command before doing command (since it may depend on current state)
             if((!suppressFromHistory)&&(commandObject.createUndoCommand)) {   
@@ -83,7 +72,7 @@ export default class CommandManager {
             description = commandObject.commandInfo.type;
 
             try {
-                commandResult = commandObject.executeCommand(workspaceManager,command,asynchOnComplete);
+                commandResult = commandObject.executeCommand(workspaceManager,command);
             }
             catch(error) {
                 if(error.stack) console.error(error.stack);
@@ -194,25 +183,49 @@ export default class CommandManager {
                     }
                     let modelManager = workspaceManager.getModelManager();
 
-                    cmdRsltEquivelent.action = actionChangeEntry.event;
+                    //create the cmdResult for this action result
+                    cmdRsltEquivelent.eventAction = actionChangeEntry.event;
+
                     if(actionChangeEntry.member) {
-                        //member action
-                        cmdRsltEquivelent.targetId = actionChangeEntry.member.getId();
-                        cmdRsltEquivelent.targetType = "component";
-                        if(actionChangeEntry.event != "deleted") {
-                            //store the target for update and create
-                            cmdRsltEquivelent.target = modelManager.getComponentByMemberId(cmdRsltEquivelent.targetId);
+                        cmdRsltEquivelent.eventName = this._createEventName(actionChangeEntry.event,"component");
+                        switch(actionChangeEntry.event) {
+                            case "created":
+                            case "updated":
+                                cmdRsltEquivelent.target = modelManager.getComponentByMemberId(actionChangeEntry.member.getId());
+                                break;
+
+                            case "deleted":
+                                cmdRsltEquivelent.targetId = this._lookupComponentIdFromMemberId(cmdRsltEquivelent.member.getId());
+
+                                //handle the case of no component for this member id, which should happen for non-main members
+                                //in a component. Just don't add a map entry.
+                                if(!cmdRsltEquivelent.targetId) return;
+
+                                cmdRsltEquivelent.targetType = "component";
+                                break;
+                            
+                            default: 
+                                throw new Error("unrecognized event: " + actionChangeEntry.event);
                         }
                     }
                     else {
-                        //model action
-                        cmdRsltEquivelent.target = modelManager;
-                        cmdRsltEquivelent.targetId = modelManager.getId();
-                        cmdRsltEquivelent.targetType = modelManager.getType();
-                    }
+                        cmdRsltEquivelent.eventName = this._createEventName(actionChangeEntry.event,modelManager.getTargetType);
+                        switch(actionChangeEntry.event) {
+                            case "created":
+                            case "updated":
+                                cmdRsltEquivelent.target = modelManager;
+                                break;
 
-                    //all model events will do through the model manager.
-                    cmdRsltEquivelent.dispatcher = modelManager;
+                            case "deleted":
+                                cmdRsltEquivelent.targetId = modelManager.getId();
+                                cmdRsltEquivelent.targetType = modelManager.getTargetType();
+                                break;
+
+                            default: 
+                                throw new Error("unrecognized event: " + actionChangeEntry.event);
+                        }
+
+                    }
 
                     this._addToChangeMap(cmdRsltEquivelent,changeMap);
                 }
@@ -223,26 +236,20 @@ export default class CommandManager {
     /** This method merges a change entry into the change map. */
     _addToChangeMap(commandResultEntry,changeMap) {
         let targetId;
-        let targetType;
         let target;
         if(commandResultEntry.target) {
             target = commandResultEntry.target;
             targetId = target.getId();
-            targetType = target.getType();
         }
         else if((commandResultEntry.targetId != undefined)&&(commandResultEntry.targetType)) {
             target = undefined;
             targetId = commandResultEntry.targetId;
-            targetType = commandResultEntry.targetType;
         }
         else {
             //not a valid entry
             //I should acknowledge an error here
             return;
         }
-
-        //get the lookup key
-        let key = apogeeutil.createUniqueKey(targetType,targetId);
         
         //create the change map entry
         let changeMapEntry = changeMap[key];
@@ -251,17 +258,16 @@ export default class CommandManager {
             if(commandResultEntry.target) {
                 changeMapEntry.target = target;
             }
-            changeMapEntry.targetType = targetType;
             changeMapEntry.targetId = targetId;
-            changeMapEntry.dispatcher = commandResultEntry.dispatcher;
-            changeMap[key] = changeMapEntry;
+            changeMapEntry.eventName = commandResultEntry.eventName;
+            changeMap[targetId] = changeMapEntry;
         }
         //there may be a case where we do not have a target instance in the change map entry because
         //we found a delete first. We could add the target if we later come across a create or update, but
         //we won't need it since the event will be either delete or a null event.
 
         //store the event type for this target
-        changeMapEntry[commandResultEntry.action] = true;
+        changeMapEntry[commandResultEntry.eventAction] = true;
     }
 
     /** This converts the change map entry, which usd as a working variable to combine events so there
@@ -275,27 +281,33 @@ export default class CommandManager {
         }
         else if(changeMapEntry.created) {
             //created event
-            changeEntry.action = "created";
+            changeEntry.eventName = changeMapEntry.eventName;
             changeEntry.target = changeMapEntry.target;
-            changeEntry.dispatcher = changeMapEntry.dispatcher;
         }
         else if(changeMapEntry.deleted) {
             //deleted event
-            changeEntry.action = "deleted";
+            changeEntry.eventName = changeMapEntry.eventName;
             changeEntry.targetId = changeMapEntry.targetId;
             changeEntry.targetType = changeMapEntry.targetType;
-            changeEntry.dispatcher = changeMapEntry.dispatcher;
         }
         else if(changeMapEntry.updated) {
-            changeEntry.action = "updated";
+            changeEntry.eventName = changeMapEntry.eventName;
             changeEntry.target = changeMapEntry.target;
-            changeEntry.dispatcher = changeMapEntry.dispatcher;
         }
         else {
             //unknown case
             changeEntry = null;
         }
         return changeEntry;
+    }
+
+    _lookupComponentIdFromMemberId(memberId) {
+        throw new Error("Implement this!");
+    }
+
+    /** This is the standardized event name from the event action + the target type. */
+    _createEventName(eventAction,targetType) {
+        return targetType + "_" + eventAction;
     }
 
     /** This fires all the necessary events for the given command result */
@@ -305,8 +317,8 @@ export default class CommandManager {
             if(changeResult.changeList) {
                 changeResult.changeList.forEach( changeEntry => {
                     //fire event
-                    if((changeEntry.action)&&(changeEntry.dispatcher)) {
-                        changeEntry.dispatcher.dispatchEvent(changeEntry.action,changeEntry);
+                    if(changeEntry.eventName) {
+                        this.app.dispatchEvent(changeEntry.eventName,changeEntry);
                     } 
                 })
             }

@@ -74,8 +74,7 @@ literatepagetransaction.executeCommand = function(workspaceManager,commandData) 
     }
     else {
         commandResult.target = component;
-        commandResult.action = "updated";
-        commandResult.dispatcher = modelManager;
+        commandResult.eventAction = "updated";
     }
 
     return commandResult;

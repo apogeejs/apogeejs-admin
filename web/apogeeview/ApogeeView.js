@@ -442,7 +442,7 @@ export default class ApogeeView {
     getAddChildMenuItems(optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
 
         let standardComponents = this.app.getStandardComponentNames();
-        let componentClasses = this.app.getcomponentClasses();
+        let componentClasses = this.app.getComponentClasses();
         
         var menuItemList = [];
         

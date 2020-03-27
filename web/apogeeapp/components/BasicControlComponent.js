@@ -8,15 +8,18 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
  * and create a generator. */
 export default class BasicControlComponent extends Component{
     
-    constructor(member,modelManager) {
-        super(member,modelManager);
+    constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
+        super(member,modelManager,instanceToCopy,keepUpdatedFixed);
     
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-        //FIELDS
-        //default to keep alive
-        let displayDestroyFlags = DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
-        this.setField("displayDestroyFlags",displayDestroyFlags);
-        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            //default to keep alive
+            let displayDestroyFlags = DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
+            this.setField("displayDestroyFlags",displayDestroyFlags);
+         }
     };
 
     //==============================

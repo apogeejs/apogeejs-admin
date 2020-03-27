@@ -31,10 +31,13 @@ function createMemberAction(model,actionData) {
     
     let parent;
     if(actionData.modelIsParent) {
+        //the parent is the model (It should already be mutable)
         parent = model;
     }
     else {
-        parent = model.lookupMemberById(actionData.parentId);
+        //get the parent, as a new mutable instance
+        parent = model.getMutableMember(actionData.parentId);
+
         if(!parent) {
             let actionResult = {};
             actionResult.actionDone = false;
@@ -63,11 +66,6 @@ export function createMember(model,parent,memberJson) {
     }
 
     if(generator) {
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        // create member
-        // - modify parent and all parents up to model
-        // - created object is automatically unlocked.
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         member = generator.createMember(parent.getId(),memberJson); 
 
         //pass this child to the parent

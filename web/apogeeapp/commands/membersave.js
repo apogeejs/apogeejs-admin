@@ -55,25 +55,12 @@ export function getMemberStateUndoCommand(model, memberId) {
 
 
 /** @private */
-export function getSaveDataAction(model,memberId,data,asynchOnComplete) {
+export function getSaveDataAction(model,memberId,data) {
 
     var actionData = {};
     actionData.action = "updateData";
     actionData.memberId = memberId;
     actionData.data = data;
-        
-    //handle the asynch case
-    if((data instanceof Promise)&&(asynchOnComplete)) {
-        //add a promise callback if this is a promise, to handle any alert
-        actionData.promiseCallback = asynchActionResult => {
-            var asynchCommandResult = {};
-            asynchCommandResult.cmdDone = asynchActionResult.actionDone;
-            asynchCommandResult.actionResult = asynchActionResult;
-
-            asynchOnComplete(asynchCommandResult);
-        }
-    }
-    
     return actionData;
 }
 

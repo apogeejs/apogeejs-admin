@@ -26,12 +26,12 @@ savememberdata.createUndoCommand = function(workspaceManager,commandData) {
     return undoCommandJson;
 }
 
-savememberdata.executeCommand = function(workspaceManager,commandData,asynchOnComplete) {
+savememberdata.executeCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getModelManager();
     let model = modelManager.getModel();
     
-    var actionData = getSaveDataAction(model,commandData.memberId,commandData.data,asynchOnComplete);
+    var actionData = getSaveDataAction(model,commandData.memberId,commandData.data);
     
     var actionResult = doAction(model,actionData);
     
@@ -41,8 +41,7 @@ savememberdata.executeCommand = function(workspaceManager,commandData,asynchOnCo
     if((actionResult.actionDone)&&(component)) {
         commandResult.cmdDone = true;
         commandResult.target = component;
-        commandResult.dispatcher = modelManager;
-        commandResult.action = "updated";
+        commandResult.eventAction = "updated";
     }
     else {
         commandResult.cmdDone = false;
@@ -58,8 +57,7 @@ savememberdata.executeCommand = function(workspaceManager,commandData,asynchOnCo
 savememberdata.commandInfo = {
     "type": "saveMemberData",
     "targetType": "component",
-    "event": "updated",
-    "isAsynch": true
+    "event": "updated"
 }
 
 CommandManager.registerCommand(savememberdata);

@@ -1,4 +1,3 @@
-import {bannerConstants} from "/apogeeview/componentdisplay/banner.js"; 
 import ReferenceList from "/apogeeapp/references/ReferenceList.js";
 
 /** This class manages links and other reference entries, loading the references and
@@ -7,28 +6,28 @@ import ReferenceList from "/apogeeapp/references/ReferenceList.js";
  * Any links needed for the page are managed externally by the Link Loader, which
  * allows multiple users to request the same link.
  */
-export default class ReferenceManager {
+export default class ReferenceManager extends FieldObject {
 
-    constructor(app) {
+    constructor(app,instanceToCopy,keepUpdatedFixed) {
+        super("referenceManager",instanceToCopy,keepUpdatedFixed);
+
         this.app = app;
+        this.referenceClassArray = this.app.getReferenceClassArray();
 
-        //references
-        this.referenceLists = {};
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            //create empty reference map
+            this.setField("referenceEntryMap",{});
+        }
 
+        //==============
+        //Working variables
+        //==============
         this.viewStateCallback = null;
         this.cachedViewState = null;
-    }
-    
-    /** This method sets the reference types for the reference manager. 
-     * This method returns a list of command results, for the creation of the reference lists.  */
-    initReferenceLists(referenceClassArray) {
-        referenceClassArray.forEach( referenceClass => {
-            this.referenceLists[referenceClass.REFERENCE_TYPE] = new ReferenceList(referenceClass);
-        });
-    }
-    
-    getReferenceLists() {
-        return this.referenceLists;
     }
 
     getApp() {
@@ -43,46 +42,74 @@ export default class ReferenceManager {
         return this.cachedViewState;
     }
 
-    /** This method opens the reference entries, from the structure returned from
-     * the save call. It returns a promise that
-     * resolves when all entries are loaded. 
+    /** This method opens the reference entries. An on references load callback 
+     * can be passed and it will be a called when all references are loaded, with the
+     * load completion command result for each. The return value for this function is the
+     * initial command result for starting the refernce loading.
      */
-    load(json) {
+    load(workspaceManager,json,onReferencesLoaded) {
 
-        let referenceCommandResults = [];
-        let referencesOpenPromise
+        let entryCreateCommandResults = [];
+        let entryLoadedPromises = [];
+        let entryLoadedPromise;
         
         //load the reference entries
-        if(json.refLists) {
-            let referenceLoadPromises = [];
+        let oldReferenceEntryMap = this.getField("referenceEntryMap");
+        let newReferenceEntryMap = apogeeutil.jsonCopy(oldReferenceEntryMap);
+        if(json.refEntries) {
 
-            for(let listType in json.refLists) {
-                let listJson = json.refLists[listType];
+            //construct the load function
+            let loadRefEntry = refEntryJson => {
+                //create the entry (this does not actually load it)
+                let commandResult = this.createEntry(refEntryJson);
+                entryCreateCommandResults.push(commandResult);
 
-                let referenceList = this.referenceLists[listType];
-                let {listCommandResults,listLoadPromises} = referenceList.load(listJson);
+                //load the entry
+                if(commandResult.target) {
+                    //place the entry in the entry map
+                    let referenceEntry = commandResult.target;
+                    newRefEntryMap[entryKey] = referenceEntry;
 
-                referenceCommandResults.push(...listCommandResults);
-                referenceLoadPromises.push(...listLoadPromises);
+                    //load the entry - this will be asynchronous
+                    let loadEntryPromise = referenceEntry.loadEntry(workspaceManager);
+                    entryLoadedPromises.push(loadEntryPromise);
+                }
             }
 
-            if(referenceLoadPromises.length > 0) {
-                referencesOpenPromise = Promise.all(referenceLoadPromises).then(commandResultList => {
-                    //package the list of results into a single result
-                    let commandResult = {};
-                    commandResult.cmdDone = true;
-                    commandResult.childCommandResults = commandResultList;
-                    return commandResult;
-                });
-            }
+            //load each entry
+            json.entries.forEach(loadRefEntry);
         }
-        
+
         //set the view state
         if(json.viewState !== undefined) {
             this.cachedViewState = json.viewState;
         }
 
-        return {referenceCommandResults,referencesOpenPromise};
+        //handle the callback
+        if(onReferencesLoaded) {
+            if(entryLoadedPromises.length > 0) {
+                entryLoadedPromise = Promise.all(entryLoadedPromises);
+            }
+            else {
+                entryLoadedPromise = Promise.resolve();
+            }
+
+            //call callback when all promises resolve
+            entryLoadedPromise.then(commandResultList => onReferencesLoaded(commandResultList))
+                .catch(error => {
+                    //return an error command result
+                    let errorCommandResult = {};
+                    errorCommandResult.cmdDone = true;
+                    errorCommandResult.errorMsg = "Error loading references: " + (error.errorMsg) ? error.errorMsg : "unknown";
+                    onReferencesLoaded([errorCommandResult]);
+                });
+    
+            }
+
+        //set the new reference EntryMap
+        this.setField("referenceEntryMap",newReferenceEntryMap);
+        
+        return entryCreateCommandResults;
     }
 
     /** This method opens the reference entries, from the structure returned from
@@ -91,20 +118,16 @@ export default class ReferenceManager {
      */
     toJson() {
         let json = {};
-        let refListsJson = {};
-        let hasRefLists = false;
-        for(var referenceListType in this.referenceLists) {
-            let referenceList = this.referenceLists[referenceListType];
-            let refListJson = referenceList.toJson();
-            if(refListJson) {
-                refListsJson[referenceListType] = refListJson;
-                hasRefLists = true;
-            }
+        let entryMap = this.getField("referenceEntryMap");
+        let entriesJson = [];
+        for(let key in entryMap) {
+            let refEntry = entryMap[key];
+            entriesJson.push(refEntry.toJson());
         }
-        if(hasRefLists) {
-            json.refLists = refListsJson;
+        if(entriesJson.length > 0) {
+            json.refEntries = entriesJson;
         }
-
+    
         //set the view state
         if(this.viewStateCallback) {
             this.cachedViewState = this.viewStateCallback();
@@ -117,33 +140,111 @@ export default class ReferenceManager {
     /** This method creates a reference entry. This does nto however load it, to 
      * do that ReferenceEntry.loadEntry() method must be called.  */
     createEntry(entryCommandData) {
-        var referenceList = this.referenceLists[entryCommandData.entryType];
-        if(!referenceList) throw new Error("Entry type nopt found: " + entryCommandData.entryType);
+        let oldEntryMap = this.setField("referenceEntryMap");
+        
+        //check if we already have this reference entry. Do not re-load it if we do.
+        let entryKey = this._getEntryKey(entryCommandData.type,entryCommandData.url);
+        if(!oldEntryMap[entryKey]) {
+            //load the entry
+            let referenceEntryClass = this.referenceEntryClasses[entryCommandData.entryType];
+            //we might want different error handling here
+            if(!referenceEntryClass) throw new Error("Entry type nopt found: " + entryCommandData.entryType);
+            let referenceEntry = new this.referenceEntryClass(entryCommandData);
 
-        return referenceList.createEntry(entryCommandData);
+            //update map
+            let newEntryMap = {};
+            Object.assign(newEntryMap,oldEntryMap);
+            newEntryMap[entryKey] = referenceEntry;
+            this.setField("referenceEntryMap",newEntryMap);
+        }
+
+        return {
+            cmdDone: true,
+            target: referenceEntry,
+            eventAction: "created"
+        }
     }
 
-    /** This method should be called when the parent is closed. It removes all links. 
-     */
+    removeEntry(entryType,url) {
+        let commandResult = {};
+
+        let entryKey = _getEntryKey(entryType,url);
+        let oldEntryMap = this.getField("referenceEntryMap");
+        let referenceEntry = oldEntryMap[entryKey];
+        if(referenceEntry) {
+            let newEntryMap = apogeeutil.jsonCopy(oldEntryMap);
+            delete newEntryMap[entryKey];
+            referenceEntry.remove();
+
+            commandResult.cmdDone = true;
+            commandResult.targetId = referenceEntry.getId();
+            commandResult.targetType = referenceEntry.getType();
+            commandResult.eventAction = "deleted";
+        }
+        else {
+            //always return cmd done on references for now
+            commandResult.cmdDone = false;
+            commandResult.errorMsg = "Reference entry not found: " + url;
+        }
+
+        return commandResult;
+    }
+
+    updateEntry(entryType,url,entryData) {
+        let commandResult = {};
+
+        let oldEntryKey = this._getEntryKey(entryType,url);
+        let oldEntryMap = this.getField("referenceEntryMap");
+        let referenceEntry = oldEntryMap[oldEntryKey];
+        if(referenceEntry) {
+            //update entry
+            let url = (entryData.newUrl !== undefined) ? entryData.newUrl : referenceEntry.getUrl();
+            let nickname = (entryData.newNickname !== undefined) ? entryData.newNickname : referenceEntry.getNickname();
+            referenceEntry.updateData(workspaceManager,url,nickname);
+
+            //update the entry map, if needed
+            let newEntryKey = this._getEntryKey(entryType,url);
+            if(newEntryKey != oldEntryKey) {
+                let newEntryMap = apogeeutil.jsonCopy(oldEntryMap);
+                newEntryMap[newEntryKey] = referenceEntry;
+                delete newEntryMap[oldEntryKey];
+            }
+            
+            commandResult.cmdDone = true;
+            commandResult.target = referenceEntry;
+            commandResult.eventAction = "updated";
+        }
+        else {
+            //entry not found
+            commandResult.cmdDone = false;
+            commandResult.alertMsg = "Link entry to update not found: " + url;
+        }
+
+        return commandResult;
+    }
+
+    /** This method should be called when the parent is closed. It removes all links. */
     close() {
-        for(var listType in this.referenceLists) {
-            var referenceList = this.referenceLists[listType];
-            referenceList.close();
+        let entryMap = this.getField("referenceEntryMap");
+        for(let key in entryMap) {
+            let referenceEntry = entryMap[key];
+            referenceEntry.remove();
         }
     }
 
     lookupEntry(entryType,url) {
-        var referenceList = this.referenceLists[entryType];
-        if(referenceList) {
-            return referenceList.lookupEntry(url);
-        }
-        else {
-            return null;
-        }
+        let entryKey = _getEntryKey(entryType,url);
+        let entryMap = this.getField("referenceEntryMap");
+        return entryMap[entryKey];
     }
 
     //=================================
     // Private
     //=================================
-   
+
+    _getEntryKey(entryType,url) {
+        return entryType + "|"  + url;
+    }
+
+    
 }

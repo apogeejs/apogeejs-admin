@@ -75,7 +75,6 @@ deletecomponent.executeCommand = function(workspaceManager,commandData) {
     
     var commandResult = {};
     commandResult.cmdDone = actionResult.actionDone;
-
     commandResult.actionResult = actionResult;
     
     return commandResult;

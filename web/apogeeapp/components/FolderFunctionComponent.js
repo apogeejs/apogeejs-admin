@@ -6,14 +6,20 @@ import ParentComponent from "/apogeeapp/component/ParentComponent.js";
  *apogee tables rather than writing code. */
 export default class FolderFunctionComponent extends ParentComponent {
         
-    constructor(member,modelManager) {
+    constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
         //extend parent component
-        super(member,modelManager);
+        super(member,modelManager,instanceToCopy,keepUpdatedFixed);
         
-        //register this object as a parent container
-        var internalFolder = member.getInternalFolder(modelManager.getModel());
-        this.setField("member.body",internalFolder);
-        modelManager.registerMember(internalFolder,this,member);
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            //register this object as a parent container
+            var internalFolder = member.getInternalFolder(modelManager.getModel());
+            this.setField("member.body",internalFolder);
+            modelManager.registerMember(internalFolder.getId(),this,false);
+        }
     }
 
     /** This overrides the get display method of componnet to return the function declaration. */

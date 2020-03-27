@@ -93,8 +93,7 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     commandResult.cmdDone = !error;
     if(commandResult.cmdDone) {
         commandResult.target = component;
-        commandResult.dispatcher = modelManager;
-        commandResult.action = "updated";
+        commandResult.eventAction = "updated";
     }
     else {
         commandResult.errorMsg = "Error updating component: " + component.getFullName(modelManager);

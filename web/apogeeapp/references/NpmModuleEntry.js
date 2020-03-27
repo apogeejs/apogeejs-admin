@@ -16,47 +16,37 @@ export default class NpmModuleEntry extends ReferenceEntry {
 
     }
 
-    /** This method loads the link onto the page. It returns a promise that
-     * resolves when the link is loaded. */
-    loadEntry() {
+    /** This method loads the actual link. */
+    implementationLoadEntry(onLoad,onError) {
 
-        var promiseFunction = (resolve,reject) => {
+        //synchronous loading
+        try {
+            let module = require(this.getUrl());
+            if((module)&&(module.initApogeeModule)) module.initApogeeModule(apogee,apogeeapp,apogeeutil);
+            this.setField("module",module);
+            
+            onLoad();
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+            //accept the error and keep going - it will be flagged in UI
+            commandResult.cmdDone = true;
+            commandResult.errorMsg = errorMsg;
 
-            let commandResult = {};
-            commandResult.target = this;
-            commandResult.dispatcher = this;
-            commandResult.action = "updated";
-
-            //synchronous loading
-            try {
-                this.module = require(this.url);
-                if((this.module)&&(this.module.initApogeeModule)) this.module.initApogeeModule(apogee,apogeeapp,apogeeutil);
-                
-                commandResult.cmdDone = true;
-                this.setClearState();
-                resolve(commandResult);
-            }
-            catch(error) {
-                if(error.stack) console.error(error.stack);
-                
-                if(error.stack) console.error(error.stack);
-                //accept the error and keep going - it will be flagged in UI
-                commandResult.cmdDone = true;
-                commandResult.errorMsg = errorMsg;
-
-                this.setError(errorMsg);
-                resolve(commandResult);
-            }
+            onError(errorMsg);
         }
 
-        //return promise to track loading finish
-        return new Promise(promiseFunction);
     }
     
     /** This method removes the link. */
-    remove() {
+    implementationRemoveEntry() {
         //allow for an optional module remove step
-        if((this.module)&&(this.module.removeApogeeModule)) this.module.removeApogeeModule(apogee,apogeeapp,apogeeutil);
+        let module = this.getField("module");
+        if(module) {
+            if(module.removeApogeeModule) module.removeApogeeModule(apogee,apogeeapp,apogeeutil);
+
+            this.clearField("module");
+        }
         
         //we aren't really removing it...
         //require.undef(this.url);

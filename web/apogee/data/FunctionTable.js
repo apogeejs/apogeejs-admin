@@ -6,8 +6,8 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 /** This is a function. */
 export default class FunctionTable extends CodeableMember {
 
-    constructor(name,parent) {
-        super(name,parent);   
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed);   
     }
 
     //------------------------------
