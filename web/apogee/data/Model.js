@@ -56,7 +56,7 @@ export default class Model extends FieldObject {
     getMutableModel() {
         if(this.getIsLocked()) {
             //create a new instance that is a copy of this one
-            return this.constructor(this);
+            return Model(this);
         }
         else {
             //return this instance since it si already unlocked

@@ -33,8 +33,8 @@ addcomponent.createUndoCommand = function(workspaceManager,commandData) {
 
 addcomponent.executeCommand = function(workspaceManager,commandData) { 
     
-    let modelManager = workspaceManager.getModelManager();
-    let model = modelManager.getModel();
+    let modelManager = workspaceManager.getMutableModelManager();
+    let model = modelManager.getMutableModel();
     let commandResult;
 
     //create the member

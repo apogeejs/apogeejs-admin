@@ -94,8 +94,84 @@ export default class Apogee extends EventManager {
         return apogeeInstance;
     }
 
+    //==================================
+    // Workspace Management
+    //==================================
+
+    /** This method returns the active WorkspaceManager object. */
+    getWorkspaceManager() {
+        return this.workspaceManager;
+    }
+
+    /** This method returns the active model object. */
+    getModel() {
+        if(this.workspaceManager) {
+            return this.workspaceManager.getModelManager().getModel();
+        }
+        else {
+            return null;
+        }
+    }
+
+    /** This method makes an empty workspace object. This can be used to set the initial workspace
+     * manager or to give the new instance of the workspace manager. However, if the workspace manager
+     * is being updated it must have the same ID as the existing workspace manager or else an exception
+     * will be thrown.
+     */
+    setWorkspaceManager(workspaceManager) {
+        //we can only have one workspace of a given id
+        if((this.workspaceManager)&&(this.workspaceManager.getId() != workspaceManager.getId())) {
+            throw base.createError("There is already an open workspace",false);
+        }
+        this.workspaceManager = workspaceManager;
+        return true;
+    }
+
+    /** This method closes the active workspace. */
+    clearWorkspaceManager() {
+        //remove the workspace from the app
+        this.workspaceManager = null;
+        
+        return true;
+    }
+
+    //====================================
+    // Command Management
+    //====================================
+
+    /** This method should be called to execute commands. */
+    executeCommand(command) {
+        this.commandManager.executeCommand(command);
+    }
+
+    /** This method is intended for the UI for the undo/redo functionality */
+    getCommandManager() {
+        return this.commandManager;
+    }
+
+    /** This method returns true if the workspcae contains unsaved data. */
+    getWorkspaceIsDirty() {
+        if(this.workspaceManager) {
+            return this.workspaceManager.getIsDirty();
+        }
+        else {
+            return false;
+        }
+    }
+
+    /** This method clears the workspace dirty flag. */
+    clearWorkspaceIsDirty() {
+        if(this.workspaceManager) {
+            return this.workspaceManager.clearIsDirty();
+        }
+        else {
+            return false;
+        }
+    }
+
+    
     //======================================
-    // public methods
+    // configuration methods methods
     //======================================
 
     /** This method returns the app settings json. */
@@ -162,79 +238,7 @@ export default class Apogee extends EventManager {
         return this.fileAccessObject;
     }
 
-    /** This method returns the active WorkspaceManager object. */
-    getWorkspaceManager() {
-        return this.workspaceManager;
-    }
 
-    /** This method returns the active model object. */
-    getModel() {
-        if(this.workspaceManager) {
-            return this.workspaceManager.getModelManager().getModel();
-        }
-        else {
-            return null;
-        }
-    }
-
-    /** This method returns true if the workspcae contains unsaved data. */
-    getWorkspaceIsDirty() {
-        if(this.workspaceManager) {
-            return this.workspaceManager.getIsDirty();
-        }
-        else {
-            return false;
-        }
-    }
-
-    /** This method clears the workspace dirty flag. */
-    clearWorkspaceIsDirty() {
-        if(this.workspaceManager) {
-            return this.workspaceManager.clearIsDirty();
-        }
-        else {
-            return false;
-        }
-    }
-
-    //====================================
-    // Command Management
-    //====================================
-
-    /** This method should be called to execute commands. */
-    executeCommand(command) {
-        this.commandManager.executeCommand(command);
-    }
-
-    /** This method is intended for the UI for the undo/redo functionality */
-    getCommandManager() {
-        return this.commandManager;
-    }
-
-    //==================================
-    // Workspace Management
-    //==================================
-
-    /** This method makes an empty workspace object. This throws an exception if
-     * the workspace can not be opened.
-     */
-    setWorkspaceManager(workspaceManager) {
-        
-        //we can only have one workspace of a given name!
-        if(this.workspaceManager) {
-            throw base.createError("There is already an open workspace",false);
-        }
-        this.workspaceManager = workspaceManager;
-        return true;
-    }
-
-    /** This method closes the active workspace. */
-    clearWorkspaceManager() {
-        //remove the workspace from the app
-        this.workspaceManager = null;
-        
-        return true;
-    }
 
     //==================================
     // App Initialization
@@ -251,8 +255,6 @@ export default class Apogee extends EventManager {
      * 
      * References may include self-installing modules, for example a custom file
      * access method or custom components. See info on self installing modules.
-     * 
-     * @private
      */ 
     getConfigurationPromise(configJson) {   
         if(!configJson) return;

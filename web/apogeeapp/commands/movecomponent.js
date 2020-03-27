@@ -29,8 +29,8 @@ movecomponent.createUndoCommand = function(workspaceManager,commandData) {
 
 movecomponent.executeCommand = function(workspaceManager,commandData) {
     
-    let modelManager = workspaceManager.getModelManager();
-    let model = modelManager.getModel();
+    let modelManager = workspaceManager.getMutableModelManager();
+    let model = modelManager.getMutableModel();
 
     var actionData = {};
     actionData.action = "moveMember";
@@ -39,7 +39,8 @@ movecomponent.executeCommand = function(workspaceManager,commandData) {
     actionData.targetParentId = commandData.newParentId;
     let actionResult = doAction(model,actionData);
 
-    let component = modelManager.getComponentByMemberId(commandData.memberId);
+    let componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
+    let component = modelManager.getComponentByComponentId(componentId);
     
     let commandResult = {};
     if((actionResult.actionDone)&&(component)) {

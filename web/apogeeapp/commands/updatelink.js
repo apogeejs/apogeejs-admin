@@ -36,7 +36,7 @@ updatelink.createUndoCommand = function(workspaceManager,commandData) {
 }
 
 updatelink.executeCommand = function(workspaceManager,commandData) {
-    let referenceManager = workspaceManager.getReferenceManager();
+    let referenceManager = workspaceManager.getMutableReferenceManager();
     let commandResult = referenceManager.updateEntry(commandData.entryType,commandData.oldUrl,commandData);
     return commandResult;
 }

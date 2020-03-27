@@ -88,7 +88,8 @@ export default class ParentComponent extends Component {
         var childIdMap = folder.getChildIdMap();
         for(var key in childIdMap) {
             var childId = childIdMap[key];
-            var childComponent = modelManager.getComponentByMemberId(childId);
+            var childComponentId = modelManager.getComponentIdByMemberId(childId);
+            var childComponent = modelManager.getComponentByComponentId(childComponentId);
             var name = childComponent.getName();
             children[name] = childComponent.toJson(modelManager);
             childrenPresent = true;

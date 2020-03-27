@@ -30,9 +30,9 @@ addlink.executeCommand = function(workspaceManager,commandData) {
 
     try {
         //synchronous reference entry creation
-        var referenceManager = workspaceManager.getReferenceManager();
+        var referenceManager = workspaceManager.getMutableReferenceManager();
         commandResult = referenceManager.createEntry(commandData);
-        var referenceEntry = synchCommandResult.target;
+        var referenceEntry = commandResult.target;
 
         //this will trigger an asynchrnous command to update the status on loading the ref entry
         referenceEntry.loadEntry(workpaceManager);

@@ -54,7 +54,10 @@ export default class CommandManager {
      * undo commands/redo commands.
     */
     executeCommand(command,suppressFromHistory) {
-        var workspaceManager = this.app.getWorkspaceManager();
+        //get a mutable workspace manager instance
+        let oldWorkspaceManager = this.app.getWorkspaceManager();
+        let newWorkspaceManager = oldWorkspaceManager.getMutableWorkspaceManager();
+
         let commandResult;
         
         var commandObject = CommandManager.getCommandObject(command.type);
@@ -65,14 +68,14 @@ export default class CommandManager {
 
             //create undo command before doing command (since it may depend on current state)
             if((!suppressFromHistory)&&(commandObject.createUndoCommand)) {   
-                undoCommand = commandObject.createUndoCommand(workspaceManager,command);  
+                undoCommand = commandObject.createUndoCommand(newWorkspaceManager,command);  
             }
 
             //read the desrition (this needs to be improved)
             description = commandObject.commandInfo.type;
 
             try {
-                commandResult = commandObject.executeCommand(workspaceManager,command);
+                commandResult = commandObject.executeCommand(newWorkspaceManager,command);
             }
             catch(error) {
                 if(error.stack) console.error(error.stack);
@@ -87,18 +90,33 @@ export default class CommandManager {
             commandResult.cmdDone = false;
             commandResult.errorMsg = "Command type not found: " + command.type;
         }
-        
-        //add to history if the command was done and there is an undo command
-        if((commandResult.cmdDone)&&(undoCommand)) {   
-            this.commandHistory.addToHistory(undoCommand,command,description);
-        }
 
         //create change list
         let changeResult = this._createChangeResult(commandResult);
-        
-        //fire events!!
-        this._publishEvents(changeResult);
 
+        //--------------------------
+        // Accept or reject update
+        //--------------------------
+
+        //if the command succceeded, update the workspace manager instance
+        if(changeResult.cmdDone) {
+            //success - commit accept change
+            this.app.setWorkspaceManager(newWorkspaceManager);
+
+            //add to history if the command was done and there is an undo command
+            if((commandResult.cmdDone)&&(undoCommand)) {   
+                this.commandHistory.addToHistory(undoCommand,command,description);
+            }
+
+            //fire events!!
+            this._publishEvents(changeResult);
+        }
+        else {
+            //failure - keep the old workspace 
+            let errorMsg = changeResult.errorMsgs.join("; ");
+            alert("Command failed: " + errorMsg);
+        }
+        
         return changeResult;
     }
 
@@ -187,15 +205,16 @@ export default class CommandManager {
                     cmdRsltEquivelent.eventAction = actionChangeEntry.event;
 
                     if(actionChangeEntry.member) {
+                        let componentId = modelManager.getComponentIdByMemberId(actionChangeEntry.member.getId());
                         cmdRsltEquivelent.eventName = this._createEventName(actionChangeEntry.event,"component");
                         switch(actionChangeEntry.event) {
                             case "created":
                             case "updated":
-                                cmdRsltEquivelent.target = modelManager.getComponentByMemberId(actionChangeEntry.member.getId());
+                                cmdRsltEquivelent.target = modelManager.getComponentByComponentId(componentId);
                                 break;
 
                             case "deleted":
-                                cmdRsltEquivelent.targetId = this._lookupComponentIdFromMemberId(cmdRsltEquivelent.member.getId());
+                                cmdRsltEquivelent.targetId = componentId;
 
                                 //handle the case of no component for this member id, which should happen for non-main members
                                 //in a component. Just don't add a map entry.
@@ -209,7 +228,7 @@ export default class CommandManager {
                         }
                     }
                     else {
-                        cmdRsltEquivelent.eventName = this._createEventName(actionChangeEntry.event,modelManager.getTargetType);
+                        cmdRsltEquivelent.eventName = this._createEventName(actionChangeEntry.event,modelManager.getTargetType());
                         switch(actionChangeEntry.event) {
                             case "created":
                             case "updated":

@@ -23,18 +23,13 @@ import {addActionInfo} from "/apogee/actions/action.js";
 function deleteMember(model,actionData) {
     
     //get a new instance in case any changes are made during delete
-    let member = model.getMutableMember(actionData.memberId);
+    let member = model.lookupMemberById(actionData.memberId);
     if(!member) {
         let actionResult = {};
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for delete member";
         return actionResult;
     }
-
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-    // delete member (and all children)
-    // - modify parent and all parents up to model
-    //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     
     let actionResult = doDelete(model, member);
     return actionResult;

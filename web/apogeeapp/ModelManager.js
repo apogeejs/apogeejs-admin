@@ -3,7 +3,7 @@ import { Model, doAction } from "/apogee/apogeeCoreLib.js";
 import FieldObject from "/apogeeutil/FieldObject.js";
 
 /** This class manages the user interface for a model object. */
-export default class ModelManager  extends FieldObject {
+export default class ModelManager extends FieldObject {
 
     constructor(app,instanceToCopy,keepUpdatedFixed) {
         super("modelManager",instanceToCopy,keepUpdatedFixed);
@@ -20,6 +20,7 @@ export default class ModelManager  extends FieldObject {
         if(!instanceToCopy) {
             this.setField("model",null);
             this.setField("componentMap",{});
+            this.setField("memberMap",{});
         }
 
         //==============
@@ -39,6 +40,276 @@ export default class ModelManager  extends FieldObject {
         return this.app;
     }
 
+    /** This method gets the model object. */
+    getModel() {
+        return this.getField("model");
+    }
+
+    /** This method returns a mutable instance of the model. If the active model is already mutable
+     * it returns that. If not, it returns a mutble copy that also becomes the current model instance. */
+    getMutableModel() {
+        let oldModel = this.getModel();
+        if(oldModel.getIsLocked()) {
+            let newModel = oldModel.getMutableModel();
+            this.setField("model",newModel);
+            return newModel;
+        }
+        else {
+            return oldModel;
+        }
+    }
+
+    //====================================
+    // Component Management
+    //====================================
+
+    getComponentByComponentId(componentId) {
+        return this.getField("componentMap")[componentId];
+    }
+
+    /** This method gets the component associated with a member object. */
+    getMutableComponentByComponentId(componentId) {
+        let oldComponentMap = this.getField("componentMap");
+        var oldComponent = oldComponentMap[componentId];
+        if(oldComponent) {
+            if(oldComponent.getIsLocked()) {
+                //create an unlocked instance of the component
+                let newComponent = oldComponent.constructor(component.getMember(),this,oldComponent);
+
+                //register this instance
+                let newComponentMap = {};
+                Object.assign(newComponentMap,oldComponentMap);
+                newComponentMap[componentId] = newComponent;
+                this.setField("componentMap",newComponentMap);
+                return newComponent;
+            }
+            else {
+                return oldComponent;
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
+    /** This method gets the component associated with a member object. */
+    getComponentIdByMemberId(memberId) {
+        let memberMap = this.getField("memberMap");
+        var memberInfo = memberMap[memberId];
+        if(memberInfo) {
+            return memberInfo.componentId;
+        }
+        else {
+            return null;
+        }
+    }
+
+    /** This returns the list of folder names. */
+    getFolders() {
+        let componentMap = this.getField("componentMap");
+        let model = this.getModel();
+        var folders = []
+        for(var key in componentMap) {
+            var folderEntry = [];
+            var componentInfo = componentMap[key];
+            var member = componentInfo.member;
+            if((member.isParent)&&(member.getChildrenWriteable())) { 
+                folderEntry.push(member.getId());
+                folderEntry.push(member.getFullName(model));
+                folders.push(folderEntry);
+            }
+        }
+        return folders;
+    }
+
+    /** This method stores the component instance. It must be called when a
+     * new component is created and when a component instance is replaced. */
+    registerComponent(component) {
+        //copy the old map
+        let oldComponentMap = this.getField("componentMap");
+        let newComponentMap = {};
+        Object.assign(newComponentMap,oldComponentMap);
+
+        //update and save
+        newComponentMap[component.getId()] = component;
+        this.setField("componentMap",newComponentMap);
+    }
+
+    /** This method registers a member data object and its associated component object.
+     * If the member is not the main member assoicated with component but instead an included
+     * member, the main componentMember should be passed in also. Otherwise it should be left 
+     * undefined. */
+    registerMember(memberId,component,isMain) {
+
+        let oldMemberMap = this.getField("memberMap");
+
+        if(oldMemberMap[memberId]) {
+            //already registered
+            return;
+        }
+
+        //copy the old map
+        let newMemberMap = {};
+        Object.assign(newMemberMap,oldMemberMap);
+
+        //add the new info
+        let memberInfo = {};
+        memberInfo.memberId = memberId;
+        memberInfo.componentId = component.getId();
+        memberInfo.isMain = isMain;
+
+        newMemberMap[memberId] = memberInfo;
+
+        this.setField("componentMap",newMemberMap);
+    }
+    
+    testPrint(eventInfo) {
+        if(eventInfo.updated) {
+            console.log(JSON.stringify(eventInfo.updated));
+        }
+    }
+        
+    createComponentFromMember(member,componentJson) {
+        
+        //response - get new member
+        var component;
+        var commandResult = {};
+
+        if(member) {
+            
+            var componentClass = this.app.getComponentClass(componentJson.type);
+            if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
+                //create empty component
+                component = new componentClass(member,this);
+
+                //apply any serialized values
+                if(componentJson) {
+                    component.loadPropertyValues(componentJson);
+                }
+            }
+
+            //if we failed to create the component, or if we failed to make the member properly (and we used the error member)
+            if(!component) {
+                //table not found - create an empty table
+                componentClass = this.app.getComponentClass("apogeeapp.app.ErrorComponent");
+                component = new componentClass(member,this);
+                if(componentJson) {
+                    component.loadProperties(componentJson);
+                }
+            }
+
+        }
+
+        if(!component) {
+            commandResult.cmdDone = false;
+            commandResult.errorMsg = "Component creation failed: " + member.getName();
+        }
+        else {
+            commandResult.target = component;
+            commandResult.cmdDone = true;
+            commandResult.eventAction = "created";
+
+            //load the children, after the component load is completed
+            if(component.loadChildrenFromJson) {
+                let childCommentResults = component.loadChildrenFromJson(this,componentJson);
+                if((childCommentResults)&&(childCommentResults.length > 0)) {
+                    commandResult.childCommandResults = childCommentResults;
+                }
+            }
+        }
+            
+        return commandResult;
+    }
+
+    //=============================
+    // Model event handlers
+    //=============================
+
+    objectCreated(eventInfo) {
+        if(eventInfo.member) {
+            this.memberCreated(eventInfo.target);
+        }
+    }
+
+    objectUpdated(eventInfo) {
+        if(eventInfo.member) {
+            this.memberUpdated(eventInfo.member);
+        }
+        else if(eventInfo.model) {
+            this.modelUpdated(eventInfo.model);
+        }
+    }
+
+    objectDeleted(eventInfo) {
+        if(eventInfo.member) {
+            this.memberDeleted(eventInfo.member);
+        }
+    }
+
+    /** This method responds to a member updated. */
+    memberCreated(member) {
+    }
+
+
+    /** This method responds to a member updated. */
+    memberUpdated(member) {
+        let componentId = this.getComponentIdForMemberId(member.getId());
+        if(componentId) {
+            let component = getMutableComponentByComponentId(componentId);
+            component.memberUpdated(member);
+        }
+    }
+
+    modelUpdated(model) {
+        //all changes kept in model
+    }
+
+    /** This method responds to a delete menu event. */
+    memberDeleted(member) {
+        let memberId = member.getId();
+        let componentId = this.getComponentIdByMemberId(memberId);
+        if(componentId) {
+            let oldComponentMap = this.getField("componentMap");
+            let component = oldComponentMap[componentId];
+
+            //take any delete actions (thes should not require a mutable member)
+            component.onDelete();
+
+            //update the component map
+            let newComponentMap = {};
+            Object.assign(newComponentMap,oldComponentMap);
+            //remove the given component
+            delete newComponentMap[componentId];
+            //save the updated map
+            this.setField("componentMap",newComponentMap);
+
+            //update the member map
+            //this is a little cumbersome
+            let oldMemberMap = this.getField("memberMap");
+            let newMemberMap = {};
+            Object.assign(newMemberMap,oldMemberMap);
+            for(let componentMemberId in newMemberMap) {
+                let componentInfo = newMemberMap[componentMemberId];
+                if(componentInfo.componentId == componentId) {
+                    delete newMemberMap[componentMemberId];
+                }
+            }
+            this.setField("memberMap",memberMap);
+        }
+    }
+
+    actionStarted(eventInfo) {
+
+    }
+
+    actionCompleted(eventInfo) {
+        
+    }
+
+    //====================================
+    // open and save methods
+    //====================================
+    
     setViewStateCallback(viewStateCallback) {
         this.viewStateCallback = viewStateCallback;
     }
@@ -118,11 +389,6 @@ export default class ModelManager  extends FieldObject {
         return commandResult;
     }
 
-    /** This method gets the model object. */
-    getModel() {
-        return this.getField("model");
-    }
-
     /** This method closes the model object. */
     close() {
         //delete all the components - to make sure the are cleaned up
@@ -135,217 +401,6 @@ export default class ModelManager  extends FieldObject {
         }
     }
 
-    //====================================
-    // Component Management
-    //====================================
-
-    /** This method gets the component associated with a member object. */
-    getComponentByMember(member) {
-        let componentMap = this.getField("componentMap");
-        var componentInfo = componentMap[member.getId()];
-        if(componentInfo) {
-            return componentInfo.component;
-        }
-        else {
-            return null;
-        }
-    }
-
-    /** This method gets the component associated with a member object. */
-    getComponentByMemberId(memberId) {
-        let componentMap = this.getField("componentMap");
-        var componentInfo = componentMap[memberId];
-        if(componentInfo) {
-            return componentInfo.component;
-        }
-        else {
-            return null;
-        }
-    }
-
-    /** This returns the list of folder names. */
-    getFolders() {
-        let componentMap = this.getField("componentMap");
-        let model = this.getModel();
-        var folders = []
-        for(var key in componentMap) {
-            var folderEntry = [];
-            var componentInfo = componentMap[key];
-            var member = componentInfo.member;
-            if((member.isParent)&&(member.getChildrenWriteable())) { 
-                folderEntry.push(member.getId());
-                folderEntry.push(member.getFullName(model));
-                folders.push(folderEntry);
-            }
-        }
-        return folders;
-    }
-
-    /** This method registers a member data object and its associated component object.
-     * If the member is not the main member assoicated with component but instead an included
-     * member, the main componentMember should be passed in also. Otherwise it should be left 
-     * undefined. */
-    registerMember(memberId,component,isMain) {
-
-        let oldComponentMap = this.getField("componentMap");
-
-        if(oldComponentMap[memberId]) {
-            //already exists! (we need to catch this earlier if we want it to not be fatal. But we should catch it here too.)
-            throw base.createError("There is already a member with the given ID.",true);
-        }
-
-        //copy the old map
-        let newComponentMap = {};
-        Object.assign(newComponentMap,oldComponentMap);
-
-        //add the new info
-        var componentInfo = {};
-        componentInfo.memberId = memberId;
-        componentInfo.component = component;
-        componentInfo.isMain = isMain;
-
-        newComponentMap[memberId] = componentInfo;
-
-        this.setField("componentMap",newComponentMap);
-
-    }
-    
-    testPrint(eventInfo) {
-        if(eventInfo.updated) {
-            console.log(JSON.stringify(eventInfo.updated));
-        }
-    }
-        
-    createComponentFromMember(member,componentJson) {
-        
-        //response - get new member
-        var component;
-        var commandResult = {};
-
-        if(member) {
-            
-            var componentClass = this.app.getComponentClass(componentJson.type);
-            if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
-                //create empty component
-                component = new componentClass(member,this);
-
-                //apply any serialized values
-                if(componentJson) {
-                    component.loadPropertyValues(componentJson);
-                }
-            }
-
-            //if we failed to create the component, or if we failed to make the member properly (and we used the error member)
-            if(!component) {
-                //table not found - create an empty table
-                componentClass = this.app.getComponentClass("apogeeapp.app.ErrorComponent");
-                component = new componentClass(member,this);
-                if(componentJson) {
-                    component.loadProperties(componentJson);
-                }
-            }
-
-        }
-
-        if(!component) {
-            commandResult.cmdDone = false;
-            commandResult.errorMsg = "Component creation failed: " + member.getName();
-        }
-        else {
-            commandResult.target = component;
-            commandResult.cmdDone = true;
-            commandResult.eventAction = "created";
-
-            //load the children, after the component load is completed
-            if(component.loadChildrenFromJson) {
-                let childCommentResults = component.loadChildrenFromJson(this,componentJson);
-                if((childCommentResults)&&(childCommentResults.length > 0)) {
-                    commandResult.childCommandResults = childCommentResults;
-                }
-            }
-        }
-            
-        return commandResult;
-    }
-
-    objectCreated(eventInfo) {
-        if(eventInfo.member) {
-            this.memberCreated(eventInfo.target);
-        }
-    }
-
-    objectUpdated(eventInfo) {
-        if(eventInfo.member) {
-            this.memberUpdated(eventInfo.member);
-        }
-        else if(eventInfo.model) {
-            this.modelUpdated(eventInfo.model);
-        }
-    }
-
-    objectDeleted(eventInfo) {
-        if(eventInfo.member) {
-            this.memberDeleted(eventInfo.member);
-        }
-    }
-
-    /** This method responds to a member updated. */
-    memberCreated(member) {
-    }
-
-
-    /** This method responds to a member updated. */
-    memberUpdated(member) {
-        var componentInfo = this.getField("componentMap")[member.getId()];
-        if((componentInfo)&&(componentInfo.component)) {
-            componentInfo.component.memberUpdated(member);
-        }
-    }
-
-    modelUpdated(model) {
-        //all changes kept in model
-    }
-
-    /** This method responds to a delete menu event. */
-    memberDeleted(member) {
-        let memberId = member.getId();
-        let oldComponentMap = this.getField("componentMap");
-        var componentInfo = oldComponentMap[memberId];
-
-        if(componentInfo) {
-            //copy the old map
-            let newComponentMap = {};
-            Object.assign(newComponentMap,oldComponentMap);
-            //remove the given component
-            delete newComponentMap[memberId];
-            //save the updated map
-            this.setField("componentMap",newComponentMap);
-
-            //take any additionl delete actions
-            if((componentInfo)&&(componentInfo.component)) {
-                //do any needed cleanup
-                componentInfo.component.onDelete();
-            }
-        }
-    }
-
-    actionStarted(eventInfo) {
-
-    }
-
-    actionCompleted(eventInfo) {
-        
-    }
-
-    //====================================
-    // open and save methods
-    //====================================
-
-    /** This retrieves the file metadata used to save the file. */
-    getFileMetadata() {
-        return this.fileMetadata;
-    }
-
     /** This saves the model. It the optionalSavedRootFolder is passed in,
      * it will save a model with that as the root folder. */
     toJson(optionalSavedRootFolder) {
@@ -353,25 +408,23 @@ export default class ModelManager  extends FieldObject {
         let model = this.getField("model");
         let json = {};
 
-        //get the model json
-        json.model = model.toJson(optionalSavedRootFolder);
-
         //get the components json
         let componentsJson = {};
 
+        //get the "root folder" - either for the model or the optional folder to save.
         let childIdMap;
         if(optionalSavedRootFolder) {
-            childIdMap = [];
-            childIdMap[optionalSavedRootFolder.getName()] = optionalSavedRootFolder;
+            childIdMap = optionalSavedRootFolder.getChildMap();
         }
         else {
-            childIdMap = model.getChildIdMap();
+            childIdMap = model.getChildMap();
         }
 
         for(let childName in childIdMap) {
-            let childMemberId = childIdMap[childName];
-            let childComponent = this.getComponentByMemberId(childMemberId);
-            componentsJson[childName] = childComponent.toJson(this);
+            let memberId = childIdMap[childName];
+            let componentId = this.getComponentIdByMemberId(memberId);
+            let component = this.getChildComponentByComponentId(componentId);
+            componentsJson[childName] = component.toJson(this);
         }
         json.components = componentsJson;
 

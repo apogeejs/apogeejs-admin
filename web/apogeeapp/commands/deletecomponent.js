@@ -28,7 +28,6 @@ deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
     var model = modelManager.getModel();
     let member;
-    let component;
     let parent;
 
     if(commandData.memberId) {
@@ -37,9 +36,11 @@ deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
     }
     else {
         parent = model.lookupMemberById(commandData.parentId);
-        parent = parent.lookupChild(commandData.memberName);
+        member = parent.lookupChild(commandData.memberName);
     }
-    component = modelManager.getComponentByMember(model,member);
+
+    let componentId = modelManager.getComponentIdByMemberId(memberId);
+    let component = modelManager.getComponentByComponentId(componentId);
     
     var commandUndoJson = {};
     commandUndoJson.type = "addComponent";
@@ -56,8 +57,8 @@ deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
  */
 deletecomponent.executeCommand = function(workspaceManager,commandData) {
     
-    let modelManager = workspaceManager.getModelManager();
-    var model = modelManager.getModel();
+    let modelManager = workspaceManager.getMutableModelManager();
+    let model = modelManager.getMutableModel();
 
     var actionJson = {};
     actionJson.action = "deleteMember";

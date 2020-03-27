@@ -41,8 +41,9 @@ literatepagetransaction.executeCommand = function(workspaceManager,commandData) 
     var error = false;
     var errorMsg;
     
-    let modelManager = workspaceManager.getModelManager();
-    var component = modelManager.getComponentByMemberId(commandData.memberId);
+    let modelManager = workspaceManager.getMutableModelManager();
+    var componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
+    var component = modelManager.getMutableComponentByComponentId(componentId);
 
     var oldDocument = component.getDocument();
     var schema = component.getSchema();

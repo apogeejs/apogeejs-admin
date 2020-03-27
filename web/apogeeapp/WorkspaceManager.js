@@ -48,13 +48,125 @@ export default class WorkspaceManager extends FieldObject {
         return this.app;
     }
 
+    /** This method returns a mutable copy of this instance. If the instance is already mutable
+     * it will be returned rather than making a new one.  */
+    getMutableWorkspaceManager() {
+        if(this.getIsLocked()) {
+            //create a new instance that is a copy of this one
+            return WorkspaceManager(this.app,this);
+        }
+        else {
+            //return this instance since it si already unlocked
+            return this;
+        }
+    }
+
+    /** This method locks this workspace instance and all the contained object instances. */
+    lockAll() {
+        //we maybe shouldn't be modifying the members in place, but we will do it anyway
+        this.getReferenceManager().lock();
+        this.getModelManager().lock();
+        this.lock();
+    }
+
     getReferenceManager() {
         return this.getField("referenceManager");
+    }
+
+    /** This method returns an unlocked reference manager instance. If the current
+     * reference manager is unlocked it will return that. Otherwise it will return
+     * a new unlocked instance that will also be set as the current instance. */
+    getMutableReferenceManager() {
+        let oldReferenceManager = getReferenceManager();
+        if(oldReferenceManager.getIsLocked()) {
+            //create a new instance that is a copy of this one
+            let newReferenceManager = new ReferenceManager(this.app,referenceManager);
+            this.setField("referenceManager",newReferenceManager);
+            return newReferenceManager;
+        }
+        else {
+            //return this instance since it si already unlocked
+            return oldReferenceManager;
+        }
     }
 
     getModelManager() {
         return this.getField("modelManager");
     }
+
+    /** This method returns an unlocked model manager instance. If the current
+     * model manager is unlocked it will return that. Otherwise it will return
+     * a new unlocked instance that will also be set as the current instance. */
+    getMutableModelManager() {
+        let oldModelManager = getModelManager();
+        if(oldModelManager.getIsLocked()) {
+            //create a new instance that is a copy of this one
+            let newModelManager = new ModelManager(this.app,referenceManager);
+            this.setField("modelManager",newModelManager);
+            return newModelManager;
+        }
+        else {
+            //return this instance since it si already unlocked
+            return oldModelManager;
+        }
+    }
+
+    getIsDirty() {
+        return this.isDirty;
+        
+    }
+    
+    setIsDirty() {
+        this.isDirty = true;
+    }
+    
+    clearIsDirty() {
+        this.isDirty = false;
+    }
+
+    
+    
+    //====================================
+    // asynch run context methods
+    //====================================
+    runFutureCommand(commandData) {
+        let activeWorkspaceManager = this.app.getWorkspaceManager();
+        this.app.executeCommand(activeWorkspaceManager,commandData);
+    }
+
+    getModelRunContext() {
+        let modelRunContext = {};
+        modelRunContext.runFutureAction = function(modelId,action) {
+            //create a command to run this action
+            let modelActionCommand = {};
+            modelActionCommand.type = "modelActionCommand";
+            modelActionCommand.modelId = modelId;
+            modelActionCommand.action = action;
+
+            //execut this command as a future command
+            this.runFutureCommand(modelActionCommand);
+        }
+
+        return modelRunContext;
+    }
+
+    //====================================
+    // configuration
+    //====================================
+
+    /** This retrieves the file metadata used to save the file. */
+    getFileMetadata() {
+        return this.fileMetadata;
+    }
+
+    /** This method should be used to update the file metadata for the workspace, such as after the file is saved. */
+    setFileMetadata(fileMetadata) {
+        this.fileMetadata = fileMetadata;
+    }
+
+    //====================================
+    // open and save methods
+    //====================================
 
     setViewStateCallback(viewStateCallback) {
         this.viewStateCallback = viewStateCallback;
@@ -64,13 +176,34 @@ export default class WorkspaceManager extends FieldObject {
         return this.cachedViewState;
     }
 
+    /** This saves the workspace. It the optionalSavedRootFolder is passed in,
+     * it will save a workspace with that as the root folder. */
+    toJson(optionalSavedRootFolder) {
+        var json = {};
+        json.fileType = "apogee app js workspace";
+
+        json.version = WorkspaceManager.FILE_VERSION;
+
+        json.references = this.getReferenceManager().toJson();
+
+        json.code = this.getModelManager().toJson(optionalSavedRootFolder);
+
+        if(this.viewStateCallback) {
+            this.cachedViewState = this.viewStateCallback();
+            if(this.cachedViewState) json.viewState = this.cachedViewState;
+        }
+
+        return json;
+    }
+
+    
      /** This method sets the workspace. The argument workspaceJson should be included
       * if the workspace is not empty, such as when opening a existing workspace. It
       * contains the data for the component associated with each model member. For 
       * a new empty workspace the workspaceJson should be omitted. 
       * The argument fileMetadata is the file identifier if the workspace is opened from a file.
       * This will be used for the "save" function to save to an existing file. */
-    load(json,fileMetadata) {
+     load(json,fileMetadata) {
 
         //check file format
         if(json) {
@@ -135,106 +268,6 @@ export default class WorkspaceManager extends FieldObject {
         //close reference manager
         let referenceManager = this.getReferenceManager();
         referenceManager.close();
-    }
-    
-    getIsDirty() {
-        return this.isDirty;
-        
-    }
-    
-    setIsDirty() {
-        this.isDirty = true;
-    }
-    
-    clearIsDirty() {
-        this.isDirty = false;
-    }
-
-    //====================================
-    // asynch run context methods
-    //====================================
-    runFutureCommand(commandData) {
-        let activeWorkspaceManager = this.app.getWorkspaceManager();
-        this.app.executeCommand(activeWorkspaceManager,commandData);
-    }
-
-    getModelRunContext() {
-        let modelRunContext = {};
-        modelRunContext.runFutureAction = function(modelId,action) {
-            //create a command to run this action
-            let modelActionCommand = {};
-            modelActionCommand.type = "modelActionCommand";
-            modelActionCommand.modelId = modelId;
-            modelActionCommand.action = action;
-
-            //execut this command as a future command
-            this.runFutureCommand(modelActionCommand);
-        }
-
-        return modelRunContext;
-    }
-
-    //====================================
-    // open and save methods
-    //====================================
-
-    /** This retrieves the file metadata used to save the file. */
-    getFileMetadata() {
-        return this.fileMetadata;
-    }
-
-    /** This method should be used to update the file metadata for the workspace, such as after the file is saved. */
-    setFileMetadata(fileMetadata) {
-        this.fileMetadata = fileMetadata;
-    }
-
-    /** This saves the workspace. It the optionalSavedRootFolder is passed in,
-     * it will save a workspace with that as the root folder. */
-    toJson(optionalSavedRootFolder) {
-        var json = {};
-        json.fileType = "apogee app js workspace";
-
-        json.version = WorkspaceManager.FILE_VERSION;
-
-        json.references = this.getReferenceManager().toJson();
-
-        json.code = this.getModelManager().toJson(optionalSavedRootFolder);
-
-        if(this.viewStateCallback) {
-            this.cachedViewState = this.viewStateCallback();
-            if(this.cachedViewState) json.viewState = this.cachedViewState;
-        }
-
-        return json;
-    }
-
-    //------------------------------------------
-    // Event Tracking Methods
-    //------------------------------------------
-
-    getUpdated() {
-        return this.updated;
-    }
-
-    isFieldUpdated(field) {
-        return this.updated[field] ? true : false;
-    }
-
-    clearUpdated() {
-        this.updated = {};
-    }
-
-    fieldUpdated(field) {
-        this.updated[field] = true;
-    }
-
-    getId() {
-        //right now we allow for just one workspace manager
-        return 1;
-    }
-
-    getType() {
-        return "workspaceManager";
     }
 
 }

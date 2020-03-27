@@ -1,4 +1,5 @@
 import ReferenceList from "/apogeeapp/references/ReferenceList.js";
+import ReferenceEntry from "./ReferenceEntry";
 
 /** This class manages links and other reference entries, loading the references and
  * creating the UI tree elements for display of the references.
@@ -195,23 +196,27 @@ export default class ReferenceManager extends FieldObject {
 
         let oldEntryKey = this._getEntryKey(entryType,url);
         let oldEntryMap = this.getField("referenceEntryMap");
-        let referenceEntry = oldEntryMap[oldEntryKey];
-        if(referenceEntry) {
+        let oldReferenceEntry = oldEntryMap[oldEntryKey];
+        if(oldReferenceEntry) {
+            //create a mutable instance copy
+            let newReferenceEntry = new ReferenceEntry(null,oldReferenceEntry);
+
             //update entry
             let url = (entryData.newUrl !== undefined) ? entryData.newUrl : referenceEntry.getUrl();
             let nickname = (entryData.newNickname !== undefined) ? entryData.newNickname : referenceEntry.getNickname();
             referenceEntry.updateData(workspaceManager,url,nickname);
 
-            //update the entry map, if needed
+            //update the entry map
             let newEntryKey = this._getEntryKey(entryType,url);
+            let newEntryMap = apogeeutil.jsonCopy(oldEntryMap);
             if(newEntryKey != oldEntryKey) {
-                let newEntryMap = apogeeutil.jsonCopy(oldEntryMap);
-                newEntryMap[newEntryKey] = referenceEntry;
                 delete newEntryMap[oldEntryKey];
             }
+            newEntryMap[newEntryKey] = newReferenceEntry;
+            this.setField("referenceEntryMap",newEntryMap);
             
             commandResult.cmdDone = true;
-            commandResult.target = referenceEntry;
+            commandResult.target = newReferenceEntry;
             commandResult.eventAction = "updated";
         }
         else {

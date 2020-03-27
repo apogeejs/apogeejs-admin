@@ -38,7 +38,7 @@ deletelink.executeCommand = function(workspaceManager,commandData) {
     var commandResult;
 
     try {
-        var referenceManager = workspaceManager.getReferenceManager();
+        var referenceManager = workspaceManager.getMutableReferenceManager();
         commandResult = referenceManager.removeEntry(commandData.entryType,commandData.url);
     }
     catch(error) {

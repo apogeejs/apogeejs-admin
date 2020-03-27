@@ -15,6 +15,7 @@ export default class Component extends FieldObject {
         //==============
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
+            modelManager.registerComponent(this);
             this.setField("member",member);
             modelManager.registerMember(member.getId(),this,true);
         }
@@ -119,7 +120,8 @@ export default class Component extends FieldObject {
         let model = modelManager.getModel();
         let parent = this.getField("member").getParentMember(model);
         if(parent) {
-            return modelManager.getComponentByMember(parent);
+            let componentId = modelManager.getComponentIdByMemberId(parent.getId());
+            return modelManager.getComponentByComponentId(componentId);
         }
         else {
             return null;

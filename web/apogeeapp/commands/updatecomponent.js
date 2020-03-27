@@ -22,7 +22,8 @@ updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getModelManager();
     let model = modelManager.getModel();
     var member = model.lookupMemberById(commandData.memberId);
-    var component = modelManager.getComponentByMember(member);
+    var componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
+    var component = modelManager.getComponentByComponentId(componentId);
 
     var originalMemberProperties = {};
     if(member.constructor.generator.readProperties) member.constructor.generator.readProperties(member,originalMemberProperties);
@@ -60,11 +61,11 @@ updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
  * be extended to edit the values of those properties too. */
 updatecomponent.executeCommand = function(workspaceManager,commandData) {
     
-    let modelManager = workspaceManager.getModelManager();
-    let model = modelManager.getModel();
-    //get the member
-    var member = model.lookupMemberById(commandData.memberId);   
-    var component = modelManager.getComponentByMember(member);
+    let modelManager = workspaceManager.getMutableModelManager();
+    let model = modelManager.getMutableModel();
+    var member = model.getMemberById(commandData.memberId);
+    var componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
+    var component = modelManager.getMutableComponentByComponentId(componentId);
 
     var error = false;
     

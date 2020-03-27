@@ -270,8 +270,9 @@ customDataComponentUpdateData.createUndoCommand = function(workspaceManager,comm
 }
 
 customDataComponentUpdateData.executeCommand = function(workspaceManager,commandData) {
-    let modelManager = workspaceManager.getModelManager();
-    let component = modelManager.getComponentByMemberId(commandData.memberId);
+    let modelManager = workspaceManager.getMutableModelManager();
+    let componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
+    let component = modelManager.getMutableComponentByComponentId(componentId);
     var commandResult = {};
     if(component) {
         try {

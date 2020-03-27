@@ -4,18 +4,25 @@ import {bannerConstants} from "/apogeeview/componentdisplay/banner.js";
 /** This class manages references for the web page.*/
 export default class ReferenceEntry extends FieldObject {
     
+    /** The reference data is a json entry with the referenceType, url and optionally nickname.
+     * If this is a copy, the reference data wil be ignored and can be set to null. */
     constructor(referenceData,instanceToCopy,keepUpdatedFixed) {
         super("referenceEntry",instanceToCopy,keepUpdatedFixed);
 
-        this.referenceType = referenceData.entryType;
+        if(instanceToCopy) {
+            this.referenceType = instanceToCopy.referenceType;
+        }
+        else {
+            this.referenceType = referenceData.entryType;
+        }
 
-        this.setField("url",referenceData.url);
-        
         //==============
         //Fields
         //==============
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
+            this.setField("url",referenceData.url);
+
             //we create in a pending state because the link is not loaded.
             this.setField("state",bannerConstants.BANNER_TYPE_PENDING);
 
