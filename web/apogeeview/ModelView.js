@@ -19,9 +19,11 @@ export default class ModelView {
         this.init();
 
         //subscribe to events
-        this.modelManager.addListener("created",eventData => this.targetCreated(eventData));
-        this.modelManager.addListener("updated",eventData => this.targetUpdated(eventData));
-        this.modelManager.addListener("deleted",eventData => this.targetDeleted(eventData));
+        let app = this.modelManager.getApp();
+        app.addListener("component_created",eventData => this.onComponentCreated(eventData));
+        app.addListener("component_updated",eventData => this.onComponentUpdated(eventData));
+        app.addListener("component_deleted",eventData => this.onComponentDeleted(eventData));
+        app.addListener("modelManager_updated",eventData => this.onModelManagerUpdated(eventData));
 
         this.modelManager.setViewStateCallback(() => this.getViewState());
     }
@@ -62,37 +64,15 @@ export default class ModelView {
     }
 
     //================================
-    // Target Event handlers
+    // Event handlers
     //================================
 
-    targetCreated(eventData) {
-        let target = eventData.target;
-        if(target.getType() == "component") {
-            this.onComponentCreated(target);
-        }
-    }
-
-    targetUpdated(eventData) {
-        let target = eventData.target;
-        if(target.getType() == "modelManager") {
-            this.onModelUpdated(target);
-        }
-        if(target.getType() == "component") {
-            let componentView = this.getComponentViewByComponentId(target.getId());
-            componentView.componentUpdated(target);
-        }
-    }
-
-    targetDeleted(eventData) {
-        if((eventData.targetId)&&(eventData.targetType == "component")) {
-            this.onComponentDeleted(eventData.targetId);
-        }
-    }
 
     /** This is called on component created events. We only 
      * want to respond to the root folder event here.
      */
-    onComponentCreated(component) {
+    onComponentCreated(eventData) {
+        let component = eventData.target;
 
         //create the component view
         let componentViewClass = ApogeeView.getComponentViewClass(component.constructor.uniqueName);
@@ -121,8 +101,16 @@ export default class ModelView {
         componentView.loadViewStateFromComponent();
     }
 
-    onComponentDeleted(memberId) {
-        let componentView = this.componentViewMap[memberId];
+    onComponentUpdated(eventData) {
+        let component = eventData.target;
+        let componentView = this.getComponentViewByComponentId(component.getId());
+        componentView.componentUpdated(target);
+    }
+
+    onComponentDeleted(eventData) {
+        let componentId = eventData.targetId;
+
+        let componentView = this.componentViewMap[componentId];
         if(componentView) {
             componentView.onDelete();
     
@@ -137,10 +125,11 @@ export default class ModelView {
             }
         }
 
-        delete this.componentViewMap[memberId];
+        delete this.componentViewMap[componentId];
     }
 
-    onModelUpdated(modelManager) {
+    onModelManagerUpdated(eventData) {
+        let modelManager = eventData.target;
         let model = modelManager.getModel();
         if(model.isFieldUpdated("name")) {
             this.workspaceView.setName(model.getName());

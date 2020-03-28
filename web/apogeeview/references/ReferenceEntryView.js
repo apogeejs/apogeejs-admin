@@ -9,8 +9,6 @@ export default class ReferenceEntryView {
         this.referenceEntry = referenceEntry;
         this.displayInfo = displayInfo;
         this.treeEntry = this._createTreeEntry();
-
-        referenceEntry.addListener("updated",eventInfo => this._onUpdated(eventInfo));
     }
 
 
@@ -20,11 +18,7 @@ export default class ReferenceEntryView {
         return this.treeEntry;
     }
 
-    //===========================================
-    // Private Methods
-    //===========================================
-
-    _onUpdated(eventInfo) {
+    onLinkUpdated(eventInfo) {
         let target = eventInfo.target;
         if(target.getType() == "link") {
             //make sure this is the right entry 
@@ -40,6 +34,10 @@ export default class ReferenceEntryView {
             }
         }
     }
+
+    //===========================================
+    // Private Methods
+    //===========================================
 
     _createTreeEntry() {
         var iconUrl = apogeeui.getResourcePath(this.displayInfo.ENTRY_ICON_PATH);

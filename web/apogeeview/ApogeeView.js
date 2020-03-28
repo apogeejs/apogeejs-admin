@@ -39,8 +39,8 @@ export default class ApogeeView {
         this.loadUI(containerId);
 
         //subscribe to events
-        this.app.addListener("created",eventData => this.targetCreated(eventData));
-        this.app.addListener("deleted",eventData => this.targetDeleted(eventData));
+        this.app.addListener("workspaceManager_created",eventData => this.onWorkpaceCreated(eventData));
+        this.app.addListener("workspaceManager_deleted",eventData => this.onWorkspaceClosed(eventData));
 
         //TEMPORARY COMPONENT VIEW REGISTRATION#################################
         ApogeeView.registerComponentView(JsonTableComponentView);
@@ -74,21 +74,9 @@ export default class ApogeeView {
     //================================
     // TargetEvent handlers
     //================================
-    
-    targetCreated(eventData) {
-        let target = eventData.target;
-        if(target.getType() == "workspaceManager") {
-            this.onWorkspaceCreated(target);
-        }
-    }
 
-    targetDeleted(eventData) {
-        if(eventData.targetType == "workspaceManager") {
-            this.onWorkspaceClosed();
-        }
-    }
-
-    onWorkspaceCreated(workspaceManager) {
+    onWorkspaceCreated(eventData) {
+        let workspaceManager = eventdata.target;
 
         if(this.workspaceView != null) {
             //discard an old view if there is one
@@ -104,11 +92,11 @@ export default class ApogeeView {
 
         //add a listener for a change to components - we are displaying the component name of the open tab
         let modelManager = workspaceManager.getModelManager();
-        modelManager.addListener("updated",eventData => this.modelManagerObjectUpdated(eventData));
+        modelManager.addListener("modelManager_updated",eventData => this.onModelManagerUpdated(eventData));
 
     }
 
-    onWorkspaceClosed() {
+    onWorkspaceClosed(eventData) {
         //close any old workspace view
         if(this.workspaceView) {
             this.workspaceView.close();
@@ -212,7 +200,7 @@ export default class ApogeeView {
      * of that component changes, we update the tab display name. This is also not very general. I should
      * clean it up to allow other things besides components to have tabs. I should probably make a tab event that
      * its title changes, or just that it was udpated. */
-    modelManagerObjectUpdated(eventData) {
+    onModelManagerUpdated(eventData) {
         let target = eventData.target;
 
         if(target) {

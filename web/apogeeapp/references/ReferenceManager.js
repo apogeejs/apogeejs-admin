@@ -35,6 +35,10 @@ export default class ReferenceManager extends FieldObject {
         return this.app;
     }
 
+    getReferenceClassArray() {
+        return this.referenceClassArray();
+    }
+
     setViewStateCallback(viewStateCallback) {
         this.viewStateCallback = viewStateCallback;
     }

@@ -6,19 +6,14 @@ import ReferenceEntryView from "/apogeeview/references/ReferenceEntryView.js";
 
 export default class ReferenceListView {
 
-    constructor(app, referenceList,displayInfo) {
+    constructor(app,referenceType,displayInfo,viewState) {
         this.app = app;
-        this.referenceList = referenceList;
+        this.referenceType = referenceType;
         this.displayInfo = displayInfo;
 
         this.childViews = {};
 
-        this._setTreeEntry();
-
-        referenceList.addListener("created",eventInfo => this._onCreated(eventInfo));
-        referenceList.addListener("deleted",eventInfo => this._onDeleted(eventInfo));
-
-        this.referenceList.setViewStateCallback(() => this._getViewState());
+        this._setTreeEntry(viewState);
     }
 
     getDisplayInfo() {
@@ -29,38 +24,43 @@ export default class ReferenceListView {
         return this.treeEntry;
     }
 
-    //===============================================
-    // Private Methods
-    //===============================================
+    onLinkCreated(eventInfo) {
+        let referenceEntry = eventInfo.target;
+        let referenceEntryView = new ReferenceEntryView(this.app,referenceEntry,this.displayInfo);
+        this.childViews[referenceEntry.getId()] = referenceEntryView;
+        this.treeEntry.addChild(referenceEntryView.getTreeEntry());
+    }
 
-    _onCreated(eventInfo) {
-        let target = eventInfo.target;
-        if(target.getType() == "link") {
-            let referenceEntryView = new ReferenceEntryView(this.app,target,this.displayInfo);
-            this.childViews[target.getId()] = referenceEntryView;
-            this.treeEntry.addChild(referenceEntryView.getTreeEntry());
+    onLinkUpdated(eventInfo) {
+        let referenceEntry = eventInfo.target;
+        let referenceEntryView = this.childViews[referenceEntry.getId()];
+        if(referenceEntryView) {
+            referenceEntryView.onLinkUpdated(eventInfo);
         }
     }
 
-    _onDeleted(eventInfo) {
-        if(eventInfo.targetType == "link") {
-            let referenceEntryView = this.childViews[eventInfo.targetId];
+    onLinkDeleted(eventInfo) {
+        let referenceEntryView = this.childViews[eventInfo.targetId];
+        if(referenceEntryView) {
             this.treeEntry.removeChild(referenceEntryView.getTreeEntry());
         }
     }
 
-    _getViewState() {
+    getViewState() {
         if(this.treeEntry) {
             return {treeState: this.treeEntry.getState()};
         }
     }
 
-    _setTreeEntry() {
+    //===============================================
+    // Private Methods
+    //===============================================
+
+    _setTreeEntry(viewState) {
         var iconUrl = apogeeui.getResourcePath(this.displayInfo.LIST_ICON_PATH);
         var menuItemCallback = () => this._getListMenuItems();
         this.treeEntry = new TreeEntry(this.displayInfo.LIST_NAME, iconUrl, null, menuItemCallback, false);
 
-        let viewState = this.referenceList.getCachedViewState();
         if((viewState)&&(viewState.treeState !== undefined)) {
             this.treeEntry.setState(viewState.treeState)
         }

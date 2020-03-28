@@ -8,20 +8,25 @@ export default class ReferenceView {
         this.app = app;
         this.referenceManager = referenceManager;
 
+        //get the view state
+        let viewState = this.referenceManager.getCachedViewState();
+        let listViewStates = viewState ? viewState.lists : null;
+
         //create the tree entry
-        this.treeEntry = this._createTreeEntry();
+        this.treeEntry = this._createTreeEntry(viewState);
 
         //initailize the child list views
         this.referenceListViews = {};
-        let referenceLists = referenceManager.getReferenceLists();
-        for(let entryType in referenceLists) {
-            let referenceList = referenceLists[entryType];
-            let listDisplayInfo = _getListDisplayInfo(entryType);
-            let referenceListView = new ReferenceListView(this.app,referenceList,listDisplayInfo); 
-            this.referenceListViews[entryType] = referenceListView;
+        let referenceClassArray = referenceManager.getReferenceClassArray();
+        referenceClassArray.forEach( referenceClass => {
+            this.referenceListViews[entryType] = this._createReferenceListView(referenceClass.entryType,listViewStates[entryType]); 
             let childTreeEntry = referenceListView.getTreeEntry();
             this.treeEntry.addChild(childTreeEntry);
-        }
+        });
+
+        app.addListener("link_created",eventInfo => this._onLinkCreated(eventInfo));
+        app.addListener("link_updated",eventInfo => this._onLinkUpdated(eventInfo));
+        app.addListener("link_deleted",eventInfo => this._onLinkDeleted(eventInfo));
 
         this.referenceManager.setViewStateCallback(() => this.getViewState());
     }
@@ -40,8 +45,12 @@ export default class ReferenceView {
     //-----------------------------------
     
     getViewState() {
-        if(this.treeEntry) {
-            return {treeState: this.treeEntry.getState()};
+        let json = {};
+        json.treeState = this.treeEntry.getState();
+        json.lists = {};
+        for(let entryType in this.referenceListViews) {
+            let referenceList = this.referenceListViews[entryType];
+            json.lists[entryType] = referenceList.getViewState();
         }
     }
 
@@ -49,12 +58,35 @@ export default class ReferenceView {
     // Private Methods
     //==================================
 
+    _onLinkCreated(eventInfo) {
+        let referenceEntry = eventInfo.target;
+        let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
+        if(referenceList) {
+            referenceList.onLinkCreated(eventInfo);
+        }
+    }
+
+    _onLinkUpdated(eventInfo) {
+        let referenceEntry = eventInfo.target;
+        let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
+        if(referenceList) {
+            referenceList.onLinkUpdated(eventInfo);
+        }
+    }
+
+    _onLinkDeleted(eventInfo) {
+        //we don't have enough info yet to know which list it is in. Send remove to all lists
+        for(let entryType in this.referenceListViews) {
+            let referenceList = this.referenceListViews[entryType];
+            referenceList.onLinkDeleted(eventInfo);
+        }
+    }
+
     /** @private */
-    _createTreeEntry() {
+    _createTreeEntry(viewState) {
         var iconUrl = apogeeui.getResourcePath(REFERENCES_ICON_PATH);
         let treeEntry = new TreeEntry("References", iconUrl, null, null, false);
 
-        let viewState = this.referenceManager.getCachedViewState();
         if((viewState)&&(viewState.treeState !== undefined)) {
             treeEntry.setState(viewState.treeState)
         }
@@ -62,15 +94,15 @@ export default class ReferenceView {
         return treeEntry;
     }
 
-    createReferenceListView(entryType,referenceList) {
+    _createReferenceListView(entryType,viewState) {
         let listDisplayInfo = LIST_DISPLAY_INFO[entryType];
-        if(!entryTypeInfo) {
+        if(!listTypeInfo) {
             listDisplayInfo = apogeeutil.jsonCopy(DEFAULT_LIST_DISPLAY_INFO);
             //set the proper entry type, and use that for the list name too
             listDisplayInfo.REFERENCE_TYPE = entryType;
             listDisplayInfo.LIST_NAME = entryType;
         }
-        return new ReferenceListView(referenceList,listDisplayInfo);
+        return new ReferenceListView(this.app,entryType,listDisplayInfo,viewState);
     }
 
 
