@@ -383,6 +383,8 @@ export default class ComponentView {
     /** This method extends the member udpated function from the base.
      * @protected */    
     componentUpdated(component) {
+        //set the new component
+        this.component = component;
 
         //check for parent change
         if(component.isFieldUpdated("member")) {

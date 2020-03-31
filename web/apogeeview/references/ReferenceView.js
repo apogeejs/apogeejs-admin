@@ -10,7 +10,7 @@ export default class ReferenceView {
 
         //get the view state
         let viewState = this.referenceManager.getCachedViewState();
-        let listViewStates = viewState ? viewState.lists : null;
+        let listViewStates = viewState ? viewState.lists : {};
 
         //create the tree entry
         this.treeEntry = this._createTreeEntry(viewState);
@@ -19,7 +19,9 @@ export default class ReferenceView {
         this.referenceListViews = {};
         let referenceClassArray = referenceManager.getReferenceClassArray();
         referenceClassArray.forEach( referenceClass => {
-            this.referenceListViews[entryType] = this._createReferenceListView(referenceClass.entryType,listViewStates[entryType]); 
+            let entryType = referenceClass.REFERENCE_TYPE;
+            let referenceListView = this._createReferenceListView(entryType,listViewStates[entryType]); 
+            this.referenceListViews[entryType] = referenceListView;
             let childTreeEntry = referenceListView.getTreeEntry();
             this.treeEntry.addChild(childTreeEntry);
         });
@@ -96,7 +98,7 @@ export default class ReferenceView {
 
     _createReferenceListView(entryType,viewState) {
         let listDisplayInfo = LIST_DISPLAY_INFO[entryType];
-        if(!listTypeInfo) {
+        if(!listDisplayInfo) {
             listDisplayInfo = apogeeutil.jsonCopy(DEFAULT_LIST_DISPLAY_INFO);
             //set the proper entry type, and use that for the list name too
             listDisplayInfo.REFERENCE_TYPE = entryType;

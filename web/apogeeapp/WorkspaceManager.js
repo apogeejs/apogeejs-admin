@@ -1,5 +1,6 @@
 import FieldObject from "/apogeeutil/FieldObject.js";
 
+import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
 import ModelManager from "/apogeeapp/ModelManager.js";
 
@@ -8,7 +9,7 @@ import ModelManager from "/apogeeapp/ModelManager.js";
 export default class WorkspaceManager extends FieldObject {
 
     constructor(app,instanceToCopy,keepUpdatedFixed) {
-        super("workspace",instanceToCopy,keepUpdatedFixed);
+        super("workspaceManager",instanceToCopy,keepUpdatedFixed);
 
         this.app = app;
         
@@ -98,7 +99,7 @@ export default class WorkspaceManager extends FieldObject {
      * model manager is unlocked it will return that. Otherwise it will return
      * a new unlocked instance that will also be set as the current instance. */
     getMutableModelManager() {
-        let oldModelManager = getModelManager();
+        let oldModelManager = this.getModelManager();
         if(oldModelManager.getIsLocked()) {
             //create a new instance that is a copy of this one
             let newModelManager = new ModelManager(this.app,referenceManager);
@@ -224,7 +225,7 @@ export default class WorkspaceManager extends FieldObject {
         let commandResult = {};
         commandResult.cmdDone = true;
         commandResult.target = this;
-        synchCommandResult.eventAction = "created";
+        commandResult.eventAction = "created";
 
         //set the view state
         if(json.viewState !== undefined) {

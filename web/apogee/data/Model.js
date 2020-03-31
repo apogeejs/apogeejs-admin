@@ -56,7 +56,7 @@ export default class Model extends FieldObject {
     getMutableModel() {
         if(this.getIsLocked()) {
             //create a new instance that is a copy of this one
-            return Model(this);
+            return new Model(this.runContext,this);
         }
         else {
             //return this instance since it si already unlocked
@@ -223,7 +223,7 @@ export default class Model extends FieldObject {
         let member = this.lookupMemberById(memberId);
         if(member.getIsLocked()) {
             //create a unlocked copy of the member
-            let newMember = member.constructor(member.getName(),member.getParentId(),member);
+            let newMember = new member.constructor(member.getName(),member.getParentId(),member);
             //update the saved copy of this member in the member map
             this.registerMember(newMember);
             return newMember;
@@ -243,7 +243,7 @@ export default class Model extends FieldObject {
 
     finalizeMemberMap() {
         if(this.workingMemberMap) {
-            this.setField("memberMap");
+            this.setField("memberMap",this.workingMemberMap);
             this.workingMemberMap = null;
         }
     }

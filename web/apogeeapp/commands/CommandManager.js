@@ -56,7 +56,10 @@ export default class CommandManager {
     executeCommand(command,suppressFromHistory) {
         //get a mutable workspace manager instance
         let oldWorkspaceManager = this.app.getWorkspaceManager();
-        let newWorkspaceManager = oldWorkspaceManager.getMutableWorkspaceManager();
+        let newWorkspaceManager;
+        if(oldWorkspaceManager) {
+            newWorkspaceManager = oldWorkspaceManager.getMutableWorkspaceManager();
+        }
 
         let commandResult;
         
@@ -101,10 +104,12 @@ export default class CommandManager {
         //if the command succceeded, update the workspace manager instance
         if(changeResult.cmdDone) {
             //success - commit accept change
-            this.app.setWorkspaceManager(newWorkspaceManager);
+            if(newWorkspaceManager) {
+                this.app.setWorkspaceManager(newWorkspaceManager);
+            }
 
             //add to history if the command was done and there is an undo command
-            if((commandResult.cmdDone)&&(undoCommand)) {   
+            if(undoCommand) {   
                 this.commandHistory.addToHistory(undoCommand,command,description);
             }
 
@@ -206,7 +211,6 @@ export default class CommandManager {
 
                     if(actionChangeEntry.member) {
                         let componentId = modelManager.getComponentIdByMemberId(actionChangeEntry.member.getId());
-                        cmdRsltEquivelent.eventName = this._createEventName(actionChangeEntry.event,"component");
                         switch(actionChangeEntry.event) {
                             case "created":
                             case "updated":
@@ -228,7 +232,6 @@ export default class CommandManager {
                         }
                     }
                     else {
-                        cmdRsltEquivelent.eventName = this._createEventName(actionChangeEntry.event,modelManager.getTargetType());
                         switch(actionChangeEntry.event) {
                             case "created":
                             case "updated":
@@ -237,7 +240,7 @@ export default class CommandManager {
 
                             case "deleted":
                                 cmdRsltEquivelent.targetId = modelManager.getId();
-                                cmdRsltEquivelent.targetType = modelManager.getTargetType();
+                                cmdRsltEquivelent.targetType = modelManager.getType();
                                 break;
 
                             default: 
@@ -271,14 +274,14 @@ export default class CommandManager {
         }
         
         //create the change map entry
-        let changeMapEntry = changeMap[key];
+        let changeMapEntry = changeMap[targetId];
         if(!changeMapEntry) {
             changeMapEntry = {};
             if(commandResultEntry.target) {
                 changeMapEntry.target = target;
             }
             changeMapEntry.targetId = targetId;
-            changeMapEntry.eventName = commandResultEntry.eventName;
+            changeMapEntry.eventName = this._createEventName(commandResultEntry.eventAction,target.getType());
             changeMap[targetId] = changeMapEntry;
         }
         //there may be a case where we do not have a target instance in the change map entry because

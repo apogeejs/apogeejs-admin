@@ -126,8 +126,8 @@ export function updateComponent(component,componentView) {
                 // add the compone nodes to the new page after the component has been moved there
                 //----------------------------------------------
                 if(newValues.parentId) {
-                    let newParentComponent = modelManager.getComponentByMemberId(newValues.parentId);
-                    let newParentComponentView = modelView.getComponentViewByComponentId(newParentComponent.getId());
+                    let newParentComponentId = modelManager.getComponentIdByMemberId(newValues.parentId);
+                    let newParentComponentView = modelView.getComponentViewByComponentId(newParentComponentId);
 
                     let newName = newValues.name ? newValues.name : oldName;
 

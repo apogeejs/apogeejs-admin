@@ -37,8 +37,8 @@ export default class ParentComponentView extends ComponentView {
         var childIdMap = member.getChildIdMap();
         for(var childKey in childIdMap) {
             var childMemberId = childIdMap[childKey];
-            var childComponent = modelManager.getComponentByMemberId(childMemberId);
-            var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
+            var childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
+            var childComponentView = modelView.getComponentViewByComponentId(childComponentId);
             if(childComponentView) {
                 var childTreeEntry = childComponentView.getTreeEntry();
                 treeEntry.addChild(childTreeEntry);
@@ -98,11 +98,12 @@ export default class ParentComponentView extends ComponentView {
 
     /** This overides the super method to first intercept the new document and save the editor data */
     componentUpdated(component) {
-
+        //set the document data
         if(component.isFieldUpdated("document")) {
             this._loadEditorData();
         }
 
+        //update the component and its ui elements
         super.componentUpdated(component);
     }
 

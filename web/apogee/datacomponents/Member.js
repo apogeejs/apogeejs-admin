@@ -331,8 +331,7 @@ export default class Member extends FieldObject {
      * can extend this function, but it should call this base version of the function
      * if it does.  
      * @protected */
-    onDeleteMember() {
-        this.clearField("parentId");
+    onDeleteMember(model) {
     }
 
     ///** This method is called when the model is closed and also when an object

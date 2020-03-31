@@ -32,12 +32,22 @@ function deleteMember(model,actionData) {
     }
     
     let actionResult = doDelete(model, member);
+
+    //remove the top-most deleted member from its parent
+    let parentId = member.getParentId();
+    let parent = model.getMutableMember(parentId);
+    if(parent) {
+        parent.removeChild(model,member);
+    }
+
     return actionResult;
     
 }
 
 
-/** @private */
+/** Here we take any actions for deleting the member and its children,
+ * except "remove from parent", which we will do only for the top deleted member. 
+ * @private */
 function doDelete(model, member) {
 
     let actionResult = {};
@@ -59,19 +69,9 @@ function doDelete(model, member) {
             }
         }
     }
-    
-    //delete member
-    let parentId = member.getParentId();
-    let parent = model.getMutableMember(parentId);
-    if(parent) {
-        parent.removeChild(model,member);
-    }
 
-    //additional delete member actions
-    member.onDeleteMember();
-    if(member.isDependent) {
-        member.onDeleteDependent(model);
-    }
+    //delete member actions
+    member.onDeleteMember(model);
     
     actionResult.actionDone = true;
     actionResult.updateModelDependencies = true;

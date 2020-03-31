@@ -106,7 +106,6 @@ export function doAction(model,actionData) {
             model.setActionInProgress(false);
             
             model.lockAll();
-            model.dispatchEvent("actionCompleted",changeResult);
             return changeResult;
         }
 
@@ -128,6 +127,7 @@ export function doAction(model,actionData) {
 
         //commit the updated impacts map (inverse of dependency map) 
         model.finalizeImpactsMap();
+        model.finalizeMemberMap();
 
         //populate recalc list
         let recalculateList = createRecalculateList(model,actionModifiedMembers,additionalUpdatedMembers);
@@ -153,7 +153,6 @@ export function doAction(model,actionData) {
         model.setActionInProgress(false);
 
         model.lockAll();
-        model.dispatchEvent("actionCompleted",changeResult);
         return changeResult;
         
     }
@@ -178,7 +177,6 @@ export function doAction(model,actionData) {
                 model.setCalculationCanceled();
 
                 model.lockAll();
-                model.dispatchEvent("actionCompleted",changeResult);
                 return changeResult;         
             }
         }
@@ -199,7 +197,6 @@ export function doAction(model,actionData) {
                 model.clearCommandQueue();
 
                 model.lockAll();
-                model.dispatchEvent("actionCompleted",changeResult);
                 return changeResult;
             }  
         }
@@ -213,7 +210,6 @@ export function doAction(model,actionData) {
     changeResult.changeList = changeMapToChangeList(changeMap);
 
     model.lockAll();
-    model.dispatchEvent("actionCompleted",changeResult);
     return changeResult;
 }
 

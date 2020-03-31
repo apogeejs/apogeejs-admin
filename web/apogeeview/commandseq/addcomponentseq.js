@@ -80,8 +80,8 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
             let additionalCommandInfo;
             let parentComponentView;
             if(componentViewClass.hasChildEntry) {
-                let parentComponent = modelManager.getComponentByMemberId(parentMemberId);
-                parentComponentView = modelView.getComponentViewByComponentId(parentComponent.getId());
+                let parentComponentId = modelManager.getComponentIdByMemberId(parentMemberId);
+                parentComponentView = modelView.getComponentViewByComponentId(parentComponentId);
                 additionalCommandInfo = getAdditionalCommands(parentComponentView,userInputProperties.name);
 
                 //added the editor setup command

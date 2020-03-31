@@ -117,8 +117,10 @@ export default class DependentMember extends Member {
         }
     }
 
-    /** This method does any needed cleanup when the dependent is depeted.. */
-    onDeleteDependent(model) {
+    /** This method removes this dependent from the model impacts map. */
+    onDeleteMember(model) {
+        super.onDeleteMember(model);
+
         //remove this dependent from the impactor
         let dependsOnMap = this.getField("dependsOnMap");
         for(var remoteMemberIdString in dependsOnMap) {

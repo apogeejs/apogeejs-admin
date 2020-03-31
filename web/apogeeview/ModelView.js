@@ -104,7 +104,7 @@ export default class ModelView {
     onComponentUpdated(eventData) {
         let component = eventData.target;
         let componentView = this.getComponentViewByComponentId(component.getId());
-        componentView.componentUpdated(target);
+        componentView.componentUpdated(component);
     }
 
     onComponentDeleted(eventData) {

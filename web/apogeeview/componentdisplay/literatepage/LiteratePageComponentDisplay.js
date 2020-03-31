@@ -87,8 +87,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
         if (memberId) {
             var modelView = this.componentView.getModelView();
             var modelManager = modelView.getModelManager();
-            var childComponent = modelManager.getComponentByMemberId(memberId);
-            var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
+            var childComponentId = modelManager.getComponentIdByMemberId(memberId);
+            var childComponentView = modelView.getComponentViewByComponentId(childComponentId);
             let childComponentDisplay;
             if (childComponentView) {
                 childComponentDisplay = childComponentView.getComponentDisplay();
@@ -280,8 +280,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
         var childrenIds = folder.getChildIdMap();
         for(var childName in childrenIds) {
             var childMemberId = childrenIds[childName];
-            var childComponent = modelManager.getComponentByMemberId(childMemberId);
-            var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
+            var childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
+            var childComponentView = modelView.getComponentViewByComponentId(childComponentId);
             if(childComponentView) {
                 this.addChild(childComponentView);
             }
@@ -387,8 +387,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
 
         for(var childName in childIdMap) {
             var childMemberId = childIdMapv[childName];
-            var childComponent = modelManager.getComponentByMemberId(childMemberId);
-            var childComponentView = modelView.getComponentViewByComponentId(childComponent.getId());
+            var childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
+            var childComponentView = modelView.getComponentViewByComponentId(childComponentId);
             if(childComponentView) {
                 childComponentView.closeComponentDisplay();
             }

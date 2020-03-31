@@ -8,9 +8,6 @@ export default class ModelManager extends FieldObject {
     constructor(app,instanceToCopy,keepUpdatedFixed) {
         super("modelManager",instanceToCopy,keepUpdatedFixed);
 
-        //mixin initialization
-        this.eventManagerMixinInit();
-
         this.app = app;
 
         //==============
@@ -52,6 +49,12 @@ export default class ModelManager extends FieldObject {
         if(oldModel.getIsLocked()) {
             let newModel = oldModel.getMutableModel();
             this.setField("model",newModel);
+            
+            //add listeners
+            //newModel.addListener("created", eventInfo => this.objectCreated(eventInfo));
+            newModel.addListener("updated", eventInfo => this.objectUpdated(eventInfo));
+            newModel.addListener("deleted", eventInfo => this.objectDeleted(eventInfo));
+
             return newModel;
         }
         else {
@@ -111,11 +114,12 @@ export default class ModelManager extends FieldObject {
         var folders = []
         for(var key in componentMap) {
             var folderEntry = [];
-            var componentInfo = componentMap[key];
-            var member = componentInfo.member;
-            if((member.isParent)&&(member.getChildrenWriteable())) { 
-                folderEntry.push(member.getId());
-                folderEntry.push(member.getFullName(model));
+            var component = componentMap[key];
+            if(component.getParentFolderForChildren)
+            var folderMember = component.getParentFolderForChildren();
+            if(folderMember.getChildrenWriteable()) { 
+                folderEntry.push(folderMember.getId());
+                folderEntry.push(folderMember.getFullName(model));
                 folders.push(folderEntry);
             }
         }
@@ -160,7 +164,7 @@ export default class ModelManager extends FieldObject {
 
         newMemberMap[memberId] = memberInfo;
 
-        this.setField("componentMap",newMemberMap);
+        this.setField("memberMap",newMemberMap);
     }
     
     testPrint(eventInfo) {
@@ -253,15 +257,14 @@ export default class ModelManager extends FieldObject {
 
     /** This method responds to a member updated. */
     memberUpdated(member) {
-        let componentId = this.getComponentIdForMemberId(member.getId());
+        let componentId = this.getComponentIdByMemberId(member.getId());
         if(componentId) {
-            let component = getMutableComponentByComponentId(componentId);
+            let component = this.getMutableComponentByComponentId(componentId);
             component.memberUpdated(member);
         }
     }
 
     modelUpdated(model) {
-        //all changes kept in model
     }
 
     /** This method responds to a delete menu event. */
@@ -296,14 +299,6 @@ export default class ModelManager extends FieldObject {
             }
             this.setField("memberMap",memberMap);
         }
-    }
-
-    actionStarted(eventInfo) {
-
-    }
-
-    actionCompleted(eventInfo) {
-        
     }
 
     //====================================
@@ -346,8 +341,6 @@ export default class ModelManager extends FieldObject {
         //model.addListener("created", eventInfo => this.objectCreated(eventInfo));
         model.addListener("updated", eventInfo => this.objectUpdated(eventInfo));
         model.addListener("deleted", eventInfo => this.objectDeleted(eventInfo));
-        model.addListener("actionStarted", eventInfo => this.actionStarted(eventInfo));
-        model.addListener("actionCompleted", eventInfo => this.actionCompleted(eventInfo));
 
         //load the model
         let loadAction = {};

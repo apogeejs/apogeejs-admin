@@ -1,5 +1,6 @@
 import FieldObject from "/apogeeutil/FieldObject.js";
 import {bannerConstants} from "/apogeeview/componentdisplay/banner.js";
+import CommandManager from "/apogeeapp/commands/CommandManager.js";
 
 /** This class manages references for the web page.*/
 export default class ReferenceEntry extends FieldObject {

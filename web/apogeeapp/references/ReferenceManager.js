@@ -1,5 +1,5 @@
-import ReferenceList from "/apogeeapp/references/ReferenceList.js";
-import ReferenceEntry from "./ReferenceEntry";
+import ReferenceEntry from "/apogeeapp/references/ReferenceEntry.js";
+import FieldObject from "/apogeeutil/FieldObject.js";
 
 /** This class manages links and other reference entries, loading the references and
  * creating the UI tree elements for display of the references.
@@ -36,7 +36,7 @@ export default class ReferenceManager extends FieldObject {
     }
 
     getReferenceClassArray() {
-        return this.referenceClassArray();
+        return this.referenceClassArray;
     }
 
     setViewStateCallback(viewStateCallback) {

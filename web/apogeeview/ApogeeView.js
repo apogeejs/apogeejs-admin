@@ -39,8 +39,9 @@ export default class ApogeeView {
         this.loadUI(containerId);
 
         //subscribe to events
-        this.app.addListener("workspaceManager_created",eventData => this.onWorkpaceCreated(eventData));
+        this.app.addListener("workspaceManager_created",eventData => this.onWorkspaceCreated(eventData));
         this.app.addListener("workspaceManager_deleted",eventData => this.onWorkspaceClosed(eventData));
+        this.app.addListener("modelManager_updated",eventData => this.onModelManagerUpdated(eventData));
 
         //TEMPORARY COMPONENT VIEW REGISTRATION#################################
         ApogeeView.registerComponentView(JsonTableComponentView);
@@ -76,7 +77,7 @@ export default class ApogeeView {
     //================================
 
     onWorkspaceCreated(eventData) {
-        let workspaceManager = eventdata.target;
+        let workspaceManager = eventData.target;
 
         if(this.workspaceView != null) {
             //discard an old view if there is one
@@ -89,11 +90,6 @@ export default class ApogeeView {
         //load the tree entry
         let treeEntry = this.workspaceView.getTreeEntry();
         this.tree.setRootEntry(treeEntry);
-
-        //add a listener for a change to components - we are displaying the component name of the open tab
-        let modelManager = workspaceManager.getModelManager();
-        modelManager.addListener("modelManager_updated",eventData => this.onModelManagerUpdated(eventData));
-
     }
 
     onWorkspaceClosed(eventData) {
