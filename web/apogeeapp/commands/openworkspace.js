@@ -20,17 +20,9 @@ let openworkspace = {};
 //NO UNDO FOR OPEN Workspace
 //openworkspace.createUndoCommand = function(workspaceManager,commandData) {
 
-openworkspace.executeCommand = function(nullWorkspaceManager,commandData) {
+openworkspace.executeCommand = function(workspaceManager,commandData) {
     
     try {
-
-        //create the workspace manager (this does not create several child objects in it)
-        var app = Apogee.getInstance();
-        var workspaceManager = new WorkspaceManager(app);
-
-//should we wait until command succeeds, at least in part, to do this?
-        app.setWorkspaceManager(workspaceManager);
-
         let commandResult = workspaceManager.load(commandData.workspaceJson,commandData.fileMetadata);
 
         return commandResult;

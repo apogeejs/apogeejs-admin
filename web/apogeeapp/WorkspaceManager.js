@@ -23,8 +23,14 @@ export default class WorkspaceManager extends FieldObject {
 
             let referenceManager = new ReferenceManager(this.app);
             this.setField("referenceManager",referenceManager);
+
+//temporary
+this.created = true;
         }
-        
+else {
+this.created = false;
+}
+
         //==============
         //Working variables
         //==============
@@ -54,7 +60,7 @@ export default class WorkspaceManager extends FieldObject {
     getMutableWorkspaceManager() {
         if(this.getIsLocked()) {
             //create a new instance that is a copy of this one
-            return WorkspaceManager(this.app,this);
+            return new WorkspaceManager(this.app,this);
         }
         else {
             //return this instance since it si already unlocked
@@ -62,11 +68,27 @@ export default class WorkspaceManager extends FieldObject {
         }
     }
 
+    // temporary implementation
+    getChangeMap() {
+        let changeMap = {};
+        changeMap[this.getId()] = {action: (this.created ? "workspaceManager_created" : "workspaceManager_updated"), instance: this};
+
+        let referenceManager = this.getReferenceManager();
+        let referenceChangeMap = referenceManager.getChangeMap();
+        if(referenceChangeMap) Object.assign(changeMap,referenceChangeMap);
+
+        let modelManager = this.getModelManager();
+        let modelChangeMap = modelManager.getChangeMap();
+        if(modelChangeMap) Object.assign(changeMap,modelChangeMap);
+
+        return changeMap;
+    }
+
     /** This method locks this workspace instance and all the contained object instances. */
     lockAll() {
         //we maybe shouldn't be modifying the members in place, but we will do it anyway
-        this.getReferenceManager().lock();
-        this.getModelManager().lock();
+        this.getReferenceManager().lockAll();
+        this.getModelManager().lockAll();
         this.lock();
     }
 
@@ -81,7 +103,7 @@ export default class WorkspaceManager extends FieldObject {
         let oldReferenceManager = getReferenceManager();
         if(oldReferenceManager.getIsLocked()) {
             //create a new instance that is a copy of this one
-            let newReferenceManager = new ReferenceManager(this.app,referenceManager);
+            let newReferenceManager = new ReferenceManager(this.app,oldReferenceManager);
             this.setField("referenceManager",newReferenceManager);
             return newReferenceManager;
         }
@@ -102,7 +124,7 @@ export default class WorkspaceManager extends FieldObject {
         let oldModelManager = this.getModelManager();
         if(oldModelManager.getIsLocked()) {
             //create a new instance that is a copy of this one
-            let newModelManager = new ModelManager(this.app,referenceManager);
+            let newModelManager = new ModelManager(this.app,oldModelManager);
             this.setField("modelManager",newModelManager);
             return newModelManager;
         }

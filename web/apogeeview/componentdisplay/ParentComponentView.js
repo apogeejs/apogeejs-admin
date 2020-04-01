@@ -23,7 +23,7 @@ export default class ParentComponentView extends ComponentView {
         this.editorManager = createProseMirrorManager(modelView.getApp(),component.getSchema());
 
         this.editorData = null;
-        this._loadEditorData();
+        this._loadEditorData(component);
     }
 
     createTreeDisplay() {
@@ -100,17 +100,18 @@ export default class ParentComponentView extends ComponentView {
     componentUpdated(component) {
         //set the document data
         if(component.isFieldUpdated("document")) {
-            this._loadEditorData();
+            this._loadEditorData(component);
         }
 
         //update the component and its ui elements
         super.componentUpdated(component);
     }
 
-    _loadEditorData() {
-        let document = this.component.getDocument();
+    _loadEditorData(component) {
+        let document = component.getDocument();
+        let editorStateInfo = component.getEditorStateInfo(true);
+        let schema = component.getSchema();
 
-        let editorStateInfo = this.component.getEditorStateInfo(true);
         let selection;
         let storedMarks;
         if(editorStateInfo) {
@@ -123,7 +124,6 @@ export default class ParentComponentView extends ComponentView {
             //load the saved marks
             let storedMarksJson = editorStateInfo.storedMarks;
             if(storedMarksJson) {
-                let schema = this.component.getSchema();
                 storedMarks = storedMarksJson.map(markJson => Mark.fromJson(schema,markJson));
             }
         }

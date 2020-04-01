@@ -3,6 +3,7 @@ import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
+import WorkspaceManager from "/apogeeapp/WorkspaceManager.js";
 import "/apogeeapp/commandConfig.js";
 
 import JsonTableComponent from "/apogeeapp/components/JsonTableComponent.js";
@@ -101,6 +102,10 @@ export default class Apogee extends EventManager {
     /** This method returns the active WorkspaceManager object. */
     getWorkspaceManager() {
         return this.workspaceManager;
+    }
+
+    createWorkspaceManager() {
+        return new WorkspaceManager(this);
     }
 
     /** This method returns the active model object. */

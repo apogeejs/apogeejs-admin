@@ -386,7 +386,7 @@ export default class LiteratePageComponentDisplay extends EventManager {
         var modelManager = modelView.getModelManager();
 
         for(var childName in childIdMap) {
-            var childMemberId = childIdMapv[childName];
+            var childMemberId = childIdMap[childName];
             var childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
             var childComponentView = modelView.getComponentViewByComponentId(childComponentId);
             if(childComponentView) {

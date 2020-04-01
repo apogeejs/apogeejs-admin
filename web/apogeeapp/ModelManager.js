@@ -25,6 +25,11 @@ export default class ModelManager extends FieldObject {
         //==============
         this.viewStateCallback = null;
         this.cachedViewState = null;
+
+        this.workingChangeMap = {};
+
+        //add a change map entry for this object
+        this.workingChangeMap[this.getId()] = {action: instanceToCopy ? "modelManager_updated" : "modelManager_created", instance: this};
       
     }
 
@@ -62,6 +67,23 @@ export default class ModelManager extends FieldObject {
         }
     }
 
+    /** The change map lists the changes to the components and model. This will only be
+     * valid when the ModelManager is unlocked */
+    getChangeMap() {
+        return this.workingChangeMap;
+    }
+
+    /** This method locks the model manager and all components. */
+    lockAll() {
+        this.workingChangeMap = null;
+
+        let componentMap = this.getField("componentMap");
+        for(var id in componentMap) {
+            componentMap[id].lock();
+        }
+        this.lock();
+    }
+
     //====================================
     // Component Management
     //====================================
@@ -77,13 +99,11 @@ export default class ModelManager extends FieldObject {
         if(oldComponent) {
             if(oldComponent.getIsLocked()) {
                 //create an unlocked instance of the component
-                let newComponent = oldComponent.constructor(component.getMember(),this,oldComponent);
+                let newComponent = new oldComponent.constructor(oldComponent.getMember(),this,oldComponent);
 
                 //register this instance
-                let newComponentMap = {};
-                Object.assign(newComponentMap,oldComponentMap);
-                newComponentMap[componentId] = newComponent;
-                this.setField("componentMap",newComponentMap);
+                this.registerComponent(newComponent);
+
                 return newComponent;
             }
             else {
@@ -129,14 +149,83 @@ export default class ModelManager extends FieldObject {
     /** This method stores the component instance. It must be called when a
      * new component is created and when a component instance is replaced. */
     registerComponent(component) {
-        //copy the old map
+        let componentId = component.getId();
+        let oldComponentMap = this.getField("componentMap");
+
+        //create the udpated map
+        let newComponentMap = {};
+        Object.assign(newComponentMap,oldComponentMap);
+        newComponentMap[componentId] = component;
+        this.setField("componentMap",newComponentMap);
+
+        //update the change map
+        let oldChangeEntry = this.workingChangeMap[componentId];  
+        let newAction; 
+        //this.workingChangeMap[componentId] = {action: (oldInstance ? "component_updated" : "component_created"), instance: component};
+        if(oldChangeEntry) {
+            //we will assume the events come in order
+            //the only scenarios assuming order are:
+            //created then updated => keep action as created
+            //updated then updated => no change
+            //we will just update the component
+            newAction = oldChangeEntry.action;
+        }
+        else {
+            //new action will depend on if we have the component in our old component map
+            newAction = oldComponentMap[componentId] ? "component_updated" : "component_created"; 
+        }
+        this.workingChangeMap[componentId] = {action: newAction, instance: component};
+    }
+
+    /** This method takes the local actions needed when a component is deleted. It is called internally. */
+    _unregisterComponent(component) {
+        let componentId = component.getId();
+
+        //update the component map
         let oldComponentMap = this.getField("componentMap");
         let newComponentMap = {};
         Object.assign(newComponentMap,oldComponentMap);
-
-        //update and save
-        newComponentMap[component.getId()] = component;
+        //remove the given component
+        delete newComponentMap[componentId];
+        //save the updated map
         this.setField("componentMap",newComponentMap);
+
+        //update the member map
+        //this is a little cumbersome
+        let oldMemberMap = this.getField("memberMap");
+        let newMemberMap = {};
+        Object.assign(newMemberMap,oldMemberMap);
+        for(let componentMemberId in newMemberMap) {
+            let componentInfo = newMemberMap[componentMemberId];
+            if(componentInfo.componentId == componentId) {
+                delete newMemberMap[componentMemberId];
+            }
+        }
+        this.setField("memberMap",memberMap);
+
+        //update the change map
+        let oldChangeEntry = this.workingChangeMap[componentId];
+        let newChangeEntry;
+        if(oldChangeEntry) {
+            //handle the case of an existing change entry
+            if(oldChangeEntry.action == "component_created") {
+                //component created and deleted during this action - flag it as transient
+                newChangeEntry = {action: "transient", instance: component};
+            }
+            else if(oldChangeEntry.action == "component_updated") {
+                newChangeEntry = {action: "component_deleted", instance: component};
+            }
+            else {
+                //this shouldn't happen. If it does there is no change to the action
+                //we will just update the component
+                newChangeEntry = {action: oldChangeEntry.action, instance: component};
+            }
+        }
+        else {
+            //add a new change entry
+            newChangeEntry = {action: "component_deleted", instance: component};
+        }
+        this.workingChangeMap[componentId] = newChangeEntry;  
     }
 
     /** This method registers a member data object and its associated component object.
@@ -278,26 +367,8 @@ export default class ModelManager extends FieldObject {
             //take any delete actions (thes should not require a mutable member)
             component.onDelete();
 
-            //update the component map
-            let newComponentMap = {};
-            Object.assign(newComponentMap,oldComponentMap);
-            //remove the given component
-            delete newComponentMap[componentId];
-            //save the updated map
-            this.setField("componentMap",newComponentMap);
-
-            //update the member map
-            //this is a little cumbersome
-            let oldMemberMap = this.getField("memberMap");
-            let newMemberMap = {};
-            Object.assign(newMemberMap,oldMemberMap);
-            for(let componentMemberId in newMemberMap) {
-                let componentInfo = newMemberMap[componentMemberId];
-                if(componentInfo.componentId == componentId) {
-                    delete newMemberMap[componentMemberId];
-                }
-            }
-            this.setField("memberMap",memberMap);
+            //unregister the component
+            this._unregisterComponent();
         }
     }
 

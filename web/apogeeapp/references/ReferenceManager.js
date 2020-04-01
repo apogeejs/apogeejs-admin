@@ -29,10 +29,32 @@ export default class ReferenceManager extends FieldObject {
         //==============
         this.viewStateCallback = null;
         this.cachedViewState = null;
+
+        this.workingChangeMap = {};
+
+        //add a change map entry for this object
+        this.workingChangeMap[this.getId()] = {action: instanceToCopy ? "referenceManager_updated" : "referenceManager_created", instance: this};
     }
 
     getApp() {
         return this.app;
+    }
+
+    /** The change map lists the changes to the components and model. This will only be
+     * valid when the ReferenceManager is unlocked */
+    getChangeMap() {
+        return this.workingChangeMap;
+    }
+
+    /** This method locks the reference manager and all reference entries. */
+    lockAll() {
+        this.workingChangeMap = null;
+
+        let referenceEntryMap = this.getField("referenceEntryMap");
+        for(let id in referenceEntryMap) {
+            referenceEntryMap[id].lock();
+        }
+        this.lock();
     }
 
     getReferenceClassArray() {
@@ -156,11 +178,14 @@ export default class ReferenceManager extends FieldObject {
             if(!referenceEntryClass) throw new Error("Entry type nopt found: " + entryCommandData.entryType);
             let referenceEntry = new this.referenceEntryClass(entryCommandData);
 
-            //update map
+            //update entry map
             let newEntryMap = {};
             Object.assign(newEntryMap,oldEntryMap);
             newEntryMap[entryKey] = referenceEntry;
             this.setField("referenceEntryMap",newEntryMap);
+
+            //add a change map entry for this object
+            this.workingChangeMap[referenceEntry.getId()] = {action: "referenceEntry_created", instance: referenceEntry};
         }
 
         return {
@@ -170,31 +195,7 @@ export default class ReferenceManager extends FieldObject {
         }
     }
 
-    removeEntry(entryType,url) {
-        let commandResult = {};
-
-        let entryKey = _getEntryKey(entryType,url);
-        let oldEntryMap = this.getField("referenceEntryMap");
-        let referenceEntry = oldEntryMap[entryKey];
-        if(referenceEntry) {
-            let newEntryMap = apogeeutil.jsonCopy(oldEntryMap);
-            delete newEntryMap[entryKey];
-            referenceEntry.remove();
-
-            commandResult.cmdDone = true;
-            commandResult.targetId = referenceEntry.getId();
-            commandResult.targetType = referenceEntry.getType();
-            commandResult.eventAction = "deleted";
-        }
-        else {
-            //always return cmd done on references for now
-            commandResult.cmdDone = false;
-            commandResult.errorMsg = "Reference entry not found: " + url;
-        }
-
-        return commandResult;
-    }
-
+    
     updateEntry(entryType,url,entryData) {
         let commandResult = {};
 
@@ -218,6 +219,17 @@ export default class ReferenceManager extends FieldObject {
             }
             newEntryMap[newEntryKey] = newReferenceEntry;
             this.setField("referenceEntryMap",newEntryMap);
+
+            //update change map
+            let oldChangeEntry = this.workingChangeMap[referenceEntry.getId()];
+            if(oldChangeEntry.action == "referenceEntry_created") {
+                //keep created action, update instance
+                this.workingChangeMap[referenceEntry.getId()] = {action: "referenceEntry_created", instance: referenceEntry};
+            }
+            else {
+                //add an updated action entry
+                this.workingChangeMap[referenceEntry.getId()] = {action: "referenceEntry_updated", instance: referenceEntry};
+            }
             
             commandResult.cmdDone = true;
             commandResult.target = newReferenceEntry;
@@ -227,6 +239,44 @@ export default class ReferenceManager extends FieldObject {
             //entry not found
             commandResult.cmdDone = false;
             commandResult.alertMsg = "Link entry to update not found: " + url;
+        }
+
+        return commandResult;
+    }
+
+    removeEntry(entryType,url) {
+        let commandResult = {};
+
+        let entryKey = _getEntryKey(entryType,url);
+        let oldEntryMap = this.getField("referenceEntryMap");
+        let referenceEntry = oldEntryMap[entryKey];
+        if(referenceEntry) {
+            //update entry map
+            let newEntryMap = {};
+            Object.assign(newEntryMap,oldEntryMap);
+            delete newEntryMap[entryKey];
+            this.setField("referenceEntryMap",newEntryMap);
+
+            referenceEntry.remove();
+
+            //add a change map entry for this object
+            let oldChangeEntry = this.workingChangeMap[referenceEntry.getId()];
+            if(oldChangeEntry.action == "referenceEntry_created") {
+                this.workingChangeMap[referenceEntry.getId()] = {action: "transient", instance: referenceEntry};
+            }
+            else {
+                this.workingChangeMap[referenceEntry.getId()] = {action: "referenceEntry_deleted", instance: referenceEntry};
+            }
+
+            commandResult.cmdDone = true;
+            commandResult.targetId = referenceEntry.getId();
+            commandResult.targetType = referenceEntry.getType();
+            commandResult.eventAction = "deleted";
+        }
+        else {
+            //always return cmd done on references for now
+            commandResult.cmdDone = false;
+            commandResult.errorMsg = "Reference entry not found: " + url;
         }
 
         return commandResult;

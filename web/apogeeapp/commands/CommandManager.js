@@ -60,6 +60,10 @@ export default class CommandManager {
         if(oldWorkspaceManager) {
             newWorkspaceManager = oldWorkspaceManager.getMutableWorkspaceManager();
         }
+        else {
+            //instantiate a new empty workspace manager
+            newWorkspaceManager = this.app.createWorkspaceManager();
+        }
 
         let commandResult;
         
@@ -104,9 +108,7 @@ export default class CommandManager {
         //if the command succceeded, update the workspace manager instance
         if(changeResult.cmdDone) {
             //success - commit accept change
-            if(newWorkspaceManager) {
-                this.app.setWorkspaceManager(newWorkspaceManager);
-            }
+            this.app.setWorkspaceManager(newWorkspaceManager);
 
             //add to history if the command was done and there is an undo command
             if(undoCommand) {   
@@ -114,6 +116,12 @@ export default class CommandManager {
             }
 
             //fire events!!
+            let changeMap = newWorkspaceManager.getChangeMap();
+            let changeList = this._changeMapToChangeList(changeMap);
+            changeResult.changeList = changeList;
+
+            newWorkspaceManager.lockAll();
+
             this._publishEvents(changeResult);
         }
         else {
@@ -134,6 +142,20 @@ export default class CommandManager {
     // Private Methods
     //=========================================
 
+    _changeMapToChangeList(changeMap) {
+        let changeList = [];
+        for(let id in changeMap) {
+            let changeMapEntry = changeMap[id];
+            if(changeMapEntry.action != "transient") {
+                let changeListEntry = {};
+                changeListEntry.target = changeMapEntry.instance;
+                changeListEntry.eventName = changeMapEntry.action;
+                changeList.push(changeListEntry);
+            }
+        }
+        return changeList;
+    }
+
     /** This method creates a change result, used for firing events and as a return value from the command result, the
      * return value from the command. */
     _createChangeResult(commandResult) {
@@ -144,19 +166,20 @@ export default class CommandManager {
         this._processCommandResults(commandResult,changeMap,errorInfo);
 
         let changeResult = {};
+changeResult.cmdDone = true;
         if(errorInfo.error) {
             changeResult.cmdDone = false;
             changeResult.errorMsgs = errorInfo.errorMsgs;
         }
-        else {
-            changeResult.cmdDone = true;
-            changeResult.changeList = [];
-            for(let key in changeMap) {
-                let changeMapEntry = changeMap[key];
-                let changeEntry = this._changeMapEntryToChangeEntry(changeMapEntry);
-                if(changeEntry) changeResult.changeList.push(changeEntry);
-            }
-        }
+        // else {
+        //     changeResult.cmdDone = true;
+        //     changeResult.changeList = [];
+        //     for(let key in changeMap) {
+        //         let changeMapEntry = changeMap[key];
+        //         let changeEntry = this._changeMapEntryToChangeEntry(changeMapEntry);
+        //         if(changeEntry) changeResult.changeList.push(changeEntry);
+        //     }
+        // }
 
         return changeResult;
     }
@@ -168,14 +191,14 @@ export default class CommandManager {
             if(!errorInfo.errorMsgs) errorInfo.errorMsgs = [];
             errorInfo.errorMsgs.push(commandResult.errorMsg);
         }
-        else if((commandResult.target)||(commandResult.targetId)) {
-            this._addToChangeMap(commandResult,changeMap);
-        }
+        // else if((commandResult.target)||(commandResult.targetId)) {
+        //     this._addToChangeMap(commandResult,changeMap);
+        // }
 
-        //convert the actionChangeList to a commandChangeList
-        if(commandResult.actionResult) {
-            this._processActionChangeList(commandResult.actionResult,changeMap,errorInfo);
-        }
+        // //convert the actionChangeList to a commandChangeList
+        // if(commandResult.actionResult) {
+        //     this._processActionChangeList(commandResult.actionResult,changeMap,errorInfo);
+        // }
 
         //process child command results
         if(commandResult.childCommandResults) {
