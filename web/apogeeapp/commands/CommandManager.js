@@ -118,7 +118,7 @@ export default class CommandManager {
         }
         else {
             //failure - keep the old workspace 
-            let errorMsg = changeResult.errorMsgs.join("; ");
+            let errorMsg = changeResult.errorMsg;
             alert("Command failed: " + errorMsg);
         }
         
@@ -188,9 +188,9 @@ export default class CommandManager {
     _processActionChangeList(actionChangeResult,changeMap,errorInfo) {
         if(!actionChangeResult.actionDone) {
             errorInfo.error = true;
-            if(actionChangeResult.errorMsgs) {
+            if(actionChangeResult.errorMsg) {
                 if(!errorInfo.errorMsgs) errorInfo.errorMsgs = [];
-                errorInfo.errorMsgs.push(...actionChangeResult.errorMsgs);
+                errorInfo.errorMsgs.push(actionChangeResult.errorMsg);
             }
         }
         else if(actionChangeResult.changeList) {

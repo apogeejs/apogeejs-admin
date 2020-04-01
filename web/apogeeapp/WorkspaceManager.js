@@ -131,8 +131,7 @@ export default class WorkspaceManager extends FieldObject {
     // asynch run context methods
     //====================================
     runFutureCommand(commandData) {
-        let activeWorkspaceManager = this.app.getWorkspaceManager();
-        this.app.executeCommand(activeWorkspaceManager,commandData);
+        this.app.executeCommand(commandData);
     }
 
     getModelRunContext() {
@@ -244,7 +243,8 @@ export default class WorkspaceManager extends FieldObject {
                 this.runFutureCommand(loadModelCommand);
             }
 
-            let referenceCommandResults = this.referenceManager.load(this,json.references,onReferencesLoaded);
+            let referenceManager = this.getReferenceManager();
+            let referenceCommandResults = referenceManager.load(this,json.references,onReferencesLoaded);
             if((referenceCommandResults)&&(referenceCommandResults.length > 0)) {
                 //save the entries create results to the synchronous command result
                 commandResult.childCommandResults = referenceCommandResults;
@@ -301,7 +301,7 @@ loadmodelmanager.executeCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getModelManager();
     
-    return modelManager.load(commandData.json);
+    return modelManager.load(workspaceManager,commandData.json);
 }
 
 loadmodelmanager.commandInfo = {

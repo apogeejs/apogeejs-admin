@@ -71,8 +71,6 @@ let actionInfoMap = {
  * an unlocked. At the completion of the action, before returning, the model will be locked, meaning it cn not longer be changed. */
 export function doAction(model,actionData) {
     
-    let changeMap;
-    
     //only allow one action at a time
     if(model.isActionInProgress()) {
         //this is a messenger action - we will save it and execute it after this computation cycle is complete
@@ -84,81 +82,18 @@ export function doAction(model,actionData) {
         return changeResult;
     }
     
-    //flag action in progress
-    model.setActionInProgress(true);  
+    //execute the main action
+    let {success, errorMsg} = internalDoAction(model,actionData);
+    if(!success) {
+        model.clearCommandQueue();
+        model.lockAll();
 
-    try {   
-        
-        //do the action
-        let actionResult = callActionFunction(model,actionData); 
-        
-        //flatten action result tree into a list of objects modified in the action
-        var {actionModifiedMembers, actionDone, errorMsgList} = flattenActionResult(actionResult);
-
-        //return in the failure case
-        if(!actionDone) {
-            let changeResult = {};
-            changeResult.actionDone = false;
-            changeResult.errorMsgs = errorMsgList;
-
-            //clear any queued commands
-            model.clearCommandQueue();
-            model.setActionInProgress(false);
-            
-            model.lockAll();
-            return changeResult;
-        }
-
-        //this list will be additional modified members - from dependency changes
-        //due to adding and deleting members (This happens when a new remote member is referenced
-        //a member formula because of creating or deleting. This is not a common event, but it does happen)
-        var additionalUpdatedMembers = [];
-        
-        //figure out other objects that need to be updated
-        //also update dependencies (and the inverse - impacts)
-        var updateAllDep = checkUpdateAllDep(actionModifiedMembers);
-        if(updateAllDep) {
-            //update entire model - see conditions bewlo
-            model.updateDependeciesForModelChange(additionalUpdatedMembers);
-        }
-        else {
-            updateDependenciesFromAction(model,actionModifiedMembers);
-        }
-
-        //commit the updated impacts map (inverse of dependency map) 
-        model.finalizeImpactsMap();
-        model.finalizeMemberMap();
-
-        //populate recalc list
-        let recalculateList = createRecalculateList(model,actionModifiedMembers,additionalUpdatedMembers);
-        
-        //recalculate all needed objects
-        callRecalculateList(model,recalculateList);
-
-        //create the change map
-        changeMap = createChangeMap(model,actionModifiedMembers,recalculateList);
-    
-        //fire events
-        fireEvents(model,changeMap);
-	}
-	catch(error) {
-        if(error.stack) console.error(error.stack);
-        
-        //unknown application error - this is fatal
         let changeResult = {};
         changeResult.actionDone = false;
-        changeResult.errorMsgs = ["Unknown error updating model: " + error.message];
-        
-        model.clearCommandQueue();
-        model.setActionInProgress(false);
-
-        model.lockAll();
+        changeResult.model = model;
+        changeResult.errorMsg = errorMsg;
         return changeResult;
-        
     }
-    
-    //flag action in progress
-    model.setActionInProgress(false);
     
     //trigger any pending actions
     //these will be done asynchronously
@@ -170,52 +105,118 @@ export function doAction(model,actionData) {
             //ask user if about continueing
             var doContinue = confirm("The calculation is taking a long time. Continue?");
             if(!doContinue) {
+                model.setCalculationCanceled();
+                model.lockAll();
+
                 let changeResult = {};
                 changeResult.actionDone = false;
-                changeResult.errorMsgs = ["The calculation was canceled"];
-
-                model.setCalculationCanceled();
-
-                model.lockAll();
+                changeResult.model = model;
+                changeResult.errorMsg = "The calculation was canceled";
                 return changeResult;         
             }
         }
 
         if(runQueuedAction) {
             //this action is run synchronously
-            let childActionChangeResult = doAction(model,savedMessengerAction);
+            let {success, errorMsg} = internalDoAction(model,savedMessengerAction);
+            if(!success) {
+                model.clearCommandQueue();
+                model.lockAll();
 
-            //merge this child return value into our main
-            mergeReturnValueIntoChangeMap(model,changeMap,childActionChangeResult);
-
-            if(!childActionChangeResult.actionDone) {
-                //if there is an failure in the child action, return an error for the whole action.
                 let changeResult = {};
                 changeResult.actionDone = false;
-                changeResult.errorMsg = childActionChangeResult.errorMsg;
-                
-                model.clearCommandQueue();
-
-                model.lockAll();
+                changeResult.model = model;
+                changeResult.errorMsg = errorMsg;
                 return changeResult;
-            }  
+            }
         }
     }
     else {
         model.clearConsecutiveQueuedTracking();
     } 
     
+    //fire the events
+    let changeList = changeMapToChangeList(model.getChangeMap());
+    fireEvents(model,changeList);
+
+    //lock the model
+    model.lockAll();
+
+    //return result
     let changeResult = {};
     changeResult.actionDone = true;
-    changeResult.changeList = changeMapToChangeList(changeMap);
-
-    model.lockAll();
+    changeResult.model = model;
+    changeResult.changeList = changeList;
     return changeResult;
 }
 
 /** This function is used to register an action. */
 export function addActionInfo(actionName,actionFunction) {
     actionInfoMap[actionName] = actionFunction;
+}
+
+/** This method executes a single action function, */
+function internalDoAction(model,actionData) {
+
+    let success, errorMsg;
+
+    //flag action in progress
+    model.setActionInProgress(true);  
+
+    try {
+
+        //do the action
+        let actionResult = callActionFunction(model,actionData); 
+        
+        //flatten action result tree into a list of objects modified in the action
+        var {actionModifiedMembers, actionDone, errorMsgList} = flattenActionResult(actionResult);
+
+        //return in the failure case
+        if(actionDone) {
+            //this list will be additional modified members - from dependency changes
+            //due to adding and deleting members (This happens when a new remote member is referenced
+            //a member formula because of creating or deleting. This is not a common event, but it does happen)
+            var additionalUpdatedMembers = [];
+            
+            //figure out other objects that need to be updated
+            //also update dependencies (and the inverse - impacts)
+            var updateAllDep = checkUpdateAllDep(actionModifiedMembers);
+            if(updateAllDep) {
+                //update entire model - see conditions bewlo
+                model.updateDependeciesForModelChange(additionalUpdatedMembers);
+            }
+            else {
+                updateDependenciesFromAction(model,actionModifiedMembers);
+            }
+
+            //commit the updated impacts map (inverse of dependency map) 
+            model.finalizeImpactsMap();
+            model.finalizeMemberMap();
+
+            //populate recalc list
+            let recalculateList = createRecalculateList(model,actionModifiedMembers,additionalUpdatedMembers);
+            
+            //recalculate all needed objects
+            callRecalculateList(model,recalculateList);
+
+            success = true;
+        }
+        else {
+            success = false;
+            errorMsg = errorMsgList.join("; ");
+        }
+
+    }
+	catch(error) {
+        if(error.stack) console.error(error.stack);
+        success = false;
+        errorMsg = "Unknown error updating model: " + error.message
+    }
+
+    //flag action in progress
+    model.setActionInProgress(false);
+
+    return {success, errorMsg};
 }
 
 /** This function looks up the proper function for an action and executes it. */
@@ -278,91 +279,36 @@ function createRecalculateList(model,actionModifiedMembers,additionalUpdatedMemb
 /** This function fires the proper events for the  It combines events to 
  * fire a single event for each member.
  * @private */
-function fireEvents(model,changeMap) {
-    for(var idString in changeMap) {
-        let changeMapEntry = changeMap[idString];
-        let changeListEntry = changeMapEntryToChangeListEntry(changeMapEntry);
+function fireEvents(model,changeList) {
+    changeList.forEach(changeListEntry => {
         model.dispatchEvent(changeListEntry.event,changeListEntry);
-    }
-}
-
-/** This creates the change map, which will be used to fire events and for the return value. */
-function createChangeMap(model,completedResults,recalculateList) {
-    var changeMap = {};
-    var member;
-    
-    //go through explicitly called events from results
-    for(var i = 0; i < completedResults.length; i++) {
-        var actionResult = completedResults[i];
-        
-        if(actionResult.event) {
-            mergeIntoChangeMap(changeMap,model,actionResult.member,actionResult.event);
-        }
-    }
-    
-    //add an update event for any object not accounted from
-    for(i = 0; i < recalculateList.length; i++) {
-        var member = recalculateList[i];
-        mergeIntoChangeMap(changeMap,model,member,"updated");
-    } 
-
-    return changeMap;
-}
-
-
-function mergeReturnValueIntoChangeMap(model,changeMap,actionReturnValue) {
-    if(actionReturnValue.actionDone) {
-        actionReturnValue.changeList.forEach( changeItem => {
-            //target is either member or model
-            mergeIntoChangeMap(changeMap,model,changeItem.member,changeItem.event);
-        })
-    }
-}
-
-/** This is a helper function to dispatch an event. */
-function mergeIntoChangeMap(changeMap,model,member,eventName) {
-    //action target is either the member, if defined, or the model
-    let actionTarget = member ? member : model;
-    let lookupKey = actionTarget.getId()
-    var existingInfo = changeMap[lookupKey];
-    if(!existingInfo) {
-        existingInfo = {};
-        if(member) existingInfo.member = member;
-        else existingInfo.model = model;
-        changeMap[lookupKey] = existingInfo;
-    }
-
-    //record the event type
-    existingInfo[eventName] = true;
+    });
 }
 
 function changeMapToChangeList(changeMap) {
     let changeList = [];
-    for(let key in changeMap) {
-        let changeListEntry = changeMapEntryToChangeListEntry(changeMap[key]);
-        if(changeListEntry) changeList.push(changeListEntry);
+    for(let id in changeMap) {
+        let changeMapEntry = changeMap[id];
+
+        //ignore the transient objects
+        if(changeMapEntry.action == "transient") continue;
+
+        let changeListEntry = {};
+        changeListEntry.event = changeMapEntry.action;
+        if(changeMapEntry.instance.getType() == "model") {
+            changeListEntry.model = changeMapEntry.instance;
+        }
+        else if(changeMapEntry.instance.getType() == "member") {
+            changeListEntry.member = changeMapEntry.instance;
+        }
+        else {
+            //this shouldn't happen. Ignore it if it does
+            continue;
+        }
+
+        changeList.push(changeListEntry);
     }
     return changeList;
-}
-
-function changeMapEntryToChangeListEntry(changeMapEntry) {
-    let changeListEntry = {};
-
-    //member present only if the member is the event target
-    if(changeMapEntry.member) {
-        changeListEntry.member = changeMapEntry.member;
-    }
-    else if(changeMapEntry.model) {
-        changeListEntry.model = changeMapEntry.model;
-    }
-    //merge the events into a single event
-    if((changeMapEntry.created)&&(changeMapEntry.deleted)) return null;
-    else if(changeMapEntry.created) changeListEntry.event = "created";
-    else if(changeMapEntry.deleted) changeListEntry.event = "deleted";
-    else if(changeMapEntry.updated) changeListEntry.event = "updated";
-    else return null;
-
-    return changeListEntry;
 }
 
 /** This method determines if updating all dependencies is necessary. Our dependency 

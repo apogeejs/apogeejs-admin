@@ -117,8 +117,8 @@ export default class CodeableMember extends DependentMember {
         
         if((this.hasCode())&&(compiledInfo.valid)) {
             //set the dependencies
-            var dependencyInfo = getDependencyInfo(compiledInfo.varInfo,model,this.getContextManager());
-            this.updateDependencies(model,dependencyInfo);
+            var dependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getContextManager());
+            this.updateDependencies(model,dependsOnMap);
             
         }
         else {
@@ -134,14 +134,16 @@ export default class CodeableMember extends DependentMember {
         if((compiledInfo)&&(compiledInfo.valid)) {
                     
             //calculate new dependencies
-            var dependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getContextManager());
-            
-            //update the dependency list
-            var dependenciesChanged = this.updateDependencies(model,dependsOnMap);
-            if(dependenciesChanged) {
-                //add to update list
-                additionalUpdatedMembers.push(this);
-            }  
+            let oldDependsOnMap = this.getDependsOn();
+            let newDependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getContextManager());
+
+            if(!apogeeutil.jsonEquals(oldDependsOnMap,newDependsOnMap)) {
+                //if dependencies changes, make a new mutable copy and add this to 
+                //the updated values list
+                let mutableMemberCopy = model.getMutableMember(this.getId());
+                mutableMemberCopy.updateDependencies(model,newDependsOnMap);
+                additionalUpdatedMembers.push(mutableMemberCopy);
+            }
         }
     }
 

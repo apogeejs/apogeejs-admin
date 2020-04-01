@@ -21,8 +21,8 @@ export function addDependsOnToRecalculateList(model,recalculateList,member) {
     //add any member that depends on this one  
     var impactsList = model.getImpactsList(member);
     for(var i = 0; i < impactsList.length; i++) {
-        let impactor = model.lookupMemberById(impactsList[i]);
-        addToRecalculateList(model,recalculateList,impactor);
+        let dependent = model.getMutableMember(impactsList[i]);
+        addToRecalculateList(model,recalculateList,dependent);
     }
 }
 

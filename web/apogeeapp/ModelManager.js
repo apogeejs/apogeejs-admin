@@ -401,6 +401,12 @@ export default class ModelManager extends FieldObject {
         let model = this.getField("model");
         let json = {};
 
+        //get the model json
+        if(optionalSavedRootFolder) {
+            throw new Error("Need to correctly save the model for the optional saved root folder!");
+        }
+        json.model = model.toJson();
+
         //get the components json
         let componentsJson = {};
 
@@ -410,13 +416,15 @@ export default class ModelManager extends FieldObject {
             childIdMap = optionalSavedRootFolder.getChildMap();
         }
         else {
-            childIdMap = model.getChildMap();
-        }
+            childIdMap = model.getChildIdMap();
+        } 
 
+        //get all the components asoicated with the root members
         for(let childName in childIdMap) {
+            //member
             let memberId = childIdMap[childName];
             let componentId = this.getComponentIdByMemberId(memberId);
-            let component = this.getChildComponentByComponentId(componentId);
+            let component = this.getComponentByComponentId(componentId);
             componentsJson[childName] = component.toJson(this);
         }
         json.components = componentsJson;

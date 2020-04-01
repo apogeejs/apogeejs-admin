@@ -7,8 +7,10 @@ import {addActionInfo} from "/apogee/actions/action.js";
  * {
  *  "action": "moveMember",
  *  "member": (member to move),
+ *  "targetName": (optional new name for the member - defaults to no new name)
+ *  "targetParentId": (optiona new parent id - defaults to old parent id)
  *  
- *  "eventInfo": (OUTPUT - event info for the associated delete event)
+ *  \
  * }
  */
 
@@ -26,11 +28,28 @@ function moveMember(model,actionData) {
     }
     actionResult.member = member;
 
-    var targetParent = model.getMutableMember(actionData.targetParentId);
+    //get the name
+    let targetName;
+    if(actionData.targetName) {
+        targetName = actionData.targetName;
+    }
+    else {
+        targetName = member.getName();
+    }
+
+    //get the parent
+    let targetParentId;
+    if(actionData.targetParentId) {
+        targetParentId = actionData.targetParentId;
+    }
+    else {
+        targetParentId = member.getParentId();
+    }
+    var targetParent = model.getMutableMember(targetParentId);
     if(!targetParent) {
         actionResult.actionDone = false;
-        actionResult.errorMsg = "New parent not found for move member";
-        return;
+        actionResult.errorMsg = "Parent not found for move member";
+        return actionResult;
     }
 
     //if the parent changes, remove this child from the parent
@@ -46,7 +65,7 @@ function moveMember(model,actionData) {
     }
         
     //appl the move to the member
-    member.move(actionData.targetName,targetParent);
+    member.move(targetName,targetParent);
 
     //set the member in the new/old parent (rest in old parent to handle a name change)
     if(targetParent.isParent) {

@@ -8,7 +8,10 @@ import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js"
 //=====================================
 
 /** This method gets a callback to update the properties of a component. */
-export function updateComponent(component,componentView) {
+export function updateComponent(componentView) {
+
+    var modelManager = componentView.getModelView().getModelManager(); 
+    var component = componentView.getComponent();
     
     var componentClass = component.constructor;
     var componentViewClass = componentView.constructor;
@@ -16,7 +19,6 @@ export function updateComponent(component,componentView) {
     var displayName = componentClass.displayName
     var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
 
-    var modelManager = component.getModelManager(); 
     var initialValues = component.getPropertyValues(modelManager.getModel()); 
 
     //add folder list, only if we can set the parent (if there is a parent)

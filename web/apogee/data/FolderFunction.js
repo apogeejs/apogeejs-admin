@@ -157,9 +157,14 @@ export default class FolderFunction extends DependentMember {
     updateDependeciesForModelChange(model,additionalUpdatedMembers) {
 
         //update dependencies of this folder
-        let dependenciesChanged = this.calculateDependents(model);
-        if(dependenciesChanged) {
-            additionalUpdatedMembers.push(this);
+        let oldDependsOnMap = this.getDependsOn();
+        let newDependsOnMap = this.calculateDependents(model);
+        if(!apogeeutil.jsonEquals(oldDependsOnMap,newDependsOnMap)) {
+            //if dependencies changes, make a new mutable copy and add this to 
+            //the updated values list
+            let mutableMemberCopy = model.getMutableMember(this.getId());
+            mutableMemberCopy.updateDependencies(model,newDependsOnMap);
+            additionalUpdatedMembers.push(mutableMemberCopy);
         }
 
         //call update in children
@@ -191,12 +196,14 @@ export default class FolderFunction extends DependentMember {
 
     onAddChild(model,child) {
         //set all children as dependents
-        this.calculateDependents(model);
+        let dependsOnMap = this.calculateDependents(model);
+        this.updateDependencies(model,dependsOnMap);
     }
 
     onRemoveChild(model,child) {
         //set all children as dependents
-        this.calculateDependents(model);
+        let dependsOnMap = this.calculateDependents(model);
+        this.updateDependencies(model,dependsOnMap);
     }
 
     /** this method gets the hame the children inherit for the full name. */
@@ -217,7 +224,7 @@ export default class FolderFunction extends DependentMember {
             var childId = childIdMap[name];
             dependsOnMap[childId] = apogeeutil.NORMAL_DEPENDENCY;
         }
-        return this.updateDependencies(model,dependsOnMap);
+        return dependsOnMap;
     }
 
     /** This is called from the update action. It should not be called externally. */

@@ -72,6 +72,7 @@ function doDelete(model, member) {
 
     //delete member actions
     member.onDeleteMember(model);
+    model.unregisterMember(member);
     
     actionResult.actionDone = true;
     actionResult.updateModelDependencies = true;

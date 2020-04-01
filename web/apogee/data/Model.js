@@ -43,6 +43,10 @@ export default class Model extends FieldObject {
         //==============
         this.workingImpactsMap = null;
         this.workingMemberMap = null;
+        this.workingChangeMap = {};
+
+        //add a change map entry for this object
+        this.workingChangeMap[this.getId()] = {action: instanceToCopy ? "updated" : "created", instance: this};
 
         // This is a queue to hold actions while one is in process.
         this.actionInProgress = false;
@@ -56,7 +60,16 @@ export default class Model extends FieldObject {
     getMutableModel() {
         if(this.getIsLocked()) {
             //create a new instance that is a copy of this one
-            return new Model(this.runContext,this);
+            let newModel = new Model(this.runContext,this);
+
+            //update the member map for the new model
+            let newMemberMap = {};
+            let oldMemberMap = newModel.getField("memberMap");
+            Object.assign(newMemberMap,oldMemberMap);
+            newMemberMap[newModel.getId()] = newModel;
+            newModel.setField("memberMap",newMemberMap);
+
+            return newModel;
         }
         else {
             //return this instance since it si already unlocked
@@ -66,6 +79,13 @@ export default class Model extends FieldObject {
 
     /** This method locks all member instances and the model instance. */
     lockAll() {
+        //clear up working fields
+        this.workingChangeMap = null;
+
+        //make sure the other working fields have been saved
+        if(this.workingImpactsMap) this.finalizeImpactsMap();
+        if(this.workingMemberMap) this.finalizeMemberMap();
+
         //member map includes all members and the model
         let memberMap = this.getField("memberMap");
         for(let id in memberMap) {
@@ -73,6 +93,28 @@ export default class Model extends FieldObject {
             //we maybe shouldn't be modifying the members in place, but we will do it anyway
             memberMap[id].lock();
         }
+    }
+
+    /** This shoudl be called after all dependencies have been updated to store the
+     * impacts map (We kept a mutable working copy during construction for efficiency)  */
+    finalizeImpactsMap() {
+        if(this.workingImpactsMap) {
+            this.setField("impactsMap",this.workingImpactsMap);
+            this.workingImpactsMap = null;
+        } 
+    }
+
+    finalizeMemberMap() {
+        if(this.workingMemberMap) {
+            this.setField("memberMap",this.workingMemberMap);
+            this.workingMemberMap = null;
+        }
+    }
+
+    /** This returns a map of the changes to the model. It is only valid while the 
+     * model instance is unlocked. */
+    getChangeMap() {
+        return this.workingChangeMap;
     }
 
     /** This function should be used to execute any action that is run asynchronously with the current
@@ -221,15 +263,21 @@ export default class Model extends FieldObject {
         if(this.getIsLocked()) throw new Error("The model must be unlocked to get a mutable member.");
 
         let member = this.lookupMemberById(memberId);
-        if(member.getIsLocked()) {
-            //create a unlocked copy of the member
-            let newMember = new member.constructor(member.getName(),member.getParentId(),member);
-            //update the saved copy of this member in the member map
-            this.registerMember(newMember);
-            return newMember;
+        if(member) {
+            if(member.getIsLocked()) {
+                //create a unlocked copy of the member
+                let newMember = new member.constructor(member.getName(),member.getParentId(),member);
+
+                //update the saved copy of this member in the member map
+                this.registerMember(newMember);
+                return newMember;
+            }
+            else {
+                return member;
+            }
         }
         else {
-            return member;
+            return null;
         }
     }
 
@@ -238,14 +286,61 @@ export default class Model extends FieldObject {
             this._populateWorkingMemberMap();
         }
 
-        this.workingMemberMap[member.getId()] = member;
+        let memberId = member.getId();
+
+        //update the change map for this member change
+        let changeMapEntry = this.workingChangeMap[memberId];
+        if(!changeMapEntry) {
+            //if it already existed we don't need to change it (that means it was a create and we want to keep that)
+            //otherwise add a new entry
+            if(this.workingMemberMap[memberId]) {
+                //this is an update
+                this.workingChangeMap[memberId] = {action: "updated", instance: member};
+            }
+            else {
+                //this is a create
+                this.workingChangeMap[memberId] = {action: "created", instance: member};
+            }
+        }
+
+        //add or update the member in the working member map
+        this.workingMemberMap[memberId] = member;
     }
 
-    finalizeMemberMap() {
-        if(this.workingMemberMap) {
-            this.setField("memberMap",this.workingMemberMap);
-            this.workingMemberMap = null;
+    unregisterMember(member) {
+        if(!this.workingMemberMap) {
+            this._populateWorkingMemberMap();
         }
+
+        let memberId = member.getId();
+
+        //update the change map for this member change
+        let changeMapEntry = this.workingChangeMap[memberId];
+        if(changeMapEntry) {
+            if(changeMapEntry.action == "updated") {
+                changeMapEntry.action = "deleted";
+            }
+            else if(changeMapEntry.action == "created") {
+                //these cancel! however, we will keep the entry around and label
+                //it as "transient", in case we get another entry for this member
+                //I don't think we should get on after delete, but just in case
+                changeMapEntry.action = "transient";
+            }
+            else if(changeMapEntry.action == "transient") {
+                //no action
+            }
+            else {
+                //this shouldn't happen. We will just mark it as delete
+                changeMapEntry.action = "deleted"
+            }
+        }
+        else {
+            changeMapEntry = {action: "deleted", instance: member};
+            this.workingChangeMap[memberId] = changeMapEntry;
+        }
+
+        //remove the member entry
+        delete this.workingMemberMap[memberId];
     }
 
     _getMemberMap() {
@@ -271,16 +366,6 @@ export default class Model extends FieldObject {
         if(!impactsList) impactsList = [];
         return impactsList;
     }
-
-    /** This shoudl be called after all dependencies have been updated to store the
-     * impacts map (We kept a mutable working copy during construction for efficiency)  */
-    finalizeImpactsMap() {
-        if(this.workingImpactsMap) {
-            this.setField("impactsMap",this.workingImpactsMap);
-            this.workingImpactsMap = null;
-        } 
-    }
-
     
     /** This method adds a data member to the imapacts list for this node.
      * The return value is true if the member was added and false if it was already there. 

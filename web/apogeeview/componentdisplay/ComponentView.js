@@ -343,12 +343,12 @@ export default class ComponentView {
             //add the standard entries
             var itemInfo = {};
             itemInfo.title = "Edit Properties";
-            itemInfo.callback = () => updateComponent(this.component,this);
+            itemInfo.callback = () => updateComponent(this);
             menuItemList.push(itemInfo);
 
             var itemInfo = {};
             itemInfo.title = "Delete";
-            itemInfo.callback = () => deleteComponent(this.component,this);
+            itemInfo.callback = () => deleteComponent(this);
             menuItemList.push(itemInfo);
         }
         

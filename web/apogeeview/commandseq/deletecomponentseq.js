@@ -2,12 +2,15 @@
 
 
 
-export function deleteComponent(component,componentView) {
+export function deleteComponent(componentView) {
 
     var doDelete = confirm("Are you sure you want to delete this object?");
     if(!doDelete) {
         return;
     }
+
+    var modelManager = componentView.getModelView().getModelManager(); 
+    var component = componentView.getComponent();
 
     var member = component.getMember();
     var commands = [];
@@ -39,5 +42,5 @@ export function deleteComponent(component,componentView) {
         return;
     }
 
-    component.getModelManager().getApp().executeCommand(commandData);
+    modelManager.getApp().executeCommand(commandData);
 }
