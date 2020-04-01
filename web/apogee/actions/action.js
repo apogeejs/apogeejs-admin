@@ -2,7 +2,10 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
 
 /**
  * Action Module
- * An action is an operation on the data model. The code in this module handles
+ * An action is an operation on the data model. A mutable (unlocked) model must be passed in. 
+ * After the action is completed, the model will be locked, and represent immutable data state.
+ * 
+ * The code in this module handles
  * the generic parts of the action process, and the action specific code is placed
  * elsewhere.
  * 
@@ -29,10 +32,29 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  *   (other, multiple): (Specific data for the action)
  * }
  * 
+ * ChangeResult:
+ * The return value of the doAction function is a change result. This is a listing of all data objects whcih changed, in the success case.
+ * The format is as follows:
+ * Format: {
+ *  actionDone: (true/false)
+ *  actionPending: (Rather than actionDone, actionPending will be returned if doAction is called while another action is in
+ *      process. This should only happen for actions being called by the messenger.)
+ *  errorMsg: (An error message in the case actionDone is false.)
+ *  model: (The model object which was acted on.)
+ *  changeList: (An array of changed objects:)
+ *      - event: (the change to the object: created/updated/deleted)
+ *      - model: (the model, if the object was the model)
+ *      - member: (the member, if the object was a member)
+ * }
+ *  *   "actionPending": (This flag is returned if the action is a queued action and will be run after the
+ *                  current action completes.)
+ * 
  * ActionResult:
- * The return value of the doAction function is an ActionResult struct, with the data below. The function should return
+ * The return value of the an action function (not the doAction function) is an ActionResult struct, with the data below. The function should return
  * an action result for each member/model that changes. There should be a single top level action result and then there can be 
- * child action results, in the childActionResults field.
+ * child action results, in the childActionResults field. An important function of the action result is to tell the doAction function
+ * how to calculate updates to the model based on changes to specific members. The flags recalculateMember, recalculateDependsOnMember,
+ * updateMemberDependencies and updateModelDependencies serve this purpose and are described below.
  * Format: {
  *   "actionDone": (If this is returned true the action was done. This does not mean it was error free, rather
  *                  if means the action completed and can be undone. For example, it may be setting code in a member
@@ -60,6 +82,7 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  *   "updateModelDepedencies" - (This is an optional action flag. The is set of the member is a dependent and it is created, deleted or moved.
  *                  In this case, all members in the model should be checked to see if they have any dependency changes.)
  * }
+ * 
  */ 
 
 /** This structure holds the processing information for all the actions. It is set by each action. 
@@ -67,8 +90,8 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
 let actionInfoMap = {
 }
 
-/** This method is used to execute an action for the data model. The model object passed in should be 
- * an unlocked. At the completion of the action, before returning, the model will be locked, meaning it cn not longer be changed. */
+/** This method is used to execute an action for the data model. The model object passed in should be _unlocked_.
+ * At the completion of the action, before returning, the model will be locked, meaning it can not longer be changed. */
 export function doAction(model,actionData) {
     
     //only allow one action at a time
@@ -155,6 +178,10 @@ export function addActionInfo(actionName,actionFunction) {
     actionInfoMap[actionName] = actionFunction;
 }
 
+//=======================================
+// Internal Methods
+//=======================================
+
 /** This method executes a single action function, */
 function internalDoAction(model,actionData) {
 
@@ -237,10 +264,6 @@ function callActionFunction(model,actionData) {
 
     return actionResult;
 }
-
-//=======================================
-// Internal Methods
-//=======================================
 
 /** This method makes sure the member dependencies in the model are properly updated. 
  * @private */
