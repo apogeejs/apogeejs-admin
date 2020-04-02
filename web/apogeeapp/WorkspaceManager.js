@@ -243,11 +243,6 @@ this.created = false;
         //store the file metadata
         this.fileMetadata = fileMetadata;
 
-        let commandResult = {};
-        commandResult.cmdDone = true;
-        commandResult.target = this;
-        commandResult.eventAction = "created";
-
         //set the view state
         if(json.viewState !== undefined) {
             this.cachedViewState = json.viewState;
@@ -257,7 +252,7 @@ this.created = false;
         if(json.references) {
             //if there are references, load these before loading the model.
             //this is asynchronous so we must load the model in a future command
-            let onReferencesLoaded = referenceLoadCommandResult => {
+            let onReferencesLoaded = () => {
                 //load references regardless of success or failure in loading references
                 let loadModelCommand = {};
                 loadModelCommand.type = "loadModelManager";
@@ -266,20 +261,13 @@ this.created = false;
             }
 
             let referenceManager = this.getReferenceManager();
-            let referenceCommandResults = referenceManager.load(this,json.references,onReferencesLoaded);
-            if((referenceCommandResults)&&(referenceCommandResults.length > 0)) {
-                //save the entries create results to the synchronous command result
-                commandResult.childCommandResults = referenceCommandResults;
-            }
+            referenceManager.load(this,json.references,onReferencesLoaded);
         }
         else {
             //if there are not references we can load the model directly.
             let modelManager = this.getModelManager();
-            let loadModelCommandResult = modelManager.load(this,json.code);
-            commandResult.childCommandResults = [loadModelCommandResult];
+            modelManager.load(this,json.code);
         }
-
-        return commandResult
     }
 
     /** This method closes the workspace object. */

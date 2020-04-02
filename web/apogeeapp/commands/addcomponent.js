@@ -35,7 +35,6 @@ addcomponent.executeCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getMutableModelManager();
     let model = modelManager.getMutableModel();
-    let commandResult;
 
     //create the member
     let createAction = {};
@@ -51,18 +50,11 @@ addcomponent.executeCommand = function(workspaceManager,commandData) {
         let parentMember = model.lookupMemberById(commandData.parentId);
         let name = commandData.memberJson.name
         let componentMember = parentMember.lookupChild(model,name);
-        commandResult = modelManager.createComponentFromMember(componentMember,commandData.componentJson);
+        modelManager.createComponentFromMember(componentMember,commandData.componentJson);
     }
     else {
-        commandResult = {};
-        commandResult.cmdDone = false;
-        commandResult.errorMsg = "Create member failed";
+        throw new Error("Failure creating member: " + actionResult.errorMsg);
     }
-    
-    //store the model level result
-    commandResult.actionResult = actionResult;
-
-    return commandResult;
 }
 
 addcomponent.commandInfo = {

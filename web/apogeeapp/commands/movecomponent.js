@@ -37,26 +37,11 @@ movecomponent.executeCommand = function(workspaceManager,commandData) {
     actionData.memberId = commandData.memberId;
     actionData.targetName = commandData.newMemberName;
     actionData.targetParentId = commandData.newParentId;
-    let actionResult = doAction(model,actionData);
 
-    let componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
-    let component = modelManager.getComponentByComponentId(componentId);
-    
-    let commandResult = {};
-    if((actionResult.actionDone)&&(component)) {
-        commandResult.cmdDone = true;
-        commandResult.eventAction = "updated";
-        commandResult.target = component;
+    let actionResult = doAction(model,actionData);
+    if(!actionResult.actionDone) {
+        throw new Error("Error moving member: " + actionResult.errorMsg);
     }
-    else {
-        commandResult.cmdDone = false;
-        let name = component ? component.getFullName(modelManager) : "unknown";
-        commandResult.errorMsg = "Error moving component: " + name;
-    }
-    commandResult.actionResult = actionResult;
-    
-    return commandResult;
-    
 }
 
 movecomponent.commandInfo = {

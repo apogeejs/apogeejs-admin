@@ -26,22 +26,12 @@ compoundcommand.createUndoCommand = function(workspaceManager,commandData) {
  * If there are additional property lines, in the generator, this method should
  * be extended to edit the values of those properties too. */
 compoundcommand.executeCommand = function(workspaceManager,commandData) {
-    
-    let commandResult = {};
-    commandResult.childCommandResults = [];
-    
-    //add the child undo commands in the reverse order
+    //execute all child commands
     for(var i = 0; i < commandData.childCommands.length; i++) {
         let childCommandJson = commandData.childCommands[i];
         let childCommandObject = CommandManager.getCommandObject(childCommandJson.type);
-        let childCommandResult = childCommandObject.executeCommand(workspaceManager,childCommandJson);
-        commandResult.childCommandResults.push(childCommandResult);
+        childCommandObject.executeCommand(workspaceManager,childCommandJson);
     }
-
-    //i need to handle error cases!
-    commandResult.cmdDone = true;
-    
-    return commandResult;
 }
 
 compoundcommand.commandInfo = {

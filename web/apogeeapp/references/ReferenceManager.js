@@ -76,7 +76,6 @@ export default class ReferenceManager extends FieldObject {
      */
     load(workspaceManager,json,onReferencesLoaded) {
 
-        let entryCreateCommandResults = [];
         let entryLoadedPromises = [];
         let entryLoadedPromise;
         
@@ -88,19 +87,12 @@ export default class ReferenceManager extends FieldObject {
             //construct the load function
             let loadRefEntry = refEntryJson => {
                 //create the entry (this does not actually load it)
-                let commandResult = this.createEntry(refEntryJson);
-                entryCreateCommandResults.push(commandResult);
+                let referenceEntry = this.createEntry(refEntryJson);
+                newRefEntryMap[entryKey] = referenceEntry;
 
-                //load the entry
-                if(commandResult.target) {
-                    //place the entry in the entry map
-                    let referenceEntry = commandResult.target;
-                    newRefEntryMap[entryKey] = referenceEntry;
-
-                    //load the entry - this will be asynchronous
-                    let loadEntryPromise = referenceEntry.loadEntry(workspaceManager);
-                    entryLoadedPromises.push(loadEntryPromise);
-                }
+                //load the entry - this will be asynchronous
+                let loadEntryPromise = referenceEntry.loadEntry(workspaceManager);
+                entryLoadedPromises.push(loadEntryPromise);
             }
 
             //load each entry
@@ -121,22 +113,15 @@ export default class ReferenceManager extends FieldObject {
                 entryLoadedPromise = Promise.resolve();
             }
 
-            //call callback when all promises resolve
-            entryLoadedPromise.then(commandResultList => onReferencesLoaded(commandResultList))
-                .catch(error => {
-                    //return an error command result
-                    let errorCommandResult = {};
-                    errorCommandResult.cmdDone = true;
-                    errorCommandResult.errorMsg = "Error loading references: " + (error.errorMsg) ? error.errorMsg : "unknown";
-                    onReferencesLoaded([errorCommandResult]);
-                });
-    
-            }
+            //call on references loaded whether or not references succeeded
+            entryLoadedPromise.catch(onReferencesLoaded).then(onReferencesLoaded).catch( errorMsg => {
+                //we shouldnt' get an error here, but handle it just in case
+                alert("Unknown error loading: " + errorMsg);
+            })
+        }
 
         //set the new reference EntryMap
         this.setField("referenceEntryMap",newReferenceEntryMap);
-        
-        return entryCreateCommandResults;
     }
 
     /** This method opens the reference entries, from the structure returned from
@@ -188,17 +173,11 @@ export default class ReferenceManager extends FieldObject {
             this.workingChangeMap[referenceEntry.getId()] = {action: "referenceEntry_created", instance: referenceEntry};
         }
 
-        return {
-            cmdDone: true,
-            target: referenceEntry,
-            eventAction: "created"
-        }
+        return referenceEntry;
     }
 
     
     updateEntry(entryType,url,entryData) {
-        let commandResult = {};
-
         let oldEntryKey = this._getEntryKey(entryType,url);
         let oldEntryMap = this.getField("referenceEntryMap");
         let oldReferenceEntry = oldEntryMap[oldEntryKey];
@@ -230,23 +209,14 @@ export default class ReferenceManager extends FieldObject {
                 //add an updated action entry
                 this.workingChangeMap[referenceEntry.getId()] = {action: "referenceEntry_updated", instance: referenceEntry};
             }
-            
-            commandResult.cmdDone = true;
-            commandResult.target = newReferenceEntry;
-            commandResult.eventAction = "updated";
         }
         else {
             //entry not found
-            commandResult.cmdDone = false;
-            commandResult.alertMsg = "Link entry to update not found: " + url;
+            throw new Error("Link entry to update not found: " + url);
         }
-
-        return commandResult;
     }
 
     removeEntry(entryType,url) {
-        let commandResult = {};
-
         let entryKey = _getEntryKey(entryType,url);
         let oldEntryMap = this.getField("referenceEntryMap");
         let referenceEntry = oldEntryMap[entryKey];
@@ -267,19 +237,11 @@ export default class ReferenceManager extends FieldObject {
             else {
                 this.workingChangeMap[referenceEntry.getId()] = {action: "referenceEntry_deleted", instance: referenceEntry};
             }
-
-            commandResult.cmdDone = true;
-            commandResult.targetId = referenceEntry.getId();
-            commandResult.targetType = referenceEntry.getType();
-            commandResult.eventAction = "deleted";
         }
         else {
-            //always return cmd done on references for now
-            commandResult.cmdDone = false;
-            commandResult.errorMsg = "Reference entry not found: " + url;
+            throw new Error("Reference entry not found: " + url);
         }
 
-        return commandResult;
     }
 
     /** This method should be called when the parent is closed. It removes all links. */

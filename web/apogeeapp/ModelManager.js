@@ -263,55 +263,43 @@ export default class ModelManager extends FieldObject {
     }
         
     createComponentFromMember(member,componentJson) {
+
+        if(!member) {
+            throw new Error("Unknown error: member missing!");
+        }
         
         //response - get new member
         var component;
-        var commandResult = {};
+        var componentClass = this.app.getComponentClass(componentJson.type);
+        if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
+            //create empty component
+            component = new componentClass(member,this);
 
-        if(member) {
-            
-            var componentClass = this.app.getComponentClass(componentJson.type);
-            if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
-                //create empty component
-                component = new componentClass(member,this);
-
-                //apply any serialized values
-                if(componentJson) {
-                    component.loadPropertyValues(componentJson);
-                }
+            //apply any serialized values
+            if(componentJson) {
+                component.loadPropertyValues(componentJson);
             }
+        }
 
-            //if we failed to create the component, or if we failed to make the member properly (and we used the error member)
-            if(!component) {
-                //table not found - create an empty table
-                componentClass = this.app.getComponentClass("apogeeapp.app.ErrorComponent");
-                component = new componentClass(member,this);
-                if(componentJson) {
-                    component.loadProperties(componentJson);
-                }
+        //if we failed to create the component, or if we failed to make the member properly (and we used the error member)
+        if(!component) {
+            //table not found - create an empty error table
+            componentClass = this.app.getComponentClass("apogeeapp.app.ErrorComponent");
+            component = new componentClass(member,this);
+            if(componentJson) {
+                component.loadProperties(componentJson);
             }
-
         }
 
         if(!component) {
-            commandResult.cmdDone = false;
-            commandResult.errorMsg = "Component creation failed: " + member.getName();
+            throw new Error("Unknown error creating componet: " + member.getName());
         }
-        else {
-            commandResult.target = component;
-            commandResult.cmdDone = true;
-            commandResult.eventAction = "created";
 
-            //load the children, after the component load is completed
-            if(component.loadChildrenFromJson) {
-                let childCommentResults = component.loadChildrenFromJson(this,componentJson);
-                if((childCommentResults)&&(childCommentResults.length > 0)) {
-                    commandResult.childCommandResults = childCommentResults;
-                }
-            }
+        //load the children, after the component load is completed
+        if(component.loadChildrenFromJson) {
+            component.loadChildrenFromJson(this,componentJson);
         }
-            
-        return commandResult;
+
     }
 
     //=============================

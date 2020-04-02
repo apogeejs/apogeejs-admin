@@ -25,25 +25,11 @@ addlink.createUndoCommand = function(workspaceManager,commandData) {
 }
 
 addlink.executeCommand = function(workspaceManager,commandData) {
-    
-    var commandResult = {};
-
-    try {
-        //synchronous reference entry creation
-        var referenceManager = workspaceManager.getMutableReferenceManager();
-        commandResult = referenceManager.createEntry(commandData);
-        var referenceEntry = commandResult.target;
-
-        //this will trigger an asynchrnous command to update the status on loading the ref entry
-        referenceEntry.loadEntry(workpaceManager);
-    }
-    catch(error) {
-        //unknown exception
-        commandResult.errorMsg = "Unknown exception in creating link: " + error.message;
-        commandResult.cmdDone = false;
-    }
-    
-    return commandResult;
+    let referenceManager = workspaceManager.getMutableReferenceManager();
+    //this creates the entry but does not load it
+    let referenceEntry = referenceManager.createEntry(commandData);
+    //this loads the entry - it will cause an asynchronouse command on completion
+    referenceEntry.loadEntry(workpaceManager);
 }
 
 addlink.commandInfo = {

@@ -34,23 +34,8 @@ deletelink.createUndoCommand = function(workspaceManager,commandData) {
 }
 
 deletelink.executeCommand = function(workspaceManager,commandData) {
-    
-    var commandResult;
-
-    try {
-        var referenceManager = workspaceManager.getMutableReferenceManager();
-        commandResult = referenceManager.removeEntry(commandData.entryType,commandData.url);
-    }
-    catch(error) {
-        if(error.stack) console.error(error.stack);
-        
-        //unkown error
-        commandResult = {}
-        commandResult.errorMsg = "Error deleting link: " + error.message;
-        commandResult.cmdDone = false;
-    }
-    
-    return commandResult;
+    var referenceManager = workspaceManager.getMutableReferenceManager();
+    referenceManager.removeEntry(commandData.entryType,commandData.url);
 }
 
 deletelink.commandInfo = {

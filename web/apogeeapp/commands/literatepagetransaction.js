@@ -37,18 +37,14 @@ literatepagetransaction.createUndoCommand = function(workspaceManager,commandDat
 
 
 literatepagetransaction.executeCommand = function(workspaceManager,commandData) {
-    
-    var error = false;
-    var errorMsg;
-    
     let modelManager = workspaceManager.getMutableModelManager();
-    var componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
-    var component = modelManager.getMutableComponentByComponentId(componentId);
+    let componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
+    let component = modelManager.getMutableComponentByComponentId(componentId);
 
-    var oldDocument = component.getDocument();
-    var schema = component.getSchema();
+    let oldDocument = component.getDocument();
+    let schema = component.getSchema();
             
-    var newDocument = updateDocument(oldDocument,schema,commandData);
+    let newDocument = updateDocument(oldDocument,schema,commandData);
 
     if(newDocument) {
         //create the editor state info if we have it
@@ -64,21 +60,8 @@ literatepagetransaction.executeCommand = function(workspaceManager,commandData) 
         component.setDocument(newDocument,editorStateInfo);
     }
     else {
-        error = true;
-        errorMsg = "Unknown error";
+        throw new Error("Unknown error updating document");
     }
-    
-    var commandResult = {};
-    commandResult.cmdDone = !error;
-    if(error) {
-        if(errorMsg) commandResult.errorMsg = errorMsg;
-    }
-    else {
-        commandResult.target = component;
-        commandResult.eventAction = "updated";
-    }
-
-    return commandResult;
 }
 
 function updateDocument(initialDocument, schema, commandData) {

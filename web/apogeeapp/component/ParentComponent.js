@@ -119,7 +119,6 @@ export default class ParentComponent extends Component {
 
     /** This method loads the children for this component */
     loadChildrenFromJson(modelManager,componentJson) {
-        let childCommandResults = [];
         if(componentJson.children) {
             let parentMember = this.getParentFolderForChildren();
             
@@ -127,13 +126,11 @@ export default class ParentComponent extends Component {
                 let childMember = parentMember.lookupChild(modelManager.getModel(),childName);
                 if(childMember) {
                     let childComponentJson = componentJson.children[childName];
-                    var childCommandResult = modelManager.createComponentFromMember(childMember,childComponentJson);
-                    childCommandResults.push(childCommandResult);
+                    modelManager.createComponentFromMember(childMember,childComponentJson);
                 }
             };
 
         }
-        return childCommandResults;
     }
 
     /** This method makes an empty document */

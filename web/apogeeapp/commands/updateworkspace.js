@@ -43,22 +43,11 @@ updateworkspace.executeCommand = function(workspaceManager,commandData) {
     actionData.properties = commandData.updatedCoreProperties;
 
     actionResult = doAction(model,actionData);
+    if(!actionResult.actionDone) {
+        throw new Error("Error updating workspace: " + actionResult.errorMsg);
+    }
 
     //update any workspace manager properties here - none for now
-    
-    var commandResult = {};
-    commandResult.cmdDone = actionResult.actionDone;
-    if(commandResult.cmdDone) {
-        commandResult.target = modelManager;
-        commandResult.eventAction = "updated";
-    }
-    else {
-        commandResult.alertMsg = "Error updating workspace";
-    }
-
-    commandResult.actionResult = actionResult;
-    
-    return commandResult;
 }
 
 updateworkspace.commandInfo = {

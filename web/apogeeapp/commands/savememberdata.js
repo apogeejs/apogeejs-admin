@@ -34,25 +34,9 @@ savememberdata.executeCommand = function(workspaceManager,commandData) {
     var actionData = getSaveDataAction(model,commandData.memberId,commandData.data);
     
     var actionResult = doAction(model,actionData);
-    
-    let componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
-    let component = modelManager.getComponentByComponentId(componentId);
-
-    var commandResult = {};
-    if((actionResult.actionDone)&&(component)) {
-        commandResult.cmdDone = true;
-        commandResult.target = component;
-        commandResult.eventAction = "updated";
+    if(!actionResult.actionDone) {
+        throw new Error("Error saving member data: " + actionResult.errorMsg);
     }
-    else {
-        commandResult.cmdDone = false;
-        let memberFullName = component ? component.getFullName(modelManager) : "<unknown>" 
-        commandResult.errorMsg = "Error saving data: " + memberFullName;
-    }
-
-    commandResult.actionResult = actionResult;
-    
-    return commandResult;
 }
 
 savememberdata.commandInfo = {

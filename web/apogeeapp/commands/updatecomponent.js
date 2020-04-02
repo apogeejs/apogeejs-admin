@@ -66,8 +66,6 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     var member = model.getMemberById(commandData.memberId);
     var componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
     var component = modelManager.getMutableComponentByComponentId(componentId);
-
-    var error = false;
     
     //create an action to update an member additional properties
     var memberGenerator = member.constructor.generator;
@@ -76,33 +74,14 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
         var actionData = memberGenerator.getPropertyUpdateAction(member,commandData.updatedMemberProperties);  
         if(actionData) {
             actionResult = doAction(model,actionData);
-            
             if(!actionResult.actionDone) {
-                error = true;
-                errorMsg = actionResult.alertMsg;
+                throw new Error("Error updating member properties: " + actionResult.errorMsg);
             }
         }
     }
  
     //update an component additional properties
-    //we should get better error handling here
-    if(!error) {
-        component.loadPropertyValues(commandData.updatedComponentProperties);
-    }
-    
-    var commandResult = {};
-    commandResult.cmdDone = !error;
-    if(commandResult.cmdDone) {
-        commandResult.target = component;
-        commandResult.eventAction = "updated";
-    }
-    else {
-        commandResult.errorMsg = "Error updating component: " + component.getFullName(modelManager);
-    }
-
-    if(actionResult) commandResult.actionResult = actionResult;
-    
-    return commandResult;
+    component.loadPropertyValues(commandData.updatedComponentProperties);
 }
 
 updatecomponent.commandInfo = {

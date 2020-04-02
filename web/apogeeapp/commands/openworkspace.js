@@ -21,22 +21,7 @@ let openworkspace = {};
 //openworkspace.createUndoCommand = function(workspaceManager,commandData) {
 
 openworkspace.executeCommand = function(workspaceManager,commandData) {
-    
-    try {
-        let commandResult = workspaceManager.load(commandData.workspaceJson,commandData.fileMetadata);
-
-        return commandResult;
-
-    }
-    catch(error) {
-        if(error.stack) console.error(error.stack);
-
-        //unkown error
-        let commandResult = {};
-        commandResult.errorMsg = "Error creating workspace: " + error.message;
-        commandResult.cmdDone = false;
-        return commandResult;
-    }
+    workspaceManager.load(commandData.workspaceJson,commandData.fileMetadata);
 }
 
 openworkspace.commandInfo = {

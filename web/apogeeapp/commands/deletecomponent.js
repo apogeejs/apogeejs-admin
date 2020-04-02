@@ -73,12 +73,9 @@ deletecomponent.executeCommand = function(workspaceManager,commandData) {
     }
     
     var actionResult = doAction(model,actionJson);
-    
-    var commandResult = {};
-    commandResult.cmdDone = actionResult.actionDone;
-    commandResult.actionResult = actionResult;
-    
-    return commandResult;
+    if(!actionResult.cmdDone) {
+        throw new Error("Error deleting component: " + actionResult.errorMsg);
+    }
 }
 
 deletecomponent.commandInfo = {
