@@ -39,9 +39,9 @@ export default class ApogeeView {
         this.loadUI(containerId);
 
         //subscribe to events
-        this.app.addListener("workspaceManager_created",eventData => this.onWorkspaceCreated(eventData));
-        this.app.addListener("workspaceManager_deleted",eventData => this.onWorkspaceClosed(eventData));
-        this.app.addListener("modelManager_updated",eventData => this.onModelManagerUpdated(eventData));
+        this.app.addListener("workspaceManager_created",workspaceManager => this.onWorkspaceCreated(workspaceManager));
+        this.app.addListener("workspaceManager_deleted",workspaceManager => this.onWorkspaceClosed(workspaceManager));
+        this.app.addListener("component_updated",component => this.onComponentUpdated(component));
 
         //TEMPORARY COMPONENT VIEW REGISTRATION#################################
         ApogeeView.registerComponentView(JsonTableComponentView);
@@ -76,9 +76,7 @@ export default class ApogeeView {
     // TargetEvent handlers
     //================================
 
-    onWorkspaceCreated(eventData) {
-        let workspaceManager = eventData.target;
-
+    onWorkspaceCreated(workspaceManager) {
         if(this.workspaceView != null) {
             //discard an old view if there is one
             this.onWorkspaceClosed();
@@ -92,7 +90,7 @@ export default class ApogeeView {
         this.tree.setRootEntry(treeEntry);
     }
 
-    onWorkspaceClosed(eventData) {
+    onWorkspaceClosed(workspaceManager) {
         //close any old workspace view
         if(this.workspaceView) {
             this.workspaceView.close();
@@ -196,17 +194,14 @@ export default class ApogeeView {
      * of that component changes, we update the tab display name. This is also not very general. I should
      * clean it up to allow other things besides components to have tabs. I should probably make a tab event that
      * its title changes, or just that it was udpated. */
-    onModelManagerUpdated(eventData) {
-        let target = eventData.target;
-
-        if(target) {
-            //tab id for components is the component id
-            if((target.getId() == this.tabFrame.getActiveTab())) {
-                //this is pretty messy too... 
-                if((target.isDisplayNameUpdated)&&(target.getMember().isFullNameUpdated())) {
-                    let tab = this.tabFrame.getTab(target.getId());
-                    this.onTabShown(tab);
-                }
+    onComponentUpdated(component) {
+        //tab id for components is the component id
+        if((component.getId() == this.tabFrame.getActiveTab())) {
+            //this is pretty messy too... 
+            let model = this.workspaceView.getModelView().getModelManager().getModel();
+            if((component.isDisplayNameUpdated())&&(component.getMember().isFullNameUpdated(model))) {
+                let tab = this.tabFrame.getTab(component.getId());
+                this.onTabShown(tab);
             }
         }
     }

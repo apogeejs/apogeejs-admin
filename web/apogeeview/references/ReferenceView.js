@@ -26,9 +26,9 @@ export default class ReferenceView {
             this.treeEntry.addChild(childTreeEntry);
         });
 
-        app.addListener("link_created",eventInfo => this._onLinkCreated(eventInfo));
-        app.addListener("link_updated",eventInfo => this._onLinkUpdated(eventInfo));
-        app.addListener("link_deleted",eventInfo => this._onLinkDeleted(eventInfo));
+        app.addListener("link_created",referenceEntry => this._onLinkCreated(referenceEntry));
+        app.addListener("link_updated",referenceEntry => this._onLinkUpdated(referenceEntry));
+        app.addListener("link_deleted",referenceEntry => this._onLinkDeleted(referenceEntry));
 
         this.referenceManager.setViewStateCallback(() => this.getViewState());
     }
@@ -60,28 +60,23 @@ export default class ReferenceView {
     // Private Methods
     //==================================
 
-    _onLinkCreated(eventInfo) {
-        let referenceEntry = eventInfo.target;
+    _onLinkCreated(referenceEntry) {
         let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
         if(referenceList) {
-            referenceList.onLinkCreated(eventInfo);
+            referenceList.onLinkCreated(referenceEntry);
         }
     }
 
-    _onLinkUpdated(eventInfo) {
-        let referenceEntry = eventInfo.target;
+    _onLinkUpdated(referenceEntry) {
         let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
         if(referenceList) {
-            referenceList.onLinkUpdated(eventInfo);
+            referenceList.onLinkUpdated(referenceEntry);
         }
     }
 
-    _onLinkDeleted(eventInfo) {
-        //we don't have enough info yet to know which list it is in. Send remove to all lists
-        for(let entryType in this.referenceListViews) {
-            let referenceList = this.referenceListViews[entryType];
-            referenceList.onLinkDeleted(eventInfo);
-        }
+    _onLinkDeleted(referenceEntry) {
+        let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
+        referenceList.onLinkDeleted(referenceEntry);
     }
 
     /** @private */

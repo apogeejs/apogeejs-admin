@@ -76,6 +76,7 @@ function updateDocument(initialDocument, schema, commandData) {
         transform = transform.step(step);
       }
       catch (error) {
+        if(error.stack) console.error(error.stack);
         console.log("Step failed: " + JSON.stringify(stepJson));
         return null;
       }

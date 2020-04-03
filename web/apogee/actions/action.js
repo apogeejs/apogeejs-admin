@@ -304,7 +304,7 @@ function createRecalculateList(model,actionModifiedMembers,additionalUpdatedMemb
  * @private */
 function fireEvents(model,changeList) {
     changeList.forEach(changeListEntry => {
-        model.dispatchEvent(changeListEntry.event,changeListEntry);
+        model.dispatchEvent(changeListEntry.event,changeListEntry.instance);
     });
 }
 
@@ -317,18 +317,8 @@ function changeMapToChangeList(changeMap) {
         if(changeMapEntry.action == "transient") continue;
 
         let changeListEntry = {};
-        changeListEntry.event = changeMapEntry.action;
-        if(changeMapEntry.instance.getType() == "model") {
-            changeListEntry.model = changeMapEntry.instance;
-        }
-        else if(changeMapEntry.instance.getType() == "member") {
-            changeListEntry.member = changeMapEntry.instance;
-        }
-        else {
-            //this shouldn't happen. Ignore it if it does
-            continue;
-        }
-
+        changeListEntry.event = changeMapEntry.instance.getType() + "_" + changeMapEntry.action;
+        changeListEntry.instance = changeMapEntry.instance;
         changeList.push(changeListEntry);
     }
     return changeList;

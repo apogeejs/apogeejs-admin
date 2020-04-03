@@ -158,7 +158,7 @@ export default class CommandManager {
         changeList.forEach( changeEntry => {
             //fire event
             if(changeEntry.eventName) {
-                this.app.dispatchEvent(changeEntry.eventName,changeEntry);
+                this.app.dispatchEvent(changeEntry.eventName,changeEntry.target);
             } 
         })
     }

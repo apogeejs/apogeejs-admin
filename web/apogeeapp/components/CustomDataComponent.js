@@ -283,6 +283,7 @@ customDataComponentUpdateData.executeCommand = function(workspaceManager,command
             commandResult.eventAction = "updated";
         }
         catch(error) {
+            if(error.stack) console.error(error.stack);
             let msg = error.message ? error.message : error;
             commandResult.cmdDone = false;
             commandResult.alertMsg = "Exception on custom component update: " + msg;

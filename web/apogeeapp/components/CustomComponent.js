@@ -85,6 +85,7 @@ export default class CustomComponent extends Component {
                     resource = resourceFunction();
                 }
                 catch(err) {
+                    if(error.stack) console.error(error.stack);
                     console.log("bad ui generator function");
                 }
             }
@@ -245,6 +246,7 @@ customComponentUpdateData.executeCommand = function(workspaceManager,commandData
             commandResult.eventAction = "updated";
         }
         catch(error) {
+            if(error.stack) console.error(error.stack);
             let msg = error.message ? error.message : error;
             commandResult.cmdDone = false;
             commandResult.alertMsg = "Exception on custom component update: " + msg;

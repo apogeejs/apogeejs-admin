@@ -56,9 +56,10 @@ export default class ModelManager extends FieldObject {
             this.setField("model",newModel);
             
             //add listeners
-            //newModel.addListener("created", eventInfo => this.objectCreated(eventInfo));
-            newModel.addListener("updated", eventInfo => this.objectUpdated(eventInfo));
-            newModel.addListener("deleted", eventInfo => this.objectDeleted(eventInfo));
+            //newModel.addListener("member_created", member => this.memberCreated(member));
+            newModel.addListener("member_updated", member => this.memberUpdated(member));
+            newModel.addListener("member_deleted", member => this.memberDeleted(member));
+            newModel.addListener("model_updated", model => this.modelUpdated(model));
 
             return newModel;
         }
@@ -306,27 +307,6 @@ export default class ModelManager extends FieldObject {
     // Model event handlers
     //=============================
 
-    objectCreated(eventInfo) {
-        if(eventInfo.member) {
-            this.memberCreated(eventInfo.target);
-        }
-    }
-
-    objectUpdated(eventInfo) {
-        if(eventInfo.member) {
-            this.memberUpdated(eventInfo.member);
-        }
-        else if(eventInfo.model) {
-            this.modelUpdated(eventInfo.model);
-        }
-    }
-
-    objectDeleted(eventInfo) {
-        if(eventInfo.member) {
-            this.memberDeleted(eventInfo.member);
-        }
-    }
-
     /** This method responds to a member updated. */
     memberCreated(member) {
     }
@@ -397,9 +377,10 @@ export default class ModelManager extends FieldObject {
         this.setField("model",model);
         
         //add listeners
-        //model.addListener("created", eventInfo => this.objectCreated(eventInfo));
-        model.addListener("updated", eventInfo => this.objectUpdated(eventInfo));
-        model.addListener("deleted", eventInfo => this.objectDeleted(eventInfo));
+        //model.addListener("member_created", member => this.memberCreated(member));
+        model.addListener("member_updated", member => this.memberUpdated(member));
+        model.addListener("member_deleted", member => this.memberDeleted(member));
+        model.addListener("model_updated", model => this.modelUpdated(model));
 
         //load the model
         let loadAction = {};

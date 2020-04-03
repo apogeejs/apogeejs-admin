@@ -24,23 +24,21 @@ export default class ReferenceListView {
         return this.treeEntry;
     }
 
-    onLinkCreated(eventInfo) {
-        let referenceEntry = eventInfo.target;
+    onLinkCreated(referenceEntry) {
         let referenceEntryView = new ReferenceEntryView(this.app,referenceEntry,this.displayInfo);
         this.childViews[referenceEntry.getId()] = referenceEntryView;
         this.treeEntry.addChild(referenceEntryView.getTreeEntry());
     }
 
-    onLinkUpdated(eventInfo) {
-        let referenceEntry = eventInfo.target;
+    onLinkUpdated(referenceEntry) {
         let referenceEntryView = this.childViews[referenceEntry.getId()];
         if(referenceEntryView) {
-            referenceEntryView.onLinkUpdated(eventInfo);
+            referenceEntryView.onLinkUpdated(referenceEntry);
         }
     }
 
-    onLinkDeleted(eventInfo) {
-        let referenceEntryView = this.childViews[eventInfo.targetId];
+    onLinkDeleted(referenceEntry) {
+        let referenceEntryView = this.childViews[referenceEntry.getId()];
         if(referenceEntryView) {
             this.treeEntry.removeChild(referenceEntryView.getTreeEntry());
         }

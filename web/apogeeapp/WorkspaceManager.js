@@ -308,9 +308,7 @@ let loadmodelmanager = {};
  * been loaded.
  */
 loadmodelmanager.executeCommand = function(workspaceManager,commandData) {
-    
-    let modelManager = workspaceManager.getModelManager();
-    
+    let modelManager = workspaceManager.getMutableModelManager();
     return modelManager.load(workspaceManager,commandData.json);
 }
 

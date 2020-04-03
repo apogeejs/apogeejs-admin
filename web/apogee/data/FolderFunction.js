@@ -144,6 +144,8 @@ export default class FolderFunction extends DependentMember {
                 this.setData(folderFunctionFunction);
             }
             catch(error) {
+                if(error.stack) console.error(error.stack);
+                
                 //error in calculation
                 this.setError(error);
             }

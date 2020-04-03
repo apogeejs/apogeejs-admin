@@ -18,20 +18,17 @@ export default class ReferenceEntryView {
         return this.treeEntry;
     }
 
-    onLinkUpdated(eventInfo) {
-        let target = eventInfo.target;
-        if(target.getType() == "link") {
-            //make sure this is the right entry 
-            if(target.getId() != this.referenceEntry.getId()) return;
-            
-            this.referenceEntry = target;
-            if(target.isFieldUpdated("nickname")) {
-                this.treeEntry.setLabel(this.referenceEntry.getLabel());
-            }
-    
-            if(target.isFieldUpdated("state")) {
-                this.treeEntry.setBannerState(this.referenceEntry.getState());
-            }
+    onLinkUpdated(referenceEntry) {
+        //make sure this is the right entry 
+        if(referenceEntry.getId() != this.referenceEntry.getId()) return;
+        
+        this.referenceEntry = referenceEntry;
+        if(referenceEntry.isFieldUpdated("nickname")) {
+            this.treeEntry.setLabel(this.referenceEntry.getLabel());
+        }
+
+        if(referenceEntry.isFieldUpdated("state")) {
+            this.treeEntry.setBannerState(this.referenceEntry.getState());
         }
     }
 

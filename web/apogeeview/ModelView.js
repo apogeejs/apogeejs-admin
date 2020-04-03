@@ -20,10 +20,10 @@ export default class ModelView {
 
         //subscribe to events
         let app = this.modelManager.getApp();
-        app.addListener("component_created",eventData => this.onComponentCreated(eventData));
-        app.addListener("component_updated",eventData => this.onComponentUpdated(eventData));
-        app.addListener("component_deleted",eventData => this.onComponentDeleted(eventData));
-        app.addListener("modelManager_updated",eventData => this.onModelManagerUpdated(eventData));
+        app.addListener("component_created",component => this.onComponentCreated(component));
+        app.addListener("component_updated",component => this.onComponentUpdated(component));
+        app.addListener("component_deleted",component => this.onComponentDeleted(component));
+        app.addListener("modelManager_updated",modelManager => this.onModelManagerUpdated(modelManager));
 
         this.modelManager.setViewStateCallback(() => this.getViewState());
     }
@@ -71,9 +71,7 @@ export default class ModelView {
     /** This is called on component created events. We only 
      * want to respond to the root folder event here.
      */
-    onComponentCreated(eventData) {
-        let component = eventData.target;
-
+    onComponentCreated(component) {
         //create the component view
         let componentViewClass = ApogeeView.getComponentViewClass(component.constructor.uniqueName);
         let componentView;
@@ -101,14 +99,13 @@ export default class ModelView {
         componentView.loadViewStateFromComponent();
     }
 
-    onComponentUpdated(eventData) {
-        let component = eventData.target;
+    onComponentUpdated(component) {
         let componentView = this.getComponentViewByComponentId(component.getId());
         componentView.componentUpdated(component);
     }
 
-    onComponentDeleted(eventData) {
-        let componentId = eventData.targetId;
+    onComponentDeleted(component) {
+        let componentId = component.getId();
 
         let componentView = this.componentViewMap[componentId];
         if(componentView) {
@@ -128,9 +125,9 @@ export default class ModelView {
         delete this.componentViewMap[componentId];
     }
 
-    onModelManagerUpdated(eventData) {
-        let modelManager = eventData.target;
-        let model = modelManager.getModel();
+    onModelManagerUpdated(modelManager) {
+        this.modelManager = modelManager;
+        let model = this.modelManager.getModel();
         if(model.isFieldUpdated("name")) {
             this.workspaceView.setName(model.getName());
         }

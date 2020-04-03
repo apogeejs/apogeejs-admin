@@ -178,6 +178,7 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
             this.processMemberFunction(model,memberFunctionInitializer,compiledInfo.memberFunctionGenerator);
         }
         catch(error) {
+            if(error.stack) console.error(error.stack);
             if(error == base.MEMBER_FUNCTION_INVALID_THROWABLE) {
                 //This is not an error. I don't like to throw an error
                 //for an expected condition, but I didn't know how else
