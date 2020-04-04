@@ -26,9 +26,10 @@ export default class ReferenceView {
             this.treeEntry.addChild(childTreeEntry);
         });
 
-        app.addListener("link_created",referenceEntry => this._onLinkCreated(referenceEntry));
-        app.addListener("link_updated",referenceEntry => this._onLinkUpdated(referenceEntry));
-        app.addListener("link_deleted",referenceEntry => this._onLinkDeleted(referenceEntry));
+        app.addListener("referenceEntry_created",referenceEntry => this._onLinkCreated(referenceEntry));
+        app.addListener("referenceEntry_updated",referenceEntry => this._onLinkUpdated(referenceEntry));
+        app.addListener("referenceEntry_deleted",referenceEntry => this._onLinkDeleted(referenceEntry));
+        app.addListener("referenceManager_updated",referenceManager => this.referenceManager = referenceManager);
 
         this.referenceManager.setViewStateCallback(() => this.getViewState());
     }

@@ -127,7 +127,7 @@ export default class CustomDataComponent extends Component {
     // Action
     //=============================
 
-    doCodeFieldUpdate(fieldName,targetValue) { 
+    doCodeFieldUpdate(app,fieldName,targetValue) { 
         var initialValue = this.getField(fieldName);
         var command = {};
         command.type = customDataComponentUpdateData.commandInfo.type;
@@ -136,7 +136,7 @@ export default class CustomDataComponent extends Component {
         command.initialValue = initialValue;
         command.targetValue = targetValue;
 
-        this.getModelManager().getApp().executeCommand(command);
+        app.executeCommand(command);
         return true; 
     }
 

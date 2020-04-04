@@ -37,7 +37,19 @@ updatelink.createUndoCommand = function(workspaceManager,commandData) {
 
 updatelink.executeCommand = function(workspaceManager,commandData) {
     let referenceManager = workspaceManager.getMutableReferenceManager();
-    referenceManager.updateEntry(commandData.entryType,commandData.oldUrl,commandData);
+
+    let refEntryId = referenceManager.lookupRefEntryId(commandData.entryType,commandData.oldUrl);
+    if(!refEntryId) throw new Error("Reference entry not found. " + entryType + ":" + url);
+
+    let referenceEntry = referenceManager.getMutableRefEntryById(refEntryId);
+    if(!referenceEntry) throw new Error("Reference entry not found. refEntryId: " + refEntryId);
+
+    //update entry
+    let targetUrl = (commandData.newUrl !== undefined) ? commandData.newUrl : referenceEntry.getUrl();
+    let targetNickname = (commandData.newNickname !== undefined) ? commandData.newNickname : referenceEntry.getNickname();
+    referenceEntry.updateData(workspaceManager,targetUrl,targetNickname);
+
+    referenceManager.registerRefEntry(referenceEntry);
 }
 
 updatelink.commandInfo = {

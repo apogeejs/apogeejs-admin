@@ -2,21 +2,12 @@
 	"fileType": "apogee app js workspace",
 	"version": "0.50",
 	"references": {
-		"refLists": {
-			"js link": {
-				"entries": [
+		"refEntries": [
 					{
-						"url": "https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js"
+						"url": "https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js",
+						"entryType": "js link"
 					}
-				],
-				"viewState": {
-					"treeState": 1
-				}
-			}
-		},
-		"viewState": {
-			"treeState": 1
-		}
+		]
 	},
 	"code": {
 		"model": {

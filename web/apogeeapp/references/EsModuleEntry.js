@@ -42,7 +42,7 @@ export default class EsModuleEntry extends ReferenceEntry {
     }
     
     /** This method removes the link. This returns a command result for the removed link. */
-    implementationRemoveEntry() {
+    removeEntry() {
         //allow for an optional module remove step
         let module = this.getField("module");
         if(module) {
@@ -80,22 +80,15 @@ let setesmodule = {};
 
 setesmodule.executeCommand = function(workspaceManager,commandData) {
     
-    var commandResult = {};
-    var referenceManager = workspaceManager.getReferenceManager();
+    let referenceManager = workspaceManager.getMutableReferenceManager();
+
+    let refEntryId = referenceManager.lookupRefEntryId(commandData.entryType,commandData.url);
+    if(!refEntryId) throw new Error("Reference entry not found. " + commandData.entryType + ":" + commandData.url);
+
+    let referenceEntry = referenceManager.getMutableRefEntryById(refEntryId);
+    if(!referenceEntry) throw new Error("Reference entry not found. refEntryId: " + refEntryId);
     
-    //lookup entry for this reference
-    var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.url);
-    
-    if(referenceEntry) {
-        referenceEntry.setField("module",commandData.module);
-    }
-    else {
-        //reference entry not found
-        commandResult.cmdDone = false;
-        commandResult.errorMsg = "Reference entry not found: " + commandData.url;
-    }
-    
-    return commandResult;
+    referenceEntry.setField("module",commandData.module);
 }
 
 setesmodule.commandInfo = {

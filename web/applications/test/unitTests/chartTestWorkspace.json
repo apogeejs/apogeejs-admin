@@ -2,21 +2,12 @@
 	"fileType": "apogee app js workspace",
 	"version": "0.50",
 	"references": {
-		"refLists": {
-			"js link": {
-				"entries": [
+		"refEntries": [
 					{
-						"url": "https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"
+						"url": "https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js",
+						"entryType": "js link"
 					}
-				],
-				"viewState": {
-					"treeState": 1
-				}
-			}
-		},
-		"viewState": {
-			"treeState": 1
-		}
+				]
 	},
 	"code": {
 		"model": {

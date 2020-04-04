@@ -109,7 +109,7 @@ export default class CustomComponent extends Component {
     // Action
     //=============================
 
-    doCodeFieldUpdate(codeFieldName,targetValue) { 
+    doCodeFieldUpdate(app,codeFieldName,targetValue) { 
         let initialValue = this.getField(codeFieldName);
 
         var command = {};
@@ -119,7 +119,7 @@ export default class CustomComponent extends Component {
         command.initialValue = initialValue;
         command.targetValue = targetValue;
 
-        this.getModelManager().getApp().executeCommand(command);
+        app.executeCommand(command);
         return true;  
     }
 

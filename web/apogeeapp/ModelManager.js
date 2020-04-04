@@ -34,7 +34,7 @@ export default class ModelManager extends FieldObject {
     }
 
     //====================================
-    // Model Management
+    // Methods
     //====================================
 
     /** This gets the application instance. */
@@ -68,6 +68,113 @@ export default class ModelManager extends FieldObject {
         }
     }
 
+    
+    //============================
+    // Component Creation
+    //============================
+
+    /** This returns the list of folder names. */
+    getFolders() {
+        let componentMap = this.getField("componentMap");
+        let model = this.getModel();
+        var folders = []
+        for(var key in componentMap) {
+            var folderEntry = [];
+            var component = componentMap[key];
+            if(component.getParentFolderForChildren)
+            var folderMember = component.getParentFolderForChildren();
+            if(folderMember.getChildrenWriteable()) { 
+                folderEntry.push(folderMember.getId());
+                folderEntry.push(folderMember.getFullName(model));
+                folders.push(folderEntry);
+            }
+        }
+        return folders;
+    }
+        
+    createComponentFromMember(member,componentJson) {
+
+        if(!member) {
+            throw new Error("Unknown error: member missing!");
+        }
+        
+        //response - get new member
+        var component;
+        var componentClass = this.app.getComponentClass(componentJson.type);
+        if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
+            //create empty component
+            component = new componentClass(member,this);
+
+            //apply any serialized values
+            if(componentJson) {
+                component.loadPropertyValues(componentJson);
+            }
+        }
+
+        //if we failed to create the component, or if we failed to make the member properly (and we used the error member)
+        if(!component) {
+            //table not found - create an empty error table
+            componentClass = this.app.getComponentClass("apogeeapp.app.ErrorComponent");
+            component = new componentClass(member,this);
+            if(componentJson) {
+                component.loadProperties(componentJson);
+            }
+        }
+
+        if(!component) {
+            throw new Error("Unknown error creating componet: " + member.getName());
+        }
+
+        //load the children, after the component load is completed
+        if(component.loadChildrenFromJson) {
+            component.loadChildrenFromJson(this,componentJson);
+        }
+
+    }
+
+    
+    //=============================
+    // Model event handlers
+    //=============================
+
+    /** This method responds to a member updated. */
+    memberCreated(member) {
+    }
+
+
+    /** This method responds to a member updated. */
+    memberUpdated(member) {
+        let componentId = this.getComponentIdByMemberId(member.getId());
+        if(componentId) {
+            let component = this.getMutableComponentByComponentId(componentId);
+            component.memberUpdated(member);
+        }
+    }
+
+    modelUpdated(model) {
+    }
+
+    /** This method responds to a delete menu event. */
+    memberDeleted(member) {
+        let memberId = member.getId();
+        let componentId = this.getComponentIdByMemberId(memberId);
+        if(componentId) {
+            let oldComponentMap = this.getField("componentMap");
+            let component = oldComponentMap[componentId];
+
+            //take any delete actions (thes should not require a mutable member)
+            component.onDelete();
+
+            //unregister the component
+            this._unregisterComponent(component);
+        }
+    }
+
+
+    //====================================
+    // Component Owner Functionality
+    //====================================
+
     /** The change map lists the changes to the components and model. This will only be
      * valid when the ModelManager is unlocked */
     getChangeMap() {
@@ -84,10 +191,6 @@ export default class ModelManager extends FieldObject {
         }
         this.lock();
     }
-
-    //====================================
-    // Component Management
-    //====================================
 
     getComponentByComponentId(componentId) {
         return this.getField("componentMap")[componentId];
@@ -126,25 +229,6 @@ export default class ModelManager extends FieldObject {
         else {
             return null;
         }
-    }
-
-    /** This returns the list of folder names. */
-    getFolders() {
-        let componentMap = this.getField("componentMap");
-        let model = this.getModel();
-        var folders = []
-        for(var key in componentMap) {
-            var folderEntry = [];
-            var component = componentMap[key];
-            if(component.getParentFolderForChildren)
-            var folderMember = component.getParentFolderForChildren();
-            if(folderMember.getChildrenWriteable()) { 
-                folderEntry.push(folderMember.getId());
-                folderEntry.push(folderMember.getFullName(model));
-                folders.push(folderEntry);
-            }
-        }
-        return folders;
     }
 
     /** This method stores the component instance. It must be called when a
@@ -260,83 +344,6 @@ export default class ModelManager extends FieldObject {
     testPrint(eventInfo) {
         if(eventInfo.updated) {
             console.log(JSON.stringify(eventInfo.updated));
-        }
-    }
-        
-    createComponentFromMember(member,componentJson) {
-
-        if(!member) {
-            throw new Error("Unknown error: member missing!");
-        }
-        
-        //response - get new member
-        var component;
-        var componentClass = this.app.getComponentClass(componentJson.type);
-        if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
-            //create empty component
-            component = new componentClass(member,this);
-
-            //apply any serialized values
-            if(componentJson) {
-                component.loadPropertyValues(componentJson);
-            }
-        }
-
-        //if we failed to create the component, or if we failed to make the member properly (and we used the error member)
-        if(!component) {
-            //table not found - create an empty error table
-            componentClass = this.app.getComponentClass("apogeeapp.app.ErrorComponent");
-            component = new componentClass(member,this);
-            if(componentJson) {
-                component.loadProperties(componentJson);
-            }
-        }
-
-        if(!component) {
-            throw new Error("Unknown error creating componet: " + member.getName());
-        }
-
-        //load the children, after the component load is completed
-        if(component.loadChildrenFromJson) {
-            component.loadChildrenFromJson(this,componentJson);
-        }
-
-    }
-
-    //=============================
-    // Model event handlers
-    //=============================
-
-    /** This method responds to a member updated. */
-    memberCreated(member) {
-    }
-
-
-    /** This method responds to a member updated. */
-    memberUpdated(member) {
-        let componentId = this.getComponentIdByMemberId(member.getId());
-        if(componentId) {
-            let component = this.getMutableComponentByComponentId(componentId);
-            component.memberUpdated(member);
-        }
-    }
-
-    modelUpdated(model) {
-    }
-
-    /** This method responds to a delete menu event. */
-    memberDeleted(member) {
-        let memberId = member.getId();
-        let componentId = this.getComponentIdByMemberId(memberId);
-        if(componentId) {
-            let oldComponentMap = this.getField("componentMap");
-            let component = oldComponentMap[componentId];
-
-            //take any delete actions (thes should not require a mutable member)
-            component.onDelete();
-
-            //unregister the component
-            this._unregisterComponent(component);
         }
     }
 

@@ -33,7 +33,7 @@ export default class AmdModuleEntry extends ReferenceEntry {
     }
     
     /** This method removes the module. */
-    implementationRemoveEntry() {
+    removeEntry() {
         //allow for an optional module remove step
         require.undef(this.getUrl());
     }

@@ -16,13 +16,13 @@ export default class CssEntry extends ReferenceEntry {
     /** This method loads the actual link. */
     implementationLoadEntry(onLoad,onError) {
         this.linkCallerId = getLinkLoader().createLinkCallerId();
-        getLinkLoader().addLinkElement("css",this.getUrl(),this.linkCallerId,onLoad,onError);
+        getLinkLoader().addLinkElement("css",this.getUrl(),this.getId(),onLoad,onError);
     }
 
     
     /** This method removes the link. It returns true if the link is removed. */
-    implementationRemoveEntry() {
-        getLinkLoader().removeLinkElement("css",this.getUrl(),this.linkCallerId);
+    removeEntry() {
+        getLinkLoader().removeLinkElement("css",this.getUrl(),this.getId());
         return true;
     }
 }

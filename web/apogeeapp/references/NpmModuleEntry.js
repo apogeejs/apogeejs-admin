@@ -36,7 +36,7 @@ export default class NpmModuleEntry extends ReferenceEntry {
     }
     
     /** This method removes the link. */
-    implementationRemoveEntry() {
+    removeEntry() {
         //allow for an optional module remove step
         let module = this.getField("module");
         if(module) {

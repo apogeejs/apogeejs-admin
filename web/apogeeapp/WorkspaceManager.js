@@ -252,6 +252,9 @@ this.created = false;
         if(json.references) {
             //if there are references, load these before loading the model.
             //this is asynchronous so we must load the model in a future command
+            let referenceManager = this.getReferenceManager();
+            let referenceLoadPromise = referenceManager.load(this,json.references);
+
             let onReferencesLoaded = () => {
                 //load references regardless of success or failure in loading references
                 let loadModelCommand = {};
@@ -260,8 +263,7 @@ this.created = false;
                 this.runFutureCommand(loadModelCommand);
             }
 
-            let referenceManager = this.getReferenceManager();
-            referenceManager.load(this,json.references,onReferencesLoaded);
+            referenceLoadPromise.then(onReferencesLoaded);
         }
         else {
             //if there are not references we can load the model directly.

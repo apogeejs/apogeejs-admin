@@ -116,7 +116,7 @@ export default class CustomDataComponentView extends ComponentView {
         return {
 
             //This method reloads the component and checks if there is a DATA update. UI update is checked later.
-            doUpdate: function(updatedComponent) {
+            doUpdate: (updatedComponent) => {
                 //set the component instance for this data source
                 component = updatedComponent;
                 inputMember = component.getField("member.input");
@@ -127,20 +127,20 @@ export default class CustomDataComponentView extends ComponentView {
                 return {reloadData,reloadDataDisplay};
             },
 
-            getDisplayData: function() {
+            getDisplayData: () => {
                 return inputMember.getData();
             },
 
-            getData: function() {
+            getData: () => {
                 return dataMember.getData();
             },
 
             //edit ok - always true
-            getEditOk: function() {
+            getEditOk: () => {
                 return true;
             },
 
-            saveData: function(formValue) {
+            saveData: (formValue) => {
                 //send value to the table whose variable name is "data"
                 //the context reference is the member called "input" 
                 let commandMessenger = new UiCommandMessenger(app,inputMember);
@@ -151,17 +151,17 @@ export default class CustomDataComponentView extends ComponentView {
             //below - custom methods for HtmlJsDataDisplay
 
             //returns the HTML for the data display
-            getHtml: function() {
+            getHtml: () => {
                 return component.getField("html");
             },
 
             //returns the resource for the data display
-            getResource: function() {
+            getResource: () => {
                 return component.createResource();
             },
 
             //gets the mebmer used as a refernce for the UI manager passed to the resource functions 
-            getContextMember: function() {
+            getContextMember: () => {
                 return inputMember;
             }
         }
@@ -182,18 +182,19 @@ export default class CustomDataComponentView extends ComponentView {
                 return {reloadData,reloadDataDisplay};
             },
 
-            getData: function() {
+            getData: () => {
                 let codeField = component.getField(codeFieldName);
                 if((codeField === undefined)||(codeField === null)) codeField = "";
                 return codeField;
             },
 
-            getEditOk: function() {
+            getEditOk: () => {
                 return true;
             },
             
-            saveData: function(text) {
-                component.doCodeFieldUpdate(codeFieldName,text);
+            saveData: (text) => {
+                let app = this.getModelView().getApp();
+                component.doCodeFieldUpdate(app,codeFieldName,text);
                 return true;
             }
         }

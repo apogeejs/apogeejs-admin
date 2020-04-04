@@ -23,7 +23,7 @@ export default class ReferenceEntryView {
         if(referenceEntry.getId() != this.referenceEntry.getId()) return;
         
         this.referenceEntry = referenceEntry;
-        if(referenceEntry.isFieldUpdated("nickname")) {
+        if(referenceEntry.getIsLabelUpdated()) {
             this.treeEntry.setLabel(this.referenceEntry.getLabel());
         }
 
@@ -38,10 +38,10 @@ export default class ReferenceEntryView {
 
     _createTreeEntry() {
         var iconUrl = apogeeui.getResourcePath(this.displayInfo.ENTRY_ICON_PATH);
-        var nickname = this.referenceEntry.getNickname();
+        var label = this.referenceEntry.getLabel();
         var menuItemsCallback = () => this._getMenuItems();
 
-        var treeEntry = new TreeEntry(nickname, iconUrl, null, menuItemsCallback, false);
+        var treeEntry = new TreeEntry(label, iconUrl, null, menuItemsCallback, false);
         treeEntry.setBannerState(this.referenceEntry.getState());
         return treeEntry;
     }

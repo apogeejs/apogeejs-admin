@@ -64,6 +64,11 @@ export default class ReferenceEntry extends FieldObject {
         return nickname ? nickname : this.getUrl();
     }
 
+    getIsLabelUpdated() {
+        //this will return true sometimes where there is no update to the label
+        return this.areAnyFieldsUpdated(["url","nickname"]);
+    }
+
     setViewStateCallback(viewStateCallback) {
         this.viewStateCallback = viewStateCallback;
     }
@@ -78,33 +83,40 @@ export default class ReferenceEntry extends FieldObject {
 
     /** This method loads the link onto the page. If passed, the onLoadComplete
      * callback will be called when load completes successfully or fails. */
-    loadEntry(workspaceManager,onLoadComplete) {
+    loadEntry(workspaceManager) {
 
-        //create load event handlers
-        //on completion execute a command to update the link status
-        var onLoad = () => {
-            let commandData = {
-                type: "updateLinkLoadStatus",
-                entryType: this.referenceType,
-                url: this.getUrl(),
-                success: true
-            };
-            let commandResult = workspaceManager.runFutureCommand(commandData);
-            if(onLoadComplete) onLoadComplete(commandResult);
-        }
-        var onError = (error) => {
-            let commandData = {
-                type: "updateLinkLoadStatus",
-                entryType: this.referenceType,
-                url: this.getUrl(),
-                success: false,
-                error: error
-            };
-            let commandResult = workspaceManager.runFutureCommand(commandData);
-            if(onLoadComplete) onLoadComplete(commandResult);
-        }
+        let entryLoadPromise = new Promise( (resolve,reject) => {
 
-        this.implementationLoadEntry(onLoad,onError,workspaceManager);
+            //create load event handlers
+            //on completion execute a command to update the link status
+            let onLoad = () => {
+                let commandData = {
+                    type: "updateLinkLoadStatus",
+                    entryType: this.referenceType,
+                    url: this.getUrl(),
+                    success: true
+                };
+                workspaceManager.runFutureCommand(commandData);
+                //call resolve in any case
+                resolve();
+            };
+            let onError = (error) => {
+                let commandData = {
+                    type: "updateLinkLoadStatus",
+                    entryType: this.referenceType,
+                    url: this.getUrl(),
+                    success: false,
+                    error: error
+                };
+                workspaceManager.runFutureCommand(commandData);
+                //call resolve in any case
+                resolve();
+            }
+
+            this.implementationLoadEntry(onLoad,onError,workspaceManager);
+        });
+
+        return entryLoadPromise;
     }
 
     /** This method loads the link onto the page. It should call the 
@@ -142,7 +154,7 @@ export default class ReferenceEntry extends FieldObject {
 
         //update url
         if(this.url != url) {
-            this.remove();
+            this.removeEntry();
             this.setField("url",url);
             var promise = this.loadEntry(workspaceManager);
         }
@@ -191,10 +203,6 @@ ReferenceEntry.ELEMENT_ID_BASE = "__apogee_link_element_";
 
 let NO_NICKNAME_EMPTY_STRING = "";
 
-/** THis is used to give an id to the link entries 
- * @private */
-let nextId = 1;
-
 //=====================================
 // Status Commands
 // These are commands run to update the status of the link after loading completes
@@ -221,11 +229,11 @@ let updatelinkstatus = {};
 updatelinkstatus.executeCommand = function(workspaceManager,commandData) {
     
     var commandResult = {};
-    var referenceManager = workspaceManager.getReferenceManager();
+    var referenceManager = workspaceManager.getMutableReferenceManager();
     
     //lookup entry for this reference
-    var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.url);
-    
+    let refEntryId = referenceManager.lookupRefEntryId(commandData.entryType,commandData.url);
+    let referenceEntry = referenceManager.getMutableRefEntryById(refEntryId);
     if(referenceEntry) {
         //update entry status
         //add event handlers
@@ -235,17 +243,15 @@ updatelinkstatus.executeCommand = function(workspaceManager,commandData) {
         }
         else {
             var errorMsg = "Failed to load link '" + this.url + "':" + error;
-            //accept the error and keep going - it will be flagged in UI
-            commandResult.cmdDone = true;
-            commandResult.errorMsg = errorMsg;
             referenceEntry.setError(errorMsg);
         }
+
+        //save the updated entry
+        referenceManager.registerRefEntry(referenceEntry);
     }
     else {
         //reference entry not found
-        commandResult.cmdDone = false;
-        commandResult.errorMsg = "Reference entry not found: " + commandData.url;
-
+        throw new Error("Reference entry not found: " + commandData.url);
     }
     
     return commandResult;
