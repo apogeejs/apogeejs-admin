@@ -85,7 +85,7 @@ export default class ReferenceEntry extends FieldObject {
         var onLoad = () => {
             let commandData = {
                 type: "updateLinkLoadStatus",
-                entryType: JsScriptEntry.REFERENCE_TYPE,
+                entryType: this.referenceType,
                 url: this.getUrl(),
                 success: true
             };
@@ -95,7 +95,7 @@ export default class ReferenceEntry extends FieldObject {
         var onError = (error) => {
             let commandData = {
                 type: "updateLinkLoadStatus",
-                entryType: JsScriptEntry.REFERENCE_TYPE,
+                entryType: this.referenceType,
                 url: this.getUrl(),
                 success: false,
                 error: error
@@ -104,7 +104,7 @@ export default class ReferenceEntry extends FieldObject {
             if(onLoadComplete) onLoadComplete(commandResult);
         }
 
-        this.implementationLoadEntry(onLoad,onError);
+        this.implementationLoadEntry(onLoad,onError,workspaceManager);
     }
 
     /** This method loads the link onto the page. It should call the 

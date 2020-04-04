@@ -20,6 +20,8 @@ export default class WorkspaceView {
 
         this.init();
 
+        this.app.addListener("workspaceManager_updated",workspaceManager => this.workspaceManager = workspaceManager);
+
         //Thisis used to retieve UI state to save when the app is being saved
         this.workspaceManager.setViewStateCallback(() => this.getViewState());
     }

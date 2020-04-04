@@ -100,7 +100,7 @@ this.created = false;
      * reference manager is unlocked it will return that. Otherwise it will return
      * a new unlocked instance that will also be set as the current instance. */
     getMutableReferenceManager() {
-        let oldReferenceManager = getReferenceManager();
+        let oldReferenceManager = this.getReferenceManager();
         if(oldReferenceManager.getIsLocked()) {
             //create a new instance that is a copy of this one
             let newReferenceManager = new ReferenceManager(this.app,oldReferenceManager);
@@ -158,10 +158,10 @@ this.created = false;
 
     getModelRunContext() {
         let modelRunContext = {};
-        modelRunContext.runFutureAction = function(modelId,action) {
+        modelRunContext.doFutureAction = (modelId,action) => {
             //create a command to run this action
             let modelActionCommand = {};
-            modelActionCommand.type = "modelActionCommand";
+            modelActionCommand.type = "futureModelActionCommand";
             modelActionCommand.modelId = modelId;
             modelActionCommand.action = action;
 

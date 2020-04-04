@@ -166,7 +166,7 @@ export default class CodeableMember extends DependentMember {
             return;
         }
         else if(!compiledInfo.valid) {
-            this.setErrors(compiledInfo.codeErrors);
+            this.setErrors(compiledInfo.errors);
             this.clearCalcPending();
             return;
         }

@@ -99,7 +99,7 @@ function updateData(model,actionData) {
         if(!member.pendingPromiseMatches(actionData.sourcePromise)) {
             //no action - this is from an asynch action that has been overwritten
             actionResult.actionDone = false;
-            return;
+            return actionResult;
         }
     }
     
@@ -115,7 +115,7 @@ function updateData(model,actionData) {
 
     //if the data is a promise, we must also initiate the asynchronous setting of the data
     if((data)&&(data instanceof Promise)) {
-        this.applyAsynchData(model,data);
+        member.applyAsynchData(model,data);
     }
     
     actionResult.actionDone = true;

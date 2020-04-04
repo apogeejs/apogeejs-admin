@@ -252,8 +252,8 @@ export default class FolderFunction extends DependentMember {
 
         //create a copy of the model to do the function calculation - we don't update the UI display version
         var virtualModel;
-        var inputElementArray;
-        var returnValueTable; 
+        var inputMemberIdArray;
+        var returnValueMemberId; 
         
         var initialized = false;
         
@@ -270,18 +270,18 @@ export default class FolderFunction extends DependentMember {
 
                 //lookup elements from virtual model
                 let virtualInternalFolder = virtualModel.getMemberByFullName(virtualModel,"body");
-                inputElementArray = this.loadInputElements(virtualModel,virtualInternalFolder);
-                returnValueTable = this.loadOutputElement(virtualModel,virtualInternalFolder); 
+                inputMemberIdArray = this.loadInputElements(virtualModel,virtualInternalFolder);
+                returnValueMemberId = this.loadOutputElement(virtualModel,virtualInternalFolder); 
                 
                 initialized = true;
             }
             
             //create an update array to set the table values to the elements  
             var updateActionList = [];
-            for(var i = 0; i < inputElementArray.length; i++) {
+            for(var i = 0; i < inputMemberIdArray.length; i++) {
                 var entry = {};
                 entry.action = "updateData";
-                entry.memberId = inputElementArray[i].getId();
+                entry.memberId = inputMemberIdArray[i];
                 entry.data = argumentArray[i];
                 updateActionList.push(entry);
             }
@@ -291,16 +291,18 @@ export default class FolderFunction extends DependentMember {
             actionData.actions = updateActionList;
 
             //apply the update
-            var actionResult = doAction(virtualModel,actionData);        
+            let workingVirtualModel = virtualModel.getMutableModel();
+            var actionResult = doAction(workingVirtualModel,actionData);        
             if(actionResult.actionDone) {
                 //retrieve the result
-                if(returnValueTable) {
+                if(returnValueMemberId) {
+                    let returnValueMember = workingVirtualModel.lookupMemberById(returnValueMemberId);
                     
-                    if(returnValueTable.getState() == apogeeutil.STATE_PENDING) {
-                        throw new Error("A folder function must not be asynchronous: " + this.getFullName(virtualModel));
+                    if(returnValueMember.getState() == apogeeutil.STATE_PENDING) {
+                        throw new Error("A folder function must not be asynchronous: " + this.getFullName(workingVirtualModel));
                     }
                     
-                    return returnValueTable.getData();
+                    return returnValueMember.getData();
                 }
                 else {
                     //no return value found
@@ -344,7 +346,7 @@ export default class FolderFunction extends DependentMember {
             var argName = argList[i];
             var argMember = virtualInternalFolder.lookupChild(virtualModel,argName);
             if(argMember) {
-                argMembers.push(argMember);
+                argMembers.push(argMember.getId());
             }     
         }
         return argMembers;
@@ -355,7 +357,7 @@ export default class FolderFunction extends DependentMember {
     loadOutputElement(virtualModel,virtualInternalFolder) {
         let returnValueString = this.getField("returnValue");
         var returnValueMember = virtualInternalFolder.lookupChild(virtualModel,returnValueString);
-        return returnValueMember;
+        return returnValueMember.getId();
     }
 }
 

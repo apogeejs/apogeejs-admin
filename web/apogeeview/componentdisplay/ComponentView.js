@@ -1,4 +1,5 @@
 import apogeeui from "/apogeeui/apogeeui.js";
+import {bannerConstants} from "/apogeeview/componentdisplay/banner.js";
 import {updateComponent} from "/apogeeview/commandseq/updatecomponentseq.js";
 import {deleteComponent} from "/apogeeview/commandseq/deletecomponentseq.js";
 import TreeComponentDisplay from "/apogeeview/componentdisplay/TreeComponentDisplay.js";
@@ -200,7 +201,7 @@ export default class ComponentView {
         if(!json) return;
 
         //set the tree state
-        if((json.treeState !== undefined)||(json.treeState !== null)) {
+        if((json.treeState !== undefined)&&(json.treeState !== null)) {
             if(this.treeDisplay) {
                 this.treeDisplay.setState(json.treeState);
                 this.treeState = null;
@@ -251,7 +252,7 @@ export default class ComponentView {
     createTreeDisplay() {
         var treeDisplay = new TreeComponentDisplay(this);
 
-        if(this.treeState !== null) {
+        if((this.treeState !== undefined)&&(this.treeState !== null)) {
             treeDisplay.setState(this.treeState);
         }
         

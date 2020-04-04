@@ -202,7 +202,7 @@ export default class ModelManager extends FieldObject {
                 delete newMemberMap[componentMemberId];
             }
         }
-        this.setField("memberMap",memberMap);
+        this.setField("memberMap",newMemberMap);
 
         //update the change map
         let oldChangeEntry = this.workingChangeMap[componentId];
@@ -336,7 +336,7 @@ export default class ModelManager extends FieldObject {
             component.onDelete();
 
             //unregister the component
-            this._unregisterComponent();
+            this._unregisterComponent(component);
         }
     }
 

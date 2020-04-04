@@ -10,14 +10,14 @@ export default class ReferenceView {
 
         //get the view state
         let viewState = this.referenceManager.getCachedViewState();
-        let listViewStates = viewState ? viewState.lists : {};
+        let listViewStates = ((viewState)&&(viewState.lists)) ? viewState.lists : {};
 
         //create the tree entry
         this.treeEntry = this._createTreeEntry(viewState);
 
         //initailize the child list views
         this.referenceListViews = {};
-        let referenceClassArray = referenceManager.getReferenceClassArray();
+        let referenceClassArray = this.app.getReferenceClassArray();
         referenceClassArray.forEach( referenceClass => {
             let entryType = referenceClass.REFERENCE_TYPE;
             let referenceListView = this._createReferenceListView(entryType,listViewStates[entryType]); 

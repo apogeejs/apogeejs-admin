@@ -185,7 +185,7 @@ export default class Member extends FieldObject {
 
     /** This returns true if the pending token matches. */
     pendingPromiseMatches(promise) {
-        return (this.pendingPromise === promise);
+        return (this.getPendingPromise() === promise);
     }
 
     //=======================================
@@ -229,7 +229,7 @@ export default class Member extends FieldObject {
     setResultPending(promise) {
         this._setState(apogeeutil.STATE_PENDING);
         if(promise) {
-            this._setField("pendingPromise",promise);
+            this.setField("pendingPromise",promise);
         }
     }
 
@@ -238,7 +238,7 @@ export default class Member extends FieldObject {
      * The optional data value should typically be undefined unless there is a specifc data value that should be
      * set with the invalid state. */
     setResultInvalid() {
-        this._setDataState(apogeeutil.STATE_INVALID);
+        this._setState(apogeeutil.STATE_INVALID);
     }
 
     /** This methos sets the data, where the data can be a generalized value
@@ -259,7 +259,7 @@ export default class Member extends FieldObject {
         }
         else if(data instanceof Error) {
             //data is an error
-            this.setError(error);
+            this.setError(data);
         }
         else if(data === apogeeutil.INVALID_VALUE) {
             //data is an invalid value

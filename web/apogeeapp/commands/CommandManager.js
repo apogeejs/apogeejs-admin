@@ -123,11 +123,15 @@ export default class CommandManager {
                 this.commandHistory.clearHistory();
                 alert("The command was succesful but there was an error in the history. Undo is not available. Error: " + undoErrorMsg);
             }
+
+            return true;
         }
         else {
             //failure - keep the old workspace 
             alert("Command failed: " + commandErrrorMsg);
         }
+
+        return false;
     }
 
     /** This returns the command history. */

@@ -16,12 +16,12 @@ export default class JsScriptEntry extends ReferenceEntry {
     /** This method loads the actual link. */
     implementationLoadEntry(onLoad,onError) {
         this.linkCallerId = getLinkLoader().createLinkCallerId();
-        getLinkLoader().addLinkElement("script",this.url,this.linkCallerId,onLoad,onError);
+        getLinkLoader().addLinkElement("script",this.getUrl(),this.linkCallerId,onLoad,onError);
     }
     
     /** This method removes the link. */
     implementationRemoveEntry() {
-        getLinkLoader().removeLinkElement("script",this.url,this.linkCallerId);
+        getLinkLoader().removeLinkElement("script",this.getUrl(),this.linkCallerId);
         return true;
     }
     

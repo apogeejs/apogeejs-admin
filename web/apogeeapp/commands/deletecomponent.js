@@ -39,7 +39,7 @@ deletecomponent.createUndoCommand = function(workspaceManager,commandData) {
         member = parent.lookupChild(commandData.memberName);
     }
 
-    let componentId = modelManager.getComponentIdByMemberId(memberId);
+    let componentId = modelManager.getComponentIdByMemberId(member.getId());
     let component = modelManager.getComponentByComponentId(componentId);
     
     var commandUndoJson = {};
@@ -73,7 +73,7 @@ deletecomponent.executeCommand = function(workspaceManager,commandData) {
     }
     
     var actionResult = doAction(model,actionJson);
-    if(!actionResult.cmdDone) {
+    if(!actionResult.actionDone) {
         throw new Error("Error deleting component: " + actionResult.errorMsg);
     }
 }

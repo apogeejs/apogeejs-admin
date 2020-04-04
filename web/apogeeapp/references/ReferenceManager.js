@@ -13,7 +13,12 @@ export default class ReferenceManager extends FieldObject {
         super("referenceManager",instanceToCopy,keepUpdatedFixed);
 
         this.app = app;
-        this.referenceClassArray = this.app.getReferenceClassArray();
+        
+        let referenceClassArray = this.app.getReferenceClassArray();
+        this.referenceClassMap = {};
+        referenceClassArray.forEach(referenceClass => {
+            this.referenceClassMap[referenceClass.REFERENCE_TYPE] = referenceClass;
+        })
 
         //==============
         //Fields
@@ -55,10 +60,6 @@ export default class ReferenceManager extends FieldObject {
             referenceEntryMap[id].lock();
         }
         this.lock();
-    }
-
-    getReferenceClassArray() {
-        return this.referenceClassArray;
     }
 
     setViewStateCallback(viewStateCallback) {
@@ -152,16 +153,17 @@ export default class ReferenceManager extends FieldObject {
     /** This method creates a reference entry. This does nto however load it, to 
      * do that ReferenceEntry.loadEntry() method must be called.  */
     createEntry(entryCommandData) {
-        let oldEntryMap = this.setField("referenceEntryMap");
-        
+        let referenceEntry
+
+        let oldEntryMap = this.getField("referenceEntryMap");
         //check if we already have this reference entry. Do not re-load it if we do.
-        let entryKey = this._getEntryKey(entryCommandData.type,entryCommandData.url);
+        let entryKey = this._getEntryKey(entryCommandData.entryType,entryCommandData.url);
         if(!oldEntryMap[entryKey]) {
             //load the entry
-            let referenceEntryClass = this.referenceEntryClasses[entryCommandData.entryType];
+            let referenceEntryClass = this.referenceClassMap[entryCommandData.entryType];
             //we might want different error handling here
             if(!referenceEntryClass) throw new Error("Entry type nopt found: " + entryCommandData.entryType);
-            let referenceEntry = new this.referenceEntryClass(entryCommandData);
+            referenceEntry = new referenceEntryClass(entryCommandData);
 
             //update entry map
             let newEntryMap = {};
@@ -217,7 +219,7 @@ export default class ReferenceManager extends FieldObject {
     }
 
     removeEntry(entryType,url) {
-        let entryKey = _getEntryKey(entryType,url);
+        let entryKey = this._getEntryKey(entryType,url);
         let oldEntryMap = this.getField("referenceEntryMap");
         let referenceEntry = oldEntryMap[entryKey];
         if(referenceEntry) {
@@ -254,7 +256,7 @@ export default class ReferenceManager extends FieldObject {
     }
 
     lookupEntry(entryType,url) {
-        let entryKey = _getEntryKey(entryType,url);
+        let entryKey = this._getEntryKey(entryType,url);
         let entryMap = this.getField("referenceEntryMap");
         return entryMap[entryKey];
     }

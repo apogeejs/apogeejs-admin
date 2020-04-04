@@ -1,4 +1,5 @@
 import ReferenceEntry from "/apogeeapp/references/ReferenceEntry.js";
+import CommandManager from "/apogeeapp/commands/CommandManager.js";
 
 import * as apogee from "/apogee/apogeeCoreLib.js";
 import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
@@ -16,14 +17,28 @@ export default class EsModuleEntry extends ReferenceEntry {
     }
             
     /** This method loads the actual link. */
-    implementationLoadEntry(onLoad,onError) {
+    implementationLoadEntry(onLoad,onError,workspaceManager) {
         let localOnLoad = (module) => {
-            if((module)&&(module.initApogeeModule)) module.initApogeeModule(apogee,apogeeapp,apogeeutil);
-            this.setField("module",module);
+            if(module) {
+                if(module.initApogeeModule) module.initApogeeModule(apogee,apogeeapp,apogeeutil);
+            
+                let commandData = {
+                    type: "setEsModule",
+                    entryType: this.referenceType,
+                    url: this.getUrl(),
+                    module: module
+                };
+                workspaceManager.runFutureCommand(commandData);
+                onLoad();
+            }
+            else {
+                onError("Unknown error: Module not properly loaded. " + this.getUrl());
+            }
+
         }
 
         //load the module
-        var moduleLoadPromise = import(this.url).then(localOnLoad).catch(onError);
+        var moduleLoadPromise = import(this.getUrl()).then(localOnLoad).catch(onError);
     }
     
     /** This method removes the link. This returns a command result for the removed link. */
@@ -40,4 +55,54 @@ export default class EsModuleEntry extends ReferenceEntry {
 }
 
 EsModuleEntry.REFERENCE_TYPE = "es module";
+
+//=====================================
+//Load Module Command
+// These are commands run to update the status of the link after loading completes
+//=====================================
+
+/*
+ *
+ * Command JSON format:
+ * {
+ *   "type":"setEsModule",
+ *   "entryType":(entry type),
+ *   "url":(url),
+ *   "module":(the module),
+ * }
+ * 
+ */ 
+
+let setesmodule = {};
+
+//No undo command. Only the original call needs to be undone.
+//setesmodule.createUndoCommand = function(workspaceManager,commandData) {
+
+setesmodule.executeCommand = function(workspaceManager,commandData) {
+    
+    var commandResult = {};
+    var referenceManager = workspaceManager.getReferenceManager();
+    
+    //lookup entry for this reference
+    var referenceEntry = referenceManager.lookupEntry(commandData.entryType,commandData.url);
+    
+    if(referenceEntry) {
+        referenceEntry.setField("module",commandData.module);
+    }
+    else {
+        //reference entry not found
+        commandResult.cmdDone = false;
+        commandResult.errorMsg = "Reference entry not found: " + commandData.url;
+    }
+    
+    return commandResult;
+}
+
+setesmodule.commandInfo = {
+    "type": "setEsModule",
+    "targetType": "referenceEntry",
+    "event": "updated"
+}
+
+CommandManager.registerCommand(setesmodule);
 

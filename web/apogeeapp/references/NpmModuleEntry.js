@@ -29,10 +29,7 @@ export default class NpmModuleEntry extends ReferenceEntry {
         }
         catch(error) {
             if(error.stack) console.error(error.stack);
-            //accept the error and keep going - it will be flagged in UI
-            commandResult.cmdDone = true;
-            commandResult.errorMsg = errorMsg;
-
+            
             onError(errorMsg);
         }
 

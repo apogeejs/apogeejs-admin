@@ -468,7 +468,7 @@ export default class Model extends FieldObject {
         json.children = {};
 
         //attach a single child named main
-        json.children.Main = folderJson;
+        json.children[folderJson.name] = folderJson;
 
         return json
     }

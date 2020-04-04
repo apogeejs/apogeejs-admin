@@ -14,7 +14,7 @@ export default class FormDataComponent extends Component {
         super(member,modelManager,instanceToCopy,keepUpdatedFixed);
         
         //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
-        folder.setChildrenWriteable(false);
+        member.setChildrenWriteable(false);
         
         let model = modelManager.getModel();
         //==============
@@ -23,15 +23,15 @@ export default class FormDataComponent extends Component {
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
             //internal tables
-            let dataMember = folder.lookupChild(model,"data");
+            let dataMember = member.lookupChild(model,"data");
             this.setField("member.data",dataMember);
             modelManager.registerMember(dataMember.getId(),this,false);
 
-            let layoutFunctionMember = folder.lookupChild(model,"layout");
+            let layoutFunctionMember = member.lookupChild(model,"layout");
             this.setField("member.layout",layoutFunctionMember);
             modelManager.registerMember(layoutFunctionMember.getId(),this,false);
 
-            let isInputValidFunctionMember = folder.lookupChild(model,"isInputValid");
+            let isInputValidFunctionMember = member.lookupChild(model,"isInputValid");
             this.setField("member.isInputValid",isInputValidFunctionMember);
             modelManager.registerMember(isInputValidFunctionMember.getId(),this,false);
         }

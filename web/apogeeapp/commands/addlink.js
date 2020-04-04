@@ -29,7 +29,7 @@ addlink.executeCommand = function(workspaceManager,commandData) {
     //this creates the entry but does not load it
     let referenceEntry = referenceManager.createEntry(commandData);
     //this loads the entry - it will cause an asynchronouse command on completion
-    referenceEntry.loadEntry(workpaceManager);
+    referenceEntry.loadEntry(workspaceManager);
 }
 
 addlink.commandInfo = {
