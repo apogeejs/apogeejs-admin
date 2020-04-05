@@ -120,7 +120,7 @@ export default class CustomComponentView extends ComponentView {
             },
 
             getData: () => {
-                return null;
+                return member.getData();
             },
 
             //below - custom methods for HtmlJsDataDisplay
