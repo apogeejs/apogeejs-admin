@@ -186,31 +186,26 @@ export function updateComponent(componentView) {
             modelManager.getApp().executeCommand(command);
         }
 
-        if(componentViewClass.hasChildDisplay) {
-            //select the component and give focus to the parent editor if this is a child
-            //NOTE - the if is not quite right. We shoudl only return to editor if the command origniated there.
-            returnToEditor(modelManager,component,submittedValues.name);
-        }
+        returnToEditor(componentView,submittedValues.name);
 
         //return true to close the dialog
         return true;
     }
 
     //return focus to editor on cancel
-    let onCancelFunction = () => returnToEditor(modelManager,component);
+    let onCancelFunction = () => returnToEditor(componentView);
 
     //show dialog
     showConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
 }
 
-function returnToEditor(modelManager,component,optionalNameToSelect) {
-    let parentComponent = component.getParentComponent(modelManager);
-    if(parentComponent) {
-        parentComponent.giveEditorFocusIfShowing();
-//NOTE - this name select did nothing. ProseMirror supressed selection change for some reason. Look into this.
-        // if(optionalNameToSelect) {
-        //     parentComponent.selectApogeeNode(optionalNameToSelect);
-        // }
+function returnToEditor(componentView) {
+    let componentViewClass = componentView.constructor;
+    if(componentViewClass.hasChildDisplay) {
+        let parentComponentView = componentView.getParentComponentView();
+        if(parentComponentView) {
+            parentComponentView.giveEditorFocusIfShowing();
+        }
     }
 }
 

@@ -63,7 +63,7 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getMutableModelManager();
     let model = modelManager.getMutableModel();
-    var member = model.getMemberById(commandData.memberId);
+    var member = model.lookupMemberById(commandData.memberId);
     var componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
     var component = modelManager.getMutableComponentByComponentId(componentId);
     
