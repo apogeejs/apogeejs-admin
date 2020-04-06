@@ -64,27 +64,27 @@ export default class CustomDataComponentView extends ComponentView {
         
         var dataDisplaySource;
         var app = this.getModelView().getApp();
-        let component = this.getComponent();
         
         //create the new view element;
         switch(viewType) {
             
             case CustomDataComponentView.VIEW_FORM:
+                let component = this.getComponent();
                 displayContainer.setDisplayDestroyFlags(component.getDisplayDestroyFlags());
                 var dataDisplaySource = this.getOutputDataDisplaySource();
                 var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,dataDisplaySource);
                 return dataDisplay;
                 
             case CustomDataComponentView.VIEW_VALUE:
-                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,component,"member.data");
+                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,this,"member.data");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                 
             case CustomDataComponentView.VIEW_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,component,"member.input");
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member.input");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomDataComponentView.VIEW_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,component,"member.input");
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member.input");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case CustomDataComponentView.VIEW_HTML:

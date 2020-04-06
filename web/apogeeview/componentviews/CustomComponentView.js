@@ -59,23 +59,23 @@ export default class CustomComponentView extends ComponentView {
         
         var dataDisplaySource;
         var app = this.getModelView().getApp();
-        let component = this.getComponent();
         
         //create the new view element;
         switch(viewType) {
             
             case CustomComponentView.VIEW_OUTPUT:
+                let component = this.getComponent();
                 displayContainer.setDisplayDestroyFlags(component.getDisplayDestroyFlags());
                 var dataDisplaySource = this.getOutputDataDisplaySource();
                 var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,dataDisplaySource);
                 return dataDisplay;
                 
             case CustomComponentView.VIEW_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,component,"member");
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case CustomComponentView.VIEW_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,component,"member");
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case CustomComponentView.VIEW_HTML:
@@ -113,10 +113,6 @@ export default class CustomComponentView extends ComponentView {
                 let reloadData = component.isMemberDataUpdated("member");
                 let reloadDataDisplay = component.areAnyFieldsUpdated(["html","uiCode"]);
                 return {reloadData,reloadDataDisplay};
-            },
-
-            getDisplayData: () => {
-                return member.getData();
             },
 
             getData: () => {

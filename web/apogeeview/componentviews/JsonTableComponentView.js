@@ -25,24 +25,25 @@ export default class JsonTableComponentView extends ComponentView {
         
         var dataDisplaySource;
         var app = this.getModelView().getApp();
-        var component = this.getComponent();
+        
         
         //create the new view element;
         switch(viewType) {
             case JsonTableComponentView.VIEW_DATA:
+                var component = this.getComponent();
                 let dataView = component.getField("dataView");
                 switch(dataView) {
                     case JsonTableComponentView.COLORIZED_DATA_VEW:
                     default:
-                        dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataTextDataSource(app,component,"member"));
+                        dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataTextDataSource(app,this,"member"));
                         return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                         
                     case JsonTableComponentView.TEXT_DATA_VEW:
-                        dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataJsonDataSource(app,component,"member"));
+                        dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member"));
                         return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/text",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                         
                     case JsonTableComponentView.GRID_DATA_VEW:
-                        dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataJsonDataSource(app,component,"member"));
+                        dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member"));
                         return new HandsonGridEditor(displayContainer,dataDisplaySource);
                         
                     // case JsonTableComponentView.PLAIN_DATA_VEW:
@@ -52,11 +53,11 @@ export default class JsonTableComponentView extends ComponentView {
                 }
                 
             case JsonTableComponentView.VIEW_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,component,"member");
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,component,"member");
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:

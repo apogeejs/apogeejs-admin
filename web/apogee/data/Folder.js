@@ -16,10 +16,12 @@ export default class Folder extends DependentMember {
         this.contextHolderMixinInit(false);
         this.parentMixinInit(instanceToCopy);
 
-        //make sure the data map is frozen
-        let dataMap = {};
-        Object.freeze(dataMap);
-        this.setData(dataMap);
+        //initialize data value if this is a new folder
+        if(!instanceToCopy) {
+            let dataMap = {};
+            Object.freeze(dataMap);
+            this.setData(dataMap);
+        }
     }
 
     //------------------------------

@@ -5,31 +5,38 @@ const FORMAT_STRING = "\t";
 
 /** This function creates the data display data source  for the data of the given member. The
  * member field should be the field name used to access the data source from the associated component. */
-dataDisplayHelper.getMemberDataJsonDataSource = function(app,component,memberFieldName) {
-    let dataMember = component.getField(memberFieldName);
+dataDisplayHelper.getMemberDataJsonDataSource = function(app,componentView,memberFieldName) {
+
+    //this is used internally to lookup the data member used here
+    let _getDataMember = function() {
+        let component = componentView.getComponent();
+        let member = component.getField(memberFieldName);
+        return member;
+    };
+    
     return {
-        doUpdate: function(updatedComponent) {
-            //set the component instance for this data source
-            component = updatedComponent;
-            dataMember = component.getField(memberFieldName);
+
+        doUpdate: function() {
             //return value is whether or not the data display needs to be udpated
+            let component = componentView.getComponent();
             let reloadData = component.isMemberDataUpdated(memberFieldName);
             let reloadDataDisplay = false;
             return {reloadData,reloadDataDisplay};
         },
 
         getData: function() {
-            return dataMember.getData();
+
+            return _getDataMember().getData();
         },
 
         getEditOk: function () {
-            return !dataMember.hasCode();
+            return !_getDataMember().hasCode();
         },
 
         saveData: function(data) {
             var commandData = {};
             commandData.type = "saveMemberData";
-            commandData.memberId = dataMember.getId();
+            commandData.memberId = _getDataMember().getId();
             commandData.data = data;
             
             app.executeCommand(commandData);
@@ -39,8 +46,9 @@ dataDisplayHelper.getMemberDataJsonDataSource = function(app,component,memberFie
 }
 
 /** This function creates editor callbacks or member data where the editor takes text format. */
-dataDisplayHelper.getMemberDataTextDataSource = function(app,component,memberFieldName) {
-    let baseSource = dataDisplayHelper.getMemberDataJsonDataSource(app,component,memberFieldName);
+dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,memberFieldName) {
+
+    let baseSource = dataDisplayHelper.getMemberDataJsonDataSource(app,componentView,memberFieldName);
 
     return {
         doUpdate: baseSource.doUpdate,
@@ -91,21 +99,27 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,component,memberFie
 /** This function creates editor callbacks or the member function body. 
  * The argument optionalClearCodeValue can optionally be set. If so, the member data will be 
  * set with this value if the function body and supplemental code are empty. */
-dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,component,memberFieldName) {
-    let functionMember = component.getField(memberFieldName);
+dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,componentView,memberFieldName) {
+
+    //this is used internally to lookup the data member used here
+    let _getFunctionMember = function() {
+        let component = componentView.getComponent();
+        let member = component.getField(memberFieldName);
+        return member;
+    };
+
     return {
-        doUpdate: function(updatedComponent) {
-            //set the component instance for this data source
-            component = updatedComponent;
-            functionMember = component.getField(memberFieldName);
+
+        doUpdate: function() {
             //return value is whether or not the data display needs to be udpated
+            let component = componentView.getComponent();
             let reloadData = component.isMemberFieldUpdated(memberFieldName,"functionBody");
             let reloadDataDisplay = false;
             return {reloadData,reloadDataDisplay};
         },
 
         getData: function() {
-            return functionMember.getFunctionBody();
+            return _getFunctionMember().getFunctionBody();
         },
 
         getEditOk: function() {
@@ -113,6 +127,8 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,component,membe
         },
 
         saveData: function(text) {
+            let functionMember = _getFunctionMember();
+
             var commandData = {};
             commandData.type = "saveMemberCode";
             commandData.memberId = functionMember.getId();
@@ -127,21 +143,27 @@ dataDisplayHelper.getMemberFunctionBodyDataSource = function(app,component,membe
 }
 
 /** This function creates editor callbacks or the member supplemental code. */
-dataDisplayHelper.getMemberSupplementalDataSource = function(app,component,memberFieldName) {
-    let functionMember = component.getField(memberFieldName);
+dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,memberFieldName) {
+
+    //this is used internally to lookup the data member used here
+    let _getFunctionMember = function() {
+        let component = componentView.getComponent();
+        let member = component.getField(memberFieldName);
+        return member;
+    };
+
     return {
-        doUpdate: function(updatedComponent) {
-            //set the component instance for this data source
-            component = updatedComponent;
-            functionMember = component.getField(memberFieldName);
+
+        doUpdate: function() {
             //return value is whether or not the data display needs to be udpated
+            let component = componentView.getComponent();
             let reloadData = component.isMemberFieldUpdated(memberFieldName,"supplementalCode");
             let reloadDataDisplay = false;
             return {reloadData,reloadDataDisplay};
         },
 
         getData: function() {
-            return functionMember.getSupplementalCode();
+            return _getFunctionMember().getSupplementalCode();
         },
 
         getEditOk: function() {
@@ -149,6 +171,8 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,component,membe
         },
 
         saveData: function(text) {
+            let functionMember = _getFunctionMember();
+
             var commandData = {};
             commandData.type = "saveMemberCode";
             commandData.memberId = functionMember.getId();

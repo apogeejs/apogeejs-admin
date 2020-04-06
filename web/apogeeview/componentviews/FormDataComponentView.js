@@ -34,7 +34,6 @@ export default class FormDataComponentView extends ComponentView {
         
         var dataDisplaySource;
         var app = this.getModelView().getApp();
-        let component = this.getComponent();
         
         //create the new view element;
         switch(viewType) {
@@ -45,23 +44,23 @@ export default class FormDataComponentView extends ComponentView {
                 return formEditorDisplay;
                 
             case FormDataComponentView.VIEW_LAYOUT_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,component,"member.layout");
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member.layout");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case FormDataComponentView.VIEW_LAYOUT_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,component,"member.layout");
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member.layout");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
             
             case FormDataComponentView.VIEW_FORM_VALUE:
-                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,component,"member.data");
+                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,this,"member.data");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
                 
             case FormDataComponentView.VIEW_INPUT_INVALID_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,component,"member.isInputValid");
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member.isInputValid");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case FormDataComponentView.VIEW_INPUT_INVALID_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,component,"member.isInputValid");
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member.isInputValid");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
