@@ -29,7 +29,7 @@ export default class ReferenceView {
         app.addListener("referenceEntry_created",referenceEntry => this._onLinkCreated(referenceEntry));
         app.addListener("referenceEntry_updated",referenceEntry => this._onLinkUpdated(referenceEntry));
         app.addListener("referenceEntry_deleted",referenceEntry => this._onLinkDeleted(referenceEntry));
-        app.addListener("referenceManager_updated",referenceManager => this.referenceManager = referenceManager);
+        app.addListener("referenceManager_updated",referenceManager => this._onReferenceManagerUpdated(referenceManager));
 
         this.referenceManager.setViewStateCallback(() => this.getViewState());
     }
@@ -55,6 +55,7 @@ export default class ReferenceView {
             let referenceList = this.referenceListViews[entryType];
             json.lists[entryType] = referenceList.getViewState();
         }
+        return json;
     }
 
     //==================================
@@ -78,6 +79,11 @@ export default class ReferenceView {
     _onLinkDeleted(referenceEntry) {
         let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
         referenceList.onLinkDeleted(referenceEntry);
+    }
+
+    _onReferenceManagerUpdated(referenceManager) {
+        this.referenceManager = referenceManager;
+        this.referenceManager.setViewStateCallback(() => this.getViewState());
     }
 
     /** @private */

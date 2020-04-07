@@ -89,13 +89,6 @@ define(['http://localhost:8383/lib/controls/simpleGeojsonControl/leaflet_1.0.1_A
                 return this.mapElement;
             }
 
-            //this method tells the window the type of content:
-            //apogeeui.RESIZABLE - if the window can freely resize it
-            //apogeeui.FIXED_SIZE - if the content is fixed size
-            getContentType() {
-                return apogeeui.RESIZABLE;
-            }
-
             setData(data) {
                 this.cachedData = data;
                 if(this.map) {

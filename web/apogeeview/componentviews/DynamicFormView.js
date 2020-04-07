@@ -52,25 +52,18 @@ export default class DynamicFormView extends ComponentView {
     }
 
     getFormCallbacks() { 
-        let component = this.getComponent();
-        let functionMember = component.getField("member");
-        let modelView = this.getModelView();
-        let app = modelView.getApp();
-
         var dataDisplaySource = {
-
-            doUpdate: function(updatedComponent) {
-                //set the component instance for this data source
-                component = updatedComponent;
-                functionMember = component.getField("member");
+            doUpdate: function() {
                 //we have no data here, just the form layout
                 let reloadData = false;
-                let reloadDataDisplay = component.isMemberCodeUpdated("member");
+                let reloadDataDisplay = this.getComponent().isMemberCodeUpdated("member");
                 return {reloadData,reloadDataDisplay};
             },
 
-            getDisplayData: () => {              
+            getDisplayData: () => {             
+                let functionMember = getComponent().getField("member"); 
                 let layoutFunction = functionMember.getData();
+                let app = this.getModelView().getApp();
                 let admin = {
                     getMessenger: () => new UiCommandMessenger(app,member)
                 }

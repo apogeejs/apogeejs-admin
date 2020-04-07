@@ -405,7 +405,7 @@ export default class PageDisplayContainer {
     componentUpdated(component) {
         //update the data display
         if((this.dataDisplay)&&(!this.inEditMode)) {
-            let {reloadDataDisplay, reloadData} = this.dataDisplay.doUpdate(component);
+            let {reloadDataDisplay, reloadData} = this.dataDisplay.doUpdate();
             if(reloadDataDisplay) {
                 this.reloadDisplay();
             }
@@ -470,12 +470,7 @@ export default class PageDisplayContainer {
         }
     }
 
-    /** This sets the content for the window. The content type
-     *  can be:
-     *  apogeeui.RESIZABLE - for this content, the content is resized to fit the plane frame. The place frame should be initialized with a size.
-     *  apogeeui.FIXED_SIZE - for this content, the plain frame is sized to fit the content. ITs size should not be externally set.
-     *  apogeeui.SIZE_WINDOW_TO_CONTENT - this is not a content type but a input option for content FIXED_SIZE that shrinks the window to fit the content. It is typically only used for dialog boxes so isn't really relevent here.
-     */
+    /** This sets the content for the window. */
     setContent(contentElement) {
         
         apogeeui.removeAllChildren(this.viewContainer);

@@ -386,6 +386,7 @@ export default class ComponentView {
     componentUpdated(component) {
         //set the new component
         this.component = component;
+        this.component.setViewStateCallback(() => this.getViewState());
 
         //check for parent change
         if(component.isFieldUpdated("member")) {

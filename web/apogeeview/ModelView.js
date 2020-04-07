@@ -131,6 +131,8 @@ export default class ModelView {
         if(model.isFieldUpdated("name")) {
             this.workspaceView.setName(model.getName());
         }
+        
+        this.modelManager.setViewStateCallback(() => this.getViewState());
     }
 
     //====================================

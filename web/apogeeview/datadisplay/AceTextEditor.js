@@ -74,10 +74,6 @@ export default class AceTextEditor extends DataDisplay {
     getContent() {
         return this.editorDiv;
     }
-    
-    getContentType() {
-        return apogeeui.RESIZABLE;
-    }
 
     getData() {
         if(this.editor) {
@@ -125,14 +121,6 @@ export default class AceTextEditor extends DataDisplay {
             this.editor.destroy();
             this.editor = null;
         }
-    }
-    
-    endEditMode() {
-        super.endEditMode();
-    }
-    
-    startEditMode() {
-        super.startEditMode();
     }
     
     checkStartEditMode() {

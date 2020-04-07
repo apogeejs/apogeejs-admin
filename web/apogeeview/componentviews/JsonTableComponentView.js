@@ -71,9 +71,9 @@ export default class JsonTableComponentView extends ComponentView {
      * a change in the data view. */
     _wrapSourceForViewChange(dataDisplaySource) {
         let originalDoUpdate = dataDisplaySource.doUpdate;
-        dataDisplaySource.doUpdate = function(updatedComponent) {
-            let returnValue = originalDoUpdate(updatedComponent);
-            returnValue.reloadDataDisplay = updatedComponent.isFieldUpdated("dataView");
+        dataDisplaySource.doUpdate = () => {
+            let returnValue = originalDoUpdate();
+            returnValue.reloadDataDisplay = this.getComponent().isFieldUpdated("dataView");
             return returnValue;
         }
         return dataDisplaySource;

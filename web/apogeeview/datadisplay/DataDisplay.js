@@ -5,7 +5,7 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
  * 
  * @param {type} displayContainer - this is the ui container that will show the display
  * @param {type} dataSource - the dataSource for the editor. It is an object with the following functions:
- *  - {reloadDataDisplay, reloadData} = doUpdate(updatedComponent) - Required - This function updates the component instance
+ *  - {reloadDataDisplay, reloadData} = doUpdate() - Required - This function updates the component instance
  *      held by the data source and it returns to boolean values, "reloadDataDisplay", which indicates is the data display should 
  *      be reloaded (such as if it is replaced with a new data display or if the UI elements for it have been updated) and
  *      "reloadData" which indicates the data value displayed in the data display should be reloaded.  
@@ -16,8 +16,6 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
  *  - closeDialog = saveData(data) - Optional This is used if the data display edit mode is used. It should save the data. The return value
  *      should be true if the edit operation should be concluded. It shoudl return false if there is a save failure such that you want to 
  *      stay in edit mode.
- *  - data = getDisplayData() - Optional - This returns model data that should be passed to construct the display. It is used in places
- *      like the configurable form controls or the custom controls.
  *  - (other) - Optional - Data displays may define additional functions as needed for their implmentations. Examples where this is done in in the custom
  *      components to pass non-model data (like the HTML or the UI generator code) into the data display.
  */ 
@@ -34,9 +32,9 @@ export default class DataDisplay {
 
     /** This method updates the internal component instance and also returns
      * true if the data display needs to be refreshed. */
-    doUpdate(updatedComponent) {
+    doUpdate() {
         if(this.dataSource) {
-            return this.dataSource.doUpdate(updatedComponent);
+            return this.dataSource.doUpdate();
         }
         else {
             return false;

@@ -96,24 +96,19 @@ export default class CustomComponentView extends ComponentView {
     }
 
     getOutputDataDisplaySource() {
-        //this is the instance of the component that is active for the data source - it will be updated
-        //as the component changes.
-        let component = this.getComponent();
-        let member = component.getMember();
+
         return {
 
             //This method reloads the component and checks if there is a DATA update. UI update is checked later.
-            doUpdate: (updatedComponent) => {
-                //set the component instance for this data source
-                component = updatedComponent;
-                member = component.getMember();
+            doUpdate: () => {
                 //return value is whether or not the data display needs to be udpated
-                let reloadData = component.isMemberDataUpdated("member");
-                let reloadDataDisplay = component.areAnyFieldsUpdated(["html","uiCode"]);
+                let reloadData = this.getComponent().isMemberDataUpdated("member");
+                let reloadDataDisplay = this.getComponent().areAnyFieldsUpdated(["html","uiCode"]);
                 return {reloadData,reloadDataDisplay};
             },
 
             getData: () => {
+                let member = this.getComponent().getMember();
                 return member.getData();
             },
 
@@ -121,38 +116,34 @@ export default class CustomComponentView extends ComponentView {
 
             //returns the HTML for the data display
             getHtml: () => {
-                return component.getField("html");
+                return this.getComponent().getField("html");
             },
 
             //returns the resource for the data display
             getResource: () => {
-                return component.createResource();
+                return this.getComponent().createResource();
             },
 
             //gets the mebmer used as a refernce for the UI manager passed to the resource functions 
             getContextMember: () => {
-                return member;
+                return this.getComponent().getMember();
             }
         }
     }
 
     /** This method returns the data dispklay data source for the code field data displays. */
     getUiDataDisplaySource(codeFieldName) {
-        //this is the instance of the component that is active for the data source - it will be updated
-        //as the component changes.
-        let component = this.getComponent();
+
         return {
-            doUpdate: (updatedComponent) => {
-                //set the component instance for this data source
-                component = updatedComponent;
+            doUpdate: () => {
                 //return value is whether or not the data display needs to be udpated
-                let reloadData = component.isFieldUpdated(codeFieldName);
+                let reloadData = this.getComponent().isFieldUpdated(codeFieldName);
                 let reloadDataDisplay = false;
                 return {reloadData,reloadDataDisplay};
             },
 
             getData: () => {
-                let codeField = component.getField(codeFieldName);
+                let codeField = this.getComponent().getField(codeFieldName);
                 if((codeField === undefined)||(codeField === null)) codeField = "";
                 return codeField;
             },
@@ -163,7 +154,7 @@ export default class CustomComponentView extends ComponentView {
             
             saveData: (text) => {
                 let app = this.getModelView().getApp();
-                component.doCodeFieldUpdate(app,codeFieldName,text);
+                this.getComponent().doCodeFieldUpdate(app,codeFieldName,text);
                 return true;
             }
         }

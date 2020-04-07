@@ -289,13 +289,6 @@ export function initApogeeModule(apogee,apogeeapp,apogeeutil) {
         getContent() {
             return this.element;
         }
-        
-        //this method tells the window the type of content:
-        //apogeeui.RESIZABLE - if the window can freely resize it
-        //apogeeui.FIXED_SIZE - if the content is fixed size
-        getContentType() {
-            return apogeeapp.apogeeui.FIXED_SIZE;
-        }
 
         setData(data) {
             this.data = data;

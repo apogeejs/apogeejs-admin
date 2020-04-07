@@ -197,7 +197,7 @@ export default class WebDisplayContainer {
    componentUpdated(component) {
     //update the data display
     if((this.dataDisplay)&&(!this.inEditMode)) {
-        let {reloadDataDisplay, reloadData} = this.dataDisplay.doUpdate(component);
+        let {reloadDataDisplay, reloadData} = this.dataDisplay.doUpdate();
         if(reloadDataDisplay) {
             this.reloadDisplay();
         }

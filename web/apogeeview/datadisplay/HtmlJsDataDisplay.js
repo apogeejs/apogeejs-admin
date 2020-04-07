@@ -4,16 +4,28 @@ import apogeeui from "/apogeeui/apogeeui.js";
 
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from
- * HTML and javascript code. Is should be passed a 
- * resource (javascript object) which has the following methods optionally defined: 
+ * HTML and javascript code. The datasrouce for this data display has some additional 
+ * fields defined for it: 
  * 
- * init(outputElement,admin)
- * setData(data,outputElement,admin)
- * getData(outputElement,admin)
- * isCloseOk(outputElement,admin)
- * destroy(outputElement,admin)
- * onLoad(outputElement,admin)
- * onUnload(outputElement,admin)
+ * - html = dataSource.getHtml(); REQUIRED - This retrieves the HTML for the display
+ * - resource = dataSource.getResource(); REQUIRED - This retrieves the "resource" object to run the display
+ * - member = dataSource.getContextMember(); REQUIRED - This retrieves a member to use as a context reference
+ * - displayData = dataSource.getDisplayData(); OPTIONAL - This returns model data to _construct_ the form
+ *               whereas the standard getData() method returns data to _populate_ the form.
+ * 
+ * The resource object can have the following methods. All of these are optional. The areguments include the outputElement
+ * whcih is the DOM element for the window and the "admin" object, which is provides some facilities to these methods. The admin
+ * is described below.
+ * 
+ * - init(outputElement,admin) - This is called when the data display is first created.
+ * - setData(data,outputElement,admin) - This is called to set model data in the display, whenever the model data
+ *                is updated. This will be called _after_ the onLoad method below.
+ * - getData(outputElement,admin) - This is called to retrieve data from the display, during a save in edit mode.
+ * - isCloseOk(outputElement,admin) - This is called before the data display is closed. Returning false will cancel the close, at
+ *                the users option.
+ * - destroy(outputElement,admin) - This is called after the display is closed.
+ * - onLoad(outputElement,admin) - This is called when the HTML of the data display is loaded.
+ * - onUnload(outputElement,admin) - This is called after the HTML for the data display is unloaded from the window.
  * 
  * The admin object includes the following functions on it:
  * getMessenger()

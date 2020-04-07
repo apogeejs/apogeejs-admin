@@ -71,20 +71,11 @@ export default class FormDataComponentView extends ComponentView {
     }
 
     getFormEditorCallbacks() {
-        let component = this.getComponent();
-        let dataTable = component.getField("member.data");
-        let layoutFunctionMember = component.getField("member.layout");
-        let isInputValidFunctionMember = component.getField("member.isInputValid");
-        let app = this.modelView.getApp();  
-        
+
         var dataDisplaySource = {};
-        dataDisplaySource.doUpdate = function(updatedComponent) {
-            //set the component instance for this data source
-            component = updatedComponent;
-            dataTable = component.getField("member.data");
-            layoutFunctionMember = component.getField("member.layout");
-            isInputValidFunctionMember = component.getField("member.isInputValid");
+        dataDisplaySource.doUpdate = () => {
             //update depends on multiplefields
+            let component = this.getComponent();
             let reloadData = component.isMemberDataUpdated("member.data");
             let reloadDataDisplay = ( (component.isMemberCodeUpdated("member.layout")) ||
                 (component.isMemberCodeUpdated("member.isInputValid")) );
@@ -93,12 +84,14 @@ export default class FormDataComponentView extends ComponentView {
 
         //return form layout
         dataDisplaySource.getDisplayData = function() { 
+            let layoutFunctionMember = this.getComponent().getField("member.layout");
             let layoutFunction = layoutFunctionMember.getData();    
             return layoutFunction();
         }
         
         //return desired form value
         dataDisplaySource.getData = function() {
+            let dataTable = this.getComponent().getField("member.data");
             return dataTable.getData();
         } 
         
@@ -110,6 +103,8 @@ export default class FormDataComponentView extends ComponentView {
         //save data - just form value here
         
         dataDisplaySource.saveData = (formValue) => {
+            let layoutFunctionMember = this.getComponent().getField("member.layout");
+            let isInputValidFunctionMember = this.getComponent().getField("member.isInputValid");
             //validate input
             var isInputValid = isInputValidFunctionMember.getData();
             var validateResult = isInputValid(formValue);
@@ -126,6 +121,7 @@ export default class FormDataComponentView extends ComponentView {
 
             //save the data - send via messenger to the variable named "data" in code, which is the field 
             //named "member.data", NOT the field named "data"
+            let app = this.modelView.getApp();
             let commandMessenger = new UiCommandMessenger(app,layoutFunctionMember);
             commandMessenger.dataUpdate("data",formValue);
             return true;

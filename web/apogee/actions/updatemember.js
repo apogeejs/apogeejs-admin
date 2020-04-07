@@ -97,8 +97,8 @@ function updateData(model,actionData) {
     //we just ignore it (it is out of date)
     if(actionData.sourcePromise) {
         if(!member.pendingPromiseMatches(actionData.sourcePromise)) {
-            //no action - this is from an asynch action that has been overwritten
-            actionResult.actionDone = false;
+            //no action - this is from an asynch action that has been overwritten. Ignore this command.
+            actionResult.actionDone = true;
             return actionResult;
         }
     }
