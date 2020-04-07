@@ -1,7 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import Component from "/apogeeapp/component/Component.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 
 /** This is a custom resource component. 
@@ -33,25 +32,11 @@ export default class CustomComponent extends Component {
         return this.getField("destroyOnInactive");
     }
 
-    getDisplayDestroyFlags() {
-        return this.getField("destroyOnInactive") ? DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_INACTIVE :
-        DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_NEVER;
-    }
-
     setDestroyOnInactive(destroyOnInactive) {
         if(destroyOnInactive != this.destroyOnInactive) {
             this.setField("destroyOnInactive",destroyOnInactive);
-
-            if(this.activeOutputMode) {
-                this.activeOutputMode.setDisplayDestroyFlags(this.getDisplayDestroyFlags());
-            }
         }
     }
-
-    /** This method deseriliazes data for the custom resource component. */
-    // updateFromJson(json) {  
-    //     this.loadResourceFromJson(json);
-    // }
 
     /** This method deseriliazes data for the custom resource component. This will
      * work is no json is passed in. */

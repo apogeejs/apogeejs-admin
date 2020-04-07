@@ -1,6 +1,5 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
@@ -64,8 +63,7 @@ export default class CustomComponentView extends ComponentView {
         switch(viewType) {
             
             case CustomComponentView.VIEW_OUTPUT:
-                let component = this.getComponent();
-                displayContainer.setDisplayDestroyFlags(component.getDisplayDestroyFlags());
+                displayContainer.setDestroyViewOnInactive(this.getComponent().getDestroyOnInactive());
                 var dataDisplaySource = this.getOutputDataDisplaySource();
                 var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,dataDisplaySource);
                 return dataDisplay;

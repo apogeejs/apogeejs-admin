@@ -79,7 +79,7 @@ export default class DataDisplay {
     // Implemement in extending class
     //=============================
     
-    //This method gets the data from the editor. REQUIRED
+    //This method gets the data from the editor. OPTIONAL. Required id editing is enabled.
     //getData() {}
     
     //this sets the data into the editor display. REQUIRED if edit mode or save is used

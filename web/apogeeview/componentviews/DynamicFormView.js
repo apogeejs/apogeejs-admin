@@ -7,9 +7,9 @@ import UiCommandMessenger from "/apogeeapp/commands/UiCommandMessenger.js";
 /** This component represents a table object. */
 export default class DynamicFormView extends ComponentView {
         
-    constructor(modelView,folderComponent) {
+    constructor(modelView,component) {
         //extend edit component
-        super(modelView,folderComponent);
+        super(modelView,component);
     };
 
     //==============================

@@ -352,10 +352,8 @@ export default class PageDisplayContainer {
     /** The displayDestroyFlags indicate when the display for this view mode will be destroyed,
      * refering to times it is not visible to the user. See further notes in the constructor
      * description. */
-    setDisplayDestroyFlags(displayDestroyFlags) {
-        
-        //note - I should probably update app to only use this one flag.
-        this.destroyViewOnInactive = (displayDestroyFlags & DATA_DISPLAY_CONSTANTS.DISPLAY_DESTROY_FLAG_INACTIVE != 0);
+    setDestroyViewOnInactive(destroyViewOnInactive) {
+        this.destroyViewOnInactive = destroyViewOnInactive;
     }   
 
     /** This method cleasr the data display. It should only be called when the data display is not showing. 

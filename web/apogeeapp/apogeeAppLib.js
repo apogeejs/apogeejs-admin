@@ -9,8 +9,6 @@ export {default as Component} from "/apogeeapp/component/Component.js";
 //needed just for web lib
 export {default as WebComponentDisplay} from "/apogeeview/componentdisplay/webpage/WebComponentDisplay.js";
 
-export {default as BasicControlComponent} from "/apogeeapp/components/BasicControlComponent.js";
-
 export {default as AceTextEditor} from "/apogeeview/datadisplay/AceTextEditor.js";
 export {default as ConfigurableFormDisplay} from "/apogeeview/datadisplay/ConfigurableFormDisplay.js";
 export {default as ConfigurableFormEditor} from "/apogeeview/datadisplay/ConfigurableFormEditor.js";

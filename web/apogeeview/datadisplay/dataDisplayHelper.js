@@ -25,7 +25,6 @@ dataDisplayHelper.getMemberDataJsonDataSource = function(app,componentView,membe
         },
 
         getData: function() {
-
             return _getDataMember().getData();
         },
 

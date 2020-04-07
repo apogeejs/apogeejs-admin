@@ -242,7 +242,7 @@ updatelinkstatus.executeCommand = function(workspaceManager,commandData) {
             referenceEntry.setClearState();
         }
         else {
-            var errorMsg = "Failed to load link '" + this.url + "':" + error;
+            var errorMsg = "Failed to load link '" + this.url + "':" + commandData.error.toString();
             referenceEntry.setError(errorMsg);
         }
 
