@@ -10,7 +10,6 @@ export {default as Component} from "/apogeeapp/component/Component.js";
 export {default as WebComponentDisplay} from "/apogeeview/componentdisplay/webpage/WebComponentDisplay.js";
 
 export {default as AceTextEditor} from "/apogeeview/datadisplay/AceTextEditor.js";
-export {default as ConfigurableFormDisplay} from "/apogeeview/datadisplay/ConfigurableFormDisplay.js";
 export {default as ConfigurableFormEditor} from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 export {default as DataDisplay} from "/apogeeview/datadisplay/DataDisplay.js";
 export {default as dataDisplayHelper} from "/apogeeview/datadisplay/dataDisplayHelper.js";
