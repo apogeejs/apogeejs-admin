@@ -1,9 +1,7 @@
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import apogeeui from "/apogeeui/apogeeui.js";
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-//import ConfigurableFormEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods
@@ -11,7 +9,6 @@ import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 export default class ChartJSComponentView extends ComponentView {
 
     constructor(modelView,component) {
-        //extend edit component
         super(modelView,component);
     };
 
@@ -31,15 +28,12 @@ export default class ChartJSComponentView extends ComponentView {
         switch(viewType) {
 
             case ChartJSComponentView.VIEW_CHART:
-                dataSource = this.getChartDataSource();
+                dataSource = this._getChartDataSource();
                 return new ChartJSDisplay(displayContainer,dataSource);
 
             case ChartJSComponentView.VIEW_INPUT:
-                // dataSource = this.getInputFormDataSource();
-                // return new ConfigurableFormEditor(displayContainer,dataSource);
-                let app = this.getModelView().getApp();
-                dataSource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member");
-                return new AceTextEditor(displayContainer,dataSource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+                dataSource = this._getInputFormDataSource();
+                return new ConfigurableFormEditor(displayContainer,dataSource);
 
             default:
                 alert("unrecognized view element!");
@@ -51,27 +45,170 @@ export default class ChartJSComponentView extends ComponentView {
     // Implementation Methods
     //=================================
 
-    getChartDataSource() {
+    _getChartDataSource() {
 
         return {
             doUpdate: () => {
-                //return value is whether or not the data display needs to be udpated
+                //update the display when the member data is updated.
+                //NOTE - we only want to update the data from the form and its generated function
+                //we should prevent someone else from updating it.
                 let reloadData = this.getComponent().isMemberDataUpdated("member");
                 let reloadDataDisplay = false;
                 return {reloadData,reloadDataDisplay};
             },
 
             getData: () => {
-                return this.getComponent().getMember().getData();
+                return this._getChartConfig();
             },
         }
     }
 
-    // getInputFormDataSource() {
+    _getInputFormDataSource() {
+        return {
+            doUpdate: () => {
+                //data updates should only be triggered by the form itself
+                let reloadData = false;
+                //form layout constant
+                let reloadDataDisplay = false;
+                return {reloadData,reloadDataDisplay};
+            }, 
+            getDisplayData: () => FORM_LAYOUT,
+            getData: () => this._getFormData(),
+            getEditOk: () => true,
+            saveData: (formData) => this._onSubmit(formData)
+        }
+    }
+    
+        //=====================================
+        // Private Methods
+        //=====================================
 
-    // }
+    _getFormData() {
+        let memberData = this.getComponent().getMember().getData();
+        if((memberData)&&(memberData.storedData)) {
+            return memberData.storedData;
+        }
+        else {
+            return DEFAULT_FORM_DATA;
+        }
+    }
+
+    _getChartConfig() {
+        let memberData = this.getComponent().getMember().getData();
+
+        if(!memberData) return DEFAULT_GRAPH_CONFIG;
+
+        let chartType = memberData.chartType ? memberData.chartType : DEFAULT_GRAPH_CONFIG.chartType;
+        let options = memberData.options ? memberData.options : DEFAULT_GRAPH_CONFIG.options;
+
+        let datasetOptions = memberData.datasetOptions ? memberData.datasetOptions : {};
+
+        let plotData = memberData.plotData ? memberData.plotData : [];
+        let plotPoints = plotData.map( (yValue,index) => {
+            return {x: index, y: yValue};
+        });
+
+        let dataset = {};
+        Object.assign(dataset,datasetOptions);
+        dataset.data = plotPoints;
+
+        let chartConfig = {};
+        chartConfig.type = chartType
+        chartConfig.data = {};
+        chartConfig.data.datasets = []
+        chartConfig.data.datasets.push(dataset);
+        chartConfig.options = options;
+
+        return chartConfig;
+    }
+    
+    _onSubmit(formData) {
+        
+        //options or columns may be the empty string - map this to undefined
+        let chartType = formData.chartType;
+        if(chartType == "") chartType = DEFAULT_GRAPH_CONFIG.type;
+
+        let plotData = formData.plotData;
+        if(plotData == "") plotData = "[]";
+
+        let datasetOptions = formData.datasetOptions;
+        if(datasetOptions == "") datasetOptions = "{}";
+
+        let options = formData.options;
+        if(options == "") options = "{}";
+
+        //compile the function body
+        //I think it is just a little hokey putting the form data in with the formula, but I am not sure of a better option.
+        var functionBody = 
+`
+return {
+    "chartType": "${chartType}",
+    "plotData": ${plotData},
+    "datasetOptions": ${datasetOptions},
+    "options": ${options},
+    "storedData": ${JSON.stringify(formData)}
+};`;
+        //set the code
+        var member = this.getComponent().getMember();
+
+        var commandData = {};
+        commandData.type = "saveMemberCode";
+        commandData.memberId = member.getId();
+        commandData.argList = [];
+        commandData.functionBody = functionBody;
+        commandData.supplementalCode = "";
+        
+        let app = this.getModelView().getApp();
+        app.executeCommand(commandData);
+
+        return true;
+    }       
+    
 
 }
+
+let DEFAULT_FORM_DATA = {
+    "type": "line"
+}
+
+let DEFAULT_GRAPH_CONFIG = {
+    type: "line",
+    data: {
+        datasets: [
+            {
+                data: []
+            }
+        ]
+    },
+    options: {
+
+    }
+}
+
+let FORM_LAYOUT = [
+    {   
+        type: "dropdown",
+        label: "Chart Type: ",
+        entries: ["bar","line"],
+        value: "<SET CURRENT VALUE",
+        key: "chartType"
+    },
+    {   
+        type: "textField",
+        label: "Plot Data: ",
+        key: "plotData"
+    },
+    {   
+        type: "textField",
+        label: "Dataset Options: ",
+        key: "datasetOptions"
+    },
+    {   
+        type: "textField",
+        label: "Graph Options: ",
+        key: "options"
+    }
+]
 
 //======================================
 // Static properties
@@ -122,6 +259,7 @@ class ChartJSDisplay extends DataDisplay {
             },
             options: {}
         };
+        this.prevOptions = this.config.options;
         
         //populate the UI element
         this.contentElement = document.createElement("div");
@@ -143,10 +281,6 @@ class ChartJSDisplay extends DataDisplay {
     /** This sets the data into the editor display. REQUIRED */
     setData(config) {
 
-        //it seems if the options change I need to create a new chart object, at least
-        //in the scenarios I was trying. I will do that below.
-        let prevOptions = this.config.options;
-
         if(config) {
             //we need to copy our data onto the existing config object
             this.config.type = config.type;
@@ -163,12 +297,15 @@ class ChartJSDisplay extends DataDisplay {
         }
 
         //make a new chart if there is no chart or if the options change (I am not sure about this criteria exactly)
-        if((!this.chart)||(!apogeeutil.jsonEquals(prevOptions,config.options))) {
+        if((!this.chart)||(!apogeeutil.jsonEquals(this.prevOptions,config.options))) {
             this.chart = new Chart(this.canvasElement,this.config);
         }
         else {
             this.chart.update();
         }
+
+        //save the options for next time
+        this.prevOption = config.options;
     }
 
     /** This method is called on loading the display. OPTIONAL */

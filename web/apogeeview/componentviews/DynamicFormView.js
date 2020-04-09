@@ -53,7 +53,7 @@ export default class DynamicFormView extends ComponentView {
 
     getFormCallbacks() { 
         var dataDisplaySource = {
-            doUpdate: function() {
+            doUpdate: () => {
                 //we have no data here, just the form layout
                 let reloadData = false;
                 let reloadDataDisplay = this.getComponent().isMemberCodeUpdated("member");
@@ -61,7 +61,7 @@ export default class DynamicFormView extends ComponentView {
             },
 
             getDisplayData: () => {             
-                let functionMember = getComponent().getField("member"); 
+                let functionMember = this.getComponent().getField("member"); 
                 let layoutFunction = functionMember.getData();
                 let app = this.getModelView().getApp();
                 let admin = {
