@@ -35,20 +35,23 @@ export default class ConfigurableFormEditor extends DataDisplay {
     
     /** This returns the form value (not the layout too) */
     getData() {
-        //output data is the form
-        return this.panel.getValue();
+        //get the form value, and set it to the refernece for changes to the form 
+        this.changeReferenceValue = this.panel.getValue();
+        return this.changeReferenceValue;
     }
     
     /** This is passed the data form the data callback, which should be the extended data  - including layout + value */
-    setData(savedFormValue) {
+    setData(data) {
+        this.changeReferenceValue = data;
+
         //input data is the layout and the value
-        this.panel.setValue(savedFormValue);
+        this.panel.setValue(data);
         
         //set change to enable save bar is form value differs from initial data
         let dataSource = this.getDataSource();
         if((dataSource.getEditOk)&&(dataSource.getEditOk())) {
             var onChange = (currentFormValue,form) => {
-                if(apogeeutil.jsonEquals(currentFormValue,savedFormValue)) {
+                if(apogeeutil.jsonEquals(currentFormValue,this.changeReferenceValue)) {
                     this.endEditMode()
                 }
                 else {
