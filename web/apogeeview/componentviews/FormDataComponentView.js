@@ -83,20 +83,20 @@ export default class FormDataComponentView extends ComponentView {
         },
 
         //return form layout
-        dataDisplaySource.getDisplayData = function() { 
+        dataDisplaySource.getDisplayData = () => { 
             let layoutFunctionMember = this.getComponent().getField("member.layout");
             let layoutFunction = layoutFunctionMember.getData();    
             return layoutFunction();
         }
         
         //return desired form value
-        dataDisplaySource.getData = function() {
+        dataDisplaySource.getData = () => {
             let dataTable = this.getComponent().getField("member.data");
             return dataTable.getData();
         } 
         
         //edit ok - always true
-        dataDisplaySource.getEditOk = function() {
+        dataDisplaySource.getEditOk = () => {
             return true;
         }
         

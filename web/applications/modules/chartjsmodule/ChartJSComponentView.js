@@ -1,5 +1,4 @@
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
-import apogeeui from "/apogeeui/apogeeui.js";
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 
@@ -45,6 +44,7 @@ export default class ChartJSComponentView extends ComponentView {
     // Implementation Methods
     //=================================
 
+    /** This is the input source for the chart data display */
     _getChartDataSource() {
 
         return {
@@ -63,6 +63,7 @@ export default class ChartJSComponentView extends ComponentView {
         }
     }
 
+    /** This is the data source for the input form data display */
     _getInputFormDataSource() {
         return {
             doUpdate: () => {
@@ -83,71 +84,143 @@ export default class ChartJSComponentView extends ComponentView {
         // Private Methods
         //=====================================
 
+    /** This method gets the form value data that will be passed to the input form. */
     _getFormData() {
         let memberData = this.getComponent().getMember().getData();
         if((memberData)&&(memberData.storedData)) {
             return memberData.storedData;
         }
         else {
-            return DEFAULT_FORM_DATA;
+            return DEFAULT_FORM_DATA_EXPORT;
         }
     }
 
+    /** This method loads the config structure that will be passed to the chart data display. */
     _getChartConfig() {
-        let memberData = this.getComponent().getMember().getData();
+        try {
+            //chart data is held as member value, calculated by formula generated from form input
+            let memberData = this.getComponent().getMember().getData();
+            if(!memberData) memberData = DEFAULT_FORM_DATA_VALUES;
 
-        if(!memberData) return DEFAULT_GRAPH_CONFIG;
+            //---------------------------
+            //get the values, factoring in defaults and calculated items
+            //---------------------------
+            let chartType = memberData.chartType;
+            
+            //general/graph options
+            let generalOptions = memberData.generalOptions;
 
-        let chartType = memberData.chartType ? memberData.chartType : DEFAULT_GRAPH_CONFIG.chartType;
-        let options = memberData.options ? memberData.options : DEFAULT_GRAPH_CONFIG.options;
+            //x value input type
+            let xValuesInputType = memberData.xValuesInputType;
 
-        let datasetOptions = memberData.datasetOptions ? memberData.datasetOptions : {};
+            //data sets
+            let datasetsInput = memberData.datasets;
+            let maxYArrayLength = 0;
+            let datasets = datasetsInput.map( datasetEntry => {
+                let entry = {};
+                //set options values
+                
+                let datasetOptions = datasetEntry.datasetOptions;
+                if(!datasetOptions) datasetOptions = {};
+                Object.assign(entry,datasetOptions);
 
-        let plotData = memberData.plotData ? memberData.plotData : [];
-        let plotPoints = plotData.map( (yValue,index) => {
-            return {x: index, y: yValue};
-        });
+                //construct data array, according to input type
+                let plotDataXInput = datasetEntry.xArray;
+                let plotDataYInput = datasetEntry.yArray;
+                if(xValuesInputType == "paired") {
+                    //construct data array as a point object list
+                    entry.data = [];
+                    for(let i = 0; i < plotDataXInput.length; i++) {
+                        entry.data.push( {x:plotDataXInput[i], y:plotDataYInput[i]} );
+                    }
+                }
+                else {
+                    //construct data array as simple value list
+                    entry.data = plotDataYInput;
+                }
 
-        let dataset = {};
-        Object.assign(dataset,datasetOptions);
-        dataset.data = plotPoints;
+                //count the longest data array, in case we need to make a default x value array
+                if(entry.data.length > maxYArrayLength) maxYArrayLength = entry.data.length
 
-        let chartConfig = {};
-        chartConfig.type = chartType
-        chartConfig.data = {};
-        chartConfig.data.datasets = []
-        chartConfig.data.datasets.push(dataset);
-        chartConfig.options = options;
 
-        return chartConfig;
+                return entry;
+            })
+
+            //common x value array
+            let commonXValueArray;
+            if(xValuesInputType == "common") {
+                commonXValueArray = memberData.commonXValueArray
+                
+                //construct a default array if values not specified and we have datasets
+                if((commonXValueArray.length == 0)&&(maxYArrayLength > 0)) {
+                    commonXValueArray = [];
+                    for(let i = 0; i < maxYArrayLength; i++) {
+                        commonXValueArray.push(i);
+                    }
+                }
+            }
+
+            //---------------------------
+            //construct the chart config
+            //---------------------------
+            let chartConfig = {};
+            chartConfig.type = chartType;
+
+            chartConfig.data = {};
+            if(xValuesInputType == "common") chartConfig.data.labels = commonXValueArray;
+            chartConfig.data.datasets = datasets;
+            chartConfig.options = generalOptions;
+
+            return chartConfig;
+        }
+        catch(error) {
+            if(error.stack) console.log(error.stack);
+            return {};
+        }
     }
     
+    /** This method receives the form input data. It does validation to accept or reject the data. If data is saved here
+     * it should meet minimum validate criteria. Otherwise there should be an error when the user tries to save. */
     _onSubmit(formData) {
+
+        let errorMessages = [];
         
-        //options or columns may be the empty string - map this to undefined
+        //read in and validate all data
         let chartType = formData.chartType;
-        if(chartType == "") chartType = DEFAULT_GRAPH_CONFIG.type;
+        if(CHART_TYPE_VALUES.indexOf(chartType) < 0) errorMessages.push("The chart type must be set");
 
-        let plotData = formData.plotData;
-        if(plotData == "") plotData = "[]";
+        let xValuesInputType = formData.xValuesInputType;
+        if(X_INPUT_TYPE_VALUES.indexOf(xValuesInputType) < 0) errorMessages.push("The X value specification type must be set");
+        
+        let commonXValueArray = formData.commonXValueArray;
+        if(commonXValueArray == "") commonXValueArray = "[]";
 
-        let datasetOptions = formData.datasetOptions;
-        if(datasetOptions == "") datasetOptions = "{}";
+        let datasets = formData.datasets;
+        if(datasets == "") datasets = "[]";
 
-        let options = formData.options;
-        if(options == "") options = "{}";
+        let generalOptions = formData.generalOptions;
+        if(generalOptions == "") generalOptions = "{}";
+
+        //handle error case here
+        if(errorMessages.length > 0) {
+            //reject for input
+            let errorMsg = errorMessages.join("; ");
+            alert(errorMsg);
+            return false;
+        }
 
         //compile the function body
         //I think it is just a little hokey putting the form data in with the formula, but I am not sure of a better option.
-        var functionBody = 
-`
-return {
-    "chartType": "${chartType}",
-    "plotData": ${plotData},
-    "datasetOptions": ${datasetOptions},
-    "options": ${options},
-    "storedData": ${JSON.stringify(formData)}
-};`;
+        var functionBody = `
+    return {
+        "chartType": "${chartType}",
+        "xValuesInputType": "${xValuesInputType}",
+        "commonXValueArray": ${commonXValueArray},
+        "datasets": ${datasets},
+        "generalOptions": ${generalOptions},
+        "storedData": ${JSON.stringify(formData)}
+    };`;
+
         //set the code
         var member = this.getComponent().getMember();
 
@@ -161,52 +234,56 @@ return {
         let app = this.getModelView().getApp();
         app.executeCommand(commandData);
 
+        //if we got this far the form save should be accepted
         return true;
     }       
-    
 
 }
 
-let DEFAULT_FORM_DATA = {
-    "type": "line"
+let DEFAULT_FORM_DATA_EXPORT = {
+    "chartType": "line"
 }
 
-let DEFAULT_GRAPH_CONFIG = {
-    type: "line",
-    data: {
-        datasets: [
-            {
-                data: []
-            }
-        ]
-    },
-    options: {
-
-    }
+let DEFAULT_FORM_DATA_VALUES = {
+    "chartType": "line",
+    "xValuesInputType": "common",
+    "commonXValueArray": [],
+    "datasets": [],
+    "generalOptions": {}
 }
+
+let CHART_TYPE_VALUES = ["bar","line"];
+let X_INPUT_TYPE_VALUES = ["common","paired"];
 
 let FORM_LAYOUT = [
     {   
         type: "dropdown",
         label: "Chart Type: ",
-        entries: ["bar","line"],
-        value: "<SET CURRENT VALUE",
+        entries: [["Bar","bar"],["Line","line"]],
+        value: "<SET CURRENT VALUE>",
         key: "chartType"
     },
     {   
-        type: "textField",
-        label: "Plot Data: ",
-        key: "plotData"
+        type: "radioButtonGroup",
+        label: "Specifying X Values: ",
+        entries: [["One Common Array","common"],["Per Series Arrays","paired"]],
+        value: "<SET CURRENT VALUE>",
+        key: "xValuesInputType"
     },
     {   
         type: "textField",
-        label: "Dataset Options: ",
-        key: "datasetOptions"
+        label: "Common X Value Array: ",
+        key: "commonXValueArray"
     },
     {   
         type: "textField",
-        label: "Graph Options: ",
-        key: "options"
+        label: "Plot Series Data: ",
+        key: "datasets"
+    },
+    {   
+        type: "textField",
+        label: "General Options: ",
+        key: "generalOptions"
     }
 ]
 
