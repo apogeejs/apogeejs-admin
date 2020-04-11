@@ -101,6 +101,12 @@ export default class ReferenceEntry extends FieldObject {
                 resolve();
             };
             let onError = (error) => {
+                //for osme on loads we get an event object with no error info
+                //convert this to a string
+                if(error instanceof Event) {
+                    error = "Link load unsuccessful";
+                }
+
                 let commandData = {
                     type: "updateLinkLoadStatus",
                     entryType: this.referenceType,
@@ -242,7 +248,8 @@ updatelinkstatus.executeCommand = function(workspaceManager,commandData) {
             referenceEntry.setClearState();
         }
         else {
-            var errorMsg = "Failed to load link '" + this.url + "':" + commandData.error.toString();
+            var errorMsg = "Failed to load link '" + referenceEntry.getUrl() + "':" + commandData.error.toString();
+            console.error(errorMsg);
             referenceEntry.setError(errorMsg);
         }
 
