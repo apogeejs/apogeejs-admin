@@ -63,27 +63,55 @@ export default class ReferenceView {
     //==================================
 
     _onLinkCreated(referenceEntry) {
-        let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
-        if(referenceList) {
-            referenceList.onLinkCreated(referenceEntry);
+        try {
+            let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
+            if(referenceList) {
+                referenceList.onLinkCreated(referenceEntry);
+            }
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+
+            alert("Error updating display for created reference entry: " + error.toString());
         }
     }
 
     _onLinkUpdated(referenceEntry) {
-        let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
-        if(referenceList) {
-            referenceList.onLinkUpdated(referenceEntry);
+        try {
+            let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
+            if(referenceList) {
+                referenceList.onLinkUpdated(referenceEntry);
+            }
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+
+            alert("Error updating display for created reference entry: " + error.toString());
         }
     }
 
     _onLinkDeleted(referenceEntry) {
-        let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
-        referenceList.onLinkDeleted(referenceEntry);
+        try {
+            let referenceList = this.referenceListViews[referenceEntry.getEntryType()];
+            referenceList.onLinkDeleted(referenceEntry);
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+
+            alert("Error updating display for reference entry: " + error.toString());
+        }
     }
 
     _onReferenceManagerUpdated(referenceManager) {
-        this.referenceManager = referenceManager;
-        this.referenceManager.setViewStateCallback(() => this.getViewState());
+        try {
+            this.referenceManager = referenceManager;
+            this.referenceManager.setViewStateCallback(() => this.getViewState());
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+
+            alert("Error updating display for deleted reference entry: " + error.toString());
+        }
     }
 
     /** @private */

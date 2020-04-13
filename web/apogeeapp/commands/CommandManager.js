@@ -73,7 +73,7 @@ export default class CommandManager {
                 if(error.stack) console.error(error.stack);
 
                 undoError = true;
-                undoErrorMsg = error.errorMessage;
+                undoErrorMsg = error.toString();
             }
 
             //execute the command
@@ -88,7 +88,7 @@ export default class CommandManager {
                 if(error.stack) console.error(error.stack);
 
                 commandError = true;
-                commandErrrorMsg = error.errorMessage;
+                commandErrrorMsg = error.toString();
             }
         }
         else {

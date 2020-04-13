@@ -72,67 +72,95 @@ export default class ModelView {
      * want to respond to the root folder event here.
      */
     onComponentCreated(component) {
-        //create the component view
-        let componentViewClass = ApogeeView.getComponentViewClass(component.constructor.uniqueName);
-        let componentView;
-        if(componentViewClass) {
-            componentView = new componentViewClass(this,component);
-        }
+        try {
+            //create the component view
+            let componentViewClass = ApogeeView.getComponentViewClass(component.constructor.uniqueName);
+            let componentView;
+            if(componentViewClass) {
+                componentView = new componentViewClass(this,component);
+            }
 
-        if(!componentView) {
-            componentView = new ERROR_COMPONENT_VIEW_CLASS(this,component);
-        }
+            if(!componentView) {
+                componentView = new ERROR_COMPONENT_VIEW_CLASS(this,component);
+            }
 
-        this.componentViewMap[component.getId()] = componentView;
+            this.componentViewMap[component.getId()] = componentView;
 
-        //add this entry to the proper parent.
-        let parentComponentView = componentView.getParentComponentView();
-        if(parentComponentView) {
-            parentComponentView.addChild(componentView);
-        }
-        else {
-            //this is a root component
-            this.treeEntry.addChild(componentView.getTreeEntry());
-        }
-
-        //do view state initialization
-        componentView.loadViewStateFromComponent();
-    }
-
-    onComponentUpdated(component) {
-        let componentView = this.getComponentViewByComponentId(component.getId());
-        componentView.componentUpdated(component);
-    }
-
-    onComponentDeleted(component) {
-        let componentId = component.getId();
-
-        let componentView = this.componentViewMap[componentId];
-        if(componentView) {
-            componentView.onDelete();
-    
-            //remove from the parent parent
-            let parentComponentView = componentView.getLastAssignedParentComponentView();
+            //add this entry to the proper parent.
+            let parentComponentView = componentView.getParentComponentView();
             if(parentComponentView) {
-                parentComponentView.removeChild(componentView);
+                parentComponentView.addChild(componentView);
             }
             else {
                 //this is a root component
-                this.treeEntry.removeChild(componentView.getTreeEntry());
+                this.treeEntry.addChild(componentView.getTreeEntry());
             }
-        }
 
-        delete this.componentViewMap[componentId];
+            //do view state initialization
+            componentView.loadViewStateFromComponent();
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+
+            alert("Error updating display for created component: " + error.toString());
+        }
+    }
+
+    onComponentUpdated(component) {
+        try {
+            let componentView = this.getComponentViewByComponentId(component.getId());
+            componentView.componentUpdated(component);
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+
+            alert("Error updating display for component: " + error.toString());
+        }
+    }
+
+    onComponentDeleted(component) {
+        try {
+            let componentId = component.getId();
+
+            let componentView = this.componentViewMap[componentId];
+            if(componentView) {
+                componentView.onDelete();
+        
+                //remove from the parent parent
+                let parentComponentView = componentView.getLastAssignedParentComponentView();
+                if(parentComponentView) {
+                    parentComponentView.removeChild(componentView);
+                }
+                else {
+                    //this is a root component
+                    this.treeEntry.removeChild(componentView.getTreeEntry());
+                }
+            }
+
+            delete this.componentViewMap[componentId];
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+
+            alert("Error updating display for delete component: " + error.toString());
+        }
     }
 
     onModelManagerUpdated(modelManager) {
-        this.modelManager = modelManager;
-        let model = this.modelManager.getModel();
-        if(model.isFieldUpdated("name")) {
-            this.workspaceView.setName(model.getName());
+        try {
+            this.modelManager = modelManager;
+            let model = this.modelManager.getModel();
+            if(model.isFieldUpdated("name")) {
+                this.workspaceView.setName(model.getName());
+            }
+            
+            this.modelManager.setViewStateCallback(() => this.getViewState());
         }
-        
-        this.modelManager.setViewStateCallback(() => this.getViewState());
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+
+            alert("Error updating display for model update: " + error.toString());
+        }
     }
 
     //====================================

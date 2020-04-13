@@ -81,12 +81,13 @@ export default class ModelManager extends FieldObject {
         for(var key in componentMap) {
             var folderEntry = [];
             var component = componentMap[key];
-            if(component.getParentFolderForChildren)
-            var folderMember = component.getParentFolderForChildren();
-            if(folderMember.getChildrenWriteable()) { 
-                folderEntry.push(folderMember.getId());
-                folderEntry.push(folderMember.getFullName(model));
-                folders.push(folderEntry);
+            if(component.getParentFolderForChildren) {
+                var folderMember = component.getParentFolderForChildren();
+                if(folderMember.getChildrenWriteable()) { 
+                    folderEntry.push(folderMember.getId());
+                    folderEntry.push(folderMember.getFullName(model));
+                    folders.push(folderEntry);
+                }
             }
         }
         return folders;

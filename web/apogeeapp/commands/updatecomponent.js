@@ -62,7 +62,8 @@ updatecomponent.createUndoCommand = function(workspaceManager,commandData) {
 updatecomponent.executeCommand = function(workspaceManager,commandData) {
     
     let modelManager = workspaceManager.getMutableModelManager();
-    let model = modelManager.getMutableModel();
+    //wait to get a mutable model instance only if we need it
+    let model = modelManager.getModel();
     var member = model.lookupMemberById(commandData.memberId);
     var componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
     var component = modelManager.getMutableComponentByComponentId(componentId);
@@ -73,6 +74,8 @@ updatecomponent.executeCommand = function(workspaceManager,commandData) {
     if(memberGenerator.getPropertyUpdateAction) {
         var actionData = memberGenerator.getPropertyUpdateAction(member,commandData.updatedMemberProperties);  
         if(actionData) {
+            //get a new, mutable model instance here
+            model = modelManager.getMutableModel();
             actionResult = doAction(model,actionData);
             if(!actionResult.actionDone) {
                 throw new Error("Error updating member properties: " + actionResult.errorMsg);

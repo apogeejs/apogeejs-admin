@@ -66,8 +66,15 @@ export default class WorkspaceView {
     }
 
     onWorkspaceUpdated(workspaceManager) {
-        this.workspaceManager = workspaceManager;
-        this.workspaceManager.setViewStateCallback(() => this.getViewState());
+        try {
+            this.workspaceManager = workspaceManager;
+            this.workspaceManager.setViewStateCallback(() => this.getViewState());
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+
+            alert("Error updating display for workspace update: " + error.toString());
+        }
     }
 
     //====================================

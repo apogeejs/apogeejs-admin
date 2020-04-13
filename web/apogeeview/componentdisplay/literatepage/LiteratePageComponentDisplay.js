@@ -342,7 +342,8 @@ export default class LiteratePageComponentDisplay extends EventManager {
             this.editorView.dom.focus();
 
             var initialValues = {};
-            initialValues.parentId = this.componentView.getComponent().getId();
+            var parentMember = pageComponent.getParentFolderForChildren();
+            initialValues.parentId = parentMember.getId();
 
             let appView = this.componentView.getModelView().getWorkspaceView().getAppView();
 
