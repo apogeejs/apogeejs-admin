@@ -73,17 +73,25 @@ export default class ModelManager extends FieldObject {
     // Component Creation
     //============================
 
-    /** This returns the list of folder names. */
-    getFolders() {
+    /** This returns the list of parents for newly created members. The argument includeRootFolder includes
+     * the root folder in the list. This should only be done for other parent objects (The root should not 
+     * hold any children.). */
+    getParentList(includeRootFolder) {
         let componentMap = this.getField("componentMap");
         let model = this.getModel();
-        var folders = []
+        let folders = []
+        //get the model parent entry
+        if(includeRootFolder) {
+            folders.push([model.getId(),"Root Folder"]);
+        }
+        
+        //get folder compontents
         for(var key in componentMap) {
-            var folderEntry = [];
             var component = componentMap[key];
             if(component.getParentFolderForChildren) {
-                var folderMember = component.getParentFolderForChildren();
+                let folderMember = component.getParentFolderForChildren();
                 if(folderMember.getChildrenWriteable()) { 
+                    let folderEntry = [];
                     folderEntry.push(folderMember.getId());
                     folderEntry.push(folderMember.getFullName(model));
                     folders.push(folderEntry);

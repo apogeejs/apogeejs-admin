@@ -43,10 +43,11 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
         var additionalLines = apogeeutil.jsonCopy(componentViewClass.propertyDialogLines); 
         
         //get the folder list
-        var folderList = modelManager.getFolders();
+        let includeRootFolder = componentViewClass.hasTabEntry;
+        var parentList = modelManager.getParentList(includeRootFolder);
         
         //create the dialog layout - do on the fly because folder list changes
-        var dialogLayout = getPropertiesDialogLayout(displayName,folderList,additionalLines,true,optionalInitialProperties);
+        var dialogLayout = getPropertiesDialogLayout(displayName,parentList,additionalLines,true,optionalInitialProperties);
 
         //we will populate the parent if we need to insert thenew component as a child in the parent document. 
         

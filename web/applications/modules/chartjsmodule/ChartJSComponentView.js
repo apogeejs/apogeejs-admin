@@ -1,6 +1,7 @@
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
+import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods
@@ -33,6 +34,10 @@ export default class ChartJSComponentView extends ComponentView {
             case ChartJSComponentView.VIEW_INPUT:
                 dataSource = this._getInputFormDataSource();
                 return new ConfigurableFormEditor(displayContainer,dataSource);
+
+            case ChartJSComponentView.VIEW_CONFIG_DATA:
+                dataSource = this._getConfigDebugDataSource();
+                return new AceTextEditor(displayContainer,dataSource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
 
             default:
                 alert("unrecognized view element!");
@@ -79,10 +84,29 @@ export default class ChartJSComponentView extends ComponentView {
             saveData: (formData) => this._onSubmit(formData)
         }
     }
+
+    /** This is the input source for the chart data display */
+    _getConfigDebugDataSource() {
+
+        return {
+            doUpdate: () => {
+                //update the display when the member data is updated.
+                //NOTE - we only want to update the data from the form and its generated function
+                //we should prevent someone else from updating it.
+                let reloadData = this.getComponent().isMemberDataUpdated("member");
+                let reloadDataDisplay = false;
+                return {reloadData,reloadDataDisplay};
+            },
+
+            getData: () => {
+                return JSON.stringify(this._getChartConfig(),null,"\t");
+            },
+        }
+    }
     
-        //=====================================
-        // Private Methods
-        //=====================================
+    //=====================================
+    // Private Methods
+    //=====================================
 
     /** This method gets the form value data that will be passed to the input form. */
     _getFormData() {
@@ -293,10 +317,12 @@ let FORM_LAYOUT = [
 
 ChartJSComponentView.VIEW_CHART = "Chart";
 ChartJSComponentView.VIEW_INPUT = "Input";
+ChartJSComponentView.VIEW_CONFIG_DATA = "Config (Debug)";
 
 ChartJSComponentView.VIEW_MODES = [
 	ChartJSComponentView.VIEW_CHART,
-	ChartJSComponentView.VIEW_INPUT,
+    ChartJSComponentView.VIEW_INPUT,
+    ChartJSComponentView.VIEW_CONFIG_DATA
 ];
 
 ChartJSComponentView.TABLE_EDIT_SETTINGS = {

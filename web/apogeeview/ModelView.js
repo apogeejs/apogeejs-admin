@@ -1,5 +1,6 @@
 import apogeeui from "/apogeeui/apogeeui.js";
 import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
+import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 
 import ApogeeView from "/apogeeview/ApogeeView.js"
 
@@ -184,9 +185,27 @@ export default class ModelView {
     }
 
     createTreeEntry() {
+
+        //menu item callback
+        var menuItemCallback = () => {
+            //open menu item
+            var menuItemList = [];
+            var app = this.getApp();
+            var appView = this.getAppView();
+            var folderComponentClass = app.getFolderComponentClass();
+            var initialValues = {parentId: this.getModelManager().getModel().getId()};
+
+            var childMenuItem = {};
+            childMenuItem.title = "Add Child Folder";
+            childMenuItem.callback = () => addComponent(appView,app,folderComponentClass,initialValues);
+            menuItemList.push(childMenuItem);
+
+            return menuItemList;
+        }
+
         var iconUrl = apogeeui.getResourcePath(ICON_RES_PATH);
         var isRoot = true;
-        return new TreeEntry(MODEL_FOLDER_LABEL, iconUrl, null, null, isRoot);
+        return new TreeEntry(MODEL_FOLDER_LABEL, iconUrl, null, menuItemCallback, isRoot);
     }
 
 }

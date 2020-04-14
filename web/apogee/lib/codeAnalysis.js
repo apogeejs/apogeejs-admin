@@ -250,6 +250,7 @@ export function analyzeCode(functionText) {
         if((ast.errors)&&(ast.errors.length > 0)) {
             returnValue.success = false;
             returnValue.errors = ast.errors;
+            return returnValue;
         }
         
         //get the variable list

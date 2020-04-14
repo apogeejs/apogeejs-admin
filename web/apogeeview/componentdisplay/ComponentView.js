@@ -337,21 +337,17 @@ export default class ComponentView {
     getMenuItems(optionalMenuItemList) {
         //menu items
         var menuItemList = optionalMenuItemList ? optionalMenuItemList : [];
-
-        if(this.component.getParentComponent(this.modelView.getModelManager())) {
-            //these items are only possible for members with a parent.
             
-            //add the standard entries
-            var itemInfo = {};
-            itemInfo.title = "Edit Properties";
-            itemInfo.callback = () => updateComponent(this);
-            menuItemList.push(itemInfo);
+        //add the standard entries
+        var itemInfo = {};
+        itemInfo.title = "Edit Properties";
+        itemInfo.callback = () => updateComponent(this);
+        menuItemList.push(itemInfo);
 
-            var itemInfo = {};
-            itemInfo.title = "Delete";
-            itemInfo.callback = () => deleteComponent(this);
-            menuItemList.push(itemInfo);
-        }
+        var itemInfo = {};
+        itemInfo.title = "Delete";
+        itemInfo.callback = () => deleteComponent(this);
+        menuItemList.push(itemInfo);
         
         return menuItemList;
     }

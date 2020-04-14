@@ -16,11 +16,11 @@ export function exportWorkspace(app,fileAccessObject) {
 
     var modelManager = workspaceManager.getModelManager();
 
-    //get the folder list
-    var folderList = modelManager.getFolders();
+    //get the folder list (do not include root, or else we could just save the whole workspace)
+    var parentList = modelManager.getParentList(false);
 
     //create the dialog layout - do on the fly because folder list changes
-    var dialogLayout = getExportDialogLayout(folderList);
+    var dialogLayout = getExportDialogLayout(parentList);
 
     //create on submit callback
     var onSubmitFunction = function(result) {         

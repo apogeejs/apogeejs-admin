@@ -21,11 +21,12 @@ export function updateComponent(componentView) {
 
     var initialValues = component.getPropertyValues(modelManager.getModel()); 
 
-    //add folder list, only if we can set the parent (if there is a parent)
-    var folderList = modelManager.getFolders();
+    // add the folders to which we can move this (it can move to root only if it is a parent)
+    let includeRootFolder = componentViewClass.hasTabEntry;
+    var parentList = modelManager.getParentList(includeRootFolder);
 
     //create the dialog layout - do on the fly because folder list changes
-    var dialogLayout = getPropertiesDialogLayout(displayName,folderList,additionalLines,false,initialValues);
+    var dialogLayout = getPropertiesDialogLayout(displayName,parentList,additionalLines,false,initialValues);
 
     //create on submit callback
     var onSubmitFunction = function(submittedValues) {
