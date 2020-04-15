@@ -120,7 +120,7 @@ export default class HandsonGridEditor extends DataDisplay {
         }
         //remove the frame width listener
         if(this.frameWidthListener) {
-            let app = this.displayContainer.getComponent().getModelManager().getApp();
+            let app = this.displayContainer.getComponentView().getModelView().getApp();
             app.removeListener("frameWidthResize",this.frameWidthListener);
             this.frameWidthListener = null;
         }
