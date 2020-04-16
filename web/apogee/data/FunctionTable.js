@@ -67,7 +67,7 @@ export default class FunctionTable extends CodeableMember {
     lock() {
         //check if the function is initialized
         let memberFunction = this.getData();
-        if(memberFunction) {
+        if((memberFunction)&&(memberFunction.initializeIfNeeded)) {
             try {
                 memberFunction.initializeIfNeeded();
             }
