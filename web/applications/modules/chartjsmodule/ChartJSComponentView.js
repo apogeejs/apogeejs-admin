@@ -390,6 +390,7 @@ class ChartJSDisplay extends DataDisplay {
 
         //make a new chart if there is no chart or if the options change (I am not sure about this criteria exactly)
         if((!this.chart)||(!apogeeutil.jsonEquals(this.prevOptions,config.options))) {
+            if(this.chart) this.chart.destroy();
             this.config = config;
             this.chart = new Chart(this.canvasElement,this.config);
         }
