@@ -11,7 +11,8 @@ import apogeeui from "/apogeeui/apogeeui.js";
  * - resource = dataSource.getResource(); REQUIRED - This retrieves the "resource" object to run the display
  * - member = dataSource.getContextMember(); REQUIRED - This retrieves a member to use as a context reference
  * - displayData = dataSource.getDisplayData(); OPTIONAL - This returns model data to _construct_ the form
- *               whereas the standard getData() method returns data to _populate_ the form.
+ *              whereas the standard getData() method returns data to _populate_ the form. If the display data is
+ *              not valid then the value INVALID_VALUE should be passed.
  * 
  * The resource object can have the following methods. All of these are optional. The areguments include the outputElement
  * whcih is the DOM element for the window and the "admin" object, which is provides some facilities to these methods. The admin

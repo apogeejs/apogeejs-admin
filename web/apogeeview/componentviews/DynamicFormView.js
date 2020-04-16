@@ -56,7 +56,7 @@ export default class DynamicFormView extends ComponentView {
             doUpdate: () => {
                 //we have no data here, just the form layout
                 let reloadData = false;
-                let reloadDataDisplay = this.getComponent().isMemberCodeUpdated("member");
+                let reloadDataDisplay = this.getComponent().isMemberDataUpdated("member");
                 return {reloadData,reloadDataDisplay};
             },
 

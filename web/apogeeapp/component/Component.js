@@ -49,12 +49,6 @@ export default class Component extends FieldObject {
     isMemberDataUpdated(memberFieldName) {
         return this.isMemberFieldUpdated(memberFieldName,"data");
     }
-    
-    /** This method returns true if the code, including either the function body or
-     * the supplemental code, from a given named member field has changed. */
-    isMemberCodeUpdated(memberFieldName) {
-        return this.areAnyMemberFieldsUpdated(memberFieldName,["functionBody","supplementalCode"]);
-    }
 
     /** This method returns true if the given member field has been updated. */
     isMemberFieldUpdated(memberFieldName,memberFieldFieldName) {

@@ -77,16 +77,23 @@ export default class FormDataComponentView extends ComponentView {
             //update depends on multiplefields
             let component = this.getComponent();
             let reloadData = component.isMemberDataUpdated("member.data");
-            let reloadDataDisplay = ( (component.isMemberCodeUpdated("member.layout")) ||
-                (component.isMemberCodeUpdated("member.isInputValid")) );
+            let reloadDataDisplay = ( (component.isMemberDataUpdated("member.layout")) ||
+                (component.isMemberDataUpdated("member.isInputValid")) );
             return {reloadData,reloadDataDisplay};
         },
 
         //return form layout
         dataDisplaySource.getDisplayData = () => { 
             let layoutFunctionMember = this.getComponent().getField("member.layout");
-            let layoutFunction = layoutFunctionMember.getData();    
-            return layoutFunction();
+            if(layoutFunctionMember.getState() == apogeeutil.STATE_NORMAL) {
+                let layoutFunction = layoutFunctionMember.getData();    
+                return layoutFunction();
+            }
+            else {
+                //return function not valid, return a dummy function
+                return () => [];
+            }
+            
         }
         
         //return desired form value

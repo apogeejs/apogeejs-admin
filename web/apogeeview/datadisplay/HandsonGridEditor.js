@@ -79,6 +79,11 @@ export default class HandsonGridEditor extends DataDisplay {
     }
     
     setData(json) {
+        if(json == apogeeutil.INVALID_VALUE) {
+            var errorMsg = "ERROR: Data value is not valid"
+            json = [[errorMsg]];
+        }
+
         if((this.inputData === json)&&(this.editOk)) return;
         
         //verify data is the proper format

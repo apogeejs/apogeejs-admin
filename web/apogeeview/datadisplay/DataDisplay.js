@@ -10,7 +10,7 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
  *      be reloaded (such as if it is replaced with a new data display or if the UI elements for it have been updated) and
  *      "reloadData" which indicates the data value displayed in the data display should be reloaded.  
  *  - data = getData() - Requiried - This returns the data that should be displayed. The format of the data depends on the 
- *      data display.
+ *      data display. If the data is not valid, then the value apogeeutil.INVALID_VALUE should be returned.
  *  - editOk = getEditOk() - Optional - If present, this indicates if the data display edit mode should be used. If it is not present
  *      it is assumed to be false.
  *  - closeDialog = saveData(data) - Optional This is used if the data display edit mode is used. It should save the data. The return value

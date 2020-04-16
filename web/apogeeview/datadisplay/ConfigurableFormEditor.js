@@ -42,6 +42,11 @@ export default class ConfigurableFormEditor extends DataDisplay {
     
     /** This is passed the data form the data callback, which should be the extended data  - including layout + value */
     setData(data) {
+        //we need a better error case
+        if(data == apogeeutil.INVALID_VALUE) {
+            data = {};
+        }
+
         this.changeReferenceValue = data;
 
         //input data is the layout and the value

@@ -359,7 +359,10 @@ export default class Member extends FieldObject {
     // State setting methods
     //----------------------------------
 
-    /** This updates the state. */
+    /** This updates the state. For state NORMAL, the data should be set. 
+     * For any state other than NORMAL, the data will be set to INVALID, regardless of 
+     * what argument is given for data.
+     * For state ERROR, an error list should be set. */
     _setState(state,data,errorList) {
         let newStateStruct = {};
         let oldStateStruct = this.getField("state");
@@ -389,15 +392,23 @@ export default class Member extends FieldObject {
             newStateStruct.state = state;
         }
 
+        
+
         //set the data if we passed it in, regardless of state
         this.setField("state",newStateStruct);
-        if(data !== undefined) {
-            this.setField("data",data)
+        this.setField("data",data);
+        if(state == apogeeutil.STATE_NORMAL) {
+            if(data !== undefined) {
+                this.setField("data",data);
+            }
+            else {
+                this.clearField("data");
+            }
         }
-        else {
-            this.clearField("data");
+        else { 
+            this.setField("data",apogeeutil.INVALID_VALUE);
         }
-
+        
         //clear the pending promise, if we are not in pending state
         //note that the pending promise must be set elsewhere
         if(state != apogeeutil.STATE_PENDING) {

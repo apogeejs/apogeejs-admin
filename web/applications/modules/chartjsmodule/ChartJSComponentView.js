@@ -124,7 +124,7 @@ export default class ChartJSComponentView extends ComponentView {
         try {
             //chart data is held as member value, calculated by formula generated from form input
             let memberData = this.getComponent().getMember().getData();
-            if(!memberData) memberData = DEFAULT_FORM_DATA_VALUES;
+            if((!memberData)||(memberData === apogeeutil.INVALID_VALUE)) memberData = DEFAULT_FORM_DATA_VALUES;
 
             //---------------------------
             //get the values, factoring in defaults and calculated items
@@ -384,26 +384,22 @@ class ChartJSDisplay extends DataDisplay {
     /** This sets the data into the editor display. REQUIRED */
     setData(config) {
 
-        if(config) {
-            //we need to copy our data onto the existing config object
-            this.config.type = config.type;
-            this.config.options = config.options;
-            //the chart modifies the data so we will make a copy
-            this.config.data = apogeeutil.jsonCopy(config.data);
-        }
-        else {
-            //set data for an empty chart
-            this.config.data = {
-                datasets: []
-            }
-            this.config.options = {};
+        if((!config)||(config === apogeeutil.INVALID_VALUE)) {
+            config = DEFAULT_CHART_CONFIG;
         }
 
         //make a new chart if there is no chart or if the options change (I am not sure about this criteria exactly)
         if((!this.chart)||(!apogeeutil.jsonEquals(this.prevOptions,config.options))) {
+            this.config = config;
             this.chart = new Chart(this.canvasElement,this.config);
         }
         else {
+            //we need to copy our new data into the existing config object
+            this.config.type = config.type;
+            this.config.options = config.options;
+            //the chart modifies the data so we will make a copy
+            this.config.data = apogeeutil.jsonCopy(config.data);
+
             this.chart.update();
         }
 
@@ -414,5 +410,12 @@ class ChartJSDisplay extends DataDisplay {
     /** This method is called on loading the display. OPTIONAL */
     // onLoad() {
     // }
+}
+
+let DEFAULT_CHART_CONFIG = {
+    data: {
+        datasets: []
+    },
+    options: {}
 }
 

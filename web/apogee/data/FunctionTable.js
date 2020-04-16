@@ -58,6 +58,51 @@ export default class FunctionTable extends CodeableMember {
         return __functionTableWrapper(initMember);
     }
 
+    /** Add to the base lock function - The function is lazy initialized so it can call itself without a 
+     * ciruclar reference. The initialization happens on the first actual call. This is OK if we are doing the
+     * model calculation. but if it is first called _AFTER_ the model has completed being calculated, such as
+     * externally, then we will get a locked error when the lazy initialization happens. Instead, we will
+     * complete the lazy initialization before the lock is done. At this point we don't need to worry about
+     * circular refernce anyway, since the model has already completed its calculation. */
+    lock() {
+        //check if the function is initialized
+        let memberFunction = this.getData();
+        if(memberFunction) {
+            try {
+                memberFunction.initializeIfNeeded();
+            }
+            catch(error) {
+                //handle potential error cases!!!:
+                
+                if(error == base.MEMBER_FUNCTION_INVALID_THROWABLE) {
+                    //This is not an error. I don't like to throw an error
+                    //for an expected condition, but I didn't know how else
+                    //to do this. See notes where this is thrown.
+                    this.setResultInvalid();
+                }
+                else if(error == base.MEMBER_FUNCTION_PENDING_THROWABLE) {
+                    //This is not an error. I don't like to throw an error
+                    //for an expected condition, but I didn't know how else
+                    //to do this. See notes where this is thrown.
+                    this.setResultPending();
+                }
+                //--------------------------------------
+                else {
+                    //normal error in member function execution
+                
+                    //this is an error in the code
+                    if(error.stack) {
+                        console.error(error.stack);
+                    }
+    
+                    this.setError(error);
+                }
+            }
+
+        }
+        super.lock();
+    }
+
     //------------------------------
     // Member Methods
     //------------------------------
