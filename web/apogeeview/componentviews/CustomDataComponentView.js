@@ -166,7 +166,7 @@ export default class CustomDataComponentView extends ComponentView {
     getUiDataDisplaySource(codeFieldName) {
  
         return {
-            doUpdate: function() {
+            doUpdate: () => {
                 //return value is whether or not the data display needs to be udpated
                 let reloadData = this.getComponent().isFieldUpdated(codeFieldName);
                 let reloadDataDisplay = false;
