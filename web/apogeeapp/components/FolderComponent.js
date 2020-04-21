@@ -7,6 +7,11 @@ export default class FolderComponent extends ParentComponent {
     constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
         //extend parent component
         super(member,modelManager,instanceToCopy,keepUpdatedFixed);
+
+        if(!instanceToCopy) {
+            //initialize the schema
+            this.initializeSchema(modelManager);
+        }
     };
 
     //cludge================================================

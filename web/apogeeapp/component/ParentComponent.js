@@ -16,15 +16,10 @@ export default class ParentComponent extends Component {
         //==============
         //Fields
         //==============
-        //Initailize these if this is a new instance
-        //the schema should only be created once
-        if(!instanceToCopy) {
-            let schema = createFolderSchema(modelManager.getApp(),member.getId());
-            this.setField("schema",schema);
-            //initialize with an empty document
-            let document = this._createEmptyDocument(schema);
-            this.setField("document",document);
-        }
+        //The following fields are added by the parent component. In order to add these, the method
+        //"initializeSchema" must be called. See the notes on that method.
+        //"schema"
+        //"document"
 
         //==============
         //Working variables
@@ -66,6 +61,18 @@ export default class ParentComponent extends Component {
         let member = this.getMember();
         let folder = this.getParentFolderForChildren();
         return new LiteratePageComponentDisplay(this,member,folder); 
+    }
+
+    /** This method should be called only when a new component is created, and not when it is copied. It creates the schema
+     * and an initial empty document for the page. It should be called after the parent folder for the page children is initialized.
+     * Preferebly it is called from the constructor, if there is not a reason to wait longer.. */
+    initializeSchema(modelManager) {
+        let pageFolderMember = this.getParentFolderForChildren();
+        let schema = createFolderSchema(modelManager.getApp(),pageFolderMember.getId());
+        this.setField("schema",schema);
+        //initialize with an empty document
+        let document = this._createEmptyDocument(schema);
+        this.setField("document",document);
     }
 
     //==============================

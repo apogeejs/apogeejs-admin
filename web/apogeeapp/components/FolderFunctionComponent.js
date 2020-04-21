@@ -19,6 +19,9 @@ export default class FolderFunctionComponent extends ParentComponent {
             var internalFolder = member.getInternalFolder(modelManager.getModel());
             this.setField("member.body",internalFolder);
             modelManager.registerMember(internalFolder.getId(),this,false);
+
+            //initialize the schema
+            this.initializeSchema(modelManager);
         }
     }
 
