@@ -93,23 +93,27 @@ export function updateComponent(componentView) {
 
                 //look up the old parent component
                 let oldParentComponent = component.getParentComponent(modelManager);
-                let oldParentComponentView = modelView.getComponentViewByComponentId(oldParentComponent.getId());
+                //remove the component from the parent component document.
+                //if there is no parent component, we wil assume this was in the root folder
+                if(oldParentComponent) {
+                    let oldParentComponentView = modelView.getComponentViewByComponentId(oldParentComponent.getId());
 
-                if(newValues.parentId) {
-                    //----------------------------
-                    //move case
-                    //delete old node
-                    //----------------------------
-                    let oldParentEditorCommand = oldParentComponentView.getRemoveApogeeNodeFromPageCommand(oldName);
-                    commands.push(oldParentEditorCommand);
-                }
-                else if(newValues.name) {
-                    //---------------------------
-                    //rename case
-                    //get the rename editr comamnds, then apply the one to clear the component node name
-                    //----------------------------
-                    renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(component.getMemberId(),oldName,newValues.name);
-                    commands.push(renameEditorCommands.setupCommand);
+                    if(newValues.parentId) {
+                        //----------------------------
+                        //move case
+                        //delete old node
+                        //----------------------------
+                        let oldParentEditorCommand = oldParentComponentView.getRemoveApogeeNodeFromPageCommand(oldName);
+                        commands.push(oldParentEditorCommand);
+                    }
+                    else if(newValues.name) {
+                        //---------------------------
+                        //rename case
+                        //get the rename editr comamnds, then apply the one to clear the component node name
+                        //----------------------------
+                        renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(component.getMemberId(),oldName,newValues.name);
+                        commands.push(renameEditorCommands.setupCommand);
+                    }
                 }
             }
             
@@ -130,28 +134,38 @@ export function updateComponent(componentView) {
                 //----------------------------------------------
                 if(newValues.parentId) {
                     let newParentComponentId = modelManager.getComponentIdByMemberId(newValues.parentId);
-                    let newParentComponentView = modelView.getComponentViewByComponentId(newParentComponentId);
+                    //there will be no component id if we are putting this in the root folder
+                    if(newParentComponentId) {
+                        let newParentComponentView = modelView.getComponentViewByComponentId(newParentComponentId);
 
-                    let newName = newValues.name ? newValues.name : oldName;
+                        let newName = newValues.name ? newValues.name : oldName;
 
-                    //insert node add at end of new page
-                    let newParentCommands = newParentComponentView.getInsertApogeeNodeOnPageCommands(newName,true);
-                    //added the editor setup command
-                    if(newParentCommands.editorSetupCommand) commands.push(newParentCommands.editorSetupCommand);
-                    //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
-                    if(newParentCommands.deletedComponentCommands) {
-                        //make sure the user wants to proceed
-                        let deletedComponentNames = newParentCommands.deletedComponentCommands.map(command => command.memberId);
-                        let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
-                        
-                        //return if user rejects
-                        if(!doDelete) return;
-                        
-                        commands.push(...newParentCommands.deletedComponentCommands);
+                        //insert node add at end of new page
+                        let newParentCommands = newParentComponentView.getInsertApogeeNodeOnPageCommands(newName,true);
+                        //added the editor setup command
+                        if(newParentCommands.editorSetupCommand) commands.push(newParentCommands.editorSetupCommand);
+                        //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
+                        if(newParentCommands.deletedComponentCommands) {
+                            //make sure the user wants to proceed
+                            let deletedComponentNames = newParentCommands.deletedComponentCommands.map(command => command.memberId);
+                            let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
+                            
+                            //return if user rejects
+                            if(!doDelete) return;
+                            
+                            commands.push(...newParentCommands.deletedComponentCommands);
+                        }
+
+                        //add the editor insert command
+                        if(newParentCommands.editorAddCommand) commands.push(newParentCommands.editorAddCommand);
+                    }
+                    else {
+                        if(!componentViewClass.hasTabEntry) {
+                            //TBR if we want to enforce this condition...
+                            throw new Error("This component can not be placed in the root folder.");
+                        }
                     }
 
-                    //add the editor insert command
-                    if(newParentCommands.editorAddCommand) commands.push(newParentCommands.editorAddCommand);
                 }
 
                 //----------------------------

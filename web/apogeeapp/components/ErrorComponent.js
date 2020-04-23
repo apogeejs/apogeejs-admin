@@ -19,7 +19,7 @@ export default class ErrorComponent extends Component {
     }
 
     /** This overrides the open deserialize method to save the entire json. */
-    loadPropertyValues(json) {
+    loadStoredData(json) {
         this.completeJson = json;
     }
 

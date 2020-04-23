@@ -28,6 +28,10 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         //check boxes
         this.checkboxList = [];
         var addCheckbox = checkboxInfo => {
+            var buttonContainer = apogeeui.createElement("div");
+            buttonContainer.style.display = elementInitData.horizontal ? "inline-block" : "block";
+            containerElement.appendChild(buttonContainer);
+
             var checkbox = apogeeui.createElement("input");
             checkbox.type = "checkbox";
             
@@ -43,9 +47,11 @@ export default class CheckboxGroupElement extends ConfigurableElement {
             }
             checkbox.value = value;
             this.checkboxList.push(checkbox);
-            containerElement.appendChild(checkbox);
-            containerElement.appendChild(document.createTextNode(label));
-            if(!elementInitData.horizontal) containerElement.appendChild(document.createElement("br"));
+            buttonContainer.appendChild(checkbox);
+            buttonContainer.appendChild(document.createTextNode(label));
+
+            if(elementInitData.horizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
+
             
             if(elementInitData.disabled) checkbox.disabled = true;
         };

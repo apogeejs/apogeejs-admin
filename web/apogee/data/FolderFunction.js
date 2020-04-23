@@ -105,8 +105,8 @@ export default class FolderFunction extends DependentMember {
         let updateData = newValues.updateData;
         if((updateData)&&((updateData.argList !== undefined)||(updateData.returnValue !== undefined))) {
 
-            var argList = updateData.argList ? updateData.argList : folderFunction.argList;
-            var returnValueString = updateData.returnValue ? updateData.returnValue : folderFunction.returnValueString;
+            var argList = updateData.argList ? updateData.argList : folderFunction.getArgList();
+            var returnValueString = updateData.returnValue ? updateData.returnValue : folderFunction.getReturnValueString();
     
             var actionData = {};
             actionData.action = "updateFolderFunction";

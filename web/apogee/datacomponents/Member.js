@@ -1,5 +1,4 @@
 import base from "/apogeeutil/base.js";
-import {doAction} from "/apogee/actions/action.js";
 import FieldObject from "/apogeeutil/FieldObject.js";
 
 /** This component encapsulates the member functionality for objects in the model.

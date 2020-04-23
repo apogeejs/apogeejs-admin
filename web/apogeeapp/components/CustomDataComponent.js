@@ -136,7 +136,7 @@ export default class CustomDataComponent extends Component {
     // serialization
     //==============================
 
-    readFromJson(json) {
+    readPropsFromJson(json) {
         if(!json) return;
         
         //set destroy flag

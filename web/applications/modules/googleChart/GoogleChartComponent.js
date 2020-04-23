@@ -146,7 +146,7 @@ export function initApogeeModule(apogee,apogeeapp,apogeeutil) {
             json.formData = this.storedData;
         }
 
-        readFromJson(json) {
+        readDataFromJson(json) {
             if(json.formData !== undefined) {
                 this._setStoredData(json.formData);
             }

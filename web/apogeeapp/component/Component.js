@@ -158,9 +158,8 @@ export default class Component extends FieldObject {
         return json;
     }
 
-    /** This is used to load the component from a json and also to set properties, such as
-     * from the set properties form. */
-    loadPropertyValues(json) {
+    /** This is used to deserialize the component. */
+    loadStoredData(json) {
         if(!json) json = {};
         
         //take any immediate needed actions
@@ -171,8 +170,20 @@ export default class Component extends FieldObject {
         }
         
         //allow the component implemnetation ro read from the json
-        if(this.readFromJson) {
-            this.readFromJson(json);
+        if(this.readDataFromJson) {
+            this.readDataFromJson(json);
+        }
+
+        //allow the component implemnetation ro read from the json
+        if(this.readPropsFromJson) {
+            this.readPropsFromJson(json);
+        }
+    }
+
+    /** This is used to update properties, such as from the set properties form. */
+    loadPropertyValues(json) {     
+        if(this.readPropsFromJson) {
+            this.readPropsFromJson(json);
         }
     }
     //==============================
@@ -180,9 +191,14 @@ export default class Component extends FieldObject {
     //==============================
 
     //This method should optionally be populated by an extending object.
-    //** This method reads any necessary component implementation-specific data
-    // * from the json. OPTIONAL */
-    //readFromJson(json);
+    //** This method reads any necessary component implementation-specific stored data
+    // * from the json. This should be used for stored data that is NOT updated when properties are updated. OPTIONAL */
+    //readDataFromJson(json);
+
+    //This method should optionally be populated by an extending object.
+    //** This method reads any necessary component implementation-specific properties data
+    // * from the json. This is also use when updating properties. OPTIONAL */
+    //readPropsFromJson(json);
 
     //This method should optionally be populated by an extending object.
     //** This method writes any necessary component implementation-specific data

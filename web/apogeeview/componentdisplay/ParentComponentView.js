@@ -76,9 +76,6 @@ export default class ParentComponentView extends ComponentView {
 
     /** This function adds a fhile componeent to the displays for this parent component. */
     addChild(childComponentView) {
-        //we need to record the child was assigned here, to be used if the component view is moved
-        childComponentView.setLastAssignedParentComponentView(this);
-
         //add the child to the tree entry
         var treeEntry = this.getTreeEntry();
         if(treeEntry) {

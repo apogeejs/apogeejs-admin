@@ -116,7 +116,7 @@ export default class ModelManager extends FieldObject {
 
             //apply any serialized values
             if(componentJson) {
-                component.loadPropertyValues(componentJson);
+                component.loadStoredData(componentJson);
             }
         }
 
@@ -126,7 +126,7 @@ export default class ModelManager extends FieldObject {
             componentClass = this.app.getComponentClass("apogeeapp.app.ErrorComponent");
             component = new componentClass(member,this);
             if(componentJson) {
-                component.loadProperties(componentJson);
+                component.loadStoredData(componentJson);
             }
         }
 

@@ -73,12 +73,12 @@ export default class ChartJSComponentView extends ComponentView {
         return {
             doUpdate: () => {
                 //data updates should only be triggered by the form itself
-                let reloadData = false;
+                let reloadData = this.getComponent().isMemberDataUpdated("member");
                 //form layout constant
                 let reloadDataDisplay = false;
                 return {reloadData,reloadDataDisplay};
             }, 
-            getDisplayData: () => FORM_LAYOUT,
+            getDisplayData: () => _getFormLayout(this.getName()),
             getData: () => this._getFormData(),
             getEditOk: () => true,
             saveData: (formData) => this._onSubmit(formData)
@@ -279,37 +279,40 @@ let DEFAULT_FORM_DATA_VALUES = {
 let CHART_TYPE_VALUES = ["bar","line"];
 let X_INPUT_TYPE_VALUES = ["common","paired"];
 
-let FORM_LAYOUT = [
-    {   
-        type: "dropdown",
-        label: "Chart Type: ",
-        entries: [["Bar","bar"],["Line","line"]],
-        value: "<SET CURRENT VALUE>",
-        key: "chartType"
-    },
-    {   
-        type: "radioButtonGroup",
-        label: "Specifying X Values: ",
-        entries: [["One Common Array","common"],["Per Series Arrays","paired"]],
-        value: "<SET CURRENT VALUE>",
-        key: "xValuesInputType"
-    },
-    {   
-        type: "textField",
-        label: "Common X Value Array: ",
-        key: "commonXValueArray"
-    },
-    {   
-        type: "textField",
-        label: "Plot Series Data: ",
-        key: "datasets"
-    },
-    {   
-        type: "textField",
-        label: "General Options: ",
-        key: "generalOptions"
-    }
-]
+function _getFormLayout(componentName) {
+    return [
+        {   
+            type: "dropdown",
+            label: "Chart Type: ",
+            entries: [["Bar","bar"],["Line","line"]],
+            value: "line", //initial default
+            key: "chartType"
+        },
+        {   
+            type: "radioButtonGroup",
+            label: "Specifying X Values: ",
+            entries: [["One Common Array","common"],["Per Series Arrays","paired"]],
+            value: "common", //initial default
+            groupName: componentName + "|xType",
+            key: "xValuesInputType"
+        },
+        {   
+            type: "textField",
+            label: "Common X Value Array: ",
+            key: "commonXValueArray"
+        },
+        {   
+            type: "textField",
+            label: "Plot Series Data: ",
+            key: "datasets"
+        },
+        {   
+            type: "textField",
+            label: "General Options: ",
+            key: "generalOptions"
+        }
+    ];
+}
 
 //======================================
 // Static properties

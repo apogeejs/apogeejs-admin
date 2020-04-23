@@ -29,6 +29,10 @@ export default class RadioGroupElement extends ConfigurableElement {
         this.buttonList = [];
         var groupName = elementInitData.groupName;
         var addButton = buttonInfo => {
+            var buttonContainer = apogeeui.createElement("div");
+            buttonContainer.style.display = elementInitData.horizontal ? "inline-block" : "block";
+            containerElement.appendChild(buttonContainer);
+
             var radio = apogeeui.createElement("input");
             radio.type = "radio";
             radio.name = groupName;
@@ -45,9 +49,10 @@ export default class RadioGroupElement extends ConfigurableElement {
             }
             radio.value = value;
             this.buttonList.push(radio);
-            containerElement.appendChild(radio);
-            containerElement.appendChild(document.createTextNode(label));
-            if(!elementInitData.horizontal) containerElement.appendChild(document.createElement("br"));
+            buttonContainer.appendChild(radio);
+            buttonContainer.appendChild(document.createTextNode(label));
+            
+            if(elementInitData.horizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
         };
         elementInitData.entries.forEach(addButton);
         

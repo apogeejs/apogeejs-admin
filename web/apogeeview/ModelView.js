@@ -91,10 +91,11 @@ export default class ModelView {
             let parentComponentView = componentView.getParentComponentView();
             if(parentComponentView) {
                 parentComponentView.addChild(componentView);
+                componentView.setLastAssignedParentComponentView(parentComponentView);
             }
             else {
                 //this is a root component
-                this.treeEntry.addChild(componentView.getTreeEntry());
+                this.addChildToRoot(componentView)
             }
 
             //do view state initialization
@@ -134,7 +135,7 @@ export default class ModelView {
                 }
                 else {
                     //this is a root component
-                    this.treeEntry.removeChild(componentView.getTreeEntry());
+                    this.removeChildFromRoot(componentView);
                 }
             }
 
@@ -162,6 +163,14 @@ export default class ModelView {
 
             alert("Error updating display for model update: " + error.toString());
         }
+    }
+
+    addChildToRoot(componentView) {
+        this.treeEntry.addChild(componentView.getTreeEntry());
+    }
+
+    removeChildFromRoot(componentView) {
+        this.treeEntry.removeChild(componentView.getTreeEntry());
     }
 
     //====================================

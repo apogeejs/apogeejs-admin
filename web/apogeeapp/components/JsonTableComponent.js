@@ -39,7 +39,7 @@ export default class JsonTableComponent extends Component {
         json.dataView = this.getDataView();
     }
 
-    readFromJson(json) {
+    readPropsFromJson(json) {
         if(json.dataView !== undefined) {
             this.setDataView(json.dataView);
         }

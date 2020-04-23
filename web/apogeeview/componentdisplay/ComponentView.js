@@ -388,7 +388,7 @@ export default class ComponentView {
         if(component.isFieldUpdated("member")) {
             let member = component.getMember();
             if(member.isFieldUpdated("parentId")) {
-                var oldParentComponentView = this.lastAssignedParentComponentView;
+                var oldParentComponentView = this.getLastAssignedParentComponentView();
                 var newParentComponentView = this.getParentComponentView();
 
                 if(oldParentComponentView != newParentComponentView) {
@@ -401,10 +401,20 @@ export default class ComponentView {
                             this.childComponentDisplay = null;
                         }
                     }
+                    else {
+                        //this was in the root folder
+                        this.modelView.removeChildFromRoot(this);
+                    }
 
                     //add to the new parent component
                     if(newParentComponentView) {
                         newParentComponentView.addChild(this);
+                        this.setLastAssignedParentComponentView(newParentComponentView);
+                    }
+                    else {
+                        //this is placed in the root folder
+                        this.modelView.addChildToRoot(this);
+                        this.setLastAssignedParentComponentView(null);
                     }
                 }
             }  

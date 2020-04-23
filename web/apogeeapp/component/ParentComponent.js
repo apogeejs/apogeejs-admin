@@ -108,7 +108,7 @@ export default class ParentComponent extends Component {
         return json;
     }
 
-    readFromJson(json) {
+    readDataFromJson(json) {
         let document;
         let schema = this.getField("schema");
 
