@@ -14,9 +14,7 @@ export default class FolderFunction extends DependentMember {
         super(name,parentId,instanceToCopy,keepUpdatedFixed);
 
         //mixin init where needed
-        //this is a root for the context. Internal members can NOT see what is outside.
-        //Any external values must be passed in as arguments.
-        this.contextHolderMixinInit(true);
+        this.contextHolderMixinInit();
         this.parentMixinInit(instanceToCopy);
 
         //==============
@@ -26,6 +24,10 @@ export default class FolderFunction extends DependentMember {
         if(!instanceToCopy) {
             //set to an empty function
             this.setData(function(){});
+
+            //this field is used to disable the calculation of the value of this function
+            //It is used in the "virtual model" to prevent any unnecessary downstream calculations
+            this.setField("sterilized",false)
         }
 
         //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -133,6 +135,16 @@ export default class FolderFunction extends DependentMember {
     /** This updates the member data based on the function. It returns
      * true for success and false if there is an error.  */
     calculate(model) {  
+
+        //if this function is sterilized, we will just set the value to invalid value.
+        //This prevents any object which calls this function from updating. It is inended to be 
+        //used in the virtual workspace assoicated with this folder function
+        if(this.getField("sterilized")) {
+            this.setResultInvalid();
+            this.clearCalcPending();
+            return;
+        }
+
         //make sure the data is set in each impactor
         this.initializeImpactors(model);
 
@@ -186,10 +198,15 @@ export default class FolderFunction extends DependentMember {
 
     /** This method retrieve creates the loaded context manager. */
     createContextManager() {
-        return new ContextManager(this);
-
-        //we do not provide a parent entry for this context manager because the contents of the
-        //folder function are NOT accessible to outside members.
+        //set the context manager
+        var contextManager = new ContextManager(this);
+        
+        //add an entry for this folder
+        var myEntry = {};
+        myEntry.contextHolderAsParent = true;
+        contextManager.addToContextList(myEntry);
+        
+        return contextManager;
     }
 
     //------------------------------
@@ -260,23 +277,33 @@ export default class FolderFunction extends DependentMember {
         var folderFunctionFunction = (...argumentArray) => {
             
             if(!initialized) {
-                //create a copy of the model to do the function calculation - we don't update the UI display version
-                virtualModel = this.createVirtualModel(model);
-        
-        //HANDLE THIS ERROR CASE DIFFERENTLY!!!
-                if(!virtualModel) {
-                    return null;
-                }
+                //get the ids of the inputs and outputs. We can use the real instance to look these up since they don't change.
+                let internalFolder = this.getInternalFolder(model);
+                inputMemberIdArray = this.loadInputElementIds(model,internalFolder);
+                returnValueMemberId = this.loadOutputElementId(model,internalFolder); 
 
-                //lookup elements from virtual model
-                let virtualInternalFolder = virtualModel.getMemberByFullName(virtualModel,"body");
-                inputMemberIdArray = this.loadInputElements(virtualModel,virtualInternalFolder);
-                returnValueMemberId = this.loadOutputElement(virtualModel,virtualInternalFolder); 
+                //prepare the virtual function
+                //this is a copy of the original model, but with any member that is unlocked replaced.
+                //to prevent us from modifying an object in use by our current real model calculation.
+                virtualModel = model.getCleanCopy(this.temporaryVirtualModelRunContext);
+
+                //we want to set the folder function as "sterilized" - this prevents any downstream work from the folder function updating
+                let commandData = {}
+                commandData.action = "setField";
+                commandData.memberId = this.getId();
+                commandData.fieldName = "sterilized";
+                commandData.fieldValue = "true";
+                let actionResult = doAction(virtualModel,commandData);
+
+                //we should do something with the action result
+                if(!actionResult.actionDone) {
+                    throw new Error("Error calculating folder function");
+                }
                 
                 initialized = true;
             }
             
-            //create an update array to set the table values to the elements  
+            //create an update array to set the table values for the input elements  
             var updateActionList = [];
             for(var i = 0; i < inputMemberIdArray.length; i++) {
                 var entry = {};
@@ -302,6 +329,7 @@ export default class FolderFunction extends DependentMember {
                         throw new Error("A folder function must not be asynchronous: " + this.getFullName(workingVirtualModel));
                     }
                     
+                    //get the resulting output
                     return returnValueMember.getData();
                 }
                 else {
@@ -318,33 +346,14 @@ export default class FolderFunction extends DependentMember {
         return folderFunctionFunction;    
     }
 
-    /** This method creates a copy of the model to be used for the function evvaluation. 
-     * @private */
-    createVirtualModel(model) {
-        let internalFolder = this.getInternalFolder(model);
-        var folderJson = internalFolder.toJson(model);
-        var modelJson = Model.createModelJsonFromFolderJson(this.getName(),folderJson);
-        var virtualModel = new Model(this.temporaryVirtualModelRunContext);
-
-        //load the model
-        let loadAction = {};
-        loadAction.action = "loadModel";
-        loadAction.modelJson = modelJson;
-        let actionResult = doAction(virtualModel,loadAction);
-        
-        //do something with action result!!!
-        
-        return virtualModel;
-    }
-
     /** This method loads the input argument members from the virtual model. 
      * @private */
-    loadInputElements(virtualModel,virtualInternalFolder) {
+    loadInputElementIds(model,internalFolder) {
         let argMembers = [];
         let argList = this.getField("argList");
         for(var i = 0; i < argList.length; i++) {
             var argName = argList[i];
-            var argMember = virtualInternalFolder.lookupChild(virtualModel,argName);
+            var argMember = internalFolder.lookupChild(model,argName);
             if(argMember) {
                 argMembers.push(argMember.getId());
             }     
@@ -354,9 +363,9 @@ export default class FolderFunction extends DependentMember {
 
     /** This method loads the output member from the virtual model. 
      * @private  */
-    loadOutputElement(virtualModel,virtualInternalFolder) {
+    loadOutputElementId(model,internalFolder) {
         let returnValueString = this.getField("returnValue");
-        var returnValueMember = virtualInternalFolder.lookupChild(virtualModel,returnValueString);
+        var returnValueMember = internalFolder.lookupChild(model,returnValueString);
         return returnValueMember.getId();
     }
 }

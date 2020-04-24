@@ -77,6 +77,30 @@ export default class Model extends FieldObject {
         }
     }
 
+    /** This gets a copy of the model where any unlocked members are replaced with new instance copies.
+     * This ensures if we look up a mutable member from here we get a different instance from what was 
+     * in our original model instance. */
+    getCleanCopy(newRunContext) {
+        let newModel = new Model(newRunContext,this);
+
+        //update the member map for the new model
+        let oldMemberMap = this.getField("memberMap");
+
+        newModel._populateWorkingMemberMap();
+        newModel.workingMemberMap[newModel.getId()] = newModel;
+
+        for(let memberId in oldMemberMap) {
+            let member = oldMemberMap[memberId];
+            if((member != this)&&(!member.getIsLocked())) {
+                //create a new copy of the member and register it.
+                let newMember = new member.constructor(member.getName(),member.getParentId(),member);
+                newModel.workingMemberMap[newMember.getId()] = newMember;
+            }
+        }
+
+        return newModel;
+    }
+
     /** This method locks all member instances and the model instance. */
     lockAll() {
         //clear up working fields
