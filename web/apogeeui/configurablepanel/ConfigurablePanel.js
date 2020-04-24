@@ -132,9 +132,11 @@ export default class ConfigurablePanel {
     }
     
     setDisabled(isDisabled) {
-        var state = isDisabled ? ConfigurablePanelConstants.STATE_DISABLED :
-                ConfigurablePanelConstants.STATE_NORMAL;
-        this.elementObjects.forEach( elementObject => elementObject.setState(state) );
+        this.elementObjects.forEach( elementObject => {
+            if(elementObject._setDisabled) {
+                elementObject._setDisabled(isDisabled);
+            }
+        });
     }
     
     /** This method is used to register configurable elements with the panel */

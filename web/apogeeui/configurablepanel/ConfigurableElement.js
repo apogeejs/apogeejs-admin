@@ -30,6 +30,8 @@ export default class ConfigurableElement {
     /** This hides or shows the given element within the panel. */
     setState(state) {
         this.state = state;
+
+console.log("Settings state: " + state + "; element key: " + this.key);
          
         switch(state) {
             case ConfigurablePanelConstants.STATE_NORMAL:
@@ -101,6 +103,7 @@ export default class ConfigurableElement {
     
     /** This is a function that can be used to set values when the parent element has a single value. */
     static setChildStateSingleValue(childData,value) {
+console.log("Setting child state single. Child Data Value: " + childData.value + ". Parent value: " + value);
         if(childData.value == value) {
             childData.element.setState(ConfigurablePanelConstants.STATE_NORMAL);
         }
@@ -112,6 +115,7 @@ export default class ConfigurableElement {
     
     /** This is a function that can be used to set values when the parent element has an array value. */
     static setChildStateArrayValue(childData,value) {
+console.log("Setting child state array.");
         if(value.indexOf(childData.value) >= 0) {
             childData.element.setState(ConfigurablePanelConstants.STATE_NORMAL);
         }
