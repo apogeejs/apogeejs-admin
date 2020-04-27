@@ -1,7 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 
-import "/apogeeapp/commands/literatepagetransaction.js";
 import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatepage/proseMirrorSetup.js";
 
 import { TextSelection, NodeSelection, EditorState, Selection } from "/prosemirror/lib/prosemirror-state/src/index.js";
@@ -31,10 +30,11 @@ export default class ParentComponentView extends ComponentView {
         
         //add any existing children to the tree entry
         var treeEntry = treeDisplay.getTreeEntry();
-        var member = this.component.getMember();
+        var parentFolder = this.component.getParentFolderForChildren();
         var modelView = this.getModelView();
         var modelManager = modelView.getModelManager();
-        var childIdMap = member.getChildIdMap();
+
+        var childIdMap = parentFolder.getChildIdMap();
         for(var childKey in childIdMap) {
             var childMemberId = childIdMap[childKey];
             var childComponentId = modelManager.getComponentIdByMemberId(childMemberId);

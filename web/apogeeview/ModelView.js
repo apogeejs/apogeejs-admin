@@ -1,5 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
-import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
+import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 
 import ApogeeView from "/apogeeview/ApogeeView.js"
@@ -87,13 +86,16 @@ export default class ModelView {
 
             this.componentViewMap[component.getId()] = componentView;
 
-            //add this entry to the proper parent.
-            let parentComponentView = componentView.getParentComponentView();
-            if(parentComponentView) {
-                parentComponentView.addChild(componentView);
-                componentView.setLastAssignedParentComponentView(parentComponentView);
+            //find the parent
+            let parentComponent = component.getParentComponent(this.modelManager);
+            if(parentComponent) {
+                let parentComponentView = this.getComponentViewByComponentId(parentComponent.getId());
+                if(parentComponentView) {
+                    parentComponentView.addChild(componentView);
+                    componentView.setLastAssignedParentComponentView(parentComponentView);
+                }
             }
-            else {
+            else { 
                 //this is a root component
                 this.addChildToRoot(componentView)
             }

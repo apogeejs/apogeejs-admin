@@ -1,6 +1,5 @@
 import {addLink} from "/apogeeview/commandseq/updatelinkseq.js";
-import apogeeui from "/apogeeui/apogeeui.js";
-import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
+import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 
 import ReferenceEntryView from "/apogeeview/references/ReferenceEntryView.js";
 

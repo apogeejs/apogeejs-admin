@@ -1,4 +1,3 @@
-import base from "/apogeeutil/base.js";
 import EventManager from "/apogeeutil/EventManagerClass.js";
 
 import {addComponent, addAdditionalComponent} from "/apogeeview/commandseq/addcomponentseq.js";
@@ -7,10 +6,7 @@ import PageChildComponentDisplay from "/apogeeview/componentdisplay/literatepage
 
 import {selectionBetween} from "/prosemirror/lib/prosemirror-view/src/selection.js";
 
-import ModelView from "/apogeeview/ModelView.js";
-
-import apogeeui from "/apogeeui/apogeeui.js";
-import Tab from "/apogeeui/tabframe/Tab.js";
+import {apogeeui,Tab} from "/apogeeui/apogeeUiLib.js";
 
 /** This component represents a json table object. */
 export default class LiteratePageComponentDisplay extends EventManager {

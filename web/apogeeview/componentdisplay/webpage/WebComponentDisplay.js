@@ -1,5 +1,5 @@
 import {bannerConstants,getBanner} from "/apogeeview/componentdisplay/banner.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import {apogeeui} from "/apogeeui/apogeeUiLib.js";
 import WebDisplayContainer from "/apogeeview/componentdisplay/webpage/WebDisplayContainer.js";
 
 /** This is the component display for a web page.

@@ -1,6 +1,6 @@
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
-import UiCommandMessenger from "/apogeeapp/commands/UiCommandMessenger.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import { UiCommandMessenger } from "/apogeeapp/apogeeAppLib.js";
+import {apogeeui} from "/apogeeui/apogeeUiLib.js";
 
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from

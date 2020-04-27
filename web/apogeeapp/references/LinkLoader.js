@@ -52,24 +52,24 @@ class LinkLoader {
                 elementEntry.callerInfoList = [];
 
                 //create script element
-                var linkProps = {};
+                var element = document.createElement(elementType);
+
                 if(type == "css") {
-                    linkProps.href = url;
-                    linkProps.rel = "stylesheet";
-                    linkProps.type = "text/css";
+                    element.href = url;
+                    element.rel = "stylesheet";
+                    element.type = "text/css";
                 }
                 else if(type == "script") {
-                    linkProps.src = url;
+                    element.src = url;
                 }
 
-                linkProps.onload = () => {
+                element.onload = () => {
                     elementEntry.callerInfoList.forEach(callerInfo => {if(callerInfo.onLoad) callerInfo.onLoad()});
                 }
-                linkProps.onerror = (error) => {
+                element.onerror = (error) => {
                     elementEntry.callerInfoList.forEach(callerInfo => {if(callerInfo.onError) callerInfo.onError(error)});
                 }
 
-                var element = apogeeui.createElement(elementType,linkProps);
                 elementEntry.element = element;
                 elementList[url] = elementEntry;
 

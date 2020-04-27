@@ -1,5 +1,5 @@
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import {apogeeui} from "/apogeeui/apogeeUiLib.js";
 
 /** JsDataDisplay
  * This is the data display for a custom control where the control is generated

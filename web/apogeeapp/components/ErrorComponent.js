@@ -1,5 +1,4 @@
 import Component from "/apogeeapp/component/Component.js";
-import ErrorDisplay from "/apogeeview/datadisplay/ErrorDisplay.js";
 
 /** This component represents a json table object. */
 export default class ErrorComponent extends Component {

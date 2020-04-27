@@ -1,5 +1,5 @@
 import {getIconOverlay} from "/apogeeview/componentdisplay/banner.js"; 
-import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
+import {TreeEntry} from "/apogeeui/apogeeUiLib.js";
 
 import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 

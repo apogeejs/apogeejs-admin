@@ -1,21 +1,27 @@
 import "/apogee/webGlobals.js";
-import { Apogee, initIncludePath } from "/apogeeapp/apogeeAppLib.js";
-import CutNPasteAppConfigManager from "./CutNPasteAppConfigManager.js";
+import { ApogeeView, initIncludePath } from "/apogeeview/apogeeViewLib.js";
+import CutNPasteAppConfigManager from "/applications/cutnpastewebapp/CutNPasteAppConfigManager.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 //expose these apogee libraries
 window.apogeeutil = apogeeutil;
 
+let appView;
+
 window.init = function() {
 
-    //initialize resource path (relative to base path in web page)
-    initIncludePath("");
+    //initialize the include paths separately
+    const includeBasePathStruct = {
+        "resources": "/",
+        "ace_includes": "/ext/ace/ace_1.4.3/"
+    };
+    initIncludePath(includeBasePathStruct);
     
     //use cutnpaste file access
-    var appConfigManager = new CutNPasteAppConfigManager();
+    let appConfigManager = new CutNPasteAppConfigManager();
     
     //create the application
-    Apogee.createApp("appContainer",appConfigManager);
+    appView = new ApogeeView("appContainer",appConfigManager);
 }
 
 function beforeUnloadHandler(e) {

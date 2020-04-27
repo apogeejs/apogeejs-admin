@@ -1,5 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
-import dialogMgr from "/apogeeui/window/dialogMgr.js";
+import {apogeeui,dialogMgr} from "/apogeeui/apogeeUiLib.js";
 
 /** This method shows a dialog to select from additional components. */
 export function showSelectComponentDialog(componentInfoList,onSelectFunction) {

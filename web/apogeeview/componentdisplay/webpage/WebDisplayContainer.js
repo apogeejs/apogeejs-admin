@@ -1,4 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
+import {apogeeui} from "/apogeeui/apogeeUiLib.js";
 import {getSaveBar} from "/apogeeview/componentdisplay/toolbar.js";
 
 /** This is a standin for the display conatiner for the literate page

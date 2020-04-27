@@ -6,13 +6,6 @@ import {exportWorkspace} from "/apogeeview/commandseq/exportworkspaceseq.js";
 import {openWorkspace} from "/apogeeview/commandseq/openworkspaceseq.js";
 import {saveWorkspace} from "/apogeeview/commandseq/saveworkspaceseq.js";
 
-import apogeeui from "/apogeeui/apogeeui.js";
-import TabFrame from "/apogeeui/tabframe/TabFrame.js";
-import Menu from "/apogeeui/menu/Menu.js";
-import SplitPane from "/apogeeui/splitpane/SplitPane.js";
-import TreeControl from "/apogeeui/treecontrol/TreeControl.js";
-import DisplayAndHeader from "/apogeeui/displayandheader/DisplayAndHeader.js";
-
 import WorkspaceView from "/apogeeview/WorkspaceView.js";
 
 import JsonTableComponentView from "/apogeeview/componentviews/JsonTableComponentView.js";
@@ -25,18 +18,27 @@ import CustomComponentView from "/apogeeview/componentviews/CustomComponentView.
 import CustomDataComponentView from "/apogeeview/componentviews/CustomDataComponentView.js";
 import ErrorComponentView from "/apogeeview/componentviews/ErrorComponentView.js";
 
-import "/apogeeui/configurablepanel/ConfigurablePanelInit.js";
-import Apogee from "/apogeeapp/Apogee.js";
+import {apogeeui,TabFrame,Menu,SplitPane,TreeControl,DisplayAndHeader} from "/apogeeui/apogeeUiLib.js";
+
+import { Apogee } from "/apogeeapp/apogeeAppLib.js";
 
 export default class ApogeeView {
 
+    /** This creates the app view, which in turn creates the contained app.
+     * - containerId - This is the DOM element ID in which the app view should be created. If this is set
+     * to null (or other false value) the UI will not be created.
+     * - appConfigManager - This is the app config managerm which defines some needed functionality. 
+     */
     constructor(containerId,appConfigManager) {
         this.treePane = null;
         this.tabFrame = null;
         this.workspaceView = null;
         this.containerId = containerId;
         this.app = new Apogee(appConfigManager);
-        this.loadUI(containerId);
+        
+        if(containerId) {
+            this.loadUI(containerId);
+        }
 
         //subscribe to events
         this.app.addListener("workspaceManager_created",workspaceManager => this.onWorkspaceCreated(workspaceManager));
@@ -85,9 +87,11 @@ export default class ApogeeView {
         //create the new workspace view
         this.workspaceView = new WorkspaceView(workspaceManager,this);
 
-        //load the tree entry
-        let treeEntry = this.workspaceView.getTreeEntry();
-        this.tree.setRootEntry(treeEntry);
+        //load the tree entry, if needed
+        if(this.containerId) {
+            let treeEntry = this.workspaceView.getTreeEntry();
+            this.tree.setRootEntry(treeEntry);
+        }
     }
 
     onWorkspaceClosed(workspaceManager) {
@@ -98,7 +102,9 @@ export default class ApogeeView {
         }
 
         //clear the tree
-        this.tree.clearRootEntry();
+        if(this.containerId) {
+            this.tree.clearRootEntry();
+        }
     }
 
     //=================================

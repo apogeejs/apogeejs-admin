@@ -1,5 +1,4 @@
 import FieldObject from "/apogeeutil/FieldObject.js";
-import {bannerConstants} from "/apogeeview/componentdisplay/banner.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 
 /** This class manages references for the web page.*/
@@ -25,7 +24,7 @@ export default class ReferenceEntry extends FieldObject {
             this.setField("url",referenceData.url);
 
             //we create in a pending state because the link is not loaded.
-            this.setField("state",bannerConstants.BANNER_TYPE_PENDING);
+            this.setField("state",apogeeutil.STATE_PENDING);
 
             let nickname = referenceData.nickname;
             if(!nickname) nickname = NO_NICKNAME_EMPTY_STRING; 
@@ -180,15 +179,15 @@ export default class ReferenceEntry extends FieldObject {
     //===================================
 
     setClearState() {
-        this.setState(bannerConstants.BANNER_TYPE_NONE);
+        this.setState(apogeeutil.STATE_NORMAL);
     }
 
     setError(errorMsg) {
-        this.setState(bannerConstants.BANNER_TYPE_ERROR,errorMsg);
+        this.setState(apogeeutil.STATE_ERROR,errorMsg);
     }
 
     setPendingState() {
-        this.setState(bannerConstants.BANNER_TYPE_PENDING,"loading");
+        this.setState(apogeeutil.STATE_PENDING,"loading");
     }
 
     setState(state,msg) {

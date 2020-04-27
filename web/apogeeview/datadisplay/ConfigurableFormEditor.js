@@ -1,8 +1,7 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
-import ConfigurablePanel from "/apogeeui/configurablepanel/ConfigurablePanel.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import {ConfigurablePanel} from "/apogeeui/apogeeUiLib.js";
 
 /** This is an editor that displays a customized form for data input. */
 export default class ConfigurableFormEditor extends DataDisplay {

@@ -1,9 +1,8 @@
-import apogeeui from "/apogeeui/apogeeui.js";
+import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 import {bannerConstants} from "/apogeeview/componentdisplay/banner.js";
 import {updateComponent} from "/apogeeview/commandseq/updatecomponentseq.js";
 import {deleteComponent} from "/apogeeview/commandseq/deletecomponentseq.js";
 import TreeComponentDisplay from "/apogeeview/componentdisplay/TreeComponentDisplay.js";
-import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js"; 
 
 /** This is the base functionality for a component. */
 export default class ComponentView {
@@ -21,7 +20,7 @@ export default class ComponentView {
         
         this.tabDisplay = null; //only valid on parents, which open into a tab
         
-        this.treeDisplay = this.createTreeDisplay(); //this is shown in the tree view
+        this.treeDisplay = null; //this is shown in the tree view
         this.treeState = null;
 
         this.component.setViewStateCallback(() => this.getViewState());
@@ -245,6 +244,9 @@ export default class ComponentView {
     // tree entry methods - this is the element in the tree view
     //-------------------
     getTreeEntry() {
+        if(!this.treeDisplay) {
+            this.treeDisplay = this.createTreeDisplay();
+        }
         return this.treeDisplay.getTreeEntry();
     }
 
@@ -306,12 +308,15 @@ export default class ComponentView {
     createTabDisplay(makeActive) {
         if((this.usesTabDisplay())&&(!this.tabDisplay)) {
             if(this.modelView) { 
-                this.tabDisplay = this.instantiateTabDisplay();
-
-                //add the tab display to the tab frame
-                var tab = this.tabDisplay.getTab();
                 var tabFrame = this.modelView.getTabFrame();
-                tabFrame.addTab(tab,makeActive);
+                if(tabFrame) {
+
+                    this.tabDisplay = this.instantiateTabDisplay();
+
+                    //add the tab display to the tab frame
+                    let tab = this.tabDisplay.getTab();
+                    tabFrame.addTab(tab,makeActive);
+                }
             }
         }
     }

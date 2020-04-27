@@ -1,5 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
-import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
+import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 import ReferenceListView from "/apogeeview/references/ReferenceListView.js";
 
 export default class ReferenceView {

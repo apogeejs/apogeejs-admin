@@ -5,6 +5,7 @@ import "/apogeeapp/commands/compoundcommand.js";
 import "/apogeeapp/commands/deletecomponent.js";
 import "/apogeeapp/commands/deletelink.js";
 import "/apogeeapp/commands/futuremodelactioncommand.js";
+import "/apogeeapp/commands/literatepagetransaction.js";
 import "/apogeeapp/commands/movecomponent.js";
 import "/apogeeapp/commands/openworkspace.js";
 import "/apogeeapp/commands/savemembercode.js";

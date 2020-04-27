@@ -213,6 +213,7 @@ function packageElectronSourceTask() {
                     "/apogeeutil/apogeeUtilLib.js": "./" + UTIL_LIB_CJS_FILE_NAME,
                     "/apogee/apogeeCoreLib.js": "./" + CORE_LIB_CJS_FILE_NAME,
                     "/apogeeapp/apogeeAppLib.js": "./" + APP_LIB_CJS_FILE_NAME
+                    "/apogeeview/apogeeViewLib.js": "./" + VIEW_LIB_CJS_FILE_NAME
                 }
             }
         );
@@ -321,6 +322,69 @@ function packageAppLibTask() {
                     paths: {
                         "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
                         "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.cjs.js"
+                    }
+                }
+            )
+        ])
+    });
+}
+
+//==============================
+// Package UI Lib
+//==============================
+
+const UI_LIB_BASE_FILE_NAME = "apogeeUiLib";
+const UI_LIB_ES_FILE_NAME = UI_LIB_BASE_FILE_NAME + ".es.js"
+const UI_LIB_CJS_FILE_NAME = UI_LIB_BASE_FILE_NAME + ".cjs.js"
+
+function packageAppLibTask() {
+    return rollup.rollup({
+        input: '../apogeeui/apogeeUiLib.js',
+        external: ["/apogeeutil/apogeeUtilLib.js"],
+		plugins: [
+			{resolveId}
+        ]
+    }).then(bundle => {
+        return Promise.all([
+            bundle.write(
+                { 
+                    file: ELECTRON_FOLDER + "/" + UI_LIB_CJS_FILE_NAME,
+                    format: 'cjs',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
+                    }
+                }
+            )
+        ])
+    });
+}
+
+//==============================
+// Package View Lib
+//==============================
+
+const VIEW_LIB_BASE_FILE_NAME = "apogeeAppLib";
+const VIEW_LIB_ES_FILE_NAME = VIEW_LIB_BASE_FILE_NAME + ".es.js"
+const VIEW_LIB_CJS_FILE_NAME = VIEW_LIB_BASE_FILE_NAME + ".cjs.js"
+
+function packageAppLibTask() {
+    return rollup.rollup({
+        input: '../apogeeview/apogeeViewLib.js',
+        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js","/apogeeui/apogeeUiLib.js"],
+		plugins: [
+			{resolveId}
+        ]
+    }).then(bundle => {
+        return Promise.all([
+            bundle.write(
+                { 
+                    file: ELECTRON_FOLDER + "/" + VIEW_LIB_CJS_FILE_NAME,
+                    format: 'cjs',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
+                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.cjs.js",
+                        "/apogeeapp/apogeeAppLib.js": "./apogeeAppLib.cjs.js",
+                        "/apogeeui/apogeeUiLib.js": "./apogeeUiLib.cjs.js"
                     }
                 }
             )

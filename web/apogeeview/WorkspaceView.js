@@ -1,5 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
-import TreeEntry from "/apogeeui/treecontrol/TreeEntry.js";
+import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 
 import {updateWorkspaceProperties} from "/apogeeview/commandseq/updateworkspaceseq.js";
 import ReferenceView from "/apogeeview/references/ReferenceView.js";

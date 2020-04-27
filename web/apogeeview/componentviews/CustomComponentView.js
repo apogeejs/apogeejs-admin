@@ -1,9 +1,8 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import {apogeeui} from "/apogeeui/apogeeUiLib.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will

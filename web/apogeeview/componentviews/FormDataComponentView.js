@@ -2,7 +2,7 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import UiCommandMessenger from "/apogeeapp/commands/UiCommandMessenger.js";
+import { UiCommandMessenger } from "/apogeeapp/apogeeAppLib.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form

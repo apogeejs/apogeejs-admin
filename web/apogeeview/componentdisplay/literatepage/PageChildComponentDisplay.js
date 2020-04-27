@@ -2,8 +2,7 @@ import {bannerConstants,getBanner,getIconOverlay} from "/apogeeview/componentdis
 
 import PageDisplayContainer from "/apogeeview/componentdisplay/literatepage/PageDisplayContainer.js";
 
-import apogeeui from "/apogeeui/apogeeui.js";
-import Menu from "/apogeeui/menu/Menu.js";
+import {apogeeui,Menu} from "/apogeeui/apogeeUiLib.js";
 
 /** This component represents a json table object. */
 export default class PageChildComponentDisplay {
