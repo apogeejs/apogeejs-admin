@@ -1,5 +1,3 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";

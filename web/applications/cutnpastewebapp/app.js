@@ -1,7 +1,6 @@
 import "/apogee/webGlobals.js";
 import { ApogeeView, initIncludePath } from "/apogeeview/apogeeViewLib.js";
 import CutNPasteAppConfigManager from "/applications/cutnpastewebapp/CutNPasteAppConfigManager.js";
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 //expose these apogee libraries
 window.apogeeutil = apogeeutil;

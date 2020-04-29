@@ -1,4 +1,3 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 
 import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatepage/proseMirrorSetup.js";
@@ -687,7 +686,7 @@ export default class ParentComponentView extends ComponentView {
     }
 
     
-    getComponentRange = function(editorData,componentShortName) {
+    getComponentRange(editorData,componentShortName) {
         let doc = editorData.doc;
         let schema = editorData.schema;
         let result = {};

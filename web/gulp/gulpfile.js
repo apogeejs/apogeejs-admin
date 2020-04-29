@@ -212,7 +212,7 @@ function packageElectronSourceTask() {
                     "/apogee/nodeGlobals.js": "./nodeGlobals.js",
                     "/apogeeutil/apogeeUtilLib.js": "./" + UTIL_LIB_CJS_FILE_NAME,
                     "/apogee/apogeeCoreLib.js": "./" + CORE_LIB_CJS_FILE_NAME,
-                    "/apogeeapp/apogeeAppLib.js": "./" + APP_LIB_CJS_FILE_NAME
+                    "/apogeeapp/apogeeAppLib.js": "./" + APP_LIB_CJS_FILE_NAME,
                     "/apogeeview/apogeeViewLib.js": "./" + VIEW_LIB_CJS_FILE_NAME
                 }
             }
@@ -303,8 +303,8 @@ function packageCoreLibTask() {
 //==============================
 
 const APP_LIB_BASE_FILE_NAME = "apogeeAppLib";
-const APP_LIB_ES_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".es.js"
-const APP_LIB_CJS_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".cjs.js"
+const APP_LIB_ES_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".es.js";
+const APP_LIB_CJS_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".cjs.js";
 
 function packageAppLibTask() {
     return rollup.rollup({
@@ -337,7 +337,7 @@ const UI_LIB_BASE_FILE_NAME = "apogeeUiLib";
 const UI_LIB_ES_FILE_NAME = UI_LIB_BASE_FILE_NAME + ".es.js"
 const UI_LIB_CJS_FILE_NAME = UI_LIB_BASE_FILE_NAME + ".cjs.js"
 
-function packageAppLibTask() {
+function packageUiLibTask() {
     return rollup.rollup({
         input: '../apogeeui/apogeeUiLib.js',
         external: ["/apogeeutil/apogeeUtilLib.js"],
@@ -351,7 +351,7 @@ function packageAppLibTask() {
                     file: ELECTRON_FOLDER + "/" + UI_LIB_CJS_FILE_NAME,
                     format: 'cjs',
                     paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
                     }
                 }
             )
@@ -363,11 +363,11 @@ function packageAppLibTask() {
 // Package View Lib
 //==============================
 
-const VIEW_LIB_BASE_FILE_NAME = "apogeeAppLib";
+const VIEW_LIB_BASE_FILE_NAME = "apogeeViewLib";
 const VIEW_LIB_ES_FILE_NAME = VIEW_LIB_BASE_FILE_NAME + ".es.js"
 const VIEW_LIB_CJS_FILE_NAME = VIEW_LIB_BASE_FILE_NAME + ".cjs.js"
 
-function packageAppLibTask() {
+function packageViewLibTask() {
     return rollup.rollup({
         input: '../apogeeview/apogeeViewLib.js',
         external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js","/apogeeui/apogeeUiLib.js"],
@@ -436,18 +436,20 @@ releaseElectronTask
 
 //This task executes the complete release
 exports.release = series(
-    cleanTask,
+    //cleanTask,
     parallel(
         copyReleaseInfoTask,
         packageCssTask,
         copyResourcesTask,
         copyAceIncludesTask,
         copyGlobalsFiles,
-        releaseWebAppTask,
-        releaseWebClientLibTask,
-        releaseElectronTask,
         packageUtilLibTask,
         packageCoreLibTask,
-        packageAppLibTask
+        packageAppLibTask,
+        packageUiLibTask,
+        packageViewLibTask,
+        releaseWebAppTask,
+        releaseWebClientLibTask,
+        releaseElectronTask
     )
 );

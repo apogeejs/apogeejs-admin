@@ -1,6 +1,6 @@
 import apogeeui from "/apogeeui/apogeeui.js";
 import Menu from "/apogeeui/menu/Menu.js";
-import {getIconOverlay} from "/apogeeview/componentdisplay/banner.js"; 
+import {getIconOverlay} from "/apogeeui/banner/banner.js"; 
 
 export default class TreeEntry {
 

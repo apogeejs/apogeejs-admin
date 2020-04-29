@@ -1,4 +1,3 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
 
 import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";

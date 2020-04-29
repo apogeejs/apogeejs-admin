@@ -1,4 +1,3 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import FieldObject from "/apogeeutil/FieldObject.js";
 
 /** This is the base functionality for a component. */

@@ -22,6 +22,7 @@ import {apogeeui,TabFrame,Menu,SplitPane,TreeControl,DisplayAndHeader} from "/ap
 
 import { Apogee } from "/apogeeapp/apogeeAppLib.js";
 
+
 export default class ApogeeView {
 
     /** This creates the app view, which in turn creates the contained app.

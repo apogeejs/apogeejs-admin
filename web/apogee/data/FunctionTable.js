@@ -1,5 +1,4 @@
 import base from "/apogeeutil/base.js";
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Model from "/apogee/data/Model.js";
 import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 

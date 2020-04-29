@@ -1,5 +1,3 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import {apogeeui} from "/apogeeui/apogeeUiLib.js";

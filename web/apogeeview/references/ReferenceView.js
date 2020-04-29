@@ -136,41 +136,6 @@ export default class ReferenceView {
         return new ReferenceListView(this.app,entryType,listDisplayInfo,viewState);
     }
 
-
-    
-    // /** This method determines the overall reference state from the state of each list. 
-    //  * @private */
-    // processReferenceState() {
-    //     //just check all entries for find state
-    //     var hasError = false;
-    //     var hasPending = false;
-        
-    //     for(var listType in this.referenceLists) {
-    //         var referenceList = this.referenceLists[listType];
-            
-    //         var listState = referenceList.getState();
-            
-    //         if(listState == bannerConstants.BANNER_TYPE_ERROR) hasError = true;
-    //         else if(listState == bannerConstants.BANNER_TYPE_PENDING) hasPending = true;
-    //     }
-            
-    //     var newState;
-    //     if(hasError) {
-    //         newState = bannerConstants.BANNER_TYPE_ERROR;
-    //     }
-    //     else if(hasPending) {
-    //         newState = bannerConstants.BANNER_TYPE_PENDING;
-    //     }
-    //     else {
-    //         newState = bannerConstants.BANNER_TYPE_NONE;
-    //     }
-        
-    //     if(this.state != newState) {
-    //         this.state = newState;
-    //         this.fieldUpdated("state");
-    //     }
-    // }
-
 }
 
 

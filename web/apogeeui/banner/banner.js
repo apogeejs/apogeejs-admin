@@ -1,5 +1,4 @@
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js"
+import apogeeui from "/apogeeui/apogeeui.js";
 
 /** This namespacve provides methods to create a status banner and icon overlay. */
 

@@ -1,4 +1,5 @@
-import Component from "/apogeeapp/component/Component.js";
+//import {Component} from "/apogeeapp/apogeeAppLib.js";
+import {Component} from "/lib/v0.9.1/assets/apogeeAppLib.js";
 
 /** This is a simple custom component example. */
 export default class ChartJSComponent extends Component {

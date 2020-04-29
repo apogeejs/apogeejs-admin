@@ -82,7 +82,7 @@ ButtonComponentView.componentName = "apogeeapp.app.ButtonComponent";
         this.button.innerHTML = "Click me!";
         this.button.onclick = () => this.buttonClicked();      
     
-        this.outputElement = apogeeui.createElement("div");
+        this.outputElement = document.createElement("div");
         this.outputElement.appendChild(document.createTextNode("For a good time press this button:"));
         this.outputElement.appendChild(document.createElement("br"));
         this.outputElement.appendChild(this.button);

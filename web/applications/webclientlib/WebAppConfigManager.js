@@ -1,5 +1,3 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-
 /** 
  * This is the format of the AppConfigManager. This class does not need
  * to be extended. It has not internal functionality.

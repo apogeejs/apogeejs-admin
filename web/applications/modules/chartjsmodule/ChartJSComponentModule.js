@@ -1,7 +1,9 @@
 import ChartJSComponent from "./ChartJSComponent.js";
 import ChartJSComponentView from "./ChartJSComponentView.js";
-import Apogee from "/apogeeapp/Apogee.js";
-import ApogeeView from "/apogeeview/ApogeeView.js";
+//import {Apogee} from "/apogeeapp/apogeeAppLib.js";
+//import {ApogeeView} from "/apogeeview/apogeeViewLib.js";
+import {Apogee} from "/lib/v0.9.1/assets/apogeeAppLib.js";
+import {ApogeeView} from "/lib/v0.9.1/assets/apogeeViewLib.js";
 
 //-------------------------------
 //register the button component

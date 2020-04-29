@@ -1,4 +1,3 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 
 //=====================================

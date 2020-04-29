@@ -1,5 +1,5 @@
 import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
-import {bannerConstants} from "/apogeeview/componentdisplay/banner.js";
+import {bannerConstants} from "/apogeeui/apogeeUiLib.js";
 import {updateComponent} from "/apogeeview/commandseq/updatecomponentseq.js";
 import {deleteComponent} from "/apogeeview/commandseq/deletecomponentseq.js";
 import TreeComponentDisplay from "/apogeeview/componentdisplay/TreeComponentDisplay.js";
