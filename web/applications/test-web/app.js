@@ -11,7 +11,7 @@ import CutNPasteAppConfigManager from "/applications/cutnpastewebapp/CutNPasteAp
 window.apogeeutil = apogeeutil;
 window.apogee = apogee;
 window.apogeeapp = apogeeapp;
-window.apogeeapp = apogeeapp;
+window.apogeeui = apogeeui;
 window.apogeeview = apogeeview;
 
 

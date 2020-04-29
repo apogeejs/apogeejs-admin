@@ -1,10 +1,6 @@
 import ReferenceEntry from "/apogeeapp/references/ReferenceEntry.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 
-import * as apogee from "/apogee/apogeeCoreLib.js";
-import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-
 /* 
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -20,7 +16,7 @@ export default class EsModuleEntry extends ReferenceEntry {
     implementationLoadEntry(onLoad,onError,workspaceManager) {
         let localOnLoad = (module) => {
             if(module) {
-                if(module.initApogeeModule) module.initApogeeModule(apogee,apogeeapp,apogeeutil);
+                if(module.initApogeeModule) module.initApogeeModule();
             
                 let commandData = {
                     type: "setEsModule",
@@ -46,7 +42,7 @@ export default class EsModuleEntry extends ReferenceEntry {
         //allow for an optional module remove step
         let module = this.getField("module");
         if(module) {
-            if(module.removeApogeeModule) module.removeApogeeModule(apogee,apogeeapp,apogeeutil);
+            if(module.removeApogeeModule) module.removeApogeeModule();
             this.clearField("module");
         }
         return true;

@@ -4,7 +4,6 @@ import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
 import WorkspaceManager from "/apogeeapp/WorkspaceManager.js";
-import "/apogeeapp/commandConfig.js";
 
 /** @private */
 let apogeeInstance = null;
