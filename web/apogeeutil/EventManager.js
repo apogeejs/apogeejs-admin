@@ -46,6 +46,11 @@ EventManager.removeListener = function(eventName, callback) {
 }
 
 /** THis method dispatches an event. */
+EventManager.hasListeners = function(eventName) {
+    return this.listenerTable[eventName] ? true : false;
+}
+
+/** THis method dispatches an event. */
 EventManager.dispatchEvent = function(eventName, eventData) {
     var callbackList = this.listenerTable[eventName];
     if(callbackList) {

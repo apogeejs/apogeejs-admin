@@ -14,17 +14,16 @@ window.apogeeapp = apogeeapp;
 window.apogeeui = apogeeui;
 window.apogeeview = apogeeview;
 
-
 let appView;
 
 window.init = function() {
 
     //initialize the include paths separately
-    const includeBasePathStruct = {
-        "resources": "/",
-        "ace_includes": "/ext/ace/ace_1.4.3/"
+    const includePathInfo = {
+        "resources": "/resources",
+        "aceIncludes": "/ext/ace/ace_1.4.3/ace_includes"
     };
-    initIncludePath(includeBasePathStruct);
+    initIncludePath(includePathInfo);
     
     //use cutnpaste file access
     let appConfigManager = new CutNPasteAppConfigManager();

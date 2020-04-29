@@ -3,9 +3,8 @@ import commonjs from 'rollup-plugin-commonjs';
 import pkg from './package.json';
 
 //test for absolute references-----------------------
-//let basedir = '/Dave/dev/github/hax_code/master/ApogeeJS/web/dev/rollup_test/rollup-starter-lib-master/src';
 let baseDir;
-const BUNDLE_PATH = "\\apogeeapp\\test-electron\\bundle";
+const BUNDLE_PATH = "\\applications\\test-electron\\bundle";
 console.log(BUNDLE_PATH.length);
 if(__dirname.endsWith(BUNDLE_PATH)) {
 	let baseLength = __dirname.length - BUNDLE_PATH.length;
