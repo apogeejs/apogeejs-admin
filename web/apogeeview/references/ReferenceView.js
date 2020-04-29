@@ -17,7 +17,7 @@ export default class ReferenceView {
 
         //initailize the child list views
         this.referenceListViews = {};
-        let referenceClassArray = this.app.getReferenceClassArray();
+        let referenceClassArray = referenceManager.constructor.getReferenceClassArray();
         referenceClassArray.forEach( referenceClass => {
             let entryType = referenceClass.REFERENCE_TYPE;
             let referenceListView = this._createReferenceListView(entryType,listViewStates[entryType]); 

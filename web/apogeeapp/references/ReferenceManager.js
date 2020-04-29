@@ -1,4 +1,4 @@
-import ReferenceEntry from "/apogeeapp/references/ReferenceEntry.js";
+
 import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
 
 /** This class manages links and other reference entries, loading the references and
@@ -14,7 +14,7 @@ export default class ReferenceManager extends FieldObject {
 
         this.app = app;
         
-        let referenceClassArray = this.app.getReferenceClassArray();
+        let referenceClassArray = ReferenceManager.getReferenceClassArray();
         this.referenceClassMap = {};
         referenceClassArray.forEach(referenceClass => {
             this.referenceClassMap[referenceClass.REFERENCE_TYPE] = referenceClass;
@@ -361,5 +361,14 @@ export default class ReferenceManager extends FieldObject {
         return entryType + "|"  + url;
     }
 
+    /** This method returns the reference entry type classes which will be used in the app. */
+    static getReferenceClassArray() {
+        return ReferenceManager.referenceClassArray;
+    }
+
+    /** This method sets the reference entry type classes. */
+    static setReferenceClassArray(referenceClassArray) {
+        ReferenceManager.referenceClassArray = referenceClassArray
+    }
     
 }

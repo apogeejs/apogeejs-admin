@@ -6,21 +6,6 @@ import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
 import WorkspaceManager from "/apogeeapp/WorkspaceManager.js";
 import "/apogeeapp/commandConfig.js";
 
-import JsonTableComponent from "/apogeeapp/components/JsonTableComponent.js";
-import FunctionComponent from "/apogeeapp/components/FunctionComponent.js";
-import FolderComponent from "/apogeeapp/components/FolderComponent.js";
-import FolderFunctionComponent from "/apogeeapp/components/FolderFunctionComponent.js";
-import DynamicForm from "/apogeeapp/components/DynamicForm.js";
-import FormDataComponent from "/apogeeapp/components/FormDataComponent.js";
-import CustomComponent from "/apogeeapp/components/CustomComponent.js";
-import CustomDataComponent from "/apogeeapp/components/CustomDataComponent.js";
-import ErrorComponent from "/apogeeapp/components/ErrorComponent.js";
-
-import EsModuleEntry from "/apogeeapp/references/EsModuleEntry.js";
-import NpmModuleEntry from "/apogeeapp/references/NpmModuleEntry.js";
-import JsScriptEntry from "/apogeeapp/references/JsScriptEntry.js";
-import CssEntry from "/apogeeapp/references/CssEntry.js";
-
 /** @private */
 let apogeeInstance = null;
 
@@ -95,6 +80,13 @@ export default class Apogee {
     /** This retrieves an existing instance. It does not create an instance. */
     static getInstance() {
         return apogeeInstance;
+    }
+
+    /** This function initializes the default classes for the application. */
+    static setBaseClassLists(standardComponents, additionalComponents, errorComponentClass) {
+        Apogee.standardComponents = standardComponents;
+        Apogee.additionalComponents = additionalComponents;
+        Apogee.errorComponentClass = errorComponentClass;
     }
 
     //==================================
@@ -323,19 +315,9 @@ export default class Apogee {
      * @private */
     loadComponentClasses() {
         //standard components
-        this.registerStandardComponent(JsonTableComponent);
-        this.registerStandardComponent(FolderComponent);
-        this.registerStandardComponent(FunctionComponent);
-        this.registerStandardComponent(FolderFunctionComponent);
-        this.registerStandardComponent(DynamicForm);
-        this.registerStandardComponent(FormDataComponent);
-        
-        //additional components
-        this.registerComponent(CustomComponent);
-        this.registerComponent(CustomDataComponent);
-
-        //load the error class, but not as either a standard or additional component
-        this.componentClasses[ErrorComponent.uniqueName] = ErrorComponent;
+        Apogee.standardComponents.forEach(componentClass => this.registerStandardComponent(componentClass));
+        Apogee.additionalComponents.forEach(componentClass => this.registerComponent(componentClass));
+        this.componentClasses[Apogee.errorComponentClass.uniqueName] = Apogee.errorComponentClass;
     }
 
     /** This method registers a component. 
@@ -353,17 +335,6 @@ export default class Apogee {
             this.standardComponents.push(name);
         }
     }
-
-    /** This method returns the reference entry type classes which will be used in the app. */
-    getReferenceClassArray() {
-        let referenceClassArray = [];
-        if(__APOGEE_ENVIRONMENT__ == "WEB") referenceClassArray.push(EsModuleEntry);
-        if(__APOGEE_ENVIRONMENT__ == "NODE") referenceClassArray.push(NpmModuleEntry);
-        referenceClassArray.push(JsScriptEntry);
-        referenceClassArray.push(CssEntry);
-        return referenceClassArray;
-    }
-
 }
 
 //add mixins to this class

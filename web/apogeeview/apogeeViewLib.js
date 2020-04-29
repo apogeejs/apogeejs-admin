@@ -20,6 +20,9 @@ export {default as HtmlJsDataDisplay} from "/apogeeview/datadisplay/HtmlJsDataDi
 
 export {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 
+//import the default component views
+import "/apogeeview/componentViewConfig.js";
+
 /** This function initializes the resources paths. Thuis covers the following paths
  * - "resources" folder - where the resource images are held
  * - "ace_includes" folder - where ace include files like themes are held

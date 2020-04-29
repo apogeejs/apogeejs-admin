@@ -8,16 +8,6 @@ import {saveWorkspace} from "/apogeeview/commandseq/saveworkspaceseq.js";
 
 import WorkspaceView from "/apogeeview/WorkspaceView.js";
 
-import JsonTableComponentView from "/apogeeview/componentviews/JsonTableComponentView.js";
-import FolderComponentView from "/apogeeview/componentviews/FolderComponentView.js";
-import FunctionComponentView from "/apogeeview/componentviews/FunctionComponentView.js";
-import FolderFunctionComponentView from "/apogeeview/componentviews/FolderFunctionComponentView.js";
-import DynamicFormView from "/apogeeview/componentviews/DynamicFormView.js";
-import FormDataComponentView from "/apogeeview/componentviews/FormDataComponentView.js";
-import CustomComponentView from "/apogeeview/componentviews/CustomComponentView.js";
-import CustomDataComponentView from "/apogeeview/componentviews/CustomDataComponentView.js";
-import ErrorComponentView from "/apogeeview/componentviews/ErrorComponentView.js";
-
 import {uiutil,TabFrame,Menu,SplitPane,TreeControl,DisplayAndHeader} from "/apogeeui/apogeeUiLib.js";
 
 import { Apogee } from "/apogeeapp/apogeeAppLib.js";
@@ -45,18 +35,6 @@ export default class ApogeeView {
         this.app.addListener("workspaceManager_created",workspaceManager => this.onWorkspaceCreated(workspaceManager));
         this.app.addListener("workspaceManager_deleted",workspaceManager => this.onWorkspaceClosed(workspaceManager));
         this.app.addListener("component_updated",component => this.onComponentUpdated(component));
-
-        //TEMPORARY COMPONENT VIEW REGISTRATION#################################
-        ApogeeView.registerComponentView(JsonTableComponentView);
-        ApogeeView.registerComponentView(FolderComponentView);
-        ApogeeView.registerComponentView(FunctionComponentView);
-        ApogeeView.registerComponentView(FolderFunctionComponentView);
-        ApogeeView.registerComponentView(ErrorComponentView);
-        ApogeeView.registerComponentView(DynamicFormView);
-        ApogeeView.registerComponentView(FormDataComponentView);
-        ApogeeView.registerComponentView(CustomComponentView);
-        ApogeeView.registerComponentView(CustomDataComponentView);
-        //######################################################################
     }
 
     getTreePane() {
