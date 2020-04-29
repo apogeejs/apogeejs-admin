@@ -1,6 +1,7 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 import Handsontable from "/ext/handsontable/handsontable_6.2.0/handsontable.full.min_to_es6.js";
 
 /** This is a grid editor using hands on table*/
@@ -12,7 +13,7 @@ export default class HandsonGridEditor extends DataDisplay {
         this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
         this.savedPixelHeight = DEFAULT_PIXEL_HEIGHT;
 
-        this.gridDiv = apogeeui.createElement("div",null,{
+        this.gridDiv = uiutil.createElement("div",null,{
             "width": "100%",
             "height":this.savedPixelHeight + "px",
             "overflow":"hidden",

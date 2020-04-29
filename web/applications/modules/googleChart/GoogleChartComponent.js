@@ -270,7 +270,7 @@ export function initApogeeModule(apogee,apogeeapp,apogeeutil) {
             this.member = member;
             //create a content element of variable size in the top left of the parent
             //the chart library will set the size to match the rendered chart
-            this.element = apogeeapp.apogeeui.createElement("div");
+            this.element = apogeeapp.uiutil.createElement("div");
             this.element.style =  {
                 position:"relative",
                 overflow:"auto"

@@ -1,4 +1,4 @@
-import FieldObject from "/apogeeutil/FieldObject.js";
+import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
 
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";

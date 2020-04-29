@@ -1,6 +1,7 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 
 /** Editor that uses the Ace text editor.
@@ -14,7 +15,7 @@ export default class AceTextEditor extends DataDisplay {
     constructor(displayContainer,dataSource,aceMode,options) {
         super(displayContainer,dataSource);
 
-        this.editorDiv = apogeeui.createElement("div");
+        this.editorDiv = uiutil.createElement("div");
 
         //========================
         //this is for consistency of lines to pixels

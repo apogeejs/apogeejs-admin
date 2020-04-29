@@ -18,7 +18,7 @@ import CustomComponentView from "/apogeeview/componentviews/CustomComponentView.
 import CustomDataComponentView from "/apogeeview/componentviews/CustomDataComponentView.js";
 import ErrorComponentView from "/apogeeview/componentviews/ErrorComponentView.js";
 
-import {apogeeui,TabFrame,Menu,SplitPane,TreeControl,DisplayAndHeader} from "/apogeeui/apogeeUiLib.js";
+import {uiutil,TabFrame,Menu,SplitPane,TreeControl,DisplayAndHeader} from "/apogeeui/apogeeUiLib.js";
 
 import { Apogee } from "/apogeeapp/apogeeAppLib.js";
 
@@ -116,7 +116,7 @@ export default class ApogeeView {
      * @private */
     loadUI(containerId) {
         
-        var windowElements = apogeeui.initWindows(containerId);
+        var windowElements = uiutil.initWindows(containerId);
         var topContainer = windowElements.baseElement;
         
         var mainContainer = new DisplayAndHeader(DisplayAndHeader.FIXED_PANE,
@@ -148,7 +148,7 @@ export default class ApogeeView {
 
         //tree view
         this.tree = new TreeControl();
-        apogeeui.removeAllChildren(this.treePane);
+        uiutil.removeAllChildren(this.treePane);
         this.treePane.appendChild(this.tree.getElement());
         
         //----------------------
@@ -158,8 +158,8 @@ export default class ApogeeView {
         this.splitPane.getRightPaneContainer().appendChild(this.tabFrame.getElement());
         
         //add listener for displaying the active tab
-        this.tabFrame.addListener(apogeeui.SHOWN_EVENT,tab => this.onTabShown(tab));
-        this.tabFrame.addListener(apogeeui.HIDDEN_EVENT,tab => this.onTabHidden(tab));
+        this.tabFrame.addListener(uiutil.SHOWN_EVENT,tab => this.onTabShown(tab));
+        this.tabFrame.addListener(uiutil.HIDDEN_EVENT,tab => this.onTabHidden(tab));
 
         //-----------------------
         // Create the width resize listener (for now I am putting it in app - refering to both panes)
@@ -258,9 +258,9 @@ export default class ApogeeView {
         var menus = {};
         
         //creat menu  bar with left elements (menus) and right elements (active tab display)
-        var menuBar = apogeeui.createElementWithClass("div","menu_bar");
-        var menuBarLeft = apogeeui.createElementWithClass("div","menu_bar_left",menuBar);
-        var menuBarRight = apogeeui.createElementWithClass("div","menu_bar_right",menuBar);
+        var menuBar = uiutil.createElementWithClass("div","menu_bar");
+        var menuBarLeft = uiutil.createElementWithClass("div","menu_bar_left",menuBar);
+        var menuBarRight = uiutil.createElementWithClass("div","menu_bar_right",menuBar);
 
         //Workspace menu
         name = "Workspace";
@@ -313,9 +313,9 @@ export default class ApogeeView {
         }
         
         //add the active tab display
-        this.activeTabIconDisplay = apogeeui.createElementWithClass("img","tab-icon-display",menuBarRight);
+        this.activeTabIconDisplay = uiutil.createElementWithClass("img","tab-icon-display",menuBarRight);
         this.activeTabIconDisplay.style.display = "none";
-        this.activeTabTitleDisplay = apogeeui.createElementWithClass("div","tab-title-display",menuBarRight);
+        this.activeTabTitleDisplay = uiutil.createElementWithClass("div","tab-title-display",menuBarRight);
         this.activeTabTitleDisplay.style.display = "none";
         return menuBar;
         

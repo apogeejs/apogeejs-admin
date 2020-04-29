@@ -1,6 +1,6 @@
 import ConfigurablePanelConstants from "/apogeeui/configurablepanel/ConfigurablePanelConstants.js";
 import ConfigurableElement from "/apogeeui/configurablepanel/ConfigurableElement.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This is an submit element configurable element.
  * 
@@ -32,7 +32,7 @@ export default class SubmitElement extends ConfigurableElement {
                 submitLabel = ConfigurablePanelConstants.DEFAULT_SUBMIT_LABEL;
             }
             
-            this.submitButton = apogeeui.createElement("button",{"className":"apogee_configurablePanelButton","innerHTML":submitLabel,"onclick":onSubmit});
+            this.submitButton = uiutil.createElement("button",{"className":"apogee_configurablePanelButton","innerHTML":submitLabel,"onclick":onSubmit});
             containerElement.appendChild(this.submitButton);
         }
         else {
@@ -54,7 +54,7 @@ export default class SubmitElement extends ConfigurableElement {
                 cancelLabel = ConfigurablePanelConstants.DEFAULT_CANCEL_LABEL;
             }
             
-            this.cancelButton = apogeeui.createElement("button",{"className":"apogee_configurablePanelButton","innerHTML":cancelLabel,"onclick":onCancel});
+            this.cancelButton = uiutil.createElement("button",{"className":"apogee_configurablePanelButton","innerHTML":cancelLabel,"onclick":onCancel});
             containerElement.appendChild(this.cancelButton);
         }
         else {

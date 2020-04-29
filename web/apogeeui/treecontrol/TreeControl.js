@@ -1,9 +1,9 @@
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 export default class TreeControl {
 
     constructor() {
-        this.list = apogeeui.createElementWithClass("ul","visiui-tc-child-list",this.element); 
+        this.list = uiutil.createElementWithClass("ul","visiui-tc-child-list",this.element); 
     }
 
     /** The outer DOM element */
@@ -17,7 +17,7 @@ export default class TreeControl {
     }
 
     clearRootEntry() {
-        apogeeui.removeAllChildren(this.list);
+        uiutil.removeAllChildren(this.list);
     }
 
 }

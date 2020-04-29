@@ -1,35 +1,37 @@
-import apogeeui from "/apogeeui/apogeeui.js";
-import EventManager from "/apogeeutil/EventManagerClass.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import uiutil from "/apogeeui/uiutil.js";
+import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
 
 /** This is a split pane, with a right and left pane. The types of pane are 
  * given by the constants defined below:
  * SplitPane.SCROLLING_PANE
  * SplitPane.FIXED_PANE
  */ 
-export default class SplitPane extends EventManager {
+export default class SplitPane {
 
     constructor(leftPaneType,rightPaneType) {
-        super();
+        //mixin initialization
+        this.eventManagerMixinInit();
 
         //-----------------
         // Create the DOM elements
         //-----------------
         
-        this.container1 = apogeeui.createElementWithClass("div","visiui-sp-parent");
-        var container2 = apogeeui.createElementWithClass("div","visiui-sp-parent2",this.container1);
-        var table = apogeeui.createElementWithClass("table","visiui-sp-table",container2);
+        this.container1 = uiutil.createElementWithClass("div","visiui-sp-parent");
+        var container2 = uiutil.createElementWithClass("div","visiui-sp-parent2",this.container1);
+        var table = uiutil.createElementWithClass("table","visiui-sp-table",container2);
         
-        var row = apogeeui.createElementWithClass("tr","visiui-sp-row",table);
+        var row = uiutil.createElementWithClass("tr","visiui-sp-row",table);
         
-        var leftCell = apogeeui.createElementWithClass("td","visiui-sp-left",row);
-        var divider = apogeeui.createElementWithClass("td","visiui-sp-divider",row);
-        var rightCell = apogeeui.createElementWithClass("td","visiui-sp-right",row);
+        var leftCell = uiutil.createElementWithClass("td","visiui-sp-left",row);
+        var divider = uiutil.createElementWithClass("td","visiui-sp-divider",row);
+        var rightCell = uiutil.createElementWithClass("td","visiui-sp-right",row);
 
-        var leftInnerPane = apogeeui.createElementWithClass("div","visiui-sp-inner",leftCell);
-        this.leftOuterPane = apogeeui.createElementWithClass("div",leftPaneType,leftInnerPane);
+        var leftInnerPane = uiutil.createElementWithClass("div","visiui-sp-inner",leftCell);
+        this.leftOuterPane = uiutil.createElementWithClass("div",leftPaneType,leftInnerPane);
         
-        var rightInnerPane = apogeeui.createElementWithClass("div","visiui-sp-inner",rightCell);
-        this.rightOuterPane = apogeeui.createElementWithClass("div",rightPaneType,rightInnerPane);
+        var rightInnerPane = uiutil.createElementWithClass("div","visiui-sp-inner",rightCell);
+        this.rightOuterPane = uiutil.createElementWithClass("div",rightPaneType,rightInnerPane);
 
         //-----------------
         // Create the mouse handler logic for resizing
@@ -98,6 +100,9 @@ export default class SplitPane extends EventManager {
     }
 
 }
+
+//add mixins to this class
+apogeeutil.mixin(SplitPane,EventManager);
 
 /** This is the pane type for a pane that scrolls in both X and Y, iv needed. */
 SplitPane.SCROLLING_PANE = "visiui-sp-scrolling";

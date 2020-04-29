@@ -1,4 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 import Menu from "/apogeeui/menu/Menu.js";
 import {getIconOverlay} from "/apogeeui/banner/banner.js"; 
 
@@ -6,10 +6,10 @@ export default class TreeEntry {
 
     constructor(labelText,iconSrc,dblClickCallback,menuItemCallback,isRoot) {
         
-        this.contractUrl = apogeeui.getResourcePath("/opened_bluish.png");
-        this.expandUrl = apogeeui.getResourcePath("/closed_bluish.png");
-        this.noControlUrl = apogeeui.getResourcePath("/circle_bluish.png");
-        this.emptyControlUrl = apogeeui.getResourcePath("/circle_bluish.png");
+        this.contractUrl = uiutil.getResourcePath("/opened_bluish.png");
+        this.expandUrl = uiutil.getResourcePath("/closed_bluish.png");
+        this.noControlUrl = uiutil.getResourcePath("/circle_bluish.png");
+        this.emptyControlUrl = uiutil.getResourcePath("/circle_bluish.png");
         
         this.isRoot = isRoot;
         
@@ -21,13 +21,13 @@ export default class TreeEntry {
             baseCssClass = "visiui-tc-child";
         }
         
-        this.element = apogeeui.createElementWithClass("li", baseCssClass);
-        this.control = apogeeui.createElementWithClass("img", "visiui-tc-control",this.element);
+        this.element = uiutil.createElementWithClass("li", baseCssClass);
+        this.control = uiutil.createElementWithClass("img", "visiui-tc-control",this.element);
         
 
         //icon/menu
         if(iconSrc) {
-            this.iconContainerElement = apogeeui.createElementWithClass("div", "visiui-tc-icon-container",this.element);
+            this.iconContainerElement = uiutil.createElementWithClass("div", "visiui-tc-icon-container",this.element);
             if(menuItemCallback) {
                 //icon as menu
                 this.menu = Menu.createMenuFromImage(iconSrc);
@@ -36,16 +36,16 @@ export default class TreeEntry {
             }
             else {
                 //plain icon
-                this.icon = apogeeui.createElementWithClass("img", "visiui-tc-icon",this.iconContainerElement);
+                this.icon = uiutil.createElementWithClass("img", "visiui-tc-icon",this.iconContainerElement);
                 this.icon.src = iconSrc; 
             }
-            this.iconOverlayElement = apogeeui.createElementWithClass("div","visiui_tc_icon_overlay",this.iconContainerElement);
+            this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_tc_icon_overlay",this.iconContainerElement);
         }
         
         
         
         //label
-        this.label = apogeeui.createElementWithClass("div", "visiui-tc-label",this.element);
+        this.label = uiutil.createElementWithClass("div", "visiui-tc-label",this.element);
         if(labelText) {
             this.setLabel(labelText);
         }
@@ -192,7 +192,7 @@ export default class TreeEntry {
     }
 
     clearIconOverlay() {
-        apogeeui.removeAllChildren(this.iconOverlayElement);
+        uiutil.removeAllChildren(this.iconOverlayElement);
     }
 
     setBannerState(bannerState) {
@@ -220,7 +220,7 @@ export default class TreeEntry {
     _insertChildIntoList(childEntry) {
         if(!this.childContainer) {
             //add the child list if it does not exist
-            this.childContainer = apogeeui.createElementWithClass("ul","visiui-tc-child-list",this.element); 
+            this.childContainer = uiutil.createElementWithClass("ul","visiui-tc-child-list",this.element); 
             this.setState(this.nonEmptyState);
         }
         
@@ -260,7 +260,7 @@ export default class TreeEntry {
     _updateChildElements() {
     var temp = this.childEntries.map( element => element);
     temp.sort(this.sortFunction);
-    apogeeui.removeAllChildren(this.childContainer);
+    uiutil.removeAllChildren(this.childContainer);
     temp.forEach(child => this.childContainer.appendChild(child.getElement()));
 
     }    

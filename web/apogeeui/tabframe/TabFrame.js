@@ -1,23 +1,24 @@
-import base from "/apogeeutil/base.js";
-import EventManager from "/apogeeutil/EventManagerClass.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This is a tab frame.
  * 
  * @class 
  */
-export default class TabFrame extends EventManager {
+export default class TabFrame {
 
     constructor() {
-        super();
+        //mixin initialization
+        this.eventManagerMixinInit();
         
         //variables
         this.tabTable = {};
         this.activeTab = null;
         
-        this.tabFrameControl = apogeeui.createElementWithClass("div","visiui-tf-frame");
-        this.tabBar = apogeeui.createElementWithClass("div","visiui-tf-tab-bar",this.tabFrameControl);
-        this.tabFrame = apogeeui.createElementWithClass("div","visiui-tf-tab-container",this.tabFrameControl);   	
+        this.tabFrameControl = uiutil.createElementWithClass("div","visiui-tf-frame");
+        this.tabBar = uiutil.createElementWithClass("div","visiui-tf-tab-bar",this.tabFrameControl);
+        this.tabFrame = uiutil.createElementWithClass("div","visiui-tf-tab-container",this.tabFrameControl);   	
     }
 
     /** This method returns the dom element for the control. */
@@ -80,7 +81,7 @@ export default class TabFrame extends EventManager {
             delete this.tabTable[id];
             
             if(this.activeTab == id) {
-                this.dispatchEvent(apogeeui.HIDDEN_EVENT,tab);
+                this.dispatchEvent(uiutil.HIDDEN_EVENT,tab);
                 this.activeTab = null;
                 //choose a random tab
                 for(var newId in this.tabTable) {
@@ -110,9 +111,9 @@ export default class TabFrame extends EventManager {
             this.tabFrame.appendChild(tab.getMainElement());
             this.updateTabDisplay();
             if(oldTab) {
-                this.dispatchEvent(apogeeui.HIDDEN_EVENT,oldTab);
+                this.dispatchEvent(uiutil.HIDDEN_EVENT,oldTab);
             }
-            this.dispatchEvent(apogeeui.SHOWN_EVENT,tab);
+            this.dispatchEvent(uiutil.SHOWN_EVENT,tab);
             
         }
     }
@@ -145,3 +146,5 @@ export default class TabFrame extends EventManager {
 
 }
 
+//add mixins to this class
+apogeeutil.mixin(TabFrame,EventManager);

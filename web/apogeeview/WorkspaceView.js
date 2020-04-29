@@ -1,4 +1,4 @@
-import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
+import {uiutil,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 
 import {updateWorkspaceProperties} from "/apogeeview/commandseq/updateworkspaceseq.js";
 import ReferenceView from "/apogeeview/references/ReferenceView.js";
@@ -115,7 +115,7 @@ export default class WorkspaceView {
         let modelManager = this.workspaceManager.getModelManager();
         let model = modelManager.getModel();
         var labelText = model ? model.getName() : Workspace_OPENING_NAME; //add the name
-        var iconUrl = apogeeui.getResourcePath(WorkspaceView.ICON_RES_PATH);
+        var iconUrl = uiutil.getResourcePath(WorkspaceView.ICON_RES_PATH);
         var menuItemCallback = () => this.getMenuItems();
         var isRoot = true;
         return new TreeEntry(labelText, iconUrl, null, menuItemCallback,isRoot);

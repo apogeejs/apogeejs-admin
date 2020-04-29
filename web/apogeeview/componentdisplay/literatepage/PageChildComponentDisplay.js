@@ -1,6 +1,6 @@
 import PageDisplayContainer from "/apogeeview/componentdisplay/literatepage/PageDisplayContainer.js";
 
-import {apogeeui,Menu,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
+import {uiutil,Menu,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
 
 /** This component represents a json table object. */
 export default class PageChildComponentDisplay {
@@ -21,15 +21,15 @@ export default class PageChildComponentDisplay {
         this.isPageShowing = false;
 
         //make the container
-        this.mainElement = apogeeui.createElementWithClass("div","visiui_pageChild_mainClass",null);
+        this.mainElement = uiutil.createElementWithClass("div","visiui_pageChild_mainClass",null);
     
         //this is the window in which the component is displayed
         if(componentView) this.loadComponentDisplay();
         
         //connect to parent
         this.setIsPageShowing(this.parentComponentDisplay.getIsShowing());
-        this.parentComponentDisplay.addListener(apogeeui.SHOWN_EVENT,() => this.setIsPageShowing(true));
-        this.parentComponentDisplay.addListener(apogeeui.HIDDEN_EVENT,() => this.setIsPageShowing(false));
+        this.parentComponentDisplay.addListener(uiutil.SHOWN_EVENT,() => this.setIsPageShowing(true));
+        this.parentComponentDisplay.addListener(uiutil.HIDDEN_EVENT,() => this.setIsPageShowing(false));
     }
 
     getElement() {
@@ -150,10 +150,10 @@ export default class PageChildComponentDisplay {
         this.addTitleBar();
         
         //add banner container
-        this.bannerContainer = apogeeui.createElementWithClass("div","visiui_pageChild_bannerContainerClass",this.mainElement);
+        this.bannerContainer = uiutil.createElementWithClass("div","visiui_pageChild_bannerContainerClass",this.mainElement);
         
         //add the view container
-        this.viewContainer = apogeeui.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
+        this.viewContainer = uiutil.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
         
         //add the view elements
         var settings = this.componentView.getTableEditSettings();
@@ -186,17 +186,17 @@ export default class PageChildComponentDisplay {
     /** This makes the title bar, and installs it inline */
     addTitleBar() {
         
-        this.titleBarContainer = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarClass",this.mainElement);
-        this.titleBarMenuElement = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarMenuClass",this.titleBarContainer);
-        this.titleBarNameElement = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarNameClass",this.titleBarContainer);
-        this.titleBarViewsElement = apogeeui.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
+        this.titleBarContainer = uiutil.createElementWithClass("div","visiui_pageChild_titleBarClass",this.mainElement);
+        this.titleBarMenuElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarMenuClass",this.titleBarContainer);
+        this.titleBarNameElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarNameClass",this.titleBarContainer);
+        this.titleBarViewsElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
         
         //------------------
         // menu
         //------------------
         
         var iconUrl = this.componentView.getIconUrl();
-        if(!iconUrl) iconUrl = apogeeui.getResourcePath(apogeeui.MENU_IMAGE);
+        if(!iconUrl) iconUrl = uiutil.getResourcePath(uiutil.MENU_IMAGE);
         
         this.menu = Menu.createMenuFromImage(iconUrl);
         var menuItemCallback = () => {
@@ -207,7 +207,7 @@ export default class PageChildComponentDisplay {
         this.titleBarMenuElement.appendChild(this.menu.getElement());
         
         //create the icon (menu) overlay
-        this.iconOverlayElement = apogeeui.createElementWithClass("div","visiui_pageChild_icon_overlay_style",this.titleBarMenuElement);
+        this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_pageChild_icon_overlay_style",this.titleBarMenuElement);
 
     }
 
@@ -244,7 +244,7 @@ export default class PageChildComponentDisplay {
 
     clearIconOverlay() {
         if(this.iconOverlayElement) {
-            apogeeui.removeAllChildren(this.iconOverlayElement);
+            uiutil.removeAllChildren(this.iconOverlayElement);
         }
     }
 
@@ -269,7 +269,7 @@ export default class PageChildComponentDisplay {
         else {
             bannerDiv = getBanner(bannerMessage,bannerState);
         }
-        apogeeui.removeAllChildren(this.bannerContainer);
+        uiutil.removeAllChildren(this.bannerContainer);
         if(bannerDiv) {
             this.bannerContainer.appendChild(bannerDiv);
         }

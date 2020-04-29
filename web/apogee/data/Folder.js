@@ -1,4 +1,4 @@
-import base from "/apogeeutil/base.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Model from "/apogee/data/Model.js";
 import DependentMember from "/apogee/datacomponents/DependentMember.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
@@ -183,8 +183,8 @@ export default class Folder extends DependentMember {
 }
 
 //add components to this class                     
-base.mixin(Folder,ContextHolder);
-base.mixin(Folder,Parent);
+apogeeutil.mixin(Folder,ContextHolder);
+apogeeutil.mixin(Folder,Parent);
 
 //============================
 // Static methods

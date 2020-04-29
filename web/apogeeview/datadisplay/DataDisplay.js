@@ -1,5 +1,3 @@
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js"
-
 /** This is the base class for data displays, which show individual edit/display fields for a component. For example, a standard JSON
  * data component has three data displays, for the component value, the function body and the supplemental code.
  * 

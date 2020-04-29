@@ -2,7 +2,7 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 /** This is a custom resource component. 
  * To implement it, the resource script must have the methods "run()" which will
@@ -18,7 +18,7 @@ export default class CustomComponentView extends ComponentView {
         //make this, I iwll put this here.
         let css = component.getField("css");
         if((css)&&(css != "")) {
-            apogeeui.setObjectCssData(component.getId(),css);
+            uiutil.setObjectCssData(component.getId(),css);
         }
         //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     };
@@ -29,7 +29,7 @@ export default class CustomComponentView extends ComponentView {
 
         //if this is the css field, set it immediately
         if(component.isFieldUpdated("css")) {
-            apogeeui.setObjectCssData(component.getId(),component.getField("css"));
+            uiutil.setObjectCssData(component.getId(),component.getField("css"));
         }
     }
 
@@ -40,7 +40,7 @@ export default class CustomComponentView extends ComponentView {
     /** This component extends the on delete method to get rid of any css data for this component. */
     onDelete() {
         //remove the css data for this component
-        apogeeui.setObjectCssData(this.component.getId(),"");
+        uiutil.setObjectCssData(this.component.getId(),"");
         
         super.onDelete();
     }

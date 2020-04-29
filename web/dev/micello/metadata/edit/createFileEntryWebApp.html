@@ -61,7 +61,7 @@
             
             'use strict'
 			function init() {
-                //apogeeui.initResourcePath("../../resources");
+                //uiutil.initResourcePath("../../resources");
                 
                 webAppAccess.initWebApp(workspaceUrl,onWorkspaceLoad);   
             }
@@ -112,7 +112,7 @@
                 
                 //put the display element in the parent
                 var element = displayFrame.getElement();
-                apogeeui.removeAllChildren(parentElement);
+                uiutil.removeAllChildren(parentElement);
                 parentElement.appendChild(element);
                 
                 //the display frame method "setIsShowing" must be called when

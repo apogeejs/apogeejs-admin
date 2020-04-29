@@ -1,6 +1,6 @@
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import { UiCommandMessenger } from "/apogeeapp/apogeeAppLib.js";
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from
@@ -45,7 +45,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         this.isLoaded = false;
         this.cachedData = undefined;
 
-        this.outputElement = apogeeui.createElement("div",null,{
+        this.outputElement = uiutil.createElement("div",null,{
             "position":"relative"
         });
 

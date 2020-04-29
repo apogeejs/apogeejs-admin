@@ -1,4 +1,5 @@
-import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import {uiutil,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 import {bannerConstants} from "/apogeeui/apogeeUiLib.js";
 import {updateComponent} from "/apogeeview/commandseq/updatecomponentseq.js";
 import {deleteComponent} from "/apogeeview/commandseq/deletecomponentseq.js";
@@ -119,7 +120,7 @@ export default class ComponentView {
         else {
             var resPath = this.constructor.ICON_RES_PATH;
             if(!resPath) resPath = ComponentView.DEFAULT_ICON_RES_PATH;
-            return apogeeui.getResourcePath(resPath);
+            return uiutil.getResourcePath(resPath);
         }
     }
 

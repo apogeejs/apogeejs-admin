@@ -1,5 +1,6 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ConfigurableElement from "/apogeeui/configurablepanel/ConfigurableElement.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This is an text field element configurable element.
  * 
@@ -27,11 +28,11 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         //check boxes
         this.checkboxList = [];
         var addCheckbox = checkboxInfo => {
-            var buttonContainer = apogeeui.createElement("div");
+            var buttonContainer = uiutil.createElement("div");
             buttonContainer.style.display = elementInitData.horizontal ? "inline-block" : "block";
             containerElement.appendChild(buttonContainer);
 
-            var checkbox = apogeeui.createElement("input");
+            var checkbox = uiutil.createElement("input");
             checkbox.type = "checkbox";
             
             var label;

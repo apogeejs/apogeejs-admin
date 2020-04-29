@@ -1,5 +1,5 @@
-//import { DataDisplay,ComponentView,ConfigurableFormEditor,AceTextEditor} from "/apogeeview/apogeeViewLib.js";
-import { DataDisplay,ComponentView,ConfigurableFormEditor,AceTextEditor} from "/lib/v0.9.1/assets/apogeeViewLib.js";
+//These are in lieue of the import statements
+let { DataDisplay,ComponentView,ConfigurableFormEditor,AceTextEditor} = apogeeview;
 
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods

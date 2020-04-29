@@ -1,5 +1,5 @@
-import base from "/apogeeutil/base.js";
-import FieldObject from "/apogeeutil/FieldObject.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
 
 /** This component encapsulates the member functionality for objects in the model.
  * 
@@ -421,7 +421,7 @@ export default class Member extends FieldObject {
 }
 
 //add mixins to this class
-base.mixin(Member,FieldObject);
+apogeeutil.mixin(Member,FieldObject);
 
 let UNKNOWN_ERROR_MSG_PREFIX = "Unknown error in member ";
 

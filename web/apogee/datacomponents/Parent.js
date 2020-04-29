@@ -1,5 +1,3 @@
-import ContextManager from "/apogee/lib/ContextManager.js";
-
 /** This component encapsulates an parent object that is a member and contains children members, creating  a 
  * hierarchical structure in the model. Each child has a name and this name
  * forms the index of the child into its parent. (I guess that means it doesn't
@@ -71,7 +69,7 @@ Parent.addChild = function(model,child) {
     let childIdMap = this.getField("childIdMap");
     if(childIdMap[name]) {
         //already exists! not fatal since it is not added to the model yet,
-        throw base.createError("There is already an object with the given name.",false);
+        throw new Error("There is already an object with the given name.");
     }
 
     //make a copy of the child map to modify

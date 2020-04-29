@@ -1,3 +1,4 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import {ConfigurablePanel} from "/apogeeui/apogeeUiLib.js";
 

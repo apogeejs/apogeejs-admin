@@ -1,4 +1,5 @@
-import {apogeeui,dialogMgr} from "/apogeeui/apogeeUiLib.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import {uiutil,dialogMgr} from "/apogeeui/apogeeUiLib.js";
 
 /** This method shows a configurable dialog. The layout object
  * defines the form content for the dialog. The on submit
@@ -47,7 +48,7 @@ export function showConfigurableDialog(layout,onSubmitFunction,optionalOnCancelF
     //this will be used if we want to set the initial focus
     var initialFocusElement;
 
-    var content = apogeeui.createElement("div",{"className":"dialogBody"});
+    var content = uiutil.createElement("div",{"className":"dialogBody"});
     for(var i = 0; i < layout.lines.length; i++) {
         var lineDef = layout.lines[i];
         
@@ -63,7 +64,7 @@ export function showConfigurableDialog(layout,onSubmitFunction,optionalOnCancelF
     }
     
     //show dialog
-    dialog.setContent(content,apogeeui.SIZE_WINDOW_TO_CONTENT);
+    dialog.setContent(content,uiutil.SIZE_WINDOW_TO_CONTENT);
     dialogMgr.showDialog(dialog);
     if(initialFocusElement) {
         initialFocusElement.focus();
@@ -94,8 +95,8 @@ let lineFunctions = {
     "title": function(lineDef,formActions) {
         var lineObject = {};
         //create the element
-        var line = apogeeui.createElement("div",{"className":"dialogLine"});
-        line.appendChild(apogeeui.createElement("div",{"className":"dialogTitle","innerHTML":lineDef.title}));
+        var line = uiutil.createElement("div",{"className":"dialogLine"});
+        line.appendChild(uiutil.createElement("div",{"className":"dialogTitle","innerHTML":lineDef.title}));
         lineObject.element = line;
         
         //no addToResult or onClose
@@ -111,11 +112,11 @@ let lineFunctions = {
     "dropdown": function(lineDef,formActions) {
         var lineObject = {};
         //create the element
-        var line = apogeeui.createElement("div",{"className":"dialogLine"});
+        var line = uiutil.createElement("div",{"className":"dialogLine"});
         if(lineDef.heading) {
             line.appendChild(document.createTextNode(lineDef.heading));
         }
-        var select = apogeeui.createElement("select");
+        var select = uiutil.createElement("select");
         lineObject.focusElement = select;
         for(var i = 0; i < lineDef.entries.length; i++) {
             var entry = lineDef.entries[i];
@@ -128,7 +129,7 @@ let lineFunctions = {
                 value = entry;
                 label = entry;   
             }
-            select.add(apogeeui.createElement("option",{"text":label, "value":value}));
+            select.add(uiutil.createElement("option",{"text":label, "value":value}));
         }
         if(lineDef.initial) {
             select.value = lineDef.initial;
@@ -154,11 +155,11 @@ let lineFunctions = {
     "inputElement": function(lineDef,formActions) {
         var lineObject = {};
         //create the element
-        var line = apogeeui.createElement("div",{"className":"dialogLine"});
+        var line = uiutil.createElement("div",{"className":"dialogLine"});
         if(lineDef.heading) {
             line.appendChild(document.createTextNode(lineDef.heading));
         }
-        var inputElement = apogeeui.createElement("input",{"type":"text"});
+        var inputElement = uiutil.createElement("input",{"type":"text"});
         lineObject.focusElement = inputElement;
         if(lineDef.initial) {
             inputElement.value = lineDef.initial;
@@ -189,11 +190,11 @@ let lineFunctions = {
     "checkbox": function(lineDef,formActions) {
         var lineObject = {};
         //create the element
-        var line = apogeeui.createElement("div",{"className":"dialogLine"});
+        var line = uiutil.createElement("div",{"className":"dialogLine"});
         if(lineDef.heading) {
             line.appendChild(document.createTextNode(lineDef.heading));
         }
-        var checkbox = apogeeui.createElement("input");
+        var checkbox = uiutil.createElement("input");
         checkbox.type = "checkbox";
         lineObject.focusElement = checkbox;
         if(lineDef.name) {
@@ -223,13 +224,13 @@ let lineFunctions = {
     "submit": function(lineDef,formActions) {
         var lineObject = {};
         //create the element
-        var line = apogeeui.createElement("div",{"className":"dialogLine"});
+        var line = uiutil.createElement("div",{"className":"dialogLine"});
         if(lineDef.submit) {  
-            line.appendChild(apogeeui.createElement("button",
+            line.appendChild(uiutil.createElement("button",
             {"className":"dialogButton","innerHTML":lineDef.submit,"onclick":formActions.onSubmit}));
         }
         if(lineDef.cancel) {
-            line.appendChild(apogeeui.createElement("button",
+            line.appendChild(uiutil.createElement("button",
             {"className":"dialogButton","innerHTML":lineDef.cancel,"onclick":formActions.onCancel}));
         }
         lineObject.element = line;

@@ -1,4 +1,5 @@
-import apogeeui from "/apogeeui/apogeeui.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This namespacve provides methods to create a status banner and icon overlay. */
 
@@ -53,7 +54,7 @@ export function getBanner(text,bannerState) {
     }
    
     //banner showing
-    var bannerDiv = apogeeui.createElement("div",null,
+    var bannerDiv = uiutil.createElement("div",null,
         {
             //"display":"block",
             //"position":"relative",
@@ -86,7 +87,7 @@ export function getIconOverlay(bannerState) {
     
     var iconOverlayElement = document.createElement("img");
     if(resource) {
-        var url = apogeeui.getResourcePath(resource);
+        var url = uiutil.getResourcePath(resource);
         iconOverlayElement.src = url;
     }
     return iconOverlayElement;

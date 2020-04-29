@@ -1,6 +1,7 @@
 import Apogee from "/apogeeapp/Apogee.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ElectronAppConfigManager from "/supplemental/electronCode/ElectronAppConfigManager.js";
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 
 //expose these apogee libraries
@@ -9,7 +10,7 @@ __globals__.apogeeutil = apogeeutil;
 export function appInit() {
 
     //initialize resource path
-    apogeeui.initResourcePath("../../resources");
+    uiutil.initResourcePath("../../resources");
 
     //any needs mode or theme files for the ace editor should go in the folder set below
     ace.config.set('basePath','../../ext/ace/ace_1.4.3/ace_includes');

@@ -1,5 +1,5 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-
 import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatepage/proseMirrorSetup.js";
 
 import { TextSelection, NodeSelection, EditorState, Selection } from "/prosemirror/lib/prosemirror-state/src/index.js";

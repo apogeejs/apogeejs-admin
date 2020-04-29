@@ -1,4 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 //---------------------------------
 // Link Element Management - This manages DOM elements for links

@@ -1,3 +1,4 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Member from "/apogee/datacomponents/Member.js";
 
 /** This mixin encapsulates an member whose value depends on on another

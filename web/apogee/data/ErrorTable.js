@@ -1,4 +1,4 @@
-import base from "/apogeeutil/base.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Model from "/apogee/data/Model.js";
 import Member from "/apogee/datacomponents/Member.js";
 
@@ -23,7 +23,7 @@ export default class ErrorTable extends Member {
     setData(data) {
         
         //make this object immutable
-        base.deepFreeze(data);
+        apogeeutil.deepFreeze(data);
 
         //store the new object
         return super.setData(data);

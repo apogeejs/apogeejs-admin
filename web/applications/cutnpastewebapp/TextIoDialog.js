@@ -1,5 +1,5 @@
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
-import { apogeeui, dialogMgr }  from "/apogeeui/apogeeUiLib.js";
+import {uiutil, dialogMgr}  from "/apogeeui/apogeeUiLib.js";
 
 /** This method shows a dialog that inputs or outputs a text area.
  * The onSubmitFunction should return true if the dialog should close and false if it should stay open. 
@@ -9,7 +9,7 @@ export function showTextIoDialog(options,onSubmitFunction) {
     var dialog = dialogMgr.createDialog({"minimizable":true,"maximizable":true,"movable":true});
             
     //add a scroll container
-    var contentContainer = apogeeui.createElement("div",null,
+    var contentContainer = uiutil.createElement("div",null,
         {
 			"display":"block",
             "position":"relative",
@@ -17,9 +17,9 @@ export function showTextIoDialog(options,onSubmitFunction) {
             "height":"100%",
             "overflow": "auto"
         });
-	dialog.setContent(contentContainer,apogeeui.SIZE_WINDOW_TO_CONTENT);
+	dialog.setContent(contentContainer,uiutil.SIZE_WINDOW_TO_CONTENT);
     
-	var content = apogeeui.createElement("div",null,
+	var content = uiutil.createElement("div",null,
 			{
 				"display":"table",
 				"overflow":"hidden"
@@ -30,23 +30,23 @@ export function showTextIoDialog(options,onSubmitFunction) {
     
     //title
     if(options.title) {
-        line = apogeeui.createElement("div",{"className":"dialogLine"});
-        line.appendChild(apogeeui.createElement("div",{"className":"dialogTitle"}));
+        line = uiutil.createElement("div",{"className":"dialogLine"});
+        line.appendChild(uiutil.createElement("div",{"className":"dialogTitle"}));
         line.innerHTML = options.title;
         content.appendChild(line);
     }
     
     //instructions
     if(options.instructions) {
-        line = apogeeui.createElement("div",{"className":"dialogLine"});
-        line.appendChild(apogeeui.createElement("div",/*{"className":"xxx"}*/));
+        line = uiutil.createElement("div",{"className":"dialogLine"});
+        line.appendChild(uiutil.createElement("div",/*{"className":"xxx"}*/));
         line.innerHTML = options.instructions;
         content.appendChild(line);
     }
     
     //text area
-    line = apogeeui.createElement("div",{"className":"dialogLine"});
-    var editorDiv = apogeeui.createElement("div",null,
+    line = uiutil.createElement("div",{"className":"dialogLine"});
+    var editorDiv = uiutil.createElement("div",null,
         {
             "position":"relative",
             "width":"500px",
@@ -56,7 +56,7 @@ export function showTextIoDialog(options,onSubmitFunction) {
     line.appendChild(editorDiv);
     content.appendChild(line);
         
-//    var jsLinksEditorDiv = apogeeui.createElement("div",null,{
+//    var jsLinksEditorDiv = uiutil.createElement("div",null,{
 //        "position":"absolute",
 //        "top":"0px",
 //        "bottom":"0px",
@@ -77,7 +77,7 @@ textEditor.$blockScrolling = Infinity;
     
     //save and cancel buttons
     //buttons and handler
-    line = apogeeui.createElement("div",{"className":"dialogLine"});
+    line = uiutil.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
         closeDialog();
     }
@@ -99,11 +99,11 @@ textEditor.$blockScrolling = Infinity;
     }
     
     var submitLabel = options.submitLabel ? options.submitLabel : "Submit";
-    line.appendChild(apogeeui.createElement("button",{"className":"dialogButton","innerHTML":submitLabel,"onclick":onSave}));
-    line.appendChild(apogeeui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
+    line.appendChild(uiutil.createElement("button",{"className":"dialogButton","innerHTML":submitLabel,"onclick":onSave}));
+    line.appendChild(uiutil.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
-    dialog.setContent(content,apogeeui.SIZE_WINDOW_TO_CONTENT);
+    dialog.setContent(content,uiutil.SIZE_WINDOW_TO_CONTENT);
     
     //show dialog
     dialogMgr.showDialog(dialog);

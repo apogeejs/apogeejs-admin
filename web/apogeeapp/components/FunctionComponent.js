@@ -1,3 +1,4 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Component from "/apogeeapp/component/Component.js";
 
 /** This component represents a table object. */

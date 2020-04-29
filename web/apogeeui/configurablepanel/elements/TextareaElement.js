@@ -1,5 +1,5 @@
 import ConfigurableElement from "/apogeeui/configurablepanel/ConfigurableElement.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This is an text field element configurable element.
  * 
@@ -23,7 +23,7 @@ export default class TextareaElement extends ConfigurableElement {
         }
         
         //text field
-        this.inputElement = apogeeui.createElement("textarea");
+        this.inputElement = uiutil.createElement("textarea");
         if(elementInitData.rows) {
             this.inputElement.rows = elementInitData.rows;
         }

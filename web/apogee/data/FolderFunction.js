@@ -1,4 +1,4 @@
-import base from "/apogeeutil/base.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {doAction} from "/apogee/actions/action.js";
 import Model from "/apogee/data/Model.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
@@ -371,8 +371,8 @@ export default class FolderFunction extends DependentMember {
 }
 
 //add components to this class
-base.mixin(FolderFunction,ContextHolder);
-base.mixin(FolderFunction,Parent);
+apogeeutil.mixin(FolderFunction,ContextHolder);
+apogeeutil.mixin(FolderFunction,Parent);
 
 FolderFunction.INTERNAL_FOLDER_NAME = "body";
 

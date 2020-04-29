@@ -1,5 +1,5 @@
 import {addLink} from "/apogeeview/commandseq/updatelinkseq.js";
-import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
+import {uiutil,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 
 import ReferenceEntryView from "/apogeeview/references/ReferenceEntryView.js";
 
@@ -54,7 +54,7 @@ export default class ReferenceListView {
     //===============================================
 
     _setTreeEntry(viewState) {
-        var iconUrl = apogeeui.getResourcePath(this.displayInfo.LIST_ICON_PATH);
+        var iconUrl = uiutil.getResourcePath(this.displayInfo.LIST_ICON_PATH);
         var menuItemCallback = () => this._getListMenuItems();
         this.treeEntry = new TreeEntry(this.displayInfo.LIST_NAME, iconUrl, null, menuItemCallback, false);
 

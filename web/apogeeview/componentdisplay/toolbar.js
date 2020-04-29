@@ -1,9 +1,9 @@
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 /** This namespace provides methods to create a standard save bar and other toolbars. */
 
 export function getSaveBar(onSave,onCancel) {
-    var saveDiv = apogeeui.createElement("div",null,
+    var saveDiv = uiutil.createElement("div",null,
         {
             //"display":"block",
             //"position":"relative",

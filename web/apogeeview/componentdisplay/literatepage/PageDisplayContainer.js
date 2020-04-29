@@ -1,6 +1,6 @@
 import {getSaveBar} from "/apogeeview/componentdisplay/toolbar.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 /** This is a standin for the display conatiner for the literate page
  * 
@@ -83,14 +83,14 @@ export default class PageDisplayContainer {
 
         if(!forceClose) {
             //make a close request
-            var requestResponse = this.callHandler(apogeeui.REQUEST_CLOSE,this);
-            if(requestResponse == apogeeui.DENY_CLOSE) {
+            var requestResponse = this.callHandler(uiutil.REQUEST_CLOSE,this);
+            if(requestResponse == uiutil.DENY_CLOSE) {
                 //do not close the window
                 return;
             }
         }
 
-        this.dispatchEvent(apogeeui.CLOSE_EVENT,this);
+        this.dispatchEvent(uiutil.CLOSE_EVENT,this);
     }
 
     getStateJson() {
@@ -142,21 +142,21 @@ export default class PageDisplayContainer {
     initUI() {
         
         //make the container
-        this.mainElement = apogeeui.createElementWithClass("div","visiui_displayContainer_mainClass",null);
+        this.mainElement = uiutil.createElementWithClass("div","visiui_displayContainer_mainClass",null);
 
         //make the selector for the view, in the component title bar
-        this.viewSelectorContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
+        this.viewSelectorContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
 
-        this.viewActiveElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewActiveElementClass",this.viewSelectorContainer);
-        this.viewNameElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewSelectorClass",this.viewSelectorContainer);
+        this.viewActiveElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewActiveElementClass",this.viewSelectorContainer);
+        this.viewNameElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorClass",this.viewSelectorContainer);
         
         this.viewNameElement.innerHTML = this.viewType;
 
-        this.expandImage = apogeeui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
-        this.expandImage.src = apogeeui.getResourcePath(PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
+        this.expandImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
+        this.expandImage.src = uiutil.getResourcePath(PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
     
-        this.contractImage = apogeeui.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
-        this.contractImage.src = apogeeui.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
+        this.contractImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
+        this.contractImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
 
         this.viewSelectorContainer.onclick = () => this.setIsViewActive(!this.isViewActive);
         
@@ -169,30 +169,30 @@ export default class PageDisplayContainer {
         if(!this.dataDisplay) return;
         
         //make the label for the view
-        this.viewLabelHeaderElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewLabelHeaderClass",this.mainElement);
+        this.viewLabelHeaderElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelHeaderClass",this.mainElement);
 
-        this.viewLabelElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
+        this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
         this.viewLabelElement.innerHTML = this.viewType;
 
-        this.viewToolbarElement = apogeeui.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.viewLabelHeaderElement);
+        this.viewToolbarElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.viewLabelHeaderElement);
 
         //add the view toolbar controls
         this.populateViewToolbar();
         
         //add the header elment (for the save bar)
-        this.headerContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
+        this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
         
         //add the view container
         let viewContainerClass = this.dataDisplay.getSupressContainerHorizontalScroll() ? 
             "visiui_displayContainer_viewContainerClass_noHScroll" : "visiui_displayContainer_viewContainerClass";
-        this.viewContainer = apogeeui.createElementWithClass("div",viewContainerClass,this.mainElement);
+        this.viewContainer = uiutil.createElementWithClass("div",viewContainerClass,this.mainElement);
 
         this.uiCompleted = true;
     }
 
     /** This undoes the data display specific parts of the container ui */
     uncompleteUI() {
-        apogeeui.removeAllChildren(this.mainElement);
+        uiutil.removeAllChildren(this.mainElement);
         this.heightUiActive = false;
         this.uiCompleted = false;
     }
@@ -214,13 +214,13 @@ export default class PageDisplayContainer {
     /** This method configures the toolbar for the view display. */
     populateViewToolbar() {
         if(this.dataDisplay.getUseContainerHeightUi()) {
-            this.showLessButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
             this.showLessButton.innerHTML = "less";
             this.showLessButton.onclick = () => this.showLess();
-            this.showMoreButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
             this.showMoreButton.innerHTML = "more";
             this.showMoreButton.onclick = () => this.showMore();
-            this.showMaxButton = apogeeui.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
             this.showMaxButton.innerHTML = "max";
             this.showMaxButton.onclick = () => this.showMax();
             this.heightUiActive = true;
@@ -464,7 +464,7 @@ export default class PageDisplayContainer {
     /** This sets the content for the window. If null (or otherwise false) is passed
      * the content will be set to empty.*/
     setHeaderContent(contentElement) {
-        apogeeui.removeAllChildren(this.headerContainer);
+        uiutil.removeAllChildren(this.headerContainer);
         if(contentElement) {
             this.headerContainer.appendChild(contentElement);
         }
@@ -473,7 +473,7 @@ export default class PageDisplayContainer {
     /** This sets the content for the window. */
     setContent(contentElement) {
         
-        apogeeui.removeAllChildren(this.viewContainer);
+        uiutil.removeAllChildren(this.viewContainer);
         
         //set the content
         this.viewContainer.appendChild(contentElement);

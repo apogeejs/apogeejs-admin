@@ -1,4 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This is is a layout element to fill a parent element with a header element and
  * a display element which takes all the remaning vertical space.
@@ -13,12 +13,12 @@ import apogeeui from "/apogeeui/apogeeui.js";
 export default class DisplayAndHeader {
 
     constructor(headerType,headerStyleClass,bodyType,bodyStyleClass) {
-    //    this.container = apogeeui.createElementWithClass("div","visiui-dnh-container");
+    //    this.container = uiutil.createElementWithClass("div","visiui-dnh-container");
     //    
-    //    this.headerOuter = apogeeui.createElementWithClass("div","visiui-dnh-header",this.container);
-    //    this.header = apogeeui.createElementWithClass("div","visiui-dnh-header-inner",this.headerOuter);
-    //    this.bodyOuter = apogeeui.createElementWithClass("div","visiui-dnh-body",this.container);
-    //    this.body = apogeeui.createElementWithClass("div","visiui-dnh-body-inner",this.bodyOuter);
+    //    this.headerOuter = uiutil.createElementWithClass("div","visiui-dnh-header",this.container);
+    //    this.header = uiutil.createElementWithClass("div","visiui-dnh-header-inner",this.headerOuter);
+    //    this.bodyOuter = uiutil.createElementWithClass("div","visiui-dnh-body",this.container);
+    //    this.body = uiutil.createElementWithClass("div","visiui-dnh-body-inner",this.bodyOuter);
     //    
     //    this.headerStyleClass = headerStyleClass;
     //    this.bodyStyleClass = bodyStyleClass;
@@ -28,12 +28,12 @@ export default class DisplayAndHeader {
     //    this.bodyContent = document.createElement("div");
     //    this.body.appendChild(this.bodyContent);
         
-        this.container = apogeeui.createElementWithClass("table","visiui-dnh-container");
+        this.container = uiutil.createElementWithClass("table","visiui-dnh-container");
         
-        this.headerOuter = apogeeui.createElementWithClass("tr","visiui-dnh-header",this.container);
-        this.header = apogeeui.createElementWithClass("td","visiui-dnh-header-inner",this.headerOuter);
-        this.bodyOuter = apogeeui.createElementWithClass("tr","visiui-dnh-body",this.container);
-        this.body = apogeeui.createElementWithClass("td","visiui-dnh-body-inner",this.bodyOuter);
+        this.headerOuter = uiutil.createElementWithClass("tr","visiui-dnh-header",this.container);
+        this.header = uiutil.createElementWithClass("td","visiui-dnh-header-inner",this.headerOuter);
+        this.bodyOuter = uiutil.createElementWithClass("tr","visiui-dnh-body",this.container);
+        this.body = uiutil.createElementWithClass("td","visiui-dnh-body-inner",this.bodyOuter);
         
         this.headerStyleClass = headerStyleClass;
         this.bodyStyleClass = bodyStyleClass;

@@ -1,3 +1,5 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+
 /** This method takes the varInfo table from the code analysis and returns
  * a lit of member objects which this member depends on.
  */

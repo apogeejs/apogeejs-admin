@@ -1,3 +1,4 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
 
 import {getPropertiesDialogLayout} from "/apogeeview/commandseq/updatecomponentseq.js";

@@ -74,7 +74,7 @@ define(['http://localhost:8383/lib/controls/simpleGeojsonControl/leaflet_1.0.1_A
                 super(viewMode,callbacks)
 
                 //create map element - this css class will fill the parent (the window frame) with no scrolling 
-                this.mapElement = apogeeui.createElement("div");
+                this.mapElement = uiutil.createElement("div");
                 this.mapElement.className = "visiui_win_container_fixed";
 
                 this.member = member;

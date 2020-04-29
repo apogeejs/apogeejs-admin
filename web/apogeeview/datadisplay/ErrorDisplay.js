@@ -1,5 +1,5 @@
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 /** JsDataDisplay
  * This is the data display for a custom control where the control is generated
@@ -23,7 +23,7 @@ export default class ErrorDisplay extends DataDisplay {
         super(displayContainer,dataSource);
         
         var msg = "ERROR - Component not loaded!";
-        var msgDiv = apogeeui.createElement("div");
+        var msgDiv = uiutil.createElement("div");
         msgDiv.style = "color:red; font-weight:bold";
         msgDiv.innerHTML = msg;
         

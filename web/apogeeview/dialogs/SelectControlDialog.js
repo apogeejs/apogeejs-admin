@@ -1,4 +1,4 @@
-import {apogeeui,dialogMgr} from "/apogeeui/apogeeUiLib.js";
+import {uiutil,dialogMgr} from "/apogeeui/apogeeUiLib.js";
 
 /** This method shows a dialog to select from additional components. */
 export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
@@ -6,7 +6,7 @@ export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
     var dialog = dialogMgr.createDialog({"movable":true});
     
     //add a scroll container
-    var contentContainer = apogeeui.createElement("div",null,
+    var contentContainer = uiutil.createElement("div",null,
         {
 			"display":"block",
             "position":"relative",
@@ -14,11 +14,11 @@ export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
             "height":"100%",
             "overflow": "auto"
         });
-	dialog.setContent(contentContainer,apogeeui.SIZE_WINDOW_TO_CONTENT);
+	dialog.setContent(contentContainer,uiutil.SIZE_WINDOW_TO_CONTENT);
     
     var line;
     
-	var content = apogeeui.createElement("div",null,
+	var content = uiutil.createElement("div",null,
 			{
 				"display":"table",
 				"overflow":"hidden"
@@ -28,22 +28,22 @@ export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
     var line;
   
     //title
-    line = apogeeui.createElement("div",{"className":"dialogLine"});
-    line.appendChild(apogeeui.createElement("div",{"className":"dialogTitle","innerHTML":"Select Component Type"}));
+    line = uiutil.createElement("div",{"className":"dialogLine"});
+    line.appendChild(uiutil.createElement("div",{"className":"dialogTitle","innerHTML":"Select Component Type"}));
     content.appendChild(line);
     
     //folder selection
-    line = apogeeui.createElement("div",{"className":"dialogLine"});
+    line = uiutil.createElement("div",{"className":"dialogLine"});
     line.appendChild(document.createTextNode("Component:"));
-    var select = apogeeui.createElement("select");
+    var select = uiutil.createElement("select");
     line.appendChild(select);
     componentInfoList.forEach( componentInfo => {
-		select.add(apogeeui.createElement("option",{"text":componentInfo.displayName,"value":componentInfo.uniqueName}));
+		select.add(uiutil.createElement("option",{"text":componentInfo.displayName,"value":componentInfo.uniqueName}));
     });
     content.appendChild(line);
     
     //buttons
-    line = apogeeui.createElement("div",{"className":"dialogLine"});
+    line = uiutil.createElement("div",{"className":"dialogLine"});
     var onCancel = function() {
         dialogMgr.closeDialog(dialog);
     }
@@ -53,11 +53,11 @@ export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
         onSelectFunction(componentClass);
         dialogMgr.closeDialog(dialog);
     }
-    line.appendChild(apogeeui.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));
-    line.appendChild(apogeeui.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
+    line.appendChild(uiutil.createElement("button",{"className":"dialogButton","innerHTML":"Create","onclick":onCreate}));
+    line.appendChild(uiutil.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
     content.appendChild(line);
     
-    dialog.setContent(content,apogeeui.SIZE_WINDOW_TO_CONTENT);  
+    dialog.setContent(content,uiutil.SIZE_WINDOW_TO_CONTENT);  
     
     //show dialog
     dialogMgr.showDialog(dialog);

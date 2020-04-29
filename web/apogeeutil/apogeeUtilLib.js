@@ -39,13 +39,35 @@ apogeeutil.createUniqueKey = function(targetType,targetId) {
  */
 apogeeutil.INVALID_VALUE = {"apogeeValue":"INVALID VALUE"};
 
+/**
+ * This is a special throwable that is used to exit a function when the function definition depends
+ * on another invalid value. I don't like to use exceptions for non-exceptional cases, which 
+ * I consider this to be, but I couldn't figure out how else to exit the function.  */
+apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE = {"apogeeException":"invalid"};
+
+/**
+ * This is a special throwable that is used to exit a function when the function definition depends
+ * on another pending value. I don't like to use exceptions for non-exceptional cases, which 
+ * I consider this to be, but I couldn't figure out how else to exit the function.  */
+apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE = {"apogeeException":"pending"};
+
 /** 
  * This function should be called from the body of a function table
  * to indicate the function will not return a valid value. (The actual invalid value
  * can not be returned since this typically will not have the desired effect.)
  */
 apogeeutil.invalidFunctionReturn = function() {
-    throw base.MEMBER_FUNCTION_INVALID_THROWABLE;
+    throw apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE;
+}
+
+/** This function reads any proeprty of the mixinObject and adds it
+ * fo the prototypr of the destObject. This is intended to apend functions and
+ * other properties to a cless directly without going through inheritance. 
+ * Note this will overwrite and similarly named object in the dest class.*/
+apogeeutil.mixin = function(destObject,mixinObject) {
+    for(var key in mixinObject) {
+        destObject.prototype[key] = mixinObject[key];
+    }
 }
 
 /** 
@@ -119,6 +141,30 @@ apogeeutil.jsonCopy = function(data) {
     if(data === null) return null;
     if(data === undefined) return undefined;
     return JSON.parse(JSON.stringify(data));
+}
+
+/** This method takes a field which can be an object, 
+ *array or other value. If it is an object or array it 
+ *freezes that object and all of its children, recursively.
+ * Warning - this does not check for cycles (which are not in JSON 
+ * objects but can be in javascript objects)
+ * Implementation from Mozilla */
+apogeeutil.deepFreeze = function(obj) {
+    if((obj === null)||(obj === undefined)) return;
+    
+    //retrieve the property names defined on obj
+    var propNames = Object.getOwnPropertyNames(obj);
+
+    //freeze properties before freezing self
+    propNames.forEach(function(name) {
+        var prop = obj[name];
+
+        //freeze prop if it is an object
+        if(typeof prop == 'object' && prop !== null) apogeeutil.deepFreeze(prop);
+    });
+
+    //freeze self (no-op if already frozen)
+    return Object.freeze(obj);
 }
 
 /** This method does format string functionality. Text should include

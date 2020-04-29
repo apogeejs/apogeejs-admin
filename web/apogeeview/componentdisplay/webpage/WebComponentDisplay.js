@@ -1,5 +1,5 @@
 import {bannerConstants,getBanner} from "/apogeeui/apogeeUiLib.js";
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 import WebDisplayContainer from "/apogeeview/componentdisplay/webpage/WebDisplayContainer.js";
 
 /** This is the component display for a web page.
@@ -56,7 +56,7 @@ export default class WebComponentDisplay {
         else {
             bannerDiv = getBanner(bannerMessage,bannerState);
         }
-        apogeeui.removeAllChildren(this.bannerContainer);
+        uiutil.removeAllChildren(this.bannerContainer);
         if(bannerDiv) {
             this.bannerContainer.appendChild(bannerDiv);
         }
@@ -140,13 +140,13 @@ export default class WebComponentDisplay {
     loadComponentDisplay() {
 
         //make the container
-        this.mainElement = apogeeui.createElementWithClass("div","visiui_pageChild_mainClass",null);
+        this.mainElement = uiutil.createElementWithClass("div","visiui_pageChild_mainClass",null);
         
         //add banner container
-        this.bannerContainer = apogeeui.createElementWithClass("div","visiui_pageChild_bannerContainerClass",this.mainElement);
+        this.bannerContainer = uiutil.createElementWithClass("div","visiui_pageChild_bannerContainerClass",this.mainElement);
         
         //add the view container
-        this.viewContainer = apogeeui.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
+        this.viewContainer = uiutil.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
         
         //create the view element
         this.displayContainer = new WebDisplayContainer(this.component, this.activeView);

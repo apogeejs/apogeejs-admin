@@ -1,4 +1,4 @@
-import base from "/apogeeutil/base.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Model from "/apogee/data/Model.js";
 import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 
@@ -40,10 +40,10 @@ export default class FunctionTable extends CodeableMember {
                     issue = new Error("Error in dependency: " + this.getName());
                 }
                 else if(state == apogeeutil.STATE_PENDING) {
-                    issue = base.MEMBER_FUNCTION_PENDING_THROWABLE;
+                    issue = apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE;
                 }
                 else if(state == apogeeutil.STATE_INVALID) {
-                    issue = base.MEMBER_FUNCTION_INVALID_THROWABLE;
+                    issue = apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE;
                 }
                 else {
                     issue = new Error("Unknown problem in initializing: " + this.getName());
@@ -73,13 +73,13 @@ export default class FunctionTable extends CodeableMember {
             catch(error) {
                 //handle potential error cases!!!:
                 
-                if(error == base.MEMBER_FUNCTION_INVALID_THROWABLE) {
+                if(error == apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE) {
                     //This is not an error. I don't like to throw an error
                     //for an expected condition, but I didn't know how else
                     //to do this. See notes where this is thrown.
                     this.setResultInvalid();
                 }
-                else if(error == base.MEMBER_FUNCTION_PENDING_THROWABLE) {
+                else if(error == apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE) {
                     //This is not an error. I don't like to throw an error
                     //for an expected condition, but I didn't know how else
                     //to do this. See notes where this is thrown.

@@ -1,4 +1,4 @@
-import base from "/apogeeutil/base.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Messenger from "/apogee/actions/Messenger.js";
 import {processCode} from "/apogee/lib/codeCompiler.js"; 
 import {getDependencyInfo} from "/apogee/lib/codeDependencies.js";
@@ -179,13 +179,13 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
         }
         catch(error) {
             
-            if(error == base.MEMBER_FUNCTION_INVALID_THROWABLE) {
+            if(error == apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE) {
                 //This is not an error. I don't like to throw an error
                 //for an expected condition, but I didn't know how else
                 //to do this. See notes where this is thrown.
                 this.setResultInvalid();
             }
-            else if(error == base.MEMBER_FUNCTION_PENDING_THROWABLE) {
+            else if(error == apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE) {
                 //This is not an error. I don't like to throw an error
                 //for an expected condition, but I didn't know how else
                 //to do this. See notes where this is thrown.
@@ -325,4 +325,4 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
 }
 
 //add components to this class
-base.mixin(CodeableMember,ContextHolder);
+apogeeutil.mixin(CodeableMember,ContextHolder);

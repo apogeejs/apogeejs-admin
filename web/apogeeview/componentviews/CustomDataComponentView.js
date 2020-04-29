@@ -4,7 +4,7 @@ import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import { UiCommandMessenger } from "/apogeeapp/apogeeAppLib.js";
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 /** This attempt has a single form edit page which returns an object. */
 // To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
@@ -25,7 +25,7 @@ export default class CustomDataComponentView extends ComponentView {
         //make this, I iwll put this here.
         let css = component.getField("css");
         if((css)&&(css != "")) {
-            apogeeui.setObjectCssData(component.getId(),css);
+            uiutil.setObjectCssData(component.getId(),css);
         }
         //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     };
@@ -36,7 +36,7 @@ export default class CustomDataComponentView extends ComponentView {
 
         //if this is the css field, set it immediately
         if(component.isFieldUpdated("css")) {
-            apogeeui.setObjectCssData(component.getId(),component.getField("css"));
+            uiutil.setObjectCssData(component.getId(),component.getField("css"));
         }
     }
 
@@ -47,7 +47,7 @@ export default class CustomDataComponentView extends ComponentView {
     /** This component extends the on delete method to get rid of any css data for this component. */
     onDelete() {
         //remove the css data for this component
-        apogeeui.setObjectCssData(this.component.getId(),"");
+        uiutil.setObjectCssData(this.component.getId(),"");
         
         super.onDelete();
     }

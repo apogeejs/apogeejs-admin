@@ -1,6 +1,5 @@
-import base from "/apogeeutil/base.js";
-import FieldObject from "/apogeeutil/FieldObject.js";
-import EventManager from "/apogeeutil/EventManager.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import {EventManager,FieldObject} from "/apogeeutil/apogeeBaseLib.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import Parent from "/apogee/datacomponents/Parent.js";
@@ -514,9 +513,9 @@ export default class Model extends FieldObject {
 }
 
 //add mixins to this class
-base.mixin(Model,EventManager);
-base.mixin(Model,ContextHolder);
-base.mixin(Model,Parent);
+apogeeutil.mixin(Model,EventManager);
+apogeeutil.mixin(Model,ContextHolder);
+apogeeutil.mixin(Model,Parent);
 
 let memberGenerators = {};
 

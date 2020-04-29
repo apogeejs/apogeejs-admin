@@ -1,4 +1,4 @@
-import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
+import {uiutil,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 
 import ApogeeView from "/apogeeview/ApogeeView.js"
@@ -214,7 +214,7 @@ export default class ModelView {
             return menuItemList;
         }
 
-        var iconUrl = apogeeui.getResourcePath(ICON_RES_PATH);
+        var iconUrl = uiutil.getResourcePath(ICON_RES_PATH);
         var isRoot = true;
         return new TreeEntry(MODEL_FOLDER_LABEL, iconUrl, null, menuItemCallback, isRoot);
     }

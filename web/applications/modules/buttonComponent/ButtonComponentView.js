@@ -1,6 +1,5 @@
 import BasicComponentView from "/apogeeview/componentviews/BasicComponentView.js";
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
-import apogeeui from "/apogeeui/apogeeui.js";
 
 
 /** This is the component view implementation for the ButtonComponent. */

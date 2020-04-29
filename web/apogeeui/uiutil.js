@@ -1,17 +1,15 @@
-import base from "/apogeeutil/base.js";
-
 /** This is the main apogeeapp ui file */
-let apogeeui = {};
-export {apogeeui as default};
+let uiutil = {};
+export {uiutil as default};
 
 /** This should be called to initializethe resource path. */
-apogeeui.initResourcePath = function(resourceDirectory) {
-    apogeeui.RESOURCE_DIR = resourceDirectory;
+uiutil.initResourcePath = function(resourceDirectory) {
+    uiutil.RESOURCE_DIR = resourceDirectory;
 }
 
 /** This retreives the resoruce path for a resource. */
-apogeeui.getResourcePath = function(relativePath) {
-    return apogeeui.RESOURCE_DIR + relativePath;
+uiutil.getResourcePath = function(relativePath) {
+    return uiutil.RESOURCE_DIR + relativePath;
 }
 
 //I put some utilities in here. I shoudl figure out a better place to put this.
@@ -19,20 +17,20 @@ apogeeui.getResourcePath = function(relativePath) {
 //=====================================
 // ZIndex Constants
 //=====================================
-apogeeui.MENU_ZINDEX = 100;
-apogeeui.WINDOW_FRAME_ZINIDEX = 10;
-apogeeui.DIALOG_ZINDEX = 200;
+uiutil.MENU_ZINDEX = 100;
+uiutil.WINDOW_FRAME_ZINIDEX = 10;
+uiutil.DIALOG_ZINDEX = 200;
 
 //======================================
 // ID Generator
 //======================================
 
-apogeeui.idIndex = 0;
-apogeeui.idBase = "_visiui_id_";
+uiutil.idIndex = 0;
+uiutil.idBase = "_visiui_id_";
 
 /** This method generates a generic id for dom elements. */
-apogeeui.createId = function() {
-    return apogeeui.idBase + apogeeui.idIndex++;
+uiutil.createId = function() {
+    return uiutil.idBase + uiutil.idIndex++;
 }
 
 //=========================================
@@ -40,7 +38,7 @@ apogeeui.createId = function() {
 //=========================================
 
 /** This method applies the style json to the dom element. */
-apogeeui.applyStyle = function(element,style) {
+uiutil.applyStyle = function(element,style) {
     for(var key in style) {
         element.style[key] = style[key];
     }
@@ -50,11 +48,11 @@ apogeeui.applyStyle = function(element,style) {
 // resources
 //=========================================
 
-apogeeui.MINIMIZE_CMD_IMAGE = "/minimize.png";
-apogeeui.RESTORE_CMD_IMAGE = "/restore.png";
-apogeeui.MAXIMIZE_CMD_IMAGE = "/maximize.png";
-apogeeui.CLOSE_CMD_IMAGE = "/close_gray.png";
-apogeeui.MENU_IMAGE = "/hamburger.png";
+uiutil.MINIMIZE_CMD_IMAGE = "/minimize.png";
+uiutil.RESTORE_CMD_IMAGE = "/restore.png";
+uiutil.MAXIMIZE_CMD_IMAGE = "/maximize.png";
+uiutil.CLOSE_CMD_IMAGE = "/close_gray.png";
+uiutil.MENU_IMAGE = "/hamburger.png";
 
 //=========================================
 // dom methods
@@ -62,7 +60,7 @@ apogeeui.MENU_IMAGE = "/hamburger.png";
 
 
 /** This method removes all the content from a DOM element. */
-apogeeui.removeAllChildren = function(element) {
+uiutil.removeAllChildren = function(element) {
 	while(element.lastChild) {
 		element.removeChild(element.lastChild);
 	}
@@ -75,7 +73,7 @@ apogeeui.removeAllChildren = function(element) {
  * properties are javascript properties, 
  * styleProperties are the style properties
  * */
-apogeeui.createElement = function(type,properties,styleProperties) {
+uiutil.createElement = function(type,properties,styleProperties) {
     var element = document.createElement(type);
     if(properties) {
         for(var key in properties) {
@@ -83,14 +81,14 @@ apogeeui.createElement = function(type,properties,styleProperties) {
         }
     }
     if(styleProperties) {
-        apogeeui.applyStyle(element,styleProperties);
+        uiutil.applyStyle(element,styleProperties);
     }
     return element;
 }
 
 /** This method creates a DOM element of the given type, sets the class name
  * and, if present, adds it to the given parent. */
-apogeeui.createElementWithClass = function(elementType,className,parent) {
+uiutil.createElementWithClass = function(elementType,className,parent) {
     var element = document.createElement(elementType);
     element.className = className;
     if(parent) parent.appendChild(element);
@@ -101,9 +99,9 @@ apogeeui.createElementWithClass = function(elementType,className,parent) {
 // window and dialog methods
 //=========================================
 
-apogeeui.dialogLayer = null;
+uiutil.dialogLayer = null;
 
-apogeeui.BASE_ELEMENT_STYLE = {
+uiutil.BASE_ELEMENT_STYLE = {
     "position":"absolute",
     "left":"0px",
     "right":"0px",
@@ -112,7 +110,7 @@ apogeeui.BASE_ELEMENT_STYLE = {
     "zIndex":1
 }
 
-apogeeui.DIALOG_LAYER_STYLE = {
+uiutil.DIALOG_LAYER_STYLE = {
     "position":"absolute",
     "left":"0px",
     "right":"0px",
@@ -122,7 +120,7 @@ apogeeui.DIALOG_LAYER_STYLE = {
     "pointerEvents": "none"
 }
 
-apogeeui.DIALOG_SHIELD_STYLE = {
+uiutil.DIALOG_SHIELD_STYLE = {
     "position":"absolute",
     "left":"0px",
     "right":"0px",
@@ -131,47 +129,47 @@ apogeeui.DIALOG_SHIELD_STYLE = {
     "pointerEvents": "auto"
 }
     
-apogeeui.initWindows = function(appElementId) {
+uiutil.initWindows = function(appElementId) {
     //create the ui elements from the app element
     var appContainer = document.getElementById(appElementId);
     if(!appContainer) {
-        throw base.createError("Container ID not found: " + appElementId);
+        throw new Error("Container ID not found: " + appElementId);
     }
     
     var elements = {};
-    elements.baseElement = apogeeui.createElement("div",null,apogeeui.BASE_ELEMENT_STYLE); 
-    elements.dialogLayer = apogeeui.createElement("div",null,apogeeui.DIALOG_LAYER_STYLE);
+    elements.baseElement = uiutil.createElement("div",null,uiutil.BASE_ELEMENT_STYLE); 
+    elements.dialogLayer = uiutil.createElement("div",null,uiutil.DIALOG_LAYER_STYLE);
     
     appContainer.appendChild(elements.baseElement);
     appContainer.appendChild(elements.dialogLayer);
     
-    apogeeui.dialogLayer = elements.dialogLayer;
+    uiutil.dialogLayer = elements.dialogLayer;
     
     return elements;
 }
 
-apogeeui.WINDOW_STATE_MINIMIZED = -1;
-apogeeui.WINDOW_STATE_NORMAL = 0;
-apogeeui.WINDOW_STATE_MAXIMIZED = 1;
+uiutil.WINDOW_STATE_MINIMIZED = -1;
+uiutil.WINDOW_STATE_NORMAL = 0;
+uiutil.WINDOW_STATE_MAXIMIZED = 1;
 
 //refers to minimized, restored or maximized
-apogeeui.WINDOW_STATE_CHANGED = "window state change";
+uiutil.WINDOW_STATE_CHANGED = "window state change";
 
-apogeeui.MINIMIZABLE = 0x01;
-apogeeui.MAXIMIZABLE = 0x02;
-apogeeui.CLOSEABLE = 0x04;
+uiutil.MINIMIZABLE = 0x01;
+uiutil.MAXIMIZABLE = 0x02;
+uiutil.CLOSEABLE = 0x04;
 
 /** This is a handler name used to request closing the window, tab or other UI element. */
-apogeeui.REQUEST_CLOSE = "request_close";
-apogeeui.DENY_CLOSE = -1;
+uiutil.REQUEST_CLOSE = "request_close";
+uiutil.DENY_CLOSE = -1;
 
-apogeeui.CLOSE_EVENT = "closed";
-apogeeui.RESIZED_EVENT = "resized";
-apogeeui.SHOWN_EVENT = "shown";
-apogeeui.HIDDEN_EVENT = "hidden";
+uiutil.CLOSE_EVENT = "closed";
+uiutil.RESIZED_EVENT = "resized";
+uiutil.SHOWN_EVENT = "shown";
+uiutil.HIDDEN_EVENT = "hidden";
 
 /** This function adds CSS data for a given member id. */
-apogeeui.setObjectCssData = function(objectId,cssText) {
+uiutil.setObjectCssData = function(objectId,cssText) {
     var cssElementId = "css_" + objectId;
     
     var cssElement = document.getElementById(cssElementId);
@@ -196,17 +194,17 @@ apogeeui.setObjectCssData = function(objectId,cssText) {
 //resizable it can be fitted to the window size. If it is fixed size it can be 
 //added to a scrolling window or used to set the container size
 //======================================
-apogeeui.RESIZABLE = 0x01;
-apogeeui.FIXED_SIZE = 0x02;
+uiutil.RESIZABLE = 0x01;
+uiutil.FIXED_SIZE = 0x02;
 
-apogeeui.SCROLL_NONE = 0x00;
-apogeeui.SCROLL_VERTICAL = 0x01;
-apogeeui.SCROLL_HORIZONTAL = 0x02;
-apogeeui.SCROLL_BOTH = 0x03;
+uiutil.SCROLL_NONE = 0x00;
+uiutil.SCROLL_VERTICAL = 0x01;
+uiutil.SCROLL_HORIZONTAL = 0x02;
+uiutil.SCROLL_BOTH = 0x03;
 
 
 //this is not an actual content type, but an option for displaying FIXED_SIZE content
-apogeeui.SIZE_WINDOW_TO_CONTENT = 0x03;
+uiutil.SIZE_WINDOW_TO_CONTENT = 0x03;
 
 
 

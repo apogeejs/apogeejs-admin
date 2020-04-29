@@ -1,4 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 import WindowFrame from "/apogeeui/window/WindowFrame.js";
 import WindowParent from "/apogeeui/window/WindowParent.js";
 
@@ -17,9 +17,9 @@ dialogMgr.createDialog = function(options) {
 }
 
 dialogMgr.showDialog = function(dialog) {
-    var shieldElement = apogeeui.createElement("div",null,apogeeui.DIALOG_SHIELD_STYLE);
+    var shieldElement = uiutil.createElement("div",null,uiutil.DIALOG_SHIELD_STYLE);
     var dialogParent = new WindowParent(shieldElement);
-    apogeeui.dialogLayer.appendChild(shieldElement);
+    uiutil.dialogLayer.appendChild(shieldElement);
 
     dialogParent.addWindow(dialog);
 }
@@ -29,5 +29,5 @@ dialogMgr.showDialog = function(dialog) {
 dialogMgr.closeDialog = function(dialog) {
     var parent = dialog.getParent();
     dialog.close();
-    apogeeui.dialogLayer.removeChild(parent.getOuterElement());
+    uiutil.dialogLayer.removeChild(parent.getOuterElement());
 }

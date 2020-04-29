@@ -1,4 +1,3 @@
-import base from "/apogeeutil/base.js";
 import esprima from "/ext/esprima/esprima_2.7.3/esprima_to_es6.js";
 
 /** This function parses the code and returns a table that gives the variable use
@@ -585,7 +584,7 @@ function markLocalVariables(processInfo) {
  * }
  * @private */
 function createParsingError(errorMsg,location) {
-    var error = base.createError(errorMsg,false);
+    var error = new Error(errorMsg);
     if(location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;

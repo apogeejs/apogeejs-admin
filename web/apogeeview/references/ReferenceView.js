@@ -1,4 +1,5 @@
-import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import {uiutil,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 import ReferenceListView from "/apogeeview/references/ReferenceListView.js";
 
 export default class ReferenceView {
@@ -115,7 +116,7 @@ export default class ReferenceView {
 
     /** @private */
     _createTreeEntry(viewState) {
-        var iconUrl = apogeeui.getResourcePath(REFERENCES_ICON_PATH);
+        var iconUrl = uiutil.getResourcePath(REFERENCES_ICON_PATH);
         let treeEntry = new TreeEntry("References", iconUrl, null, null, false);
 
         if((viewState)&&(viewState.treeState !== undefined)) {

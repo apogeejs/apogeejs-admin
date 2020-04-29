@@ -1,5 +1,5 @@
 import ConfigurableElement from "/apogeeui/configurablepanel/ConfigurableElement.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This is an text field element configurable element.
  * 
@@ -24,7 +24,7 @@ export default class TextFieldElement extends ConfigurableElement {
         
         //text field (maight had password flag)
         var type = (elementInitData.password === true) ? "password" : "text";
-        this.inputElement = apogeeui.createElement("input",{"type":type});
+        this.inputElement = uiutil.createElement("input",{"type":type});
         containerElement.appendChild(this.inputElement); 
         
         if(elementInitData.size !== undefined) {

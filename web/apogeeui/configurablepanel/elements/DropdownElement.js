@@ -1,5 +1,6 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ConfigurableElement from "/apogeeui/configurablepanel/ConfigurableElement.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This is an text field element configurable element.
  * 
@@ -22,7 +23,7 @@ export default class DropdownElement extends ConfigurableElement {
             this.labelElement = null;
         }
         
-        this.select = apogeeui.createElement("select");
+        this.select = uiutil.createElement("select");
         var addEntry = entryInfo => {
             var label;
             var value;

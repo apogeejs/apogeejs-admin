@@ -1,13 +1,14 @@
-import base from "/apogeeutil/base.js";
-import EventManager from "/apogeeutil/EventManagerClass.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This object is a container for window frames. The argument of the constructor should
  * be an element that will hold the window frames.  */
-export default class WindowParent extends EventManager {
+export default class WindowParent {
 
     constructor(containerElement) {
-        super();
+        //mixin initialization
+        this.eventManagerMixinInit();
         
         this.containerElement = containerElement;
         
@@ -29,14 +30,14 @@ export default class WindowParent extends EventManager {
      * "shown" event is to be supported.  */
     elementIsShown() {
         this.showing = true;
-        this.dispatchEvent(apogeeui.SHOWN_EVENT,this);
+        this.dispatchEvent(uiutil.SHOWN_EVENT,this);
     }
 
     /** This should be called when the window parent element is shown, if the
      * "shown" event is to be supported.  */
     elementIsHidden() {
         this.showing = false;
-        this.dispatchEvent(apogeeui.HIDDEN_EVENT,this);
+        this.dispatchEvent(uiutil.HIDDEN_EVENT,this);
     }
 
     /** This method returns true if this window parent is showing. */
@@ -121,6 +122,9 @@ export default class WindowParent extends EventManager {
     }
 
 }
+
+//add mixins to this class
+apogeeutil.mixin(WindowParent,EventManager);
 
 WindowParent.BASE_ZINDEX = 0;
 

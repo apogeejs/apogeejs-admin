@@ -1,4 +1,4 @@
-export {default as apogeeui} from "/apogeeui/apogeeui.js";
+export {default as uiutil} from "/apogeeui/uiutil.js";
 
 export {default as dialogMgr} from "/apogeeui/window/dialogMgr.js";
 

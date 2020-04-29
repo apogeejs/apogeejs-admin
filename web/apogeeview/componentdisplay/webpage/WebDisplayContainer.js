@@ -1,4 +1,4 @@
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 import {getSaveBar} from "/apogeeview/componentdisplay/toolbar.js";
 
 /** This is a standin for the display conatiner for the literate page
@@ -50,14 +50,14 @@ export default class WebDisplayContainer {
 
         if(!forceClose) {
             //make a close request
-            var requestResponse = this.callHandler(apogeeui.REQUEST_CLOSE,this);
-            if(requestResponse == apogeeui.DENY_CLOSE) {
+            var requestResponse = this.callHandler(uiutil.REQUEST_CLOSE,this);
+            if(requestResponse == uiutil.DENY_CLOSE) {
                 //do not close the window
                 return;
             }
         }
 
-        this.dispatchEvent(apogeeui.CLOSE_EVENT,this);
+        this.dispatchEvent(uiutil.CLOSE_EVENT,this);
     }
 
     /** I don't expect this will be used. People currently won't be saving from the web app.
@@ -103,13 +103,13 @@ export default class WebDisplayContainer {
     initUI() {
         
         //make the container
-        this.mainElement = apogeeui.createElementWithClass("div","visiui_displayContainer_mainClass",null);
+        this.mainElement = uiutil.createElementWithClass("div","visiui_displayContainer_mainClass",null);
         
         //add the header elment (for the save bar)
-        this.headerContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
+        this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
         
         //add the view container
-        this.viewContainer = apogeeui.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
+        this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
 
     }
 
@@ -247,7 +247,7 @@ export default class WebDisplayContainer {
     /** This sets the content for the window. If null (or otherwise false) is passed
      * the content will be set to empty.*/
     setHeaderContent(contentElement) {
-        apogeeui.removeAllChildren(this.headerContainer);
+        uiutil.removeAllChildren(this.headerContainer);
         if(contentElement) {
             this.headerContainer.appendChild(contentElement);
         }
@@ -256,7 +256,7 @@ export default class WebDisplayContainer {
     /** This sets the content for the window.  */
     setContent(contentElement) {
         
-        apogeeui.removeAllChildren(this.viewContainer);
+        uiutil.removeAllChildren(this.viewContainer);
         
         //set the content
         this.viewContainer.appendChild(contentElement);

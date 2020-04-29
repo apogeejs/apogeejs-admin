@@ -1,5 +1,5 @@
 
-import {apogeeui} from "/apogeeui/apogeeUiLib.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 
@@ -48,7 +48,7 @@ export function initIncludePath(includesBasePath) {
     let aceIncludesPath = _normalizeBasePath(aceIncludesBasePath) + ACE_INCLUDES_FOLDER_NAME;
 
     //initialize resource path (relative to base path in web page)
-    apogeeui.initResourcePath(resourcesPath);
+    uiutil.initResourcePath(resourcesPath);
 
     //any needs mode or theme files for the ace editor should go in the folder set below (relative to base path in web page)
     ace.config.set('basePath',aceIncludesPath);

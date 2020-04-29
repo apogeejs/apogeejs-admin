@@ -1,5 +1,5 @@
 import ConfigurablePanelConstants from "/apogeeui/configurablepanel/ConfigurablePanelConstants.js";
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This is an element that composes the content of a configurable panel.
  * 
@@ -9,7 +9,7 @@ export default class ConfigurableElement {
     constructor(form,elementInitData,optionalContainerClassName = ConfigurableElement.CONTAINER_CLASS_STANDARD) {
         this.form = form;
         this.key = elementInitData.key;
-        this.domElement = apogeeui.createElement("div",{"className":optionalContainerClassName});
+        this.domElement = uiutil.createElement("div",{"className":optionalContainerClassName});
     }
     
     /** This method returns the key for this ConfigurableElement within this panel. */

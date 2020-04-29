@@ -1,6 +1,6 @@
-import base from "/apogeeutil/base.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
-import EventManager from "/apogeeutil/EventManagerClass.js";
+import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
 import WorkspaceManager from "/apogeeapp/WorkspaceManager.js";
@@ -35,10 +35,12 @@ let apogeeInstance = null;
  * @param appConfigManager - An instance of an AppConfigManager on configure the application.
  * 
  * @private */
-export default class Apogee extends EventManager {
+export default class Apogee {
 
     constructor(appConfigManager) {
-        super();
+
+        //mixin initialization
+        this.eventManagerMixinInit();
         
         //make sure we define this once
         if(apogeeInstance != null) {
@@ -126,7 +128,7 @@ export default class Apogee extends EventManager {
     setWorkspaceManager(workspaceManager) {
         //we can only have one workspace of a given id
         if((this.workspaceManager)&&(this.workspaceManager.getId() != workspaceManager.getId())) {
-            throw base.createError("There is already an open workspace",false);
+            throw new Error("There is already an open workspace");
         }
         this.workspaceManager = workspaceManager;
         return true;
@@ -363,6 +365,9 @@ export default class Apogee extends EventManager {
     }
 
 }
+
+//add mixins to this class
+apogeeutil.mixin(Apogee,EventManager);
 
 
 Apogee.DEFAULT_Workspace_NAME = "workspace";

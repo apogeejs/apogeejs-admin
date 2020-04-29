@@ -1,4 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** Thiis is a namespace with functions to control menu operation
  *
@@ -23,7 +23,7 @@ Menu.createMenu = function(text) {
         Menu.initialize();
     }
 
-    var element = apogeeui.createElementWithClass("div", "visiui-menu-heading visiui-menu-text");
+    var element = uiutil.createElementWithClass("div", "visiui-menu-heading visiui-menu-text");
     element.innerHTML = text;
     return new MenuHeader(element);
 }
@@ -38,7 +38,7 @@ Menu.createMenuFromImage = function(imageUrl) {
 
     var imageElement = document.createElement("img");
     imageElement.src = imageUrl;
-    var element = apogeeui.createElementWithClass("div", "visiui-menu-heading visiui-menu-image");
+    var element = uiutil.createElementWithClass("div", "visiui-menu-heading visiui-menu-image");
     element.appendChild(imageElement);
     return new MenuHeader(element);
 }
@@ -261,7 +261,7 @@ class MenuBody {
         
     /** this adds a menu item that dispatchs the given event when clicked. */
     addMenuItem(itemInfo) {
-        itemInfo.element = apogeeui.createElementWithClass("div","visiui-menu-item");
+        itemInfo.element = uiutil.createElementWithClass("div","visiui-menu-item");
         itemInfo.element.innerHTML = itemInfo.title;
         
         if(itemInfo.childMenuItems) {
@@ -335,7 +335,7 @@ class MenuBody {
 
     /** This method creates the menu body that is shown below the header. */
     createMenuElement() {
-        this.menuDiv = apogeeui.createElementWithClass("div","visiui-menu-body");
+        this.menuDiv = uiutil.createElementWithClass("div","visiui-menu-body");
     }
 
     constructItemsForShow () {
@@ -348,7 +348,7 @@ class MenuBody {
     /** This is called after the menu body is hidden. */
     destroyItemsForHides() {
         if(this.menuDiv) {
-            apogeeui.removeAllChildren(this.menuDiv);
+            uiutil.removeAllChildren(this.menuDiv);
         }
         this.menuItems = {};
     }

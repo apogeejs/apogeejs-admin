@@ -1,3 +1,4 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ParentComponent from "/apogeeapp/component/ParentComponent.js";
 
 /** This component represents a folderFunction, which is a function that is programmed using

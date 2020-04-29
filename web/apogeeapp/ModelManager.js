@@ -1,6 +1,5 @@
-import base from "/apogeeutil/base.js";
 import { Model, doAction } from "/apogee/apogeeCoreLib.js";
-import FieldObject from "/apogeeutil/FieldObject.js";
+import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
 
 /** This class manages the user interface for a model object. */
 export default class ModelManager extends FieldObject {

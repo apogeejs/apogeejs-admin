@@ -1,4 +1,4 @@
-import {apogeeui,TreeEntry} from "/apogeeui/apogeeUiLib.js";
+import {uiutil,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 import {updateLink, removeLink} from "/apogeeview/commandseq/updatelinkseq.js";
 
 export default class ReferenceEntryView {
@@ -36,7 +36,7 @@ export default class ReferenceEntryView {
     //===========================================
 
     _createTreeEntry() {
-        var iconUrl = apogeeui.getResourcePath(this.displayInfo.ENTRY_ICON_PATH);
+        var iconUrl = uiutil.getResourcePath(this.displayInfo.ENTRY_ICON_PATH);
         var label = this.referenceEntry.getLabel();
         var menuItemsCallback = () => this._getMenuItems();
 

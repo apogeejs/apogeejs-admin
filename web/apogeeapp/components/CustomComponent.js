@@ -1,3 +1,4 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Component from "/apogeeapp/component/Component.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 

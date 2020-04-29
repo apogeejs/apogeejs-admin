@@ -1,6 +1,5 @@
 import {addActionInfo} from "/apogee/actions/action.js";
 import {createMember} from "/apogee/actions/createmember.js";
-import base from "/apogeeutil/base.js";
 import Model from "/apogee/data/Model.js";
 
 /** This is self installing command module. It has no exports
@@ -34,10 +33,10 @@ function loadModel(model,actionData) {
     //check the file format
     var fileType = modelJson.fileType;
     if(fileType !== Model.SAVE_FILE_TYPE) {
-        throw base.createError("Bad file format.",false);
+        throw new Error("Bad file format.");
     }
     if(modelJson.version !== Model.SAVE_FILE_VERSION) {
-        throw base.createError("Incorrect file version. CHECK APOGEEJS.COM FOR VERSION CONVERTER.",false);
+        throw new Error("Incorrect file version. CHECK APOGEEJS.COM FOR VERSION CONVERTER.");
     }
 
     //set the model name

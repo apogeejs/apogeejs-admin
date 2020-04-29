@@ -1,4 +1,4 @@
-import apogeeui from "/apogeeui/apogeeui.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This file provides a load listener. The element must be a positioned element
  * (position must be set to something besides static. It can only be done once per element(!)
@@ -20,7 +20,7 @@ setLoadListener = function(element, loadCallback, resizeCallback){
     };
 
     //create and attach element
-    var dummyFrameElement = apogeeui.createElement("iframe",null,styleJson);
+    var dummyFrameElement = uiutil.createElement("iframe",null,styleJson);
     dummyFrameElement.onload = function() {
         var dummyFrameBody = dummyFrameElement.contentDocument.body; 
         
