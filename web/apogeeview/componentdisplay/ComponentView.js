@@ -88,7 +88,7 @@ export default class ComponentView {
     getParentComponentView() {
 
         let parentComponent = this.component.getParentComponent(this.modelView.getModelManager());
-        if(parentComponent) {
+        if((parentComponent)&&(this.modelView)) {
             return this.modelView.getComponentViewByComponentId(parentComponent.getId());
         }
         else {
@@ -407,7 +407,7 @@ export default class ComponentView {
                             this.childComponentDisplay = null;
                         }
                     }
-                    else {
+                    else if(this.modelView) {
                         //this was in the root folder
                         this.modelView.removeChildFromRoot(this);
                     }
@@ -417,7 +417,7 @@ export default class ComponentView {
                         newParentComponentView.addChild(this);
                         this.setLastAssignedParentComponentView(newParentComponentView);
                     }
-                    else {
+                    else if(this.modelView) {
                         //this is placed in the root folder
                         this.modelView.addChildToRoot(this);
                         this.setLastAssignedParentComponentView(null);

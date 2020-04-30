@@ -9,7 +9,7 @@ let appView;
 export {apogeeWebClientLib as default};
 
 /** This method initializes the workspace. */
-apogeeWebClientLib.initWebApp = function(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed) { 
+apogeeWebClientLib.initWebApp = function(workspaceUrl) { 
 
     //==========================
     //some global initialization
@@ -24,10 +24,24 @@ apogeeWebClientLib.initWebApp = function(workspaceUrl,onWorkspaceLoad,onWorkspac
     //app initialization
     //==========================
 
-    var appConfigManager = new WebAppConfigManager(workspaceUrl);
+    var appConfigManager = new WebAppConfigManager();
     
     //create the application
     appView = new ApogeeView(null,appConfigManager);
+
+    //apogeeutil.textRequest(this.workspaceUrl);
+
+    // var openInitialWorkspace = workspaceText => {
+    //     let workspaceJson = JSON.parse(workspaceText);
+
+    //     //open workspace
+    //     var commandData = {};
+    //     commandData.type = "openWorkspace";
+    //     commandData.workspaceJson = workspaceJson;
+    //     commandData.fileMetadata = workspaceFileMetadata;
+
+    //     this.executeCommand(commandData);
+    // };
 
  //OOPS FIND THIS EVENT!!!
     let app = appView.getApp();

@@ -22,22 +22,18 @@
    
         
         <script type="module">
-            import apogeeAppLib from "/applications/webclientlib/webClientLib.js";
+            import ApogeeWebView from "/apogeeview/apogeeViewLib.js";
         
             let workspaceUrl = "webAppTestWorkspace.json";
+            let appView;
 
 			window.init = function() {
-                //start app
-                apogeeAppLib.initWebApp(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed);
-            }
+                appView = new ApogeeWebView();
 
-            function onWorkspaceLoad(openResult) {
-                apogeeAppLib.addDisplay("Model.a","aDisplayElement",true);
-                apogeeAppLib.addDisplay("Model.b","bDisplayElement",true);
-            }
+                appView.addDisplay("Main.a","aDisplayElement",true,"Data");
+                appView.addDisplay("Main.b","bDisplayElement",true,"Data");
 
-            function onWorkspaceLoadFailed(failResult) {
-                alert("Workspace open complete: " + JSON.stringify(failResult));
+                appView.openWorkspace(url);
             }
             
 		</script>

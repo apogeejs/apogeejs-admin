@@ -4,6 +4,7 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
 import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
 
 export {default as ApogeeView} from "/apogeeview/ApogeeView.js";
+export {default as ApogeeWebView} from "/apogeeview/ApogeeWebView.js";
 export {default as ComponentView} from "/apogeeview/componentdisplay/ComponentView.js";
 
 //needed just for web lib
