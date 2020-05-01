@@ -69,13 +69,6 @@ export default class PageDisplayContainer {
         return this.isComponentShowing;
     }
 
-    /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
-    setIsViewActive(isViewActive) {
-        this.isViewActive = isViewActive;
-        this.updateViewSelectorState();
-        this.updateDataDisplayLoadedState();
-    }
-
     /** This method closes the window. If the argument forceClose is not
      * set to true the "request_close" handler is called to check if
      * it is ok to close the window. */
@@ -135,8 +128,19 @@ export default class PageDisplayContainer {
     }
 
     //====================================
-    // Initialization Methods
+    // Private Methods
     //====================================
+
+    /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
+    setIsViewActive(isViewActive) {
+        this.isViewActive = isViewActive;
+        this.updateViewSelectorState();
+        this.updateDataDisplayLoadedState();
+    }
+
+    //---------------------------
+    // Initialization
+    //---------------------------
 
     /** @private */
     initUI() {

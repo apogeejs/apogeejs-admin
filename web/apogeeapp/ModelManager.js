@@ -1,5 +1,6 @@
 import { Model, doAction } from "/apogee/apogeeCoreLib.js";
 import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
+import {componentInfo} from "/apogeeapp/apogeeAppLib.js";
 
 /** This class manages the user interface for a model object. */
 export default class ModelManager extends FieldObject {
@@ -108,7 +109,7 @@ export default class ModelManager extends FieldObject {
         
         //response - get new member
         var component;
-        var componentClass = this.app.getComponentClass(componentJson.type);
+        var componentClass = componentInfo.getComponentClass(componentJson.type);
         if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
             //create empty component
             component = new componentClass(member,this);
@@ -122,7 +123,7 @@ export default class ModelManager extends FieldObject {
         //if we failed to create the component, or if we failed to make the member properly (and we used the error member)
         if(!component) {
             //table not found - create an empty error table
-            componentClass = this.app.getComponentClass("apogeeapp.app.ErrorComponent");
+            componentClass = componentInfo.ERROR_COMPONENT_CLASS;
             component = new componentClass(member,this);
             if(componentJson) {
                 component.loadStoredData(componentJson);

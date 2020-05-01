@@ -58,11 +58,6 @@ export default class Apogee {
         //command manager
         this.commandManager = new CommandManager(this);
         
-        //load the standard component generators
-        //(for now this is not configurable. This is called first so loaded modules
-        //in config can self load after the defaults)
-        this.loadComponentClasses();
-        
         //----------------------------------
         //configure the application
         //----------------------------------
@@ -81,12 +76,12 @@ export default class Apogee {
         return apogeeInstance;
     }
 
-    /** This function initializes the default classes for the application. */
-    static setBaseClassLists(standardComponents, additionalComponents, errorComponentClass) {
-        Apogee.standardComponents = standardComponents;
-        Apogee.additionalComponents = additionalComponents;
-        Apogee.errorComponentClass = errorComponentClass;
-    }
+    // /** This function initializes the default classes for the application. */
+    // static setBaseClassLists(standardComponents, additionalComponents, errorComponentClass) {
+    //     Apogee.standardComponents = standardComponents;
+    //     Apogee.additionalComponents = additionalComponents;
+    //     Apogee.errorComponentClass = errorComponentClass;
+    // }
 
     //==================================
     // Workspace Management
@@ -182,50 +177,6 @@ export default class Apogee {
         return this.referenceManager;
     }
 
-    /** This method registers a new component. It will be exposed when the user
-     * requests to create a new component */
-    registerComponent(componentClass) {
-        var name = componentClass.uniqueName;
-    //just replace - but existing ones will not change!
-    //    if(this.componentClasses[name]) {
-    //        var replace = confirm("There is already a registered component with this name. Would you like to continue?");
-    //        if(!replace) return;
-    //    }
-
-        this.componentClasses[name] = componentClass;
-        if(this.additionalComponents.indexOf(name) < 0) {
-            this.additionalComponents.push(name);
-        }
-    }
-
-    /** This method registers a new component. It will be exposed when the user
-     * requests to create a new component */
-    unregisterComponent(componentClass) {
-        //implement this
-    }
-
-    /** This method returns a component generator of a given name. */
-    getComponentClass(name) {
-        return this.componentClasses[name];
-    }
-
-    getStandardComponentNames() {
-        return this.standardComponents;
-    }
-
-    getAdditionalComponentNames() {
-        return this.additionalComponents;
-    }
-
-    getComponentClasses() {
-        return this.componentClasses;
-    }
-
-    getFolderComponentClass() {
-        return FolderComponent;
-    }
-
-
     /** This method sets the file access object. */
     setFileAccessObject(fileAccessObject) {
         this.fileAccessObject = fileAccessObject;
@@ -307,32 +258,6 @@ export default class Apogee {
             workspaceFilePromise.then(openInitialWorkspace).catch(errorMsg => alert("Error downloading initial workspace: " + errorMsg));
         }
         
-    }
-
-
-    /** This method adds the standard components to the app. 
-     * @private */
-    loadComponentClasses() {
-        //standard components
-        Apogee.standardComponents.forEach(componentClass => this.registerStandardComponent(componentClass));
-        Apogee.additionalComponents.forEach(componentClass => this.registerComponent(componentClass));
-        this.componentClasses[Apogee.errorComponentClass.uniqueName] = Apogee.errorComponentClass;
-    }
-
-    /** This method registers a component. 
-     * @private */
-    registerStandardComponent(componentClass) {
-        var name = componentClass.uniqueName;
-        if(this.componentClasses[name]) {
-            var replace = confirm("There is already a registered component with this name. Would you like to continue?");
-            if(!replace) return;
-        }
-
-    //we should maybe warn if another component bundle is being overwritten 
-        this.componentClasses[name] = componentClass;
-        if(this.standardComponents.indexOf(name) < 0) {
-            this.standardComponents.push(name);
-        }
     }
 }
 

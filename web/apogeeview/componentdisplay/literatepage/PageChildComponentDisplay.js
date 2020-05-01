@@ -36,11 +36,11 @@ export default class PageChildComponentDisplay {
         return this.mainElement;
     }
 
-    // setComponentView(componentView) {
-    //     this.componentView = componentView;
-    //     this.loadComponentDisplay();
-    //     this.updateChildDisplayStates();
-    // }
+    setComponentView(componentView) {
+        this.componentView = componentView;
+        this.loadComponentDisplay();
+        this.updateChildDisplayStates();
+    }
 
     getComponentView() {
         return this.componentView;

@@ -10,8 +10,7 @@ import WorkspaceView from "/apogeeview/WorkspaceView.js";
 
 import {uiutil,TabFrame,Menu,SplitPane,TreeControl,DisplayAndHeader} from "/apogeeui/apogeeUiLib.js";
 
-import { Apogee } from "/apogeeapp/apogeeAppLib.js";
-
+import {Apogee,componentInfo} from "/apogeeapp/apogeeAppLib.js";
 
 export default class ApogeeView {
 
@@ -405,17 +404,16 @@ export default class ApogeeView {
 
     getAddChildMenuItems(optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
 
-        let standardComponents = this.app.getStandardComponentNames();
-        let componentClasses = this.app.getComponentClasses();
+        let standardComponents = componentConfig.getStandardComponentNames();
         
         var menuItemList = [];
         
         for(var i = 0; i < standardComponents.length; i++) {
-            let key = standardComponents[i];
-            let componentClass = componentClasses[key];
+            let componentName = standardComponents[i];
+            let componentClass = componentInfo.getComponent(componentName);
             
             let menuItem = {};
-            menuItem.title = "Add " + generator.displayName;
+            menuItem.title = "Add " + componentClass.displayName;
             menuItem.callback = () => addComponent(this,this.app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
             menuItemList.push(menuItem);
         }

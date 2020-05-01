@@ -2,9 +2,10 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
 
 import {getPropertiesDialogLayout} from "/apogeeview/commandseq/updatecomponentseq.js";
-import {Component} from "/apogeeapp/apogeeAppLib.js";
+import {Component,componentInfo} from "/apogeeapp/apogeeAppLib.js";
 import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog.js";
+import {getComponentViewClass} from "/apogeeview/componentViewConfig.js";
 
 //=====================================
 // UI Entry Point
@@ -17,7 +18,7 @@ import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog
 //piggybackCommand is a temporary test!!!
 export function addComponent(appView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
 
-        let componentViewClass = appView.constructor.getComponentViewClass(componentClass.uniqueName);
+        let componentViewClass = getComponentViewClass(componentClass.uniqueName);
         let modelView = appView.getWorkspaceView().getModelView();
 
         //get the active workspace
@@ -147,7 +148,7 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
 export function addAdditionalComponent(appView,app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
         
     var onSelect = function(componentUniqueName) {
-        let componentClass = app.getComponentClass(componentUniqueName);
+        let componentClass = componentInfo.getComponentClass(componentUniqueName);
         if(componentClass) {
             addComponent(appView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
         }
@@ -156,9 +157,9 @@ export function addAdditionalComponent(appView,app,optionalInitialProperties,opt
         }
     }
     //get the display names
-    let additionalComponents = app.getAdditionalComponentNames();
+    let additionalComponents = componentInfo.getAdditionalComponentNames();
     let componentInfoList = additionalComponents.map( componentName => {
-        let componentClass = app.getComponentClass(componentName); 
+        let componentClass = componentInfo.getComponentClass(componentName); 
         return {displayName: componentClass.displayName, uniqueName: componentName};
     });
     //open select component dialog

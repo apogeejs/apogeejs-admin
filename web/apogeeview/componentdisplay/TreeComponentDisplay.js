@@ -1,4 +1,5 @@
 import {TreeEntry,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
+import {componentInfo} from "/apogeeapp/apogeeAppLib.js";
 import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 
 /** This component represents a json table object. */
@@ -78,15 +79,17 @@ export default class TreeComponentDisplay {
 
             //add child folder menu item
             if(this.componentView.usesTabDisplay()) {
-                var app = modelView.getApp();
-                var appView = modelView.getAppView();
-                var folderComponentClass = app.getFolderComponentClass();
-                var initialValues = {parentId: component.getMemberId()};
-
-                var childMenuItem = {};
-                childMenuItem.title = "Add Child Folder";
-                childMenuItem.callback = () => addComponent(appView,app,folderComponentClass,initialValues);
-                menuItemList.push(childMenuItem);
+                let app = modelView.getApp();
+                let appView = modelView.getAppView();
+                let initialValues = {parentId: component.getMemberId()};
+                let pageComponents = componentInfo.getPageComponentNames();
+                pageComponents.forEach(pageComponentName => {
+                    let childMenuItem = {};
+                    let pageComponentClass = componentInfo.getComponent(pageComponentName);
+                    childMenuItem.title = "Add Child " + pageComponentClass.displayName;
+                    childMenuItem.callback = () => addComponent(appView,app,pageComponentClass,initialValues);
+                    menuItemList.push(childMenuItem);
+                })
             }
 
             return this.componentView.getMenuItems(menuItemList);

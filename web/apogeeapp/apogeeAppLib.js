@@ -6,7 +6,8 @@ export {default as UiCommandMessenger} from "/apogeeapp/commands/UiCommandMessen
 
 export {default as Component} from "/apogeeapp/component/Component.js";
 
+export {default as componentInfo} from "/apogeeapp/componentConfig.js";
+
 //initialize the component and command and reference types.
-import "/apogeeapp/componentConfig.js";
 import "/apogeeapp/commandConfig.js";
 import "/apogeeapp/referenceConfig.js";

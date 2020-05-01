@@ -3,6 +3,8 @@ import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
 
 import {addComponent, addAdditionalComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 import PageChildComponentDisplay from "/apogeeview/componentdisplay/literatepage/PageChildComponentDisplay.js"
+import {getComponentViewClass} from "/apogeeview/componentViewConfig.js";
+
 import {uiutil,Tab,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
 
 import {selectionBetween} from "/prosemirror/lib/prosemirror-view/src/selection.js";
@@ -305,7 +307,7 @@ export default class LiteratePageComponentDisplay {
             let key = app.standardComponents[i];
 
             let componentClass = app.componentClasses[key];
-            let componentViewClass = appView.constructor.getComponentViewClass(componentClass.uniqueName);
+            let componentViewClass = getComponentViewClass(componentClass.uniqueName);
             if(componentViewClass.hasChildEntry) {
 
                 var buttonElement = uiutil.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);

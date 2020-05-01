@@ -1,7 +1,7 @@
 import {uiutil,TreeEntry} from "/apogeeui/apogeeUiLib.js";
+import {componentInfo} from "/apogeeapp/apogeeAppLib.js";
 import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
-
-import ApogeeView from "/apogeeview/ApogeeView.js"
+import {getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeeview/componentViewConfig.js";
 
 /** This class manages the user interface for a workspace object. */
 export default class ModelView {
@@ -74,7 +74,7 @@ export default class ModelView {
     onComponentCreated(component) {
         try {
             //create the component view
-            let componentViewClass = ApogeeView.getComponentViewClass(component.constructor.uniqueName);
+            let componentViewClass = getComponentViewClass(component.constructor.uniqueName);
             let componentView;
             if(componentViewClass) {
                 componentView = new componentViewClass(this,component);
@@ -203,13 +203,15 @@ export default class ModelView {
             var menuItemList = [];
             var app = this.getApp();
             var appView = this.getAppView();
-            var folderComponentClass = app.getFolderComponentClass();
-            var initialValues = {parentId: this.getModelManager().getModel().getId()};
-
-            var childMenuItem = {};
-            childMenuItem.title = "Add Child Folder";
-            childMenuItem.callback = () => addComponent(appView,app,folderComponentClass,initialValues);
-            menuItemList.push(childMenuItem);
+            let initialValues = {parentId: this.getModelManager().getModel().getId()};
+            let pageComponents = componentInfo.getPageComponentNames();
+            pageComponents.forEach(pageComponentName => {
+                let childMenuItem = {};
+                let pageComponentClass = componentInfo.getComponent(pageComponentName);
+                childMenuItem.title = "Add Child " + pageComponentClass.displayName;
+                childMenuItem.callback = () => addComponent(appView,app,pageComponentClass,initialValues);
+                menuItemList.push(childMenuItem);
+            })
 
             return menuItemList;
         }

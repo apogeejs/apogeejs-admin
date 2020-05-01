@@ -4,10 +4,11 @@ import * as apogee from "/apogee/apogeeCoreLib.js";
 import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
 import * as apogeeui from "/apogeeui/apogeeUiLib.js";
 import * as apogeeview from "/apogeeview/apogeeViewLib.js";
-import { initIncludePath } from "/apogeeview/apogeeViewLib.js";
+import {initIncludePath} from "/apogeeview/apogeeViewLib.js";
 import WebComponentDisplay from "/apogeeview/componentdisplay/webpage/WebComponentDisplay.js";
-import { Apogee } from "/apogeeapp/apogeeAppLib.js";
+import {Apogee} from "/apogeeapp/apogeeAppLib.js";
 import WebAppConfigManager from "/applications/webclientlib/WebAppConfigManager.js";
+import {getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeeview/componentViewConfig.js";
 
 //expose these apogee libraries globally so plugins can use them
 window.apogeeutil = apogeeutil;
@@ -38,6 +39,9 @@ export default class ApogeeWebView {
         this.app.addListener("component_created",component => this._onComponentCreated(component));
         this.app.addListener("component_updated",component => this._onComponentUpdated(component));
         this.app.addListener("component_deleted",component => this._onComponentDeleted(component));
+
+        //resize monitoring
+        window.addEventListener("resize",() => this.onWindowResize());
     }
 
     getApp() {
@@ -116,14 +120,37 @@ export default class ApogeeWebView {
         }
     }
 
-    /** If the DOM element is resized this method should be called. This information is available
-     * to all component display and is sued by some of them.
-     */
-    onResize(memberName,viewName) {
-        let displayViewInfo = this._lookuPDisplayViewInfo(memberName,viewName);
-        if((displayViewInfo)&&(displayViewInfo.componentDisplay)) {
-            displayViewInfo.componentDisplay.onResize();
+    // /** If the DOM element is resized this method should be called. This information is available
+    //  * to all component display and is used by some of them.
+    //  */
+    // onResize(memberName,viewName) {
+    //     let displayViewInfo = this._lookuPDisplayViewInfo(memberName,viewName);
+    //     if((displayViewInfo)&&(displayViewInfo.componentDisplay)) {
+    //         displayViewInfo.componentDisplay.onResize();
+    //     }
+    // }
+
+    //---------------------------------
+    // Width resize events - for tab frame and tree frame
+    //---------------------------------
+
+    onWindowResize() {
+        this.triggerResizeWait();
+    }
+
+    triggerResizeWait() {
+        //only do the slow resizde timer if we have listeners
+        if(!this.app.hasListeners("frameWidthResize")) return;
+
+        //create a new timer if we don't already have one
+        if(!this.resizeWaitTimer) {
+            this.resizeWaitTimer =  setTimeout(() => this.resizeTimerExpired(),RESIZE_TIMER_PERIOD_MS);
         }
+    }
+
+    resizeTimerExpired() {
+        this.resizeWaitTimer = null;
+        this.app.dispatchEvent("frameWidthResize",null);
     }
 
 
@@ -154,7 +181,7 @@ export default class ApogeeWebView {
             this.componentByIdMap[id] = componentInfo;
 
             //create the component view
-            let componentViewClass = ApogeeWebView.getComponentViewClass(component.constructor.uniqueName);
+            let componentViewClass = getComponentViewClass(component.constructor.uniqueName);
             let componentView;
             if(componentViewClass) {
                 componentView = new componentViewClass(this,component);

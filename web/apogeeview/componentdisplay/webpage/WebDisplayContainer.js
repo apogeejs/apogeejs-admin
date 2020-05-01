@@ -60,31 +60,31 @@ export default class WebDisplayContainer {
         this.dispatchEvent(uiutil.CLOSE_EVENT,this);
     }
 
-    /** I don't expect this will be used. People currently won't be saving from the web app.
-     * But if it is, it will pass along the data display state.  */
-    getStateJson() {
-        //we only read the data display data
-        if(this.dataDisplay) {
-            this.dataDisplay.addUiStateData(this.savedUiState);
-        }
-        return this.savedUiState;
-    }
+    // /** I don't expect this will be used. People currently won't be saving from the web app.
+    //  * But if it is, it will pass along the data display state.  */
+    // getStateJson() {
+    //     //we only read the data display data
+    //     if(this.dataDisplay) {
+    //         this.dataDisplay.addUiStateData(this.savedUiState);
+    //     }
+    //     return this.savedUiState;
+    // }
 
-    /** This container only reads the data display state. And saved state for the display container is ignored. */
-    setStateJson(json) {
-        if(json) {
-            this.savedUiState = json;
-        }
-        else {
-            this.savedUiState = {};
-        }
+    // /** This container only reads the data display state. And saved state for the display container is ignored. */
+    // setStateJson(json) {
+    //     if(json) {
+    //         this.savedUiState = json;
+    //     }
+    //     else {
+    //         this.savedUiState = {};
+    //     }
 
-        //we only read the data display state
-        //there is no state used in the container itself.
-        if(this.dataDisplay) {
-            this.dataDisplay.readUiStateData(this.savedUiState);
-        }
-    }
+    //     //we only read the data display state
+    //     //there is no state used in the container itself.
+    //     if(this.dataDisplay) {
+    //         this.dataDisplay.readUiStateData(this.savedUiState);
+    //     }
+    // }
 
     //---------------------------
     // GUI ELEMENT
@@ -195,18 +195,17 @@ export default class WebDisplayContainer {
     /** This method is called when the member is updated, to make sure the 
     * data display is up to date. */
    componentUpdated(component) {
-    //update the data display
-    if((this.dataDisplay)&&(!this.inEditMode)) {
-        let {reloadDataDisplay, reloadData} = this.dataDisplay.doUpdate();
-        if(reloadDataDisplay) {
-            this.reloadDisplay();
-        }
-        else if(reloadData) {
-            this.dataDisplay.showData();
-            this.updateViewSizeButtons();
+        //update the data display
+        if((this.dataDisplay)&&(!this.inEditMode)) {
+            let {reloadDataDisplay, reloadData} = this.dataDisplay.doUpdate();
+            if(reloadDataDisplay) {
+                this.reloadDisplay();
+            }
+            else if(reloadData) {
+                this.dataDisplay.showData();
+            }
         }
     }
-}
         
     //------------------------------
     // Accessed by the Editor, if applicable

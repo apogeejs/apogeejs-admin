@@ -8,15 +8,27 @@ import CustomComponentView from "/apogeeview/componentviews/CustomComponentView.
 import CustomDataComponentView from "/apogeeview/componentviews/CustomDataComponentView.js";
 import ErrorComponentView from "/apogeeview/componentviews/ErrorComponentView.js";
 
-import ApogeeView from "/apogeeview/ApogeeView.js";
-
 /** This module initializes the default component view classes. */
-ApogeeView.registerComponentView(JsonTableComponentView);
-ApogeeView.registerComponentView(FolderComponentView);
-ApogeeView.registerComponentView(FunctionComponentView);
-ApogeeView.registerComponentView(FolderFunctionComponentView);
-ApogeeView.registerComponentView(ErrorComponentView);
-ApogeeView.registerComponentView(DynamicFormView);
-ApogeeView.registerComponentView(FormDataComponentView);
-ApogeeView.registerComponentView(CustomComponentView);
-ApogeeView.registerComponentView(CustomDataComponentView);
+let componentViewClassMap = {};
+
+registerComponentView(JsonTableComponentView);
+registerComponentView(FolderComponentView);
+registerComponentView(FunctionComponentView);
+registerComponentView(FolderFunctionComponentView);
+registerComponentView(ErrorComponentView);
+registerComponentView(DynamicFormView);
+registerComponentView(FormDataComponentView);
+registerComponentView(CustomComponentView);
+registerComponentView(CustomDataComponentView);
+
+/** This method is used to register a new component view class for the user interface. */
+export function registerComponentView(viewClass) {
+    componentViewClassMap[viewClass.componentName] = viewClass;
+}
+
+/** This method retrieves a component view class using the component unique name. */
+export function getComponentViewClass(componentName) {
+    return componentViewClassMap[componentName];
+}
+
+export let ERROR_COMPONENT_VIEW_CLASS = ErrorComponentView;

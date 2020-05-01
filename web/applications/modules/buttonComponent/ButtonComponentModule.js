@@ -8,7 +8,7 @@ import ApogeeView from "/apogeeview/ApogeeView.js";
 //-------------------------------
 var app = Apogee.getInstance();
 if(app) {
-    app.registerComponent(ButtonComponent);
+    componentInfo.registerComponent(ButtonComponent);
 }
 else {
     console.log("Component could not be registered because no Apogee app instance was available at component load time: apogeeapp.app.ButtonComponent");
@@ -17,4 +17,4 @@ else {
 //-------------------------------
 //register the button component view
 //-------------------------------
-ApogeeView.registerComponentView(ButtonComponentView);
+componentViewConfig.registerComponentView(ButtonComponentView);
