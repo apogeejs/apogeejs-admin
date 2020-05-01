@@ -8,9 +8,8 @@ import WebDisplayContainer from "/apogeeview/componentdisplay/webpage/WebDisplay
  */
 export default class WebComponentDisplay {
 
-    constructor(component, activeView) {
-        this.component = component;
-        this.member = component.getMember();
+    constructor(componentView, activeView) {
+        this.componentView = componentView;
 
         this.activeView = activeView;
         this.displayContainer = null;
@@ -39,30 +38,24 @@ export default class WebComponentDisplay {
         return this.mainElement;
     }
 
-    getComponent() {
-        return this.component;
-    }
-
-    getMember() {
-        return this.member;
-    }
-
-    setBannerState(bannerState,bannerMessage) {
-        //update the banner
-        var bannerDiv;
-        if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
-            bannerDiv = null;
-        }
-        else {
-            bannerDiv = getBanner(bannerMessage,bannerState);
-        }
-        uiutil.removeAllChildren(this.bannerContainer);
-        if(bannerDiv) {
-            this.bannerContainer.appendChild(bannerDiv);
-        }
+    getComponentView() {
+        return this.componentView;
     }
 
     componentUpdated(component) {
+        //update the banner
+        // var bannerDiv;
+        // if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
+        //     bannerDiv = null;
+        // }
+        // else {
+        //     bannerDiv = getBanner(bannerMessage,bannerState);
+        // }
+        // uiutil.removeAllChildren(this.bannerContainer);
+        // if(bannerDiv) {
+        //     this.bannerContainer.appendChild(bannerDiv);
+        // }
+
         this.displayContainer.componentUpdated(component);
     }
 
@@ -78,33 +71,33 @@ export default class WebComponentDisplay {
 
     ////////////////////////////////////////////////////////////
 
-    /** This saves the state only for the single active view. */
-    getStateJson() {
-        //if the display container is active, update the saved state
-        if(this.displayContainer) {
-            this.savedActiveViewUiState = displayContainer.getStateJson();
-        }
+    // /** This saves the state only for the single active view. */
+    // getStateJson() {
+    //     //if the display container is active, update the saved state
+    //     if(this.displayContainer) {
+    //         this.savedActiveViewUiState = displayContainer.getStateJson();
+    //     }
 
-        if(this.savedActiveViewUiState) {
-            let json = {};
-            json.views = {};
-            json.views[this.activeView] = this.savedActiveViewUiState
-            return json;
-        }
-        else {
-            return null;
-        }
-    }
+    //     if(this.savedActiveViewUiState) {
+    //         let json = {};
+    //         json.views = {};
+    //         json.views[this.activeView] = this.savedActiveViewUiState
+    //         return json;
+    //     }
+    //     else {
+    //         return null;
+    //     }
+    // }
 
-    /** This reads the state only for the single active view. */
-    setStateJson(json) {
-        if((json)&&(json.views)) {
-            this.savedActiveViewUiState = json.views[this.activeView];
-            if((this.savedActiveViewUiState)&&(this.displayContainer)) {
-                this.displayContainer.setStateJson(this.savedActiveViewUiState);
-            }
-        }
-    }
+    // /** This reads the state only for the single active view. */
+    // setStateJson(json) {
+    //     if((json)&&(json.views)) {
+    //         this.savedActiveViewUiState = json.views[this.activeView];
+    //         if((this.savedActiveViewUiState)&&(this.displayContainer)) {
+    //             this.displayContainer.setStateJson(this.savedActiveViewUiState);
+    //         }
+    //     }
+    // }
 
    ////////////////////////////////////////////////////
 
@@ -149,7 +142,7 @@ export default class WebComponentDisplay {
         this.viewContainer = uiutil.createElementWithClass("div","visiui_pageChild_viewContainerClass",this.mainElement);
         
         //create the view element
-        this.displayContainer = new WebDisplayContainer(this.component, this.activeView);
+        this.displayContainer = new WebDisplayContainer(this.componentView, this.activeView);
 
         //set the saved state, if there is one
         if(this.savedActiveViewUiState) {

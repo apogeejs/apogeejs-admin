@@ -1,14 +1,13 @@
 /** This replaces ApogeeView when running a client web application. */
-import "/apogee/webGlobals.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import * as apogee from "/apogee/apogeeCoreLib.js";
 import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
 import * as apogeeui from "/apogeeui/apogeeUiLib.js";
 import * as apogeeview from "/apogeeview/apogeeViewLib.js";
-import { ApogeeWebView, initIncludePath } from "/apogeeview/apogeeViewLib.js";
+import { initIncludePath } from "/apogeeview/apogeeViewLib.js";
+import WebComponentDisplay from "/apogeeview/componentdisplay/webpage/WebComponentDisplay.js";
 import { Apogee } from "/apogeeapp/apogeeAppLib.js";
-import WebAppConfigManager from "../applications/webclientlib/WebAppConfigManager";
-import "/apogeeview/webComponentViewConfig.js"
+import WebAppConfigManager from "/applications/webclientlib/WebAppConfigManager.js";
 
 //expose these apogee libraries globally so plugins can use them
 window.apogeeutil = apogeeutil;
@@ -36,9 +35,9 @@ export default class ApogeeWebView {
         this.componentByNameMap = {};
         this.componentByIdMap = {};
 
-        this.app.addListener("component_created",component => this.onComponentCreated(component));
-        this.app.addListener("component_updated",component => this.onComponentUpdated(component));
-        this.app.addListener("component_deleted",component => this.onComponentDeleted(component));
+        this.app.addListener("component_created",component => this._onComponentCreated(component));
+        this.app.addListener("component_updated",component => this._onComponentUpdated(component));
+        this.app.addListener("component_deleted",component => this._onComponentDeleted(component));
     }
 
     getApp() {
@@ -54,12 +53,11 @@ export default class ApogeeWebView {
             var commandData = {};
             commandData.type = "openWorkspace";
             commandData.workspaceJson = workspaceJson;
-            commandData.fileMetadata = workspaceFileMetadata;
 
             this.app.executeCommand(commandData);
         };
 
-        apogeeutil.textRequest(this.workspaceUrl).then(openWorkspace);
+        apogeeutil.textRequest(url).then(openWorkspace);
     }
 
     //=======================================
@@ -146,17 +144,17 @@ export default class ApogeeWebView {
             //lookup the component info
             let modelManager = this.app.getWorkspaceManager().getModelManager();
             let memberName = component.getFullName(modelManager);
-            let componentInfo = this.componentInitInfo[memberName];
+            let componentInfo = this.componentByNameMap[memberName];
             if(!componentInfo) return;
 
             //register the id
             let id = component.getId();
             componentInfo.id = id;
             //add this to the map indexed by id
-            componentByIdMap[id] = componentInfo;
+            this.componentByIdMap[id] = componentInfo;
 
             //create the component view
-            let componentViewClass = ApogeeWeebView.getComponentViewClass(component.constructor.uniqueName);
+            let componentViewClass = ApogeeWebView.getComponentViewClass(component.constructor.uniqueName);
             let componentView;
             if(componentViewClass) {
                 componentView = new componentViewClass(this,component);
@@ -166,7 +164,7 @@ export default class ApogeeWebView {
                 componentView = new ERROR_COMPONENT_VIEW_CLASS(this,component);
             }
 
-            componentInfo.componentView = compenentView;
+            componentInfo.componentView = componentView;
 
             //initialize the display views
             componentInfo.displayViews.forEach( displayViewInfo => {
@@ -187,8 +185,8 @@ export default class ApogeeWebView {
 
     _onComponentUpdated(component) {
         try {
-            let componentView = this.getComponentViewByComponentId(component.getId());
-            if(componentView) componentView.componentUpdated(component);
+            let componentInfo = this.componentByIdMap[component.getId()];
+            if((componentInfo)&&(componentInfo.componentView)) componentInfo.componentView.componentUpdated(component);
         }
         catch(error) {
             if(error.stack) console.error(error.stack);
@@ -199,12 +197,13 @@ export default class ApogeeWebView {
 
     _onComponentDeleted(component) {
         try {
-            let componentId = component.getId();
+            let componentInfo = this.componentByIdMap[component.getId()];
+            if(componentInfo) {
+                if(componentInfo.componentView) componentInfo.componentView.onDelete();
 
-            let componentView = this.componentViewMap[componentId];
-            if(componentView) componentView.onDelete();
-
-            delete this.componentViewMap[componentId];
+                delete this.componentByIdMap[componentInfo.id];
+                delete this.componentByNameMap[componentInfo.memberName];
+            }
         }
         catch(error) {
             if(error.stack) console.error(error.stack);
@@ -224,9 +223,9 @@ export default class ApogeeWebView {
         componentInfo.componentView.setComponentDisplay(componentDisplay);
 
         //look up the parent element 
-        let parentElement = document.getElementById(parentElementId);
+        let parentElement = document.getElementById(displayViewInfo.parentElementId);
         if(!parentElement) {
-            console.error("DOM Element not found:" + parentElementId);
+            console.error("DOM Element not found:" + displayViewInfo.parentElementId);
             return;
         }
         displayViewInfo.parentElement = parentElement;

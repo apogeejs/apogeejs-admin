@@ -7,7 +7,7 @@ import {getSaveBar} from "/apogeeview/componentdisplay/toolbar.js";
  */
 export default class WebDisplayContainer {
 
-    constructor(component, viewType) {
+    constructor(componentView, viewType) {
         
         this.mainElement = null;
         this.headerContainer = null;
@@ -20,7 +20,7 @@ export default class WebDisplayContainer {
         
         this.content = null;
         
-        this.component = component;
+        this.componentView = componentView;
         this.viewType = viewType;
         this.dataDisplay = null;
         
@@ -122,7 +122,7 @@ export default class WebDisplayContainer {
             if(!this.dataDisplayLoaded) {
                 if(!this.dataDisplay) {
                     //the display should be created only when it is made visible
-                    this.dataDisplay =  this.component.getDataDisplay(this,this.viewType);
+                    this.dataDisplay =  this.componentView.getDataDisplay(this,this.viewType);
                     this.setContent(this.dataDisplay.getContent());
                     this.dataDisplay.showData();
                 }

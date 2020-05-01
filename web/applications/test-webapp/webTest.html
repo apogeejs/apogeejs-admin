@@ -22,7 +22,9 @@
    
         
         <script type="module">
-            import ApogeeWebView from "/apogeeview/apogeeViewLib.js";
+            import "/apogee/webGlobals.js";
+            import "/apogeeview/webComponentViewConfig.js"
+            import {ApogeeWebView} from "/apogeeview/apogeeViewLib.js";
         
             let workspaceUrl = "webAppTestWorkspace.json";
             let appView;
@@ -33,7 +35,7 @@
                 appView.addDisplay("Main.a","aDisplayElement",true,"Data");
                 appView.addDisplay("Main.b","bDisplayElement",true,"Data");
 
-                appView.openWorkspace(url);
+                appView.openWorkspace(workspaceUrl);
             }
             
 		</script>
