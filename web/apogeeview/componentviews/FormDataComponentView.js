@@ -41,8 +41,7 @@ export default class FormDataComponentView extends ComponentView {
                 
             case FormDataComponentView.VIEW_FORM:
                 dataDisplaySource = this.getFormEditorCallbacks();
-                var formEditorDisplay = new ConfigurableFormEditor(displayContainer,dataDisplaySource);
-                return formEditorDisplay;
+                return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
                 
             case FormDataComponentView.VIEW_LAYOUT_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member.layout");

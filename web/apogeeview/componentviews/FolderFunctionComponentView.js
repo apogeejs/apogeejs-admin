@@ -46,6 +46,7 @@ FolderFunctionComponentView.componentName = "apogeeapp.app.FolderFunctionCompone
 FolderFunctionComponentView.hasTabEntry = true;
 FolderFunctionComponentView.hasChildEntry = true;
 FolderFunctionComponentView.ICON_RES_PATH = "/componentIcons/folderFunction.png";
+FolderFunctionComponentView.TREE_ENTRY_SORT_ORDER = ParentComponentView.FOLDER_COMPONENT_TYPE_SORT_ORDER;
 
 
 FolderFunctionComponentView.propertyDialogLines = [

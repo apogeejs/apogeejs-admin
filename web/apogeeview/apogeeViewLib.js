@@ -19,7 +19,7 @@ export {default as ErrorDisplay} from "/apogeeview/datadisplay/ErrorDisplay.js";
 export {default as HandsonGridEditor} from "/apogeeview/datadisplay/HandsonGridEditor.js";
 export {default as HtmlJsDataDisplay} from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 
-export {registerComponentView,getComponentViewClass} from "/apogeeview/componentViewConfig.js";
+export {registerComponentView,getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeeview/componentViewInfo.js";
 
 export {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 

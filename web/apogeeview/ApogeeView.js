@@ -410,7 +410,7 @@ export default class ApogeeView {
         
         for(var i = 0; i < standardComponents.length; i++) {
             let componentName = standardComponents[i];
-            let componentClass = componentInfo.getComponent(componentName);
+            let componentClass = componentInfo.getComponentClass(componentName);
             
             let menuItem = {};
             menuItem.title = "Add " + componentClass.displayName;

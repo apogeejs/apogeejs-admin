@@ -169,8 +169,10 @@ export default class WebDisplayContainer {
 
     /** This method destroys the data display. */
     destroy() {
-        if((this.dataDisplay)&&(this.dataDisplay.destroy)) {
-            this.dataDisplay.destroy();
+        if(this.dataDisplay) {
+            if(this.dataDisplay.destroy) {
+                this.dataDisplay.destroy();
+            }
             this.dataDisplay = null;
             this.dataDisplayLoaded = false;
         }
@@ -197,7 +199,7 @@ export default class WebDisplayContainer {
    componentUpdated(component) {
         //update the data display
         if((this.dataDisplay)&&(!this.inEditMode)) {
-            let {reloadDataDisplay, reloadData} = this.dataDisplay.doUpdate();
+            let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
             if(reloadDataDisplay) {
                 this.reloadDisplay();
             }

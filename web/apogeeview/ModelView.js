@@ -1,7 +1,7 @@
 import {uiutil,TreeEntry} from "/apogeeui/apogeeUiLib.js";
 import {componentInfo} from "/apogeeapp/apogeeAppLib.js";
 import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
-import {getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeeview/componentViewConfig.js";
+import {getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeeview/componentViewInfo.js";
 
 /** This class manages the user interface for a workspace object. */
 export default class ModelView {
@@ -207,7 +207,7 @@ export default class ModelView {
             let pageComponents = componentInfo.getPageComponentNames();
             pageComponents.forEach(pageComponentName => {
                 let childMenuItem = {};
-                let pageComponentClass = componentInfo.getComponent(pageComponentName);
+                let pageComponentClass = componentInfo.getComponentClass(pageComponentName);
                 childMenuItem.title = "Add Child " + pageComponentClass.displayName;
                 childMenuItem.callback = () => addComponent(appView,app,pageComponentClass,initialValues);
                 menuItemList.push(childMenuItem);

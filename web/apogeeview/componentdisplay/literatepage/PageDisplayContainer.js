@@ -409,7 +409,7 @@ export default class PageDisplayContainer {
     componentUpdated(component) {
         //update the data display
         if((this.dataDisplay)&&(!this.inEditMode)) {
-            let {reloadDataDisplay, reloadData} = this.dataDisplay.doUpdate();
+            let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
             if(reloadDataDisplay) {
                 this.reloadDisplay();
             }

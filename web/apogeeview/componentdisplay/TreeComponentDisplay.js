@@ -85,7 +85,7 @@ export default class TreeComponentDisplay {
                 let pageComponents = componentInfo.getPageComponentNames();
                 pageComponents.forEach(pageComponentName => {
                     let childMenuItem = {};
-                    let pageComponentClass = componentInfo.getComponent(pageComponentName);
+                    let pageComponentClass = componentInfo.getComponentClass(pageComponentName);
                     childMenuItem.title = "Add Child " + pageComponentClass.displayName;
                     childMenuItem.callback = () => addComponent(appView,app,pageComponentClass,initialValues);
                     menuItemList.push(childMenuItem);

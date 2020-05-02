@@ -3,7 +3,7 @@ import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
 
 import {addComponent, addAdditionalComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 import PageChildComponentDisplay from "/apogeeview/componentdisplay/literatepage/PageChildComponentDisplay.js"
-import {getComponentViewClass} from "/apogeeview/componentViewConfig.js";
+import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 
 import {uiutil,Tab,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
 

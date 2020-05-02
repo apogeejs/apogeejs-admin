@@ -24,4 +24,4 @@ FolderComponentView.componentName = "apogeeapp.app.FolderComponent";
 FolderComponentView.hasTabEntry = true;
 FolderComponentView.hasChildEntry = false;
 FolderComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";
-FolderComponentView.TREE_ENTRY_SORT_ORDER = ComponentView.FOLDER_COMPONENT_TYPE_SORT_ORDER;
+FolderComponentView.TREE_ENTRY_SORT_ORDER = ParentComponentView.FOLDER_COMPONENT_TYPE_SORT_ORDER;

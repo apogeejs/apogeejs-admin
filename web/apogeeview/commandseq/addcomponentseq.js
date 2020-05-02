@@ -5,7 +5,7 @@ import {getPropertiesDialogLayout} from "/apogeeview/commandseq/updatecomponents
 import {Component,componentInfo} from "/apogeeapp/apogeeAppLib.js";
 import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog.js";
-import {getComponentViewClass} from "/apogeeview/componentViewConfig.js";
+import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 
 //=====================================
 // UI Entry Point
