@@ -1,5 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
+import {componentInfo} from "/apogeeapp/apogeeAppLib.js";
 
 import {addComponent, addAdditionalComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 import PageChildComponentDisplay from "/apogeeview/componentdisplay/literatepage/PageChildComponentDisplay.js"
@@ -303,10 +304,11 @@ export default class LiteratePageComponentDisplay {
         var appView = this.componentView.getModelView().getWorkspaceView().getAppView();
         var app = appView.getApp();
 
-        for(var i = 0; i < app.standardComponents.length; i++) {
-            let key = app.standardComponents[i];
+        let standardComponentNames = componentInfo.getStandardComponentNames();
+        for(var i = 0; i < standardComponentNames.length; i++) {
+            let componentName = standardComponentNames[i];
 
-            let componentClass = app.componentClasses[key];
+            let componentClass = componentInfo.getComponentClass(componentName);
             let componentViewClass = getComponentViewClass(componentClass.uniqueName);
             if(componentViewClass.hasChildEntry) {
 

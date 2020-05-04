@@ -141,13 +141,13 @@ export default class DependentMember extends Member {
         for(var idString in newDependsOnMap) {
             if(newDependsOnMap[idString] != oldDependsOnMap[idString]) {
                 dependenciesUpdated = true;
-                if(!oldDependsOnMap[idString]) model.addToImpactsList(this.getId(),idString);
+                if(newDependsOnMap[idString] == apogeeutil.NORMAL_DEPENDENCY) model.addToImpactsList(this.getId(),idString);
             }
         }
         for(var idString in oldDependsOnMap) {
             if(newDependsOnMap[idString] != oldDependsOnMap[idString]) {
                 dependenciesUpdated = true;
-                if(!oldDependsOnMap[idString]) model.removeFromImpactsList(this.getId(),idString);
+                if(!oldDependsOnMap[idString] == apogeeutil.NORMAL_DEPENDENCY) model.removeFromImpactsList(this.getId(),idString);
             }
         }
 
