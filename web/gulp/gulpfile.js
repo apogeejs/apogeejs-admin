@@ -199,7 +199,7 @@ let releaseElectronTask = parallel(
 function packageElectronSourceTask() {
     return rollup.rollup({
         input: '../applications/electronapp/app.js',
-		external: ['fs',"/apogee/nodeGLobals.js","/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
+		external: ['fs'],
 		plugins: [
 			{resolveId}
 		]
@@ -207,14 +207,7 @@ function packageElectronSourceTask() {
         return bundle.write(
             {
                 file: ELECTRON_FOLDER + "/" + ELECTRON_APP_JS_FILENAME,
-                format: 'cjs',
-                paths: {
-                    "/apogee/nodeGlobals.js": "./nodeGlobals.js",
-                    "/apogeeutil/apogeeUtilLib.js": "./" + UTIL_LIB_CJS_FILE_NAME,
-                    "/apogee/apogeeCoreLib.js": "./" + CORE_LIB_CJS_FILE_NAME,
-                    "/apogeeapp/apogeeAppLib.js": "./" + APP_LIB_CJS_FILE_NAME,
-                    "/apogeeview/apogeeViewLib.js": "./" + VIEW_LIB_CJS_FILE_NAME
-                }
+                format: 'cjs'
             }
         );
     });
