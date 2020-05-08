@@ -1,27 +1,8 @@
 /** This replaces ApogeeView when running a client web application. */
 import {Apogee} from "/apogeeapp/apogeeAppLib.js";
-import {initIncludePath} from "/apogeeview/apogeeViewLib.js";
 import WebComponentDisplay from "/apogeeview/componentdisplay/webpage/WebComponentDisplay.js";
 import {getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeeview/componentViewInfo.js";
 import WebAppConfigManager from "/applications/webclientlib/WebAppConfigManager.js";
-
-//expose these apogee libraries globally so plugins can use them
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import * as apogee from "/apogee/apogeeCoreLib.js";
-import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
-import * as apogeeui from "/apogeeui/apogeeUiLib.js";
-import * as apogeeview from "/apogeeview/apogeeViewLib.js";
-window.apogeeutil = apogeeutil;
-window.apogee = apogee;
-window.apogeeapp = apogeeapp;
-window.apogeeui = apogeeui;
-window.apogeeview = apogeeview;
-
-const INCLUDE_PATH_INFO = {
-    "resources": "/resources",
-    "aceIncludes": "/ext/ace/ace_1.4.3/ace_includes"
-};
-initIncludePath(INCLUDE_PATH_INFO);
 
 export default class ApogeeWebView {
 
