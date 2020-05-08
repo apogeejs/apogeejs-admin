@@ -1,116 +1,152 @@
-import base from "/apogeeutil/base.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import Workspace from "/apogee/data/Workspace.js";
-import Member from "/apogee/datacomponents/Member.js";
-import Dependent from "/apogee/datacomponents/Dependent.js";
-import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
-import Codeable from "/apogee/datacomponents/Codeable.js";
+import Model from "/apogee/data/Model.js";
+import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 
 /** This is a function. */
-function FunctionTable(name,owner,initialData) {
-    //base init
-    Member.init.call(this,name,FunctionTable.generator);
-    Dependent.init.call(this);
-    ContextHolder.init.call(this);
-	Codeable.init.call(this,argList,false);
-    
-    this.initOwner(owner);
-    
-    //set initial data
-    var argList = initialData.argList ? initialData.argList : [];
-    var functionBody = initialData.functionBody ? initialData.functionBody : "";
-    var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
-    this.applyCode(argList,functionBody,supplementalCode);
-}
+export default class FunctionTable extends CodeableMember {
 
-//add components to this class
-base.mixin(FunctionTable,Member);
-base.mixin(FunctionTable,Dependent);
-base.mixin(FunctionTable,ContextHolder);
-base.mixin(FunctionTable,Codeable);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed);   
+    }
 
-//------------------------------
-// Codeable Methods
-//------------------------------
+    //------------------------------
+    // Codeable Methods
+    //------------------------------
 
-FunctionTable.prototype.processMemberFunction = function(memberGenerator) {
-    var memberFunction = this.getLazyInitializedMemberFunction(memberGenerator);
-	this.setData(memberFunction);
-}
+    processMemberFunction(model,memberFunctionInitializer,memberGenerator) {
+        var memberFunction = this.getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator);
+        this.setData(memberFunction);
+    }
 
-FunctionTable.prototype.getLazyInitializedMemberFunction = function(memberGenerator) {
-    var instance = this;
+    getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator) {
 
-    //create init member function for lazy initialization
-    //we need to do this for recursive functions, or else we will get a circular reference
-    var initMember = function() {
-        var impactorSuccess = instance.memberFunctionInitialize();
-        if(impactorSuccess) {
-            return memberGenerator();
-        }
-        else {
-            //error handling
-            var issue;
-            
-            //in the case of "result invalid" or "result pending" this is 
-            //NOT an error. But I don't know
-            //how else to stop the calculation other than throwing an error, so 
-            //we do that here. It should be handled by anyone calling a function.
-            if(instance.hasError()) {
-                issue = new Error("Error in dependency: " + instance.getFullName());
-
-            }
-            else if(instance.getResultPending()) {
-                issue = base.MEMBER_FUNCTION_PENDING_THROWABLE;
-            }
-            else if(instance.getResultInvalid()) {
-                issue = base.MEMBER_FUNCTION_INVALID_THROWABLE;
+        //create init member function for lazy initialization
+        //we need to do this for recursive functions, or else we will get a circular reference
+        var initMember = () => {
+            var impactorSuccess = memberFunctionInitializer();
+            if(impactorSuccess) {
+                return memberGenerator();
             }
             else {
-                issue = new Error("Unknown problem in initializing: " + instance.getFullName());
+                //error handling
+                let issue;
+                let state = this.getState();
+
+                //in the case of "result invalid" or "result pending" this is 
+                //NOT an error. But I don't know
+                //how else to stop the calculation other than throwing an error, so 
+                //we do that here. It should be handled by anyone calling a function.
+                if(state == apogeeutil.STATE_ERROR) {
+                    issue = new Error("Error in dependency: " + this.getName());
+                }
+                else if(state == apogeeutil.STATE_PENDING) {
+                    issue = apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE;
+                }
+                else if(state == apogeeutil.STATE_INVALID) {
+                    issue = apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE;
+                }
+                else {
+                    issue = new Error("Unknown problem in initializing: " + this.getName());
+                }
+                
+                throw issue;
+            } 
+        }
+
+        //this is called from separate code to make debugging more readable
+        return __functionTableWrapper(initMember);
+    }
+
+    /** Add to the base lock function - The function is lazy initialized so it can call itself without a 
+     * ciruclar reference. The initialization happens on the first actual call. This is OK if we are doing the
+     * model calculation. but if it is first called _AFTER_ the model has completed being calculated, such as
+     * externally, then we will get a locked error when the lazy initialization happens. Instead, we will
+     * complete the lazy initialization before the lock is done. At this point we don't need to worry about
+     * circular refernce anyway, since the model has already completed its calculation. */
+    lock() {
+        //check if the function is initialized
+        let memberFunction = this.getData();
+        if((memberFunction)&&(memberFunction.initializeIfNeeded)) {
+            try {
+                memberFunction.initializeIfNeeded();
             }
-            
-            throw issue;
-        } 
+            catch(error) {
+                //handle potential error cases!!!:
+                
+                if(error == apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE) {
+                    //This is not an error. I don't like to throw an error
+                    //for an expected condition, but I didn't know how else
+                    //to do this. See notes where this is thrown.
+                    this.setResultInvalid();
+                }
+                else if(error == apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE) {
+                    //This is not an error. I don't like to throw an error
+                    //for an expected condition, but I didn't know how else
+                    //to do this. See notes where this is thrown.
+                    this.setResultPending();
+                }
+                //--------------------------------------
+                else {
+                    //normal error in member function execution
+                
+                    //this is an error in the code
+                    if(error.stack) {
+                        console.error(error.stack);
+                    }
+    
+                    this.setError(error);
+                }
+            }
+
+        }
+        super.lock();
     }
 
-    //this is called from separate code to make debugging more readable
-    return __functionTableWrapper(initMember);
-}
+    //------------------------------
+    // Member Methods
+    //------------------------------
 
-//------------------------------
-// Member Methods
-//------------------------------
+    /** This method creates a member from a json. It should be implemented as a static
+     * method in a non-abstract class. */ 
+    static fromJson(parentId,json) {
+        let member = new FunctionTable(json.name,parentId);
 
-/** This method creates a member from a json. It should be implemented as a static
- * method in a non-abstract class. */ 
-FunctionTable.fromJson = function(owner,json) {
-    return new FunctionTable(json.name,owner,json.updateData);
-}
+        //set initial data
+        let initialData = json.updateData;
 
-/** This method extends the base method to get the property values
- * for the property editting. */
-FunctionTable.readProperties = function(member,values) {
-    var argList = member.getArgList();
-    var argListString = argList.toString();
-    values.argListString = argListString;
-    return values;
-}
+        var argList = initialData.argList ? initialData.argList : [];
+        var functionBody = initialData.functionBody ? initialData.functionBody : "";
+        var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
+        member.applyCode(argList,functionBody,supplementalCode);
 
-/** This method executes a property update. */
-FunctionTable.getPropertyUpdateAction = function(member,newValues) {
-    if((newValues.updateData)&&(newValues.updateData.argList !== undefined)) {
-        var actionData = {};
-        actionData.action = "updateCode";
-        actionData.memberName = member.getFullName();
-        actionData.argList = newValues.updateData.argList;
-        actionData.functionBody = member.getFunctionBody();
-        actionData.supplementalCode = member.getSupplementalCode();
-        return actionData;
+        return member;
     }
-    else {
-        return null;
+
+    /** This method extends the base method to get the property values
+     * for the property editting. */
+    static readProperties(member,values) {
+        var argList = member.getArgList();
+        var argListString = argList.toString();
+        values.argListString = argListString;
+        return values;
     }
+
+    /** This method executes a property update. */
+    static getPropertyUpdateAction(member,newValues) {
+        if((newValues.updateData)&&(newValues.updateData.argList !== undefined)) {
+            var actionData = {};
+            actionData.action = "updateCode";
+            actionData.memberId = member.getId();
+            actionData.argList = newValues.updateData.argList;
+            actionData.functionBody = member.getFunctionBody();
+            actionData.supplementalCode = member.getSupplementalCode();
+            return actionData;
+        }
+        else {
+            return null;
+        }
+    }
+
 }
 
 //============================
@@ -127,6 +163,6 @@ FunctionTable.generator.setDataOk = false;
 FunctionTable.generator.setCodeOk = true;
 
 //register this member
-Workspace.addMemberGenerator(FunctionTable.generator);
+Model.addMemberGenerator(FunctionTable.generator);
 
 

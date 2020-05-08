@@ -1,4 +1,4 @@
-import DataDisplay from "/apogeeapp/app/datadisplay/DataDisplay.js";
+import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 
 /** 
  * SimpleGeojsonControl
@@ -31,8 +31,8 @@ define(['http://localhost:8383/lib/controls/simpleGeojsonControl/leaflet_1.0.1_A
 
         /** This is a simple custom resource component example. */
         apogeeapp.app.SimpleGeojsonControl = class extends apogeeapp.app.BasicControlComponent {
-            constructor(workspaceUI,control) {
-                super(workspaceUI,control,apogeeapp.app.SimpleGeojsonControl);
+            constructor(member,modelManager) {
+                super(member,modelManager);
             }
 
             getOutputDisplay(viewMode) {
@@ -74,7 +74,7 @@ define(['http://localhost:8383/lib/controls/simpleGeojsonControl/leaflet_1.0.1_A
                 super(viewMode,callbacks)
 
                 //create map element - this css class will fill the parent (the window frame) with no scrolling 
-                this.mapElement = apogeeui.createElement("div");
+                this.mapElement = uiutil.createElement("div");
                 this.mapElement.className = "visiui_win_container_fixed";
 
                 this.member = member;
@@ -87,13 +87,6 @@ define(['http://localhost:8383/lib/controls/simpleGeojsonControl/leaflet_1.0.1_A
             //This gets the content for the display
             getContent() {
                 return this.mapElement;
-            }
-
-            //this method tells the window the type of content:
-            //apogeeui.RESIZABLE - if the window can freely resize it
-            //apogeeui.FIXED_SIZE - if the content is fixed size
-            getContentType() {
-                return apogeeui.RESIZABLE;
             }
 
             setData(data) {

@@ -1,0 +1,170 @@
+{
+	"fileType": "apogee app js workspace",
+	"version": "0.50",
+	"references": {
+		"viewState": {
+			"treeState": -1
+		}
+	},
+	"code": {
+		"model": {
+			"fileType": "apogee model",
+			"version": 0.2,
+			"name": "Workspace",
+			"children": {
+				"Main": {
+					"name": "Main",
+					"type": "apogee.Folder",
+					"children": {
+						"df": {
+							"name": "df",
+							"type": "apogee.FunctionTable",
+							"updateData": {
+								"argList": [
+									"admin"
+								],
+								"functionBody": "let onSubmit = formValue => alert(JSON.stringify(formValue));\nlet onCancel = () => false;\n\nreturn [\n    {\n        type: \"heading\",\n        \"level\": 2,\n        \"text\": \"Test Form\"\n    },\n    {\n\t\t\"type\": \"textField\",\n\t\t\"label\": \"Test text entry: \",\n\t\t\"value\": \"Hello There!\",\n\t\t\"key\": \"text1\"\n\t},\n\t{\n\t\t\"type\": \"radioButtonGroup\",\n\t\t\"label\": \"Radio 1: \",\n\t\t\"groupName\": \"rg1\",\n\t\t\"entries\": [\n\t\t\t\"antelope\",\n\t\t\t\"buffalo\",\n\t\t\t\"cat\",\n\t\t\t\"dog\"\n\t\t],\n\t\t\"value\": \"dog\",\n\t\t\"key\": \"radioGroup1\"\n\t},\n\t{\n\t    \"type\": \"submit\",\n\t    \"submitLabel\": \"SUBMIT!\",\n\t    \"onSubmit\": onSubmit\n\t}\n]",
+								"supplementalCode": ""
+							}
+						},
+						"fdq": {
+							"name": "fdq",
+							"type": "apogee.Folder",
+							"children": {
+								"layout": {
+									"name": "layout",
+									"type": "apogee.FunctionTable",
+									"updateData": {
+										"argList": [],
+										"functionBody": "return [\n    {\n        type: \"heading\",\n        \"level\": 2,\n        \"text\": \"Test Form\"\n    },\n    {\n\t\t\"type\": \"textField\",\n\t\t\"label\": \"Test text entry: \",\n\t\t\"value\": \"Hello There!\",\n\t\t\"key\": \"text1\"\n\t},\n\t{\n\t\t\"type\": \"radioButtonGroup\",\n\t\t\"label\": \"Radio 1: \",\n\t\t\"groupName\": \"rg1\",\n\t\t\"entries\": [\n\t\t\t\"antelope\",\n\t\t\t\"buffalo\",\n\t\t\t\"cat\",\n\t\t\t\"dog\"\n\t\t],\n\t\t\"value\": \"dog\",\n\t\t\"key\": \"radioGroup1\"\n\t},\n\t{\n\t    \"type\": \"submit\",\n\t    \"submitLabel\": \"SUBMIT!\",\n\t    \"onSubmit\": onSubmit\n\t}\n]",
+										"supplementalCode": ""
+									}
+								},
+								"data": {
+									"name": "data",
+									"type": "apogee.JsonTable",
+									"updateData": {
+										"data": {
+											"text1": "Hello. Is there anybody out there.",
+											"radioGroup1": "buffalo"
+										}
+									}
+								},
+								"isInputValid": {
+									"name": "isInputValid",
+									"type": "apogee.FunctionTable",
+									"updateData": {
+										"argList": [
+											"formValue"
+										],
+										"functionBody": "//If data valid, return true. If data is invalid, return an error message.\nreturn true;",
+										"supplementalCode": ""
+									}
+								}
+							},
+							"childrenNotWriteable": true
+						}
+					}
+				}
+			}
+		},
+		"components": {
+			"Main": {
+				"type": "apogeeapp.app.FolderComponent",
+				"data": {
+					"doc": {
+						"type": "doc",
+						"content": [
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "df",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "Data Form"
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "fdq",
+									"id": 0,
+									"state": ""
+								}
+							}
+						]
+					}
+				},
+				"children": {
+					"df": {
+						"type": "apogeeapp.app.DynamicForm",
+						"viewState": {
+							"childDisplayState": {
+								"views": {
+									"Form": {
+										"isViewActive": true
+									},
+									"Code": {
+										"isViewActive": false,
+										"height": 7000
+									},
+									"Private": {
+										"isViewActive": false
+									}
+								}
+							}
+						}
+					},
+					"fdq": {
+						"type": "apogeeapp.app.FormDataComponent",
+						"viewState": {
+							"childDisplayState": {
+								"views": {
+									"Form": {
+										"isViewActive": true
+									},
+									"Layout Code": {
+										"height": 7000,
+										"isViewActive": false
+									},
+									"Layout Private": {
+										"isViewActive": false
+									},
+									"isInputValid(formValue)": {
+										"isViewActive": false
+									},
+									"isInputValid Private": {
+										"isViewActive": false
+									},
+									"Form Value": {
+										"isViewActive": true,
+										"height": 280
+									}
+								}
+							}
+						}
+					}
+				},
+				"viewState": {
+					"childDisplayState": null,
+					"tabOpened": true,
+					"tabShowing": true
+				}
+			},
+			"viewState": {
+				"treeState": 1
+			}
+		}
+	},
+	"viewState": {
+		"treeState": 1
+	}
+}

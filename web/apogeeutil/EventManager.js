@@ -6,7 +6,7 @@ var EventManager = {};
 export { EventManager as default };
     
 /** This serves as the constructor. */
-EventManager.init = function() {
+EventManager.eventManagerMixinInit = function() {
      /** This field holds the event listeners
     * @private */
     this.listenerTable = {};
@@ -43,6 +43,11 @@ EventManager.removeListener = function(eventName, callback) {
             callbackList.splice(index,1);
         }
     }
+}
+
+/** THis method dispatches an event. */
+EventManager.hasListeners = function(eventName) {
+    return this.listenerTable[eventName] ? true : false;
 }
 
 /** THis method dispatches an event. */

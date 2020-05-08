@@ -6,38 +6,35 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         
         <link rel="stylesheet" type="text/css" href="/prosemirror/lib/compiledCss/editor.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/app/apogeeapp.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/app/component/literatepage/LiteratePage.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/app/editor/toolbar/ApogeeToolbar.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/window/WindowFrame.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/window/dialog.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/displayandheader/DisplayAndHeader.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/menu/Menu.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/splitpane/SplitPane.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/tabframe/TabFrame.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/treecontrol/TreeControl.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeapp/ui/configurablepanel/ConfigurablePanel.css">     
+        <link rel="stylesheet" type="text/css" href="/apogeeview/apogeeapp.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeview/componentdisplay/literatepage/LiteratePage.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeview/editor/toolbar/ApogeeToolbar.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeui/window/WindowFrame.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeui/window/dialog.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeui/displayandheader/DisplayAndHeader.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeui/menu/Menu.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeui/splitpane/SplitPane.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeui/tabframe/TabFrame.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeui/treecontrol/TreeControl.css">
+        <link rel="stylesheet" type="text/css" href="/apogeeui/configurablepanel/ConfigurablePanel.css">     
         <link rel="stylesheet" type="text/css" href="/ext/handsontable/handsontable_6.2.0/handsontable.full.min.css">
         <!-- <link rel="stylesheet" type="text/css" href="/gulp/dist/v0.9.0a/assets/cssBundle.css"> -->
    
         
         <script type="module">
-            import apogeeAppLib from "/applications/webclientlib/webClientLib.js";
+            import "/apogee/webGlobals.js";
+            import {ApogeeWebView} from "/apogeeview/apogeeViewLib.js";
         
             let workspaceUrl = "webAppTestWorkspace.json";
+            let appView;
 
 			window.init = function() {
-                //start app
-                apogeeAppLib.initWebApp(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed);
-            }
+                appView = new ApogeeWebView();
 
-            function onWorkspaceLoad(openResult) {
-                apogeeAppLib.addDisplay("Model.a","aDisplayElement",true);
-                apogeeAppLib.addDisplay("Model.b","bDisplayElement",true);
-            }
+                appView.addDisplay("Main.a","aDisplayElement",true,"Data");
+                appView.addDisplay("Main.b","bDisplayElement",true,"Data");
 
-            function onWorkspaceLoadFailed(failResult) {
-                alert("Workspace open complete: " + JSON.stringify(failResult));
+                appView.openWorkspace(workspaceUrl);
             }
             
 		</script>

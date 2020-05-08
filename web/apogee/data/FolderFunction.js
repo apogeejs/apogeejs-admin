@@ -1,364 +1,380 @@
-import base from "/apogeeutil/base.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {doAction} from "/apogee/actions/action.js";
-import Workspace from "/apogee/data/Workspace.js";
-import ActionError from "/apogee/lib/ActionError.js";
+import Model from "/apogee/data/Model.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
-import Member from "/apogee/datacomponents/Member.js";
-import Dependent from "/apogee/datacomponents/Dependent.js";
+import DependentMember from "/apogee/datacomponents/DependentMember.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
-import Owner from "/apogee/datacomponents/Owner.js";
-import RootHolder from "/apogee/datacomponents/RootHolder.js";
-import CommandManager from "/apogeeapp/app/commands/CommandManager.js";
+import Parent from "/apogee/datacomponents/Parent.js";
 
 /** This is a folderFunction, which is basically a function
  * that is expanded into data objects. */
-function FolderFunction(name,owner,initialData) {
-    //base init
-    Member.init.call(this,name,FolderFunction.generator);
-    Dependent.init.call(this);
-    ContextHolder.init.call(this);
-    Owner.init.call(this);
-    RootHolder.init.call(this);
+export default class FolderFunction extends DependentMember {
+
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed);
+
+        //mixin init where needed
+        this.contextHolderMixinInit();
+        this.parentMixinInit(instanceToCopy);
+
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            //set to an empty function
+            this.setData(function(){});
+
+            //this field is used to disable the calculation of the value of this function
+            //It is used in the "virtual model" to prevent any unnecessary downstream calculations
+            this.setField("sterilized",false)
+        }
+
+        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        this.temporaryVirtualModelRunContext = {
+            doFutureAction: function(modelId,actionData) {
+                let msg = "NOT IPLEMENTED: Asynchronous actions in folder function!"
+                alert(msg);
+                throw new Error(msg);
+            }
+        }
+        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    }
+
+    /** This gets the internal forlder for the folderFunction. */
+    getInternalFolder(model) {
+        return this.lookupChild(model,"body");
+    }
+
+    /** This gets the name of the return object for the folderFunction function. */
+    getReturnValueString() {
+        return this.getField("returnValue");
+    }
+
+    /** This gets the arg list of the folderFunction function. */
+    getArgList() {
+        return this.getField("argList");
+    }
+
+    //------------------------------
+    // Member Methods
+    //------------------------------
+
+    /** This method creates a member from a json. It should be implemented as a static
+     * method in a non-abstract class. */ 
+    static fromJson(parentId,json) {
+        let member = new FolderFunction(json.name,parentId);
+
+        //set initial data
+        let initialData = json.updateData;
+        let argList = ((initialData)&&(initialData.argList !== undefined)) ? initialData.argList : [];
+        member.setField("argList",argList);
+        let returnValueString = ((initialData)&&(initialData.returnValue !== undefined)) ? initialData.returnValue : [];
+        member.setField("returnValue",returnValueString);
+        
+        return member;
+    }
+
+    /** This method adds any additional data to the json saved for this member. 
+     * @protected */
+    addToJson(model,json) {
+        json.updateData = {};
+        json.updateData.argList = this.getField("argList");
+        json.updateData.returnValue = this.getField("returnValue");
+        json.children = {};
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            var childId = childIdMap[name];
+            let child = model.lookupMemberById(childId);
+            if(child) {
+                json.children[name] = child.toJson(model);
+            }
+        }
+    }
+
+    /** This method extends the base method to get the property values
+     * for the property editting. */
+    static readProperties(member,values) {
+        var argList = member.getArgList();
+        var argListString = argList.toString();
+        values.argListString = argListString;
+        values.returnValueString = member.getReturnValueString();
+        return values;
+    }
+
+    /** This method executes a property update. */
+    static getPropertyUpdateAction(folderFunction,newValues) {
+        let updateData = newValues.updateData;
+        if((updateData)&&((updateData.argList !== undefined)||(updateData.returnValue !== undefined))) {
+
+            var argList = updateData.argList ? updateData.argList : folderFunction.getArgList();
+            var returnValueString = updateData.returnValue ? updateData.returnValue : folderFunction.getReturnValueString();
     
-    this.initOwner(owner);
-    
-    //set initial data
-    this.argList = initialData.argList !== undefined ? initialData.argList : [];
-    this.returnValueString = initialData.returnValue !== undefined ? initialData.returnValue : [];
-    //set to an empty function
-    this.setData(function(){});
-    this.fieldUpdated("argList");
-    this.fieldUpdated("returnValue");
+            var actionData = {};
+            actionData.action = "updateFolderFunction";
+            actionData.memberId = folderFunction.getId();
+            actionData.argList = argList;
+            actionData.returnValueString = returnValueString;
+            return actionData;
+        }    
+        else {
+            return null;
+        }
+    }
+
+    //-------------------------------
+    // Dependent Methods
+    //-------------------------------
+        
+
+    /** If this is true the member must be executed. */
+    memberUsesRecalculation() {
+        return true;
+    }
+
+    /** This updates the member data based on the function. It returns
+     * true for success and false if there is an error.  */
+    calculate(model) {  
+
+        //if this function is sterilized, we will just set the value to invalid value.
+        //This prevents any object which calls this function from updating. It is inended to be 
+        //used in the virtual workspace assoicated with this folder function
+        if(this.getField("sterilized")) {
+            this.setResultInvalid();
+            this.clearCalcPending();
+            return;
+        }
+
+        //make sure the data is set in each impactor
+        this.initializeImpactors(model);
+
+        let state = this.getState();
+        if((state != apogeeutil.STATE_ERROR)&&(state != apogeeutil.STATE_PENDING)&&(state != apogeeutil.STATE_INVALID)) {
+            //check for code errors, if so set a data error
+            try {
+                var folderFunctionFunction = this.getFolderFunctionFunction(model);
+                this.setData(folderFunctionFunction);
+            }
+            catch(error) {
+                if(error.stack) console.error(error.stack);
+                
+                //error in calculation
+                this.setError(error);
+            }
+        }
+        
+        this.clearCalcPending();
+    }
+
+    /** This method updates the dependencies of any children
+     * based on an object being added. */
+    updateDependeciesForModelChange(model,additionalUpdatedMembers) {
+
+        //update dependencies of this folder
+        let oldDependsOnMap = this.getDependsOn();
+        let newDependsOnMap = this.calculateDependents(model);
+        if(!apogeeutil.jsonEquals(oldDependsOnMap,newDependsOnMap)) {
+            //if dependencies changes, make a new mutable copy and add this to 
+            //the updated values list
+            let mutableMemberCopy = model.getMutableMember(this.getId());
+            mutableMemberCopy.updateDependencies(model,newDependsOnMap);
+            additionalUpdatedMembers.push(mutableMemberCopy);
+        }
+
+        //call update in children
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            var childId = childIdMap[name];
+            let child = model.lookupMemberById(childId);
+            if((child)&&(child.isDependent)) {
+                child.updateDependeciesForModelChange(model,additionalUpdatedMembers);
+            }
+        }
+    }
+
+    //------------------------------
+    //ContextHolder methods
+    //------------------------------
+
+    /** This method retrieve creates the loaded context manager. */
+    createContextManager() {
+        //set the context manager
+        var contextManager = new ContextManager(this);
+        
+        //add an entry for this folder
+        var myEntry = {};
+        myEntry.contextHolderAsParent = true;
+        contextManager.addToContextList(myEntry);
+        
+        return contextManager;
+    }
+
+    //------------------------------
+    //Parent methods
+    //------------------------------
+
+    onAddChild(model,child) {
+        //set all children as dependents
+        let dependsOnMap = this.calculateDependents(model);
+        this.updateDependencies(model,dependsOnMap);
+    }
+
+    onRemoveChild(model,child) {
+        //set all children as dependents
+        let dependsOnMap = this.calculateDependents(model);
+        this.updateDependencies(model,dependsOnMap);
+    }
+
+    /** this method gets the hame the children inherit for the full name. */
+    getPossesionNameBase(model) {
+        return this.getFullName(model) + ".";
+    }
+
+    //============================
+    // Private methods
+    //============================
+
+    /** This method updates the table data object in the folder data map. 
+     * @private */
+    calculateDependents(model) {
+        let dependsOnMap = [];
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            var childId = childIdMap[name];
+            dependsOnMap[childId] = apogeeutil.NORMAL_DEPENDENCY;
+        }
+        return dependsOnMap;
+    }
+
+    /** This is called from the update action. It should not be called externally. */
+    setReturnValueString(returnValueString) {
+        let existingRVS = this.getField("returnValue");
+        if(existingRVS != returnValueString) {
+            this.setField("returnValue",returnValueString);
+        }
+    }
+
+    /** This is called from the update action. It should not be called externally. */
+    setArgList(argList) {
+        let existingArgList = this.getField("argList");
+        if(existingArgList != argList) {
+            this.setField("argList",argList);
+        }
+    }
+
+    /** This method creates the folderFunction function. It is called from the update action 
+     * and should not be called externally. 
+     * @private */
+    getFolderFunctionFunction(model) {
+
+        //create a copy of the model to do the function calculation - we don't update the UI display version
+        var virtualModel;
+        var inputMemberIdArray;
+        var returnValueMemberId; 
+        
+        var initialized = false;
+        
+        var folderFunctionFunction = (...argumentArray) => {
+            
+            if(!initialized) {
+                //get the ids of the inputs and outputs. We can use the real instance to look these up since they don't change.
+                let internalFolder = this.getInternalFolder(model);
+                inputMemberIdArray = this.loadInputElementIds(model,internalFolder);
+                returnValueMemberId = this.loadOutputElementId(model,internalFolder); 
+
+                //prepare the virtual function
+                //this is a copy of the original model, but with any member that is unlocked replaced.
+                //to prevent us from modifying an object in use by our current real model calculation.
+                virtualModel = model.getCleanCopy(this.temporaryVirtualModelRunContext);
+
+                //we want to set the folder function as "sterilized" - this prevents any downstream work from the folder function updating
+                let commandData = {}
+                commandData.action = "setField";
+                commandData.memberId = this.getId();
+                commandData.fieldName = "sterilized";
+                commandData.fieldValue = "true";
+                let actionResult = doAction(virtualModel,commandData);
+
+                //we should do something with the action result
+                if(!actionResult.actionDone) {
+                    throw new Error("Error calculating folder function");
+                }
+                
+                initialized = true;
+            }
+            
+            //create an update array to set the table values for the input elements  
+            var updateActionList = [];
+            for(var i = 0; i < inputMemberIdArray.length; i++) {
+                var entry = {};
+                entry.action = "updateData";
+                entry.memberId = inputMemberIdArray[i];
+                entry.data = argumentArray[i];
+                updateActionList.push(entry);
+            }
+            
+            var actionData = {};
+            actionData.action = "compoundAction";
+            actionData.actions = updateActionList;
+
+            //apply the update
+            let workingVirtualModel = virtualModel.getMutableModel();
+            var actionResult = doAction(workingVirtualModel,actionData);        
+            if(actionResult.actionDone) {
+                //retrieve the result
+                if(returnValueMemberId) {
+                    let returnValueMember = workingVirtualModel.lookupMemberById(returnValueMemberId);
+                    
+                    if(returnValueMember.getState() == apogeeutil.STATE_PENDING) {
+                        throw new Error("A folder function must not be asynchronous: " + this.getFullName(workingVirtualModel));
+                    }
+                    
+                    //get the resulting output
+                    return returnValueMember.getData();
+                }
+                else {
+                    //no return value found
+                    return undefined;
+                }
+            }
+            else {
+                let errorMsg = actionResult.errorMsg ? actionResult.errorMsg : "Unknown error evaluating Folder Function " + this.getName();
+                throw new Error(errorMsg);
+            }
+        }
+        
+        return folderFunctionFunction;    
+    }
+
+    /** This method loads the input argument members from the virtual model. 
+     * @private */
+    loadInputElementIds(model,internalFolder) {
+        let argMembers = [];
+        let argList = this.getField("argList");
+        for(var i = 0; i < argList.length; i++) {
+            var argName = argList[i];
+            var argMember = internalFolder.lookupChild(model,argName);
+            if(argMember) {
+                argMembers.push(argMember.getId());
+            }     
+        }
+        return argMembers;
+    }
+
+    /** This method loads the output member from the virtual model. 
+     * @private  */
+    loadOutputElementId(model,internalFolder) {
+        let returnValueString = this.getField("returnValue");
+        var returnValueMember = internalFolder.lookupChild(model,returnValueString);
+        return returnValueMember.getId();
+    }
 }
 
 //add components to this class
-base.mixin(FolderFunction,Member);
-base.mixin(FolderFunction,Dependent);
-base.mixin(FolderFunction,ContextHolder);
-base.mixin(FolderFunction,Owner);
-base.mixin(FolderFunction,RootHolder);
+apogeeutil.mixin(FolderFunction,ContextHolder);
+apogeeutil.mixin(FolderFunction,Parent);
 
-FolderFunction.INTERNAL_FOLDER_NAME = "root";
-
-/** This gets the internal forlder for the folderFunction. */
-FolderFunction.prototype.getInternalFolder = function() {
-    return this.internalFolder;
-}
-
-/** Implemnetation of get root for folder function. */
-FolderFunction.prototype.getRoot = function() {
-    return this.getInternalFolder();
-}
-
-/** This method sets the root object - implemented from RootHolder.  */
-FolderFunction.prototype.setRoot = function(child) {
-    this.internalFolder = child;
-    var newDependsOn = [];
-    if(child) newDependsOn.push(child);
-    this.updateDependencies(newDependsOn);
-}
-
-/** This gets the name of the return object for the folderFunction function. */
-FolderFunction.prototype.getReturnValueString = function() {
-    return this.returnValueString;
-}
-
-/** This gets the arg list of the folderFunction function. */
-FolderFunction.prototype.getArgList = function() {
-    return this.argList;
-}
-
-//------------------------------
-// Member Methods
-//------------------------------
-
-/** This method removes any data from this workspace on closing. */
-FolderFunction.prototype.close = function() {
-    this.internalFolder.onClose();
-}
-
-/** This method creates a member from a json. It should be implemented as a static
- * method in a non-abstract class. */ 
-FolderFunction.fromJson = function(owner,json) {
-    return new FolderFunction(json.name,owner,json.updateData);
-}
-
-/** This method adds any additional data to the json saved for this member. 
- * @protected */
-FolderFunction.prototype.addToJson = function(json) {
-    json.updateData = {};
-    json.updateData.argList = this.argList;
-    json.updateData.returnValue = this.returnValueString;
-    json.children = {};
-    json.children[FolderFunction.INTERNAL_FOLDER_NAME] = this.internalFolder.toJson();
-}
-
-/** This method extends the base method to get the property values
- * for the property editting. */
-FolderFunction.readProperties = function(member,values) {
-    var argList = member.getArgList();
-    var argListString = argList.toString();
-    values.argListString = argListString;
-    values.returnValueString = member.getReturnValueString();
-    return values;
-}
-
-/** This method executes a property update. */
-FolderFunction.getPropertyUpdateAction = function(folderFunction,newValues) {
-    let updateData = newValues.updateData;
-    if((updateData)&&((updateData.argList !== undefined)||(updateData.returnValue !== undefined))) {
-
-        var argList = updateData.argList ? updateData.argList : folderFunction.argList;
-        var returnValueString = updateData.returnValue ? updateData.returnValue : folderFunction.returnValueString;
- 
-        var actionData = {};
-        actionData.action = "updateFolderFunction";
-        actionData.memberName = folderFunction.getFullName();
-        actionData.argList = argList;
-        actionData.returnValueString = returnValueString;
-        return actionData;
-    }    
-    else {
-        return null;
-    }
-}
-
-//-------------------------------
-// Dependent Methods
-//-------------------------------
-    
-
-/** If this is true the member must be executed. */
-FolderFunction.prototype.needsCalculating = function() {
-	return true;
-}
-
-/** This updates the member data based on the function. It returns
- * true for success and false if there is an error.  */
-FolderFunction.prototype.calculate = function() {  
-    //make sure the data is set in each impactor
-    this.initializeImpactors();
-    
-    var folderFunctionErrors = [];
-    
-	//check for code errors, if so set a data error
-    var folderFunctionFunction = this.getFolderFunctionFunction(folderFunctionErrors);
-    
-    if(folderFunctionErrors.length == 0) {
-        this.setData(folderFunctionFunction);
-    }
-    else {
-        //for now I can only set a single error. I will set the first.
-        //I should get way to set multiple
-        this.addErrors(folderFunctionErrors);
-    }
-    
-    this.clearCalcPending();
-}
-
-/** This method updates the dependencies of any children
- * based on an object being added. */
-FolderFunction.prototype.updateDependeciesForModelChange = function(recalculateList) {
-    if(this.internalFolder) {
-        this.internalFolder.updateDependeciesForModelChange(recalculateList);
-    }
-}
-
-//------------------------------
-//ContextHolder methods
-//------------------------------
-
-/** This method retrieve creates the loaded context manager. */
-FolderFunction.prototype.createContextManager = function() {
-    return new ContextManager(this);
-}
-
-//------------------------------
-//Parent methods
-//------------------------------
-
-/** this method gets the table map. */
-FolderFunction.prototype.getChildMap = function() {
-    return this.internalFolder.childMap;
-}
-
-/** This method looks up a child from this folder.  */
-FolderFunction.prototype.lookupChild = function(name) {
-    //check look for object in this folder
-    return this.internalFolder.childMap[name];
-}
-
-//------------------------------
-//Owner methods
-//------------------------------
-
-/** this method gets the hame the children inherit for the full name. */
-FolderFunction.prototype.getPossesionNameBase = function() {
-    return this.getFullName() + ".";
-}
-
-/** This method looks up a member by its full name. */
-FolderFunction.prototype.getMemberByPathArray = function(path,startElement) {
-    if(startElement === undefined) startElement = 0;
-    if(path[startElement] === this.internalFolder.getName()) {
-        if(startElement === path.length-1) {
-            return this.internalFolder;
-        }
-        else {
-            startElement++;
-            return this.internalFolder.lookupChildFromPathArray(path,startElement);
-        }
-    }
-    else {
-        return null;
-    }
-}
-
-
-//==============================
-// Private Methods
-//==============================
-
-/** This is called from the update action. It should not be called externally. */
-FolderFunction.prototype.setReturnValueString = function(returnValueString) {
-    if(this.returnValueString != returnValueString) {
-        this.fieldUpdated("returnValue");
-    }
-    this.returnValueString = returnValueString;
-}
-
-/** This is called from the update action. It should not be called externally. */
-FolderFunction.prototype.setArgList = function(argList) {
-    if(this.argList != argList) {
-        this.fieldUpdated("argList");
-    }
-    this.argList = argList;
-}
-
-/** This method creates the folderFunction function. It is called from the update action 
- * and should not be called externally. 
- * @private */
-FolderFunction.prototype.getFolderFunctionFunction = function(folderFunctionErrors) {
-
-    //create a copy of the workspace to do the function calculation - we don't update the UI display version
-    var virtualWorkspace;
-    var rootFolder;
-    var inputElementArray;
-    var returnValueTable; 
-    
-    var initialized = false;
-    var instance = this;
-    
-    var folderFunctionFunction = function(args) {
-        
-        if(!initialized) {
-            //create a copy of the workspace to do the function calculation - we don't update the UI display version
-            virtualWorkspace = instance.createVirtualWorkspace(folderFunctionErrors);
-	
-    //HANDLE THIS ERROR CASE DIFFERENTLY!!!
-            if(!virtualWorkspace) {
-                return null;
-            }
-
-            //lookup elements from virtual workspace
-            rootFolder = virtualWorkspace.getRoot();
-            inputElementArray = instance.loadInputElements(rootFolder,folderFunctionErrors);
-            returnValueTable = instance.loadOutputElement(rootFolder,folderFunctionErrors); 
-            
-            initialized = true;
-        }
-        
-        //create an update array to set the table values to the elements  
-        var updateActionList = [];
-        for(var i = 0; i < inputElementArray.length; i++) {
-            var entry = {};
-            entry.action = "updateData";
-            entry.memberName = inputElementArray[i].getFullName();
-            entry.data = arguments[i];
-            updateActionList.push(entry);
-        }
-        
-        var actionData = {};
-        actionData.action = "compoundAction";
-        actionData.actions = updateActionList;
-
-        //apply the update
-        var actionResult = doAction(virtualWorkspace,actionData);        
-        if(actionResult.alertMsg) {
-            CommandManager.errorAlert(actionResult.alertMsg);
-        }
-        if(actionResult.actionDone) {
-            //retrieve the result
-            if(returnValueTable) {
-                
-                if(returnValueTable.getResultPending()) {
-                    throw new Error("A folder function must not be asynchronous: " + instance.getFullName());
-                }
-                
-                return returnValueTable.getData();
-            }
-            else {
-                //no return value found
-                return undefined;
-            }
-        }
-    }
-    
-    return folderFunctionFunction;    
-}
-
-/** This method creates a copy of the workspace to be used for the function evvaluation. 
- * @private */
-FolderFunction.prototype.createVirtualWorkspace = function(folderFunctionErrors) {
-    try {
-        var folderJson = this.internalFolder.toJson();
-		var workspaceJson = Workspace.createWorkpaceJsonFromFolderJson(this.getName(),folderJson);
-        var virtualWorkspace = new Workspace(this.getOwner());
-        var actionResult = virtualWorkspace.loadFromJson(workspaceJson);
-        
-        //do something with action result!!!
-        
-        return virtualWorkspace;
-	}
-	catch(error) {
-        var actionError = ActionError.processException(error,"FolderFunction - Code",false);
-		folderFunctionErrors.push(actionError);
-		return null;
-	}
-}
-
-/** This method loads the input argument members from the virtual workspace. 
- * @private */
-FolderFunction.prototype.loadInputElements = function(rootFolder,folderFunctionErrors) {
-    var argMembers = [];
-    for(var i = 0; i < this.argList.length; i++) {
-        var argName = this.argList[i];
-        var argMember = rootFolder.lookupChild(argName);
-        if(argMember) {
-			argMembers.push(argMember);
-		}
-//		else {
-//            //missing input element
-//            var msg = "Input element not found in folderFunction: " + argName;
-//            var actionError = new ActionError(msg,"FolderFunction - Code",this);
-//            folderFunctionErrors.push(actionError);
-//        }       
-    }
-    return argMembers;
-}
-
-/** This method loads the output member from the virtual workspace. 
- * @private  */
-FolderFunction.prototype.loadOutputElement = function(rootFolder,folderFunctionErrors) {
-    var returnValueMember = rootFolder.lookupChild(this.returnValueString);
-//    if(!returnValueMember) {
-//        //missing input element
-//        var msg = "Return element not found in folderFunction: " + this.returnValueString;
-//        var actionError = new ActionError(msg,"FolderFunction - Code",this);
-//        folderFunctionErrors.push(actionError);
-//    }
-    return returnValueMember;
-}
+FolderFunction.INTERNAL_FOLDER_NAME = "body";
 
         
 //============================
@@ -375,6 +391,8 @@ FolderFunction.generator.setDataOk = false;
 FolderFunction.generator.setCodeOk = false;
 
 //register this member
-Workspace.addMemberGenerator(FolderFunction.generator);
+Model.addMemberGenerator(FolderFunction.generator);
+
+
 
 

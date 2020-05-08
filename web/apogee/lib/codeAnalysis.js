@@ -1,5 +1,3 @@
-import base from "/apogeeutil/base.js";
-import ActionError from "/apogee/lib/ActionError.js";
 import esprima from "/ext/esprima/esprima_2.7.3/esprima_to_es6.js";
 
 /** This function parses the code and returns a table that gives the variable use
@@ -241,21 +239,17 @@ export const EXCLUSION_NAMES = {
  * an exception if there is an error parsing.
  **/
 export function analyzeCode(functionText) {
+
+    var returnValue = {};
     
     try {
-        var returnValue = {};
         var ast = esprima.parse(functionText, { tolerant: true, loc: true });
     
         //check for errors in parsing
         if((ast.errors)&&(ast.errors.length > 0)) {
             returnValue.success = false;
-            returnValue.errors = [];
-            for(var i = 0; i < ast.errors.length; i++) {
-                var astError = ast.errors[i];
-                var actionError = new ActionError(astError.description,"Analyze - Code");
-                actionError.setParentException(astError);
-                returnValue.errors.push(actionError);
-            }
+            returnValue.errors = ast.errors;
+            return returnValue;
         }
         
         //get the variable list
@@ -267,10 +261,8 @@ export function analyzeCode(functionText) {
         return returnValue;
     }
     catch(exception) {
-        var actionError = ActionError.processException(exception,"Analyze - Code",false);
-        returnValue.success = false;
         returnValue.errors = [];
-        returnValue.errors.push(actionError);
+        returnValue.errors.push(exception);
         return returnValue;
     }
 }
@@ -592,7 +584,7 @@ function markLocalVariables(processInfo) {
  * }
  * @private */
 function createParsingError(errorMsg,location) {
-    var error = base.createError(errorMsg,false);
+    var error = new Error(errorMsg);
     if(location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;

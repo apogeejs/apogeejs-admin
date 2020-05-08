@@ -1,14 +1,14 @@
 import {addActionInfo} from "/apogee/actions/action.js";
-import Workspace from "/apogee/data/Workspace.js";
-import ActionError from "/apogee/lib/ActionError.js";
+import Model from "/apogee/data/Model.js";
 
-/** This is self installing command module. It has no exports
- * but it must be imported to install the command. 
+/** This is self installing command module. This must be imported to install the command.
+ * Note that this module also contains an export, unlike most command modules. 
+ * The export us used so other actions can load child members. 
  *
  * Action Data format:
  * {
  *  "action": "createMember",
- *  "owner": (parent/owner for new member),
+ *  "parentId": (parent for new member),
  *  "name": (name of the new member),
  *  "createData": 
  *      - name
@@ -17,7 +17,7 @@ import ActionError from "/apogee/lib/ActionError.js";
  *  
  * }
  *
- * MEMBER CREATED EVENT: "memberCreated"
+ * MEMBER CREATED EVENT: "created"
  * Event member format:
  * {
  *  "member": (member)
@@ -25,80 +25,91 @@ import ActionError from "/apogee/lib/ActionError.js";
  */
 
 
-/** This method instantiates a member, without setting the update data. 
- *@private */
-function createMember(workspace,actionData,processedActions,actionResult) {
+/** This is the action function to create a member. 
+ * @private */
+function createMemberAction(model,actionData) {
     
-    var owner;
-    if(actionData.workspaceIsOwner) {
-        owner = workspace;
+    let parent;
+    if(actionData.modelIsParent) {
+        //the parent is the model (It should already be mutable)
+        parent = model;
     }
     else {
-        var ownerFullName = actionData.ownerName;
-        var owner = workspace.getMemberByFullName(ownerFullName);
-        if(!owner) {
+        //get the parent, as a new mutable instance
+        parent = model.getMutableMember(actionData.parentId);
+
+        if(!parent) {
+            let actionResult = {};
             actionResult.actionDone = false;
-            actionResult.alertMsg = "Parent not found for created member";
-            return;
+            actionResult.errorMsg = "Parent not found for created member";
+            return actionResult;
         }
     }
- 
-    createMemberImpl(owner,actionData,processedActions,actionResult);
+
+    let memberJson = actionData.createData;
+    let actionResult = createMember(model,parent,memberJson);
+    return actionResult;
 }
- 
+
+/** This function creates a member and any children for that member, returning an action result for
+ * the member. This is exported so create member can be used by other actions, such as load model. */
+export function createMember(model,parent,memberJson) {
+
+    let member;
+    let actionResult = {};
+    actionResult.event = ACTION_EVENT;
     
-function createMemberImpl(owner,actionData,actionResult) {
-    
-    var memberJson = actionData.createData;
-    var member;
-     
     //create member
-    var generator;
+    let generator;
     if(memberJson) {
-        generator = Workspace.getMemberGenerator(memberJson.type);
+        generator = Model.getMemberGenerator(memberJson.type);
     }
 
     if(generator) {
-        member = generator.createMember(owner,memberJson);   
+        member = generator.createMember(parent.getId(),memberJson); 
+
+        //pass this child to the parent
+        parent.addChild(model,member);
+
+        //register member with model
+        model.registerMember(member);
+
+        //set action flags for successfull new member
+        actionResult.updateModelDependencies = true;
+        if((member.hasCode)&&(member.hasCode())) {
+            actionResult.recalculateMember = true;
+        }
+        else {
+            actionResult.recalculateDependsOnMembers = true;
+        }
 
         //instantiate children if there are any
         if(memberJson.children) {
-            actionResult.childActionResults = {};
-            for(var childName in memberJson.children) {
-                var childActionData = {};
-                childActionData.action = "createMember";
-                childActionData.createData = memberJson.children[childName];
-                var childActionResult = {};
-                childActionResult.actionInfo = ACTION_INFO;
-                createMemberImpl(member,childActionData,childActionResult);
-                actionResult.childActionResults[childName] = childActionResult;
+            actionResult.childActionResults = [];
+            for(let childName in memberJson.children) {
+                let childJson = memberJson.children[childName];
+                let childActionResult = createMember(model,member,childJson);
+                actionResult.childActionResults.push(childActionResult);
             }
         }
     }
     else {
         //type not found! - create a dummy object and add an error to it
-        var errorTableGenerator = Workspace.getMemberGenerator("appogee.ErrorTable");
-        member = errorTableGenerator.createMember(owner,memberJson);
-        var error = new ActionError("Member type not found: " + memberJson.type,ActionError.ERROR_TYPE_APP,null);
-        member.addError(error);
+        let errorTableGenerator = Model.getMemberGenerator("appogee.ErrorTable");
+        member = errorTableGenerator.createMember(parent,memberJson);
+        member.setError("Member type not found: " + memberJson.type);
         
         //store an error message, but this still counts as command done.
-        actionResult.alertMsg = "Error creating member: member type not found: " + memberJson.type;
+        actionResult.errorMsg = "Error creating member: member type not found: " + memberJson.type;
     }
 
     actionResult.member = member;
     actionResult.actionDone = true;
+
+    return actionResult;
 }
 
-/** Action info */
-let ACTION_INFO = {
-    "action": "createMember",
-    "actionFunction": createMember,
-    "checkUpdateAll": true,
-    "updateDependencies": true,
-    "addToRecalc": true,
-    "event": "memberCreated"
-}
+let ACTION_EVENT = "created";
 
 //This line of code registers the action 
-addActionInfo(ACTION_INFO);
+addActionInfo("createMember",createMemberAction);

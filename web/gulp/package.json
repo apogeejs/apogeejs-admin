@@ -10,5 +10,8 @@
     "gulp-replace": "^1.0.0",
     "rollup": "^1.27.13"
   },
-  "author": "Intransix"
+  "author": "Intransix",
+  "dependencies": {
+    "save-dev": "0.0.1-security"
+  }
 }

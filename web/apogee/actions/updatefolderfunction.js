@@ -15,10 +15,12 @@ import {addActionInfo} from "/apogee/actions/action.js";
  */
 
 /** Update folder function action function */
-function updateProperties(workspace,actionData,actionResult) { 
+function updateProperties(model,actionData) { 
+
+    let actionResult = {};
+    actionResult.event = ACTION_EVENT;
     
-    var memberFullName = actionData.memberName;
-    var folderFunction = workspace.getMemberByFullName(memberFullName);
+    var folderFunction = model.getMutableMember(actionData.memberId);
     if(!folderFunction) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member code";
@@ -30,19 +32,13 @@ function updateProperties(workspace,actionData,actionResult) {
     folderFunction.setReturnValueString(actionData.returnValueString);
     
     actionResult.actionDone = true;
+    actionResult.recalculateMember = true;
+
+    return actionResult;
 }
 
-/** Action info */
-let ACTION_INFO = {
-    "action": "updateFolderFunction",
-    "actionFunction": updateProperties,
-    "checkUpdateAll": false,
-    "updateDependencies": false,
-    "addToRecalc": true,
-    "event": "memberUpdated"
-};
-
+let ACTION_EVENT = "updated";
 
 //This line of code registers the action 
-addActionInfo(ACTION_INFO);
+addActionInfo("updateFolderFunction",updateProperties);
 

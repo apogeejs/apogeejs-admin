@@ -40,17 +40,17 @@ let copyReleaseInfoTask = () => copyFilesTask(BASE_FILES,RELEASE_FOLDER);
 //=================================
 
 const CSS_FILES = [
-    "../apogeeapp/app/apogeeapp.css",
-    "../apogeeapp/app/component/literatepage/LiteratePage.css",
-    "../apogeeapp/app/editor/toolbar/ApogeeToolbar.css",
-    "../apogeeapp/ui/window/WindowFrame.css",
-    "../apogeeapp/ui/window/dialog.css",
-    "../apogeeapp/ui/displayandheader/DisplayAndHeader.css",
-    "../apogeeapp/ui/menu/Menu.css",
-    "../apogeeapp/ui/splitpane/SplitPane.css",
-    "../apogeeapp/ui/tabframe/TabFrame.css",
-    "../apogeeapp/ui/treecontrol/TreeControl.css",
-    "../apogeeapp/ui/configurablepanel/ConfigurablePanel.css", 
+    "../apogeeview/apogeeapp.css",
+    "../apogeeview/componentdisplay/literatepage/LiteratePage.css",
+    "../apogeeview/editor/toolbar/ApogeeToolbar.css",
+    "../apogeeui/window/WindowFrame.css",
+    "../apogeeui/window/dialog.css",
+    "../apogeeui/displayandheader/DisplayAndHeader.css",
+    "../apogeeui/menu/Menu.css",
+    "../apogeeui/splitpane/SplitPane.css",
+    "../apogeeui/tabframe/TabFrame.css",
+    "../apogeeui/treecontrol/TreeControl.css",
+    "../apogeeui/configurablepanel/ConfigurablePanel.css", 
     "../prosemirror/lib/compiledCss/editor.css",    
     "../ext/handsontable/handsontable_6.2.0/handsontable.full.min.css"
 ]
@@ -199,7 +199,7 @@ let releaseElectronTask = parallel(
 function packageElectronSourceTask() {
     return rollup.rollup({
         input: '../applications/electronapp/app.js',
-		external: ['fs',"/apogee/nodeGLobals.js","/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js"],
+		external: ['fs'],
 		plugins: [
 			{resolveId}
 		]
@@ -207,13 +207,7 @@ function packageElectronSourceTask() {
         return bundle.write(
             {
                 file: ELECTRON_FOLDER + "/" + ELECTRON_APP_JS_FILENAME,
-                format: 'cjs',
-                paths: {
-                    "/apogee/nodeGlobals.js": "./nodeGlobals.js",
-                    "/apogeeutil/apogeeUtilLib.js": "./" + UTIL_LIB_CJS_FILE_NAME,
-                    "/apogee/apogeeCoreLib.js": "./" + CORE_LIB_CJS_FILE_NAME,
-                    "/apogeeapp/apogeeAppLib.js": "./" + APP_LIB_CJS_FILE_NAME
-                }
+                format: 'cjs'
             }
         );
     });
@@ -302,8 +296,8 @@ function packageCoreLibTask() {
 //==============================
 
 const APP_LIB_BASE_FILE_NAME = "apogeeAppLib";
-const APP_LIB_ES_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".es.js"
-const APP_LIB_CJS_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".cjs.js"
+const APP_LIB_ES_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".es.js";
+const APP_LIB_CJS_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".cjs.js";
 
 function packageAppLibTask() {
     return rollup.rollup({
@@ -321,6 +315,69 @@ function packageAppLibTask() {
                     paths: {
                         "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
                         "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.cjs.js"
+                    }
+                }
+            )
+        ])
+    });
+}
+
+//==============================
+// Package UI Lib
+//==============================
+
+const UI_LIB_BASE_FILE_NAME = "apogeeUiLib";
+const UI_LIB_ES_FILE_NAME = UI_LIB_BASE_FILE_NAME + ".es.js"
+const UI_LIB_CJS_FILE_NAME = UI_LIB_BASE_FILE_NAME + ".cjs.js"
+
+function packageUiLibTask() {
+    return rollup.rollup({
+        input: '../apogeeui/apogeeUiLib.js',
+        external: ["/apogeeutil/apogeeUtilLib.js"],
+		plugins: [
+			{resolveId}
+        ]
+    }).then(bundle => {
+        return Promise.all([
+            bundle.write(
+                { 
+                    file: ELECTRON_FOLDER + "/" + UI_LIB_CJS_FILE_NAME,
+                    format: 'cjs',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
+                    }
+                }
+            )
+        ])
+    });
+}
+
+//==============================
+// Package View Lib
+//==============================
+
+const VIEW_LIB_BASE_FILE_NAME = "apogeeViewLib";
+const VIEW_LIB_ES_FILE_NAME = VIEW_LIB_BASE_FILE_NAME + ".es.js"
+const VIEW_LIB_CJS_FILE_NAME = VIEW_LIB_BASE_FILE_NAME + ".cjs.js"
+
+function packageViewLibTask() {
+    return rollup.rollup({
+        input: '../apogeeview/apogeeViewLib.js',
+        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js","/apogeeui/apogeeUiLib.js"],
+		plugins: [
+			{resolveId}
+        ]
+    }).then(bundle => {
+        return Promise.all([
+            bundle.write(
+                { 
+                    file: ELECTRON_FOLDER + "/" + VIEW_LIB_CJS_FILE_NAME,
+                    format: 'cjs',
+                    paths: {
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
+                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.cjs.js",
+                        "/apogeeapp/apogeeAppLib.js": "./apogeeAppLib.cjs.js",
+                        "/apogeeui/apogeeUiLib.js": "./apogeeUiLib.cjs.js"
                     }
                 }
             )
@@ -372,18 +429,20 @@ releaseElectronTask
 
 //This task executes the complete release
 exports.release = series(
-    cleanTask,
+    //cleanTask,
     parallel(
         copyReleaseInfoTask,
         packageCssTask,
         copyResourcesTask,
         copyAceIncludesTask,
         copyGlobalsFiles,
-        releaseWebAppTask,
-        releaseWebClientLibTask,
-        releaseElectronTask,
         packageUtilLibTask,
         packageCoreLibTask,
-        packageAppLibTask
+        packageAppLibTask,
+        packageUiLibTask,
+        packageViewLibTask,
+        releaseWebAppTask,
+        releaseWebClientLibTask,
+        releaseElectronTask
     )
 );

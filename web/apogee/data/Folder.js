@@ -1,210 +1,195 @@
-import base from "/apogeeutil/base.js";
-import Workspace from "/apogee/data/Workspace.js";
-import Member from "/apogee/datacomponents/Member.js";
-import Dependent from "/apogee/datacomponents/Dependent.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import Model from "/apogee/data/Model.js";
+import DependentMember from "/apogee/datacomponents/DependentMember.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
-import Owner from "/apogee/datacomponents/Owner.js";
+import ContextManager from "/apogee/lib/ContextManager.js";
 import Parent from "/apogee/datacomponents/Parent.js";
 
 /** This is a folder. */
-function Folder(name,owner) {
-    //base init
-    Member.init.call(this,name,Folder.generator);
-    Dependent.init.call(this);
-    ContextHolder.init.call(this);
-    Owner.init.call(this);
-    Parent.init.call(this);
-    
-    this.initOwner(owner);
+export default class Folder extends DependentMember {
 
-    //this holds the base objects, mapped by name
-    this.childMap = {};
-    this.dataMap = {};
-	
-	//make sure the data map is frozen
-	Object.freeze(this.dataMap);
-    this.setData(this.dataMap);
-}
+    constructor(name,parent,instanceToCopy,keepUpdatedFixed) {
+        super(name,parent,instanceToCopy,keepUpdatedFixed);
 
-//add components to this class
-base.mixin(Folder,Member);
-base.mixin(Folder,Dependent);                      
-base.mixin(Folder,ContextHolder);
-base.mixin(Folder,Owner);
-base.mixin(Folder,Parent);
+        //mixin init where needed
+        //This is not a root. Scope is inherited from the parent.
+        this.contextHolderMixinInit(false);
+        this.parentMixinInit(instanceToCopy);
 
-//------------------------------
-// Parent Methods
-//------------------------------
-
-/** this method gets the table map. */
-Folder.prototype.getChildMap = function() {
-    return this.childMap;
-}
-
-/** This method looks up a child from this folder.  */
-Folder.prototype.lookupChild = function(name) {
-    //check look for object in this folder
-    return this.childMap[name];
-}
-
-/** This method adds a table to the folder. It also sets the folder for the
- *table object to this folder. It will fail if the name already exists.  */
-Folder.prototype.addChild = function(child) {
-	
-    //check if it exists first
-    var name = child.getName();
-    if(this.childMap[name]) {
-        //already exists! not fatal since it is not added to the model yet,
-        throw base.createError("There is already an object with the given name.",false);
-    }
-    //add object
-    this.childMap[name] = child;
-    
-    var data = child.getData();
-    //object may first appear with no data
-    if(data !== undefined) {
-        this.spliceDataMap(name,data);
-    }
-    
-    //set all children as dependents
-    this.calculateDependents();
-}
-
-/** This method removes a table from the folder. */
-Folder.prototype.removeChild = function(child) {
-    //make sure this is a child of this object
-	var parent = child.getParent();
-    if((!parent)||(parent !== this)) return;
-	
-    //remove from folder
-    var name = child.getName();
-    delete(this.childMap[name]);
-    this.spliceDataMap(name);
-    
-    //set all children as dependents
-    this.calculateDependents();
-}
-
-/** This method updates the table data object in the folder data map. */
-Folder.prototype.updateData = function(child) {
-	
-    var name = child.getName();
-    var data = child.getData();
-    if(this.childMap[name] === undefined) {
-        alert("Error - this table " + name + " has not yet been added to the folder.");
-        return;
-    }
-	this.spliceDataMap(name,data);
-}
-
-/** There is no calculation for the folder base on dependents. 
- * @private */
-Folder.prototype.needsCalculating = function() {
-    return true;
-}
-
-/** Calculate the data.  */
-Folder.prototype.calculate = function() {
-    //we don't need to calculate since the calculate is done on the fly
-    //we just need to make sure the impactors are set
-    this.initializeImpactors();
-    
-    this.clearCalcPending();
-}
-
-//------------------------------
-// Dependent Methods
-//------------------------------
-
-/** This method updates the dependencies of any children
- * based on an object being added. */
-Folder.prototype.updateDependeciesForModelChange = function(recalculateList) {
-    for(var key in this.childMap) {
-        var child = this.childMap[key];
-        if(child.isDependent) {
-            child.updateDependeciesForModelChange(recalculateList);
+        //initialize data value if this is a new folder
+        if(!instanceToCopy) {
+            let dataMap = {};
+            Object.freeze(dataMap);
+            this.setData(dataMap);
         }
     }
-}
 
-//------------------------------
-// Member Methods
-//------------------------------
+    //------------------------------
+    // Parent Methods
+    //------------------------------
 
-/** This method creates a member from a json. It should be implemented as a static
- * method in a non-abstract class. */ 
-Folder.fromJson = function(owner,json) {
-    var folder = new Folder(json.name,owner);
-    if(json.childrenNotWriteable) {
-        folder.setChildrenWriteable(false);
+    onAddChild(model,child) {
+        //set all children as dependents
+        let dependsOnMap = this.calculateDependents(model);
+        this.updateDependencies(model,dependsOnMap);
     }
-    return folder;
-}
 
-/** This method adds any additional data to the json to save for this member. 
- * @protected */
-Folder.prototype.addToJson = function(json) {
-	json.children = {};
-    
-    if(!this.getChildrenWriteable()) {
-        json.childrenNotWriteable = true;
+    onRemoveChild(model,child) {
+        //set all children as dependents
+        let dependsOnMap = this.calculateDependents(model);
+        this.updateDependencies(model,dependsOnMap);
     }
-    
-    for(var key in this.childMap) {
-        var child = this.childMap[key];
-        json.children[key] = child.toJson();
+
+    /** this method gets the hame the children inherit for the full name. */
+    getPossesionNameBase(model) {
+        return this.getFullName(model) + ".";
+    }
+
+    //------------------------------
+    // Dependent Methods
+    //------------------------------
+
+    /** There is no calculation for the folder base on dependents. */
+    memberUsesRecalculation() {
+        return true;
+    }
+
+    /** Calculate the data.  */
+    calculate(model) {
+        //make sure impactors are calculated
+        this.initializeImpactors(model);
+        
+        //folders work slightly different because of pass thorugh dependencies. We will set the folder data
+        //value regardless of the state, meaning if the state is error or pending or invalid, we still set
+        //the data, along with maintaining the current state.
+
+        //make an immutable map of the data for each child
+        let childIdMap = this.getChildIdMap();
+        let dataMap = {};
+        for(let name in childIdMap) {
+            let childId = childIdMap[name];
+            let child = model.lookupMemberById(childId);
+            if(child) {
+                dataMap[name] = child.getData();
+            }
+        }
+        Object.freeze(dataMap);
+
+        let state = this.getState();
+        if((state != apogeeutil.STATE_ERROR)&&(state != apogeeutil.STATE_PENDING)&&(state != apogeeutil.STATE_INVALID)) {
+            //set the data state if there is no child error or other exceptional case
+            this.setData(dataMap);
+        }
+        else {
+            //if there is a child exceptional case, still set the data for the sake of pass through dependencies
+            this.forceUpdateDataWithoutStateChange(dataMap);
+        }
+        
+        //clear calc pending flag
+        this.clearCalcPending();
+    }
+
+    /** This method updates the dependencies of any children
+     * based on an object being added. */
+    updateDependeciesForModelChange(model,additionalUpdatedMembers) {
+
+        //update dependencies of this folder
+        let oldDependsOnMap = this.getDependsOn();
+        let newDependsOnMap = this.calculateDependents(model);
+        if(!apogeeutil.jsonEquals(oldDependsOnMap,newDependsOnMap)) {
+            //if dependencies changes, make a new mutable copy and add this to 
+            //the updated values list
+            let mutableMemberCopy = model.getMutableMember(this.getId());
+            mutableMemberCopy.updateDependencies(model,newDependsOnMap);
+            additionalUpdatedMembers.push(mutableMemberCopy);
+        }
+
+        //call update in children
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            let childId = childIdMap[name];
+            var child = model.lookupMemberById(childId);
+            if((child)&&(child.isDependent)) {
+                child.updateDependeciesForModelChange(model,additionalUpdatedMembers);
+            }
+        }
+    }
+
+    //------------------------------
+    // Member Methods
+    //------------------------------
+
+    /** This method creates a member from a json. It should be implemented as a static
+     * method in a non-abstract class. */ 
+    static fromJson(parentId,json) {
+        var folder = new Folder(json.name,parentId);
+
+        if(json.childrenNotWriteable) {
+            folder.setChildrenWriteable(false);
+        }
+
+        return folder;
+    }
+
+    /** This method adds any additional data to the json to save for this member. 
+     * @protected */
+    addToJson(model,json) {
+        json.children = {};
+        
+        if(!this.getChildrenWriteable()) {
+            json.childrenNotWriteable = true;
+        }
+        
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            let childId = childIdMap[name];
+            let child = model.lookupMemberById(childId);
+            json.children[name] = child.toJson(model);
+        }
+    }
+
+    //------------------------------
+    // context holder Methods
+    //------------------------------
+
+    /** This method retrieve creates the loaded context manager. */
+    createContextManager() {
+        //set the context manager
+        var contextManager = new ContextManager(this);
+        
+        //add an entry for this folder
+        var myEntry = {};
+        myEntry.contextHolderAsParent = true;
+        contextManager.addToContextList(myEntry);
+        
+        return contextManager;
+    }
+
+    //============================
+    // Private methods
+    //============================
+
+    /** This method calculates the dependencies for this folder. 
+     * @private */
+    calculateDependents(model) {
+        let dependsOnMap = [];
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            var childId = childIdMap[name];
+            dependsOnMap[childId] = apogeeutil.NORMAL_DEPENDENCY;
+        }
+        return dependsOnMap;
     }
 }
 
-Folder.prototype.onClose = function () {
-    for(var key in this.childMap) {
-        var child = this.childMap[key];
-        if(child.onClose) child.onClose();
-    }
-}
-
-//============================
-// Private methods
-//============================
-
-/** This method updates the table data object in the folder data map. 
- * @private */
-Folder.prototype.calculateDependents = function() {
-    var newDependsOn = [];
-    for(var name in this.childMap) {
-        var child = this.childMap[name];
-        newDependsOn.push(child);
-    }
-    this.updateDependencies(newDependsOn);
-}
-
-/** This method creates a new immutable data map, either adding a give name and data or
- * removing a name. To remove a name from the map, leave "addData" as undefined. 
- * @private */
-Folder.prototype.spliceDataMap = function(addOrRemoveName,addData) {
-	var newDataMap = {};
-	
-	//copy old data
-	for(var key in this.dataMap) {
-		if(key !== addOrRemoveName) {
-			newDataMap[key] = this.dataMap[key];
-		}
-	}
-	//add or update thiis child data
-	if(addData !== undefined) {
-		newDataMap[addOrRemoveName] = addData;
-	}
-	
-	//make this immutable and set it as data for this folder
-	Object.freeze(newDataMap);
-	this.dataMap = newDataMap;
-	this.setData(this.dataMap);
-}
+//add components to this class                     
+apogeeutil.mixin(Folder,ContextHolder);
+apogeeutil.mixin(Folder,Parent);
 
 //============================
 // Static methods
 //============================
+
 
 Folder.generator = {};
 Folder.generator.displayName = "Folder";
@@ -214,5 +199,5 @@ Folder.generator.setDataOk = false;
 Folder.generator.setCodeOk = false;
 
 //register this member
-Workspace.addMemberGenerator(Folder.generator);
+Model.addMemberGenerator(Folder.generator);
 

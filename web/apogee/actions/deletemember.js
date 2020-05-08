@@ -11,7 +11,7 @@ import {addActionInfo} from "/apogee/actions/action.js";
  *  "eventInfo": (OUTPUT - event info for the associated delete event)
  * }
  *
- * MEMBER DELETED EVENT: "memberDeleted"
+ * MEMBER DELETED EVENT: "deleted"
  * Event object Format:
  * {
  *  "member": (member),
@@ -20,76 +20,68 @@ import {addActionInfo} from "/apogee/actions/action.js";
 
 
 /** Delete member action function */
-function deleteMember(workspace,actionData,actionResult) {
+function deleteMember(model,actionData) {
     
-    var memberFullName = actionData.memberName;
-    var member = workspace.getMemberByFullName(memberFullName);
+    //get a new instance in case any changes are made during delete
+    let member = model.lookupMemberById(actionData.memberId);
     if(!member) {
+        let actionResult = {};
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for delete member";
-        return;
+        return actionResult;
     }
-    actionResult.member = member;
     
-    doDelete(member,actionResult);
+    let actionResult = doDelete(model, member);
+
+    //remove the top-most deleted member from its parent
+    let parentId = member.getParentId();
+    let parent = model.getMutableMember(parentId);
+    if(parent) {
+        parent.removeChild(model,member);
+    }
+
+    return actionResult;
     
 }
 
 
-/** @private */
-function doDelete(member,actionResult) {
+/** Here we take any actions for deleting the member and its children,
+ * except "remove from parent", which we will do only for the top deleted member. 
+ * @private */
+function doDelete(model, member) {
+
+    let actionResult = {};
+    actionResult.member = member;
+    actionResult.event = ACTION_EVENT;
     
-    //delete children
-    if(member.isParent) {
-        actionResult.childActionResults = {};
+    //delete children first
+    if((member.isParent)||(member.isRootHolder)) {
+        actionResult.childActionResults = [];
         
-        var childMap = member.getChildMap();
-        for(var childName in childMap) {
-            var child = childMap[childName];
-            let childActionResult = {};
-            childActionResult.member = child;
-            childActionResult.actionInfo = ACTION_INFO
-            
-            actionResult.childActionResults[childName] = childActionResult;
-            
-            //add results for children to this member
-            doDelete(child,childActionResult);
+        //standard children for parent
+        var childIdMap = member.getChildIdMap();
+        for(var childName in childIdMap) {
+            let childId = childIdMap[childName];
+            let child = model.lookupMemberById(childId);
+            if(child) {
+                let childActionResult = doDelete(model, child);
+                actionResult.childActionResults.push(childActionResult);
+            }
         }
     }
-    else if(member.isRootHolder) {
-        actionResult.childActionResults = {};
-        
-        var root = member.getRoot();
-        let childActionResult = {};
-        childActionResult.member = root;
-        childActionResult.actionInfo = ACTION_INFO
 
-        actionResult.childActionResults["root"] = childActionResult;
-        
-        //add results for children to this member
-        doDelete(child,childActionResult);
-    }
-    
-    //delete member
-    member.onDeleteMember();
-    if(member.isDependent) {
-        member.onDeleteDependent();
-    }
+    //delete member actions
+    member.onDeleteMember(model);
+    model.unregisterMember(member);
     
     actionResult.actionDone = true;
+    actionResult.updateModelDependencies = true;
+
+    return actionResult;
 }
 
-
-/** Action info */
-let ACTION_INFO = {
-    "action": "deleteMember",
-    "actionFunction": deleteMember,
-    "checkUpdateAll": true,
-    "updateDependencies": false,
-    "addToRecalc": false,
-    "event": "memberDeleted"
-}
+let ACTION_EVENT = "deleted";
 
 
 //This line of code registers the action 
-addActionInfo(ACTION_INFO);
+addActionInfo("deleteMember",deleteMember);

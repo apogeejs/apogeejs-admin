@@ -1,6 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {addActionInfo} from "/apogee/actions/action.js";
-import ActionError from "/apogee/lib/ActionError.js";
 
 /** This is self installing command module. It has no exports
  * but it must be imported to install the command. 
@@ -8,7 +7,7 @@ import ActionError from "/apogee/lib/ActionError.js";
  * Action Data format:
  * {
  *  "action": "updateData",
- *  "memberName": (member to update),
+ *  "memberId": (member to update),
  *  "data": (new value for the table)
  *  "sourcePromise": (OPTIONAL - If this is the completion of an asynchronous action, the
  *      source promise shoudl be included to make sure it has not been overwritten with a
@@ -20,7 +19,7 @@ import ActionError from "/apogee/lib/ActionError.js";
  * Action Data format:
  * {
  *  "action": "updateCode",
- *  "memberName": (member to update),
+ *  "memberId": (member to update),
  *  "argList": (arg list for the table)
  *  "functionBody": (function body for the table)
  *  "supplementalCode": (supplemental code for the table)
@@ -28,7 +27,7 @@ import ActionError from "/apogee/lib/ActionError.js";
  */
 
 
-/** member UPDATED EVENT: "memberUpdated"
+/** member UPDATED EVENT: "updated"
  * Event member format:
  * {
  *  "member": (member)
@@ -37,10 +36,12 @@ import ActionError from "/apogee/lib/ActionError.js";
 
 
 /** Update code action function. */
-function updateCode(workspace,actionData,actionResult) {
+function updateCode(model,actionData) {
+
+    let actionResult = {};
+    actionResult.event = ACTION_EVENT;
     
-    var memberFullName = actionData.memberName;
-    var member = workspace.getMemberByFullName(memberFullName);
+    var member = model.getMutableMember(actionData.memberId);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member code";
@@ -50,7 +51,7 @@ function updateCode(workspace,actionData,actionResult) {
 
     if((!member.isCodeable)||(!member.getSetCodeOk())) {
         actionResult.actionDone = false;
-        actionResult.errorMsg = "can not set code on member: " + member.getFullName();
+        actionResult.errorMsg = "can not set code on member: " + member.getFullName(model);
         return;
     }
           
@@ -58,15 +59,20 @@ function updateCode(workspace,actionData,actionResult) {
         actionData.functionBody,
         actionData.supplementalCode);
         
-    
     actionResult.actionDone = true;
+    actionResult.updateMemberDependencies = true;
+    actionResult.recalculateMember = true;
+
+    return actionResult;
 }
 
 /** Update data action function. */
-function updateData(workspace,actionData,actionResult) {
+function updateData(model,actionData) {
+
+    let actionResult = {};
+    actionResult.event = ACTION_EVENT;
     
-    var memberFullName = actionData.memberName;
-    var member = workspace.getMemberByFullName(memberFullName);
+    var member = model.getMutableMember(actionData.memberId);
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member data";
@@ -76,81 +82,53 @@ function updateData(workspace,actionData,actionResult) {
     
     if(!member.getSetDataOk()) {
         actionResult.actionDone = false;
-        actionResult.errorMsg = "Can not set data on member: " + memberFullName;
+        actionResult.errorMsg = "Can not set data on member: " + member.getFullName(model);
         return;
     }
         
     var data = actionData.data;
+
+    //see if there were any dependents, to know if we need to update them
+    //on setting data there will be none.
+    let hadDependents = ((member.getDependsOn)&&(apogeeutil.jsonObjectLength(member.getDependsOn()) > 0));
     
     //if this is the resolution (or rejection) of a previously set promise
+    //make sure the source promise matches the pending promise. Otherwise
+    //we just ignore it (it is out of date)
     if(actionData.sourcePromise) {
-        if(member.pendingPromiseMatches(actionData.sourcePromise)) {
-            //this is the reoslution of pending data
-            member.setResultPending(false);
-        }
-        else {
-            //no action - this is from an asynch action that has been overwritten
-            actionResult.actionDone = false;
-            return;
+        if(!member.pendingPromiseMatches(actionData.sourcePromise)) {
+            //no action - this is from an asynch action that has been overwritten. Ignore this command.
+            actionResult.actionDone = true;
+            return actionResult;
         }
     }
     
     //some cleanup for new data
-    member.clearErrors();
     if((member.isCodeable)&&(actionData.sourcePromise === undefined)) {
         //clear the code - so the data is used
         //UNLESS this is a delayed set date from a promise, in what case we want to keep the code.
-        member.clearCode();
+        member.clearCode(model);
     }
-    
-    //handle four types of data inputs
-    if(data instanceof Promise) {
-        //data is a promise - will be updated asynchromously
-        
-        //check if this is only a refresh
-        var optionalPromiseRefresh = actionData.promiseRefresh ? true : false;
-        
-        member.applyPromiseData(data,actionData.onAsynchComplete,optionalPromiseRefresh);
-    }
-    else if(data instanceof Error) {
-        //data is an error
-        var actionError = ActionError.processException(data,ActionError.ERROR_TYPE_MODEL);
-        member.addError(actionError);
-    }
-    else if(data === apogeeutil.INVALID_VALUE) {
-        //data is an invalid value
-        member.setResultInvalid(true);
-    }
-    else {
-        //normal data update (poosibly from an asynchronouse update)
-        member.setData(data);
+
+    //apply the data
+    member.applyData(data);
+
+    //if the data is a promise, we must also initiate the asynchronous setting of the data
+    if((data)&&(data instanceof Promise)) {
+        member.applyAsynchData(model,data);
     }
     
     actionResult.actionDone = true;
+    if(hadDependents) {
+        actionResult.updateMemberDependencies = true;
+    }
+    actionResult.recalculateDependsOnMembers = true;
+
+    return actionResult;
 }
-        
-/** Update data action info */
-let UPDATE_DATA_ACTION_INFO = {
-    "action": "updateData",
-    "actionFunction": updateData,
-    "checkUpdateAll": false,
-    "updateDependencies": true,
-    "addToRecalc": false,
-    "addDependenceiesToRecalc": true,
-    "event": "memberUpdated"
-};
 
-/** Update code action info */
-let UPDATE_CODE_ACTION_INFO = {
-    "action": "updateCode",
-    "actionFunction": updateCode,
-    "checkUpdateAll": false,
-    "updateDependencies": true,
-    "addToRecalc": true,
-    "event": "memberUpdated"
-};
-
+let ACTION_EVENT = "updated";
 
 //The following code registers the actions
-addActionInfo(UPDATE_DATA_ACTION_INFO);
-addActionInfo(UPDATE_CODE_ACTION_INFO);
+addActionInfo("updateCode",updateCode);
+addActionInfo("updateData",updateData);

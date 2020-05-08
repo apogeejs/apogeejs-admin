@@ -1,15 +1,15 @@
 import "/apogee/webGlobals.js";
-import { Apogee, initIncludePath, WebComponentDisplay } from "/apogeeapp/apogeeAppLib.js";
+import { ApogeeView, initIncludePath, WebComponentDisplay } from "/apogeeview/apogeeViewLib.js";
 import WebAppConfigManager from "/applications/webclientlib/WebAppConfigManager.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 let apogeeWebClientLib = {};
-let app;
+let appView;
 
 export {apogeeWebClientLib as default};
 
 /** This method initializes the workspace. */
-apogeeWebClientLib.initWebApp = function(workspaceUrl,onWorkspaceLoad,onWorkspaceLoadFailed) { 
+apogeeWebClientLib.initWebApp = function(workspaceUrl) { 
 
     //==========================
     //some global initialization
@@ -24,11 +24,27 @@ apogeeWebClientLib.initWebApp = function(workspaceUrl,onWorkspaceLoad,onWorkspac
     //app initialization
     //==========================
 
-    var appConfigManager = new WebAppConfigManager(workspaceUrl);
+    var appConfigManager = new WebAppConfigManager();
     
     //create the application
-    app = Apogee.createApp(null,appConfigManager);
+    appView = new ApogeeView(null,appConfigManager);
 
+    //apogeeutil.textRequest(this.workspaceUrl);
+
+    // var openInitialWorkspace = workspaceText => {
+    //     let workspaceJson = JSON.parse(workspaceText);
+
+    //     //open workspace
+    //     var commandData = {};
+    //     commandData.type = "openWorkspace";
+    //     commandData.workspaceJson = workspaceJson;
+    //     commandData.fileMetadata = workspaceFileMetadata;
+
+    //     this.executeCommand(commandData);
+    // };
+
+ //OOPS FIND THIS EVENT!!!
+    let app = appView.getApp();
     app.addListener("workspaceComponentLoaded",onWorkspaceLoad);
     if(onWorkspaceLoadFailed) app.addListener("workspaceComponentLoadFailed",onWorkspaceLoadFailed);
 }
@@ -98,40 +114,40 @@ apogeeWebClientLib.onResize = function(memberName) {
 /** This method returns a WebComponentDisplay object which contains the component display object. 
 * If the optionalViewType is not set, the default view (which is typically the desired one) will be used.*/
 function _createComponentDisplay(memberName,optionalViewType) {
-   var workspace = app.getWorkspace();
-   var workspaceUI = app.getWorkspaceUI();
+    let app = appView.getApp();
+    let modelManager = app.getWOrkspaceManager().getModelManager();
+    let model = modelManager.getModel();
 
-   var member = workspace.getMemberByFullName(memberName); 
-   if(!member) {
-       console.error("Member not found: " + memberName);
-       return;
-   }
-   var component = workspaceUI.getComponent(member);
-   
-   var activeView = optionalViewType ? optionalViewType : component.componentGenerator.TABLE_EDIT_SETTINGS.defaultView;
-
-   var componentDisplay = new WebComponentDisplay(component, activeView);
-
-   component.setComponentDisplay(componentDisplay);
-
-   return componentDisplay;
-}
-
-/** This method returns a PlainFrame object which contains the component display object. 
-* If the optionalViewType is not set, the default view (which is typically the desired one) will be used.*/
-function _getComponentDisplay(memberName) {
-    var workspace = app.getWorkspace();
-    var workspaceUI = app.getWorkspaceUI();
- 
-    var member = workspace.getMemberByFullName(memberName); 
+    let member = model.getMemberByFullName(model,memberName);
     if(!member) {
         console.error("Member not found: " + memberName);
         return;
     }
-    var component = workspaceUI.getComponent(member);
- 
-    return component.getComponentDisplay();
+    let componentId = modelManager.getComponentIdByMemberId(member.getId());
+    let componentView = modelView.getComponentViewByComponentId(componentId);
 
+    let activeView = optionalViewType ? optionalViewType : component.constructor.TABLE_EDIT_SETTINGS.defaultView;
+    let componentDisplay = new WebComponentDisplay(componentView, activeView);
+    componentView.setComponentDisplay(componentDisplay);
+
+   return componentDisplay;
+}
+
+/** This method returns a WebComponentDisplay object which contains the component display object. */
+function _getComponentDisplay(memberName) {
+    let app = appView.getApp();
+    let modelManager = app.getWOrkspaceManager().getModelManager();
+    let model = modelManager.getModel();
+
+    let member = model.getMemberByFullName(model,memberName);
+    if(!member) {
+        console.error("Member not found: " + memberName);
+        return;
+    }
+    let componentId = modelManager.getComponentIdByMemberId(member.getId());
+    let componentView = modelView.getComponentViewByComponentId(componentId);
+
+   return componentView.getComponentDisplay();
  }
 
 

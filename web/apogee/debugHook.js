@@ -20,15 +20,21 @@ __globals__.__functionTableWrapper = function(initMember) {
     var memberFunction;
     var memberInitialized = false;
 
-    //create member function for lazy initialization
-    var wrapperMemberFunction = function(argList) {
+    var initializeIfNeeded = () => {
         if(!memberInitialized) {
             memberFunction = initMember();
             memberInitialized = true;
         }
+    }
 
+    //create member function for lazy initialization
+    var wrapperMemberFunction = function(argList) {
+        initializeIfNeeded();
         return memberFunction.apply(null,arguments);
     }
+
+    //add an function on this function to allow external initialization
+    wrapperMemberFunction.initializeIfNeeded = initializeIfNeeded;
     
     return wrapperMemberFunction;
 }

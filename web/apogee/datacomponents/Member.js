@@ -1,6 +1,7 @@
-import {doAction} from "/apogee/actions/action.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
 
-/** This component encapsulates the member functionality for objects in the workspace.
+/** This component encapsulates the member functionality for objects in the model.
  * 
  * This is a mixin and not a class. It is used for the prototype of the objects that inherit from it.
  *  
@@ -9,405 +10,418 @@ import {doAction} from "/apogee/actions/action.js";
  * FIELD NAMES (from update event):
  * - data
  * - name
- * - owner
+ * - parent
  * 
- */
-let Member = {};
-export {Member as default};
-    
-/** This serves as the constructor for the member object, when extending it. 
- * The owner should be the parent that holds this member or the object that holds
- * the hierarchy (maybe the workspace). If the owner is not a parent, this is typically
- * a folder and it is called the root folder. */
-Member.init = function(name,generator) {
-    this.id = Member._createId();
-    this.name = name;
-    
-    this.data = null;
-    this.impactsList = [];
-    
-    this.generator = generator;
-    this.errors = []; 
-    this.resultInvalid = false;
-    this.resultPending = false;
-    
-    this.updated = {};
-    
-    //set updated in constructor
-    this.fieldUpdated("name");
-    this.fieldUpdated("data");
-}
+ * This class represents a member object. 
+ * The parent should be the parent member that holds this member or the object that holds
+ * the hierarchy (maybe the model). */
+export default class Member extends FieldObject {
 
-Member.initOwner = function(owner) {
-    if(this.owner != owner) {
-        this.fieldUpdated("owner");
-    }
-    
-    this.owner = owner;
-    if(owner.isParent) {
-        this.owner.addChild(this);
-    }
-    else if(owner.isRootHolder) {
-        this.owner.setRoot(this);
-    }
-}
-
-Member.move = function(newName,newOwner) {
-
-    //remove from old owner
-    if(this.owner) {
-        if(this.owner.isParent) {
-            this.owner.removeChild(this);
-        }
-        else {
-            //don't allow moving a root for now!
-            //or renaiming either!
-        }
-    }
-    
-    //check for change of name
-    if(newName != this.name) {
-        this.fieldUpdated("name");
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
+        super("member",instanceToCopy,keepUpdatedFixed);
         
-        this.name = newName;
-    }
-    
-    //place in the new owner or update the name in the old owner
-    //owner field updated here
-    this.initOwner(newOwner);
-}
-
-/** This property tells if this object is a member.
- * This property should not be implemented on non-members. */
-Member.isMember = true
-
-/** this method gets the ID. It is not persistent and is valid only for this 
- * instance the workspace is opened. */
-Member.getId = function() {
-    return this.id;
-}
-
-/** this method gets the name. */
-Member.getName = function() {
-    return this.name;
-}
-
-/** This method returns the full name in dot notation for this object. */
-Member.getFullName = function() {
-    if(this.owner) {
-        return this.owner.getChildFullName(this.name);
-    }
-    else {
-        //this shouldn't happen
-        return this.name;
-    }
-}
-
-/** This returns the owner for this member. */
-Member.getOwner = function() {
-    return this.owner;
-}
-
-/** This returns the parent for this member. For the root folder
- * this value is null. */
-Member.getParent = function() {
-    if((this.owner)&&(this.owner.isParent)) {
-        return this.owner;
-    }
-    else {
-        return null;
-    }
-}
-
-/** this method gets the workspace. */
-Member.getWorkspace = function() {
-   if(this.owner) {
-       return this.owner.getWorkspace();
-   }
-   else {
-       return null;
-   }
-}
-
-/** this method gets the root folder/namespace for this object. */
-Member.getRoot = function() {
-    var ancestor = this;
-	while(ancestor) {
-		var owner = ancestor.getOwner();
-        if(!owner) {
-            return null;
+        //==============
+        //Fields
+        //==============
+        //Initailize these if this is a new instance
+        if(!instanceToCopy) {
+            this.setField("name",name);
+            this.setField("parentId",parentId);
+            //"data"
+            //"pendingPromise"
+            //"state"
         }
-        else if(!owner.isParent) {
-            return ancestor;
-        }
-        ancestor = owner;
-	} 
-	return null; //this shouldn't happen
-}
+    }
 
-/** This method sets the pre calc error for this dependent. */
-Member.addError = function(error) {
-    this.errors.push(error);
-}
+    /** This property tells if this object is a member. */
+    get isMember() {
+        return true;
+    }
 
-/** This method sets the pre calc error for this dependent. */
-Member.addErrors = function(errorList) {
-    this.errors = this.errors.concat(errorList);
-}
+    /** this method gets the name. */
+    getName() {
+        return this.getField("name");
+    }
 
-/** This method clears the error list. */
-Member.clearErrors = function(type) {
-    var newList = [];
-    if(type != null) {    
-        for(var i = 0; i < this.errors.length; i++) {
-            var entry = this.errors[i];
-            if(entry.type != type) {
-                newList.push(entry);
+    /** This method returns the full name in dot notation for this object. */
+    getFullName(model) {
+        let name = this.getField("name");
+        let parentId = this.getField("parentId");
+        if(parentId) {
+            let parent = model.lookupMemberById(parentId);
+            if(parent) {
+                return parent.getChildFullName(model,name);
             }
         }
+        
+        //if we get here there is no parent
+        return name;
     }
-    this.errors = newList;
-}
 
-/** This returns true if there is a pre calc error. */
-Member.hasError = function() {
-    return (this.errors.length > 0);
-}
-
-/** This returns the pre calc error. */
-Member.getErrors = function() {
-    return this.errors;
-}
-
-/** This returns true if the member is not up to date, typically
- * do to waiting on an asynchronous operation. */
-Member.getResultPending = function() {
-    return this.resultPending;
-}
-
-/** This returns true if the member is not up to date, typically
- * do to waiting on an asynchronous operation. */
-Member.getPendingPromise = function() {
-    return this.pendingPromise;
-}
-
-/** This sets the result pending flag. If is pending is set to true and
- * this is the object whose value is pending (as opposed to a member that 
- * is dependent on the pending member) the promise should be saved. This 
- * is used to ensure only a matching asynchronous action is kept. */
-Member.setResultPending = function(isPending,promise) {
-    this.resultPending = isPending;
-    this.pendingPromise = promise;
-}
-
-/** This returns true if the member is invalid, typically
- * meaning the calculation could not properly be performed becase the
- * needed data is not available. */
-Member.getResultInvalid = function() {
-    return this.resultInvalid;
-}
-
-/** This sets the result invalid flag. If the result is invalid, any
- * table depending on this will also have an invalid value. */
-Member.setResultInvalid = function(isInvalid) {
-    this.resultInvalid = isInvalid;
-}
-
-/** This returns true if the pending token matches. */
-Member.pendingPromiseMatches = function(promise) {
-    return (this.pendingPromise === promise);
-}
-
-Member.getSetDataOk = function() {
-    return this.generator.setDataOk;
-}
-
-/** This method writes the child to a json. */
-Member.toJson = function() {
-	var json = {};
-    json.name = this.name;
-    json.type = this.generator.type;
-    if(this.addToJson) {
-        this.addToJson(json);
+    /** This returns true if the full name changes. */
+    isFullNameUpdated(model) {
+        if(this.areAnyFieldsUpdated(["name","parentId"])) {
+            return true;
+        }
+        else {
+            let parent = this.getParent(model);
+            if(parent) {
+                return parent.isFullNameUpdated(model); 
+            } 
+        }
     }
-    
-    if(this.getUpdateData) {
-        var updateData = this.getUpdateData();
-        json.updateData = updateData;
+
+    getParentId() {
+        return this.getField("parentId");
     }
-    return json;
-}
 
-///** This method creates a member from a json. IT should be implemented as a static
-// * function in extending objects. */ 
-//Member.fromJson = function(owner,json,childrenJsonOutputList) {
-//}
-
-//-----------------------------------
-// Data methods
-//-----------------------------------
-
-/** this method gets the data map. */
-Member.getData = function() {
-    return this.data;
-}
-
-/** This returns an array of members this member impacts. */
-Member.getImpactsList = function() {
-    return this.impactsList;
-}
-
-/** This method sets the data for this object. This is the object used by the 
- * code which is identified by this name, for example the JSON object associated
- * with a JSON table. Besides hold the data object, this updates the parent data map. */
-Member.setData = function(data) {
-    this.data = data;
-    this.fieldUpdated("data");
-  
-    var parent = this.getParent();
-    if(parent) {
-        parent.updateData(this);
+    /** This returns the parent for this member. */
+    getParent(model) {
+        let parentId = this.getField("parentId");
+        return model.lookupMemberById(parentId);
     }
-}
 
+    /** This returns the parent for this member. For the root folder
+     * this value is null. */
+    getParentMember(model) {
+        let parentId = this.getField("parentId");
+        if(parentId) {
+            let parent = model.lookupMemberById(parentId);
+            if((parent)&&(parent instanceof Member)) {
+                return parent;
+            }
+        }
 
-/** This method implements setting asynchronous data on the member using a promise. */
-Member.applyPromiseData = function(promise,onAsynchComplete,optionalPromiseRefresh) {
-    //set the result as pending
-    this.setResultPending(true,promise);
+        //if we get here, there is no parent
+        return null;
+    }
 
-    //kick off the asynch update, if this is not only a refresh of the promise
-    if(!optionalPromiseRefresh) {
-        var workspace = this.getWorkspace();
+    //================================================
+    // Serialization Methods
+    //================================================
+
+    /** This method writes the child to a json. */
+    toJson(model) {
+        var json = {};
+        json.name = this.getField("name");
+        json.type = this.constructor.generator.type;
+        if(this.addToJson) {
+            this.addToJson(model,json);
+        }
+        
+        if(this.getUpdateData) {
+            var updateData = this.getUpdateData();
+            json.updateData = updateData;
+        }
+        return json;
+    }
+
+    ///** This method creates a member from a json. IT should be implemented as a static
+    // * function in extending objects. */ 
+    //fromJson(parent,json,childrenJsonOutputList) {
+    //}
+
+    //=======================================
+    // Data/State getting functions
+    //=======================================
+
+    /** This returns the state struct for the member. */
+    getState() {
+        let stateStruct = this.getField("state");
+        if(stateStruct) { 
+            return stateStruct.state;
+        }
+        else {
+            //If this happens, we will just make it state normal 
+            return apogeeutil.STATE_NORMAL;
+        }
+    }
+
+    /** this method gets the data map. */
+    getData() {
+        return this.getField("data");
+    }
+
+    /** This returns true if this member accepts setting the data. */
+    getSetDataOk() {
+        return this.constructor.generator.setDataOk;
+    }
+
+    /** This returns the pre calc error. */
+    getErrors() {
+        let stateStruct = this.getField("state");
+        let errorList;
+        if(stateStruct) {
+            //If this happens, we will just make it state normal
+            errorList = stateStruct.errorList;
+        }
+        if(!errorList) {
+            //just return an emptylist
+            errorList = [];
+        }
+        return errorList;
+    }
+
+    getErrorMsg() {
+        let stateStruct = this.getField("state");
+        let errorMsg;
+        if(stateStruct) {
+            //If this happens, we will just make it state normal
+            errorMsg = stateStruct.errorMsg;
+        }
+        if(!errorMsg) {
+            //just return an emptylist
+            errorMsg = UNKNOWN_ERROR_MSG_PREFIX + this.getName();
+        }
+        return errorMsg;
+    }
+
+    /** This returns true if the member is not up to date, typically
+     * do to waiting on an asynchronous operation. */
+    getPendingPromise() {
+        return this.getField("pendingPromise");
+    }
+
+    /** This returns true if the pending token matches. */
+    pendingPromiseMatches(promise) {
+        return (this.getPendingPromise() === promise);
+    }
+
+    //=======================================
+    // Update Data/State functions
+    //=======================================
+
+    /** This method clears the state field. */
+    clearState() {
+        this.clearField("state");
+    }
+
+    /** This method sets the data for this object. This is the object used by the 
+     * code which is identified by this name, for example the JSON object associated
+     * with a JSON table. Besides hold the data object, this updates the parent data map. */
+    setData(data) {
+        this.setField("data",data);
+        this._setState(apogeeutil.STATE_NORMAL,data);
+    }
+
+    /** This method adds an error for this member. It will be valid for the current round of calculation of
+     * this member. The error may be a javascript Error object of string (or any other object really). 
+     * The optional data value should typically be undefined unless there is a specifc data value that should be
+     * set with the error state. */
+    setError(error) {
+        this._setState(apogeeutil.STATE_ERROR,undefined,[error]);
+    }
+
+    /** This method sets the pre calc error for this dependent. 
+     * The optional data value should typically be undefined unless there is a specifc data value that should be
+     * set with the error state. */
+    setErrors(errorList) {
+        this._setState(apogeeutil.STATE_ERROR,undefined,errorList);
+    }
+
+    /** This sets the result pending flag. If there is a promise setting this member to pending, it should
+     * be passed as an arg. In this case the field will be updated only if the reolving promise matches this
+     * set promise. Otherwise it is assumed the promise had been superceded. In the case this member is pending
+     * because it depends on a remote pending member, then no promise should be passed in to this function. 
+     * The optional data value should typically be undefined unless there is a specifc data value that should be
+     * set with the pending state. */
+    setResultPending(promise) {
+        this._setState(apogeeutil.STATE_PENDING);
+        if(promise) {
+            this.setField("pendingPromise",promise);
+        }
+    }
+
+    /** This sets the result invalid flag. If the result is invalid, any
+     * table depending on this will also have an invalid value. 
+     * The optional data value should typically be undefined unless there is a specifc data value that should be
+     * set with the invalid state. */
+    setResultInvalid() {
+        this._setState(apogeeutil.STATE_INVALID);
+    }
+
+    /** This methos sets the data, where the data can be a generalized value
+     *  include data, apogeeutil.INVALID_VALUE, a Promis or an Error. Also, an explitict
+     * errorList can be passed in, includgin either Error or String objects. 
+     * This method does not however apply the asynchrnous data, it only flags the member as pending.
+     * the asynchronous data is set separately (also) using applyAsynchData, whcih requires access
+     * to the model object. */
+    applyData(data,errorList) {
+
+        //handle four types of data inputs
+        if((errorList)&&(errorList.length > 0)) {
+            this.setErrors(errorList);
+        }
+        else if(data instanceof Promise) {
+            //data is a promise - flag this a pending
+            this.setResultPending(data);
+        }
+        else if(data instanceof Error) {
+            //data is an error
+            this.setError(data);
+        }
+        else if(data === apogeeutil.INVALID_VALUE) {
+            //data is an invalid value
+            this.setResultInvalid();
+        }
+        else {
+            //normal data update (poosibly from an asynchronouse update)
+            this.setData(data);
+        }
+    }
+
+    /** This method implements setting asynchronous data on the member using a promise. */
+    applyAsynchData(model,promise) {
+
+        //kick off the asynch update
         var asynchCallback = memberValue => {
             //set the data for the table, along with triggering updates on dependent tables.
             let actionData = {};
             actionData.action = "updateData";
-            actionData.memberName = this.getFullName();
+            actionData.memberId = this.getId();
             actionData.sourcePromise = promise;
             actionData.data = memberValue;
-            if(onAsynchComplete) {
-                actionData.onComplete = onAsynchComplete;
-            }
-            doAction(workspace,actionData);
+            model.doFutureAction(actionData);
         }
         var asynchErrorCallback = errorMsg => {
             let actionData = {};
             actionData.action = "updateData";
-            actionData.memberName = this.getFullName();
+            actionData.memberId = this.getId();
             actionData.sourcePromise = promise;
             actionData.data = new Error(errorMsg);
-            if(onAsynchComplete) {
-                actionData.onComplete = onAsynchComplete;
-            }
-            doAction(workspace,actionData);
+            model.doFutureAction(actionData);
         }
 
         //call appropriate action when the promise completes
         promise.then(asynchCallback).catch(asynchErrorCallback);
     }
-}
 
-//========================================
-// "Protected" Methods
-//========================================
-
-/** This method is called when the member is deleted. If necessary the implementation
- * can extend this function, but it should call this base version of the function
- * if it does.  
- * @protected */
-Member.onDeleteMember = function() {
-    if(!(this.owner)) return;
-    
-	if(this.owner.isParent) {
-		this.owner.removeChild(this);
-	}
-    else if(this.owner.isRootHolder) {
-        this.owner.setRoot(null);
+    /** This method can be called to set data without setting the state. It is intended to be
+     * used by the folder to set the data value when an error, pending or invalid state is present. This
+     * data value is used for pass-through dependenceis. */
+    forceUpdateDataWithoutStateChange(data) {
+        this.setField("data",data)
     }
-    this.owner = null;
-}
 
-///** This method is called when the workspace is closed and also when an object
-// * is deleted. It should do any needed cleanup for the object.  
-// * @protected */
-//Member.onClose = function();
+    //========================================
+    // Move Functions
+    //=========================================
 
-//Implement this method if there is data to add to this member. Otherwise it may
-//be omitted
-///** This method adds any additional data to the json saved for this member. 
-// * @protected */
-//Member.addToJson = function(json) {
-//}
-
-//Implement this method if there is update data for this json. otherwise it may
-//be omitted
-///** This gets an update structure to upsate a newly instantiated member
-//* to match the current object. It may return "undefined" if there is no update
-//* data needed. 
-//* @protected */
-//Member.getUpdateData = function() {
-//}
-
-//-------------------------
-// Update Event Methods
-//-------------------------
-
-Member.getUpdated = function() {
-    return this.updated;
-}
-
-Member.clearUpdated = function() {
-    this.updated = {};
-}
-
-Member.fieldUpdated = function(field) {
-    this.updated[field] = true;
-}
-
-
-//===================================
-// Private Functions
-//===================================
-
-/** This method adds a data member to the imapacts list for this node.
- * The return value is true if the member was added and false if it was already there. 
- * @private */
-Member.addToImpactsList = function(member) {
-    //exclude this member
-    if(member === this) return;
-    
-    //add to the list iff it is not already there
-    if(this.impactsList.indexOf(member) === -1) {
-        this.impactsList.push(member);
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
-/** This method removes a data member from the imapacts list for this node. 
- * @private */
-Member.removeFromImpactsList = function(member) {
-    //it should appear only once
-    for(var i = 0; i < this.impactsList.length; i++) {
-        if(this.impactsList[i] == member) {
-            this.impactsList.splice(i,1);
-            return;
+    /** This method should be used to rename and/or change 
+     * the parent of this member. */
+    move(newName,newParent) {
+        //update the name if needed
+        if(newName != this.getField("name")) {
+            this.setField("name",newName);
+        }
+        
+        //update the parent if needed
+        let currentParentId = this.getField("parentId");
+        if(currentParentId != newParent.getId()) {
+            this.setField("parentId",newParent.getId());
         }
     }
+
+    //========================================
+    // "Protected" Methods
+    //========================================
+
+    /** This method is called when the member is deleted. If necessary the implementation
+     * can extend this function, but it should call this base version of the function
+     * if it does.  
+     * @protected */
+    onDeleteMember(model) {
+    }
+
+    ///** This method is called when the model is closed and also when an object
+    // * is deleted. It should do any needed cleanup for the object.  
+    // * @protected */
+    //onClose();
+
+    //Implement this method if there is data to add to this member. Otherwise it may
+    //be omitted
+    ///** This method adds any additional data to the json saved for this member. 
+    // * @protected */
+    //addToJson(model,json) {
+    //}
+
+    //Implement this method if there is update data for this json. otherwise it may
+    //be omitted
+    ///** This gets an update structure to upsate a newly instantiated member
+    //* to match the current object. It may return "undefined" if there is no update
+    //* data needed. 
+    //* @protected */
+    //getUpdateData() {
+    //}
+
+    //----------------------------------
+    // State setting methods
+    //----------------------------------
+
+    /** This updates the state. For state NORMAL, the data should be set. 
+     * For any state other than NORMAL, the data will be set to INVALID, regardless of 
+     * what argument is given for data.
+     * For state ERROR, an error list should be set. */
+    _setState(state,data,errorList) {
+        let newStateStruct = {};
+        let oldStateStruct = this.getField("state");
+
+        //don't update state if it is the same value (unless it is error, then we will update it
+        //becuase I don't feel like comparing the error messages)
+        if((oldStateStruct)&&(oldStateStruct.state == state)&&(state != apogeeutil.STATE_ERROR)) {
+            return;
+        }
+
+        //do some safety checks on the error list
+        if(state == apogeeutil.STATE_ERROR) {
+            //make sure there is an error list
+            if(!errorList) errorList = [];
+
+            newStateStruct.state = apogeeutil.STATE_ERROR;
+            newStateStruct.errorList = errorList;
+            if(errorList.length > 0) {
+                newStateStruct.errorMsg = errorList.join("\n");
+            }
+            else {
+                newStateStruct.errorMsg = UNKNOWN_ERROR_MSG_PREFIX + this.getName();
+            }
+        }
+        else {
+            //here we ignore the error list if there was one (there shouldn't be)
+            newStateStruct.state = state;
+        }
+
+        
+
+        //set the data if we passed it in, regardless of state
+        this.setField("state",newStateStruct);
+        this.setField("data",data);
+        if(state == apogeeutil.STATE_NORMAL) {
+            if(data !== undefined) {
+                this.setField("data",data);
+            }
+            else {
+                this.clearField("data");
+            }
+        }
+        else { 
+            this.setField("data",apogeeutil.INVALID_VALUE);
+        }
+        
+        //clear the pending promise, if we are not in pending state
+        //note that the pending promise must be set elsewhere
+        if(state != apogeeutil.STATE_PENDING) {
+            if(this.getField("pendingPromise")) {
+                this.clearField("pendingPromise");
+            }
+        }
+    }
+
+
 }
 
-/** This is used for Id generation.
- * @private */
-Member.nextId = 1;
+//add mixins to this class
+apogeeutil.mixin(Member,FieldObject);
 
-/** This method generates a member ID for the member. It is only valid
- * for the duration the workspace is opened. It is not persisted.
- * @private
- */
-Member._createId = function() {
-    return Member.nextId++;
-}
+let UNKNOWN_ERROR_MSG_PREFIX = "Unknown error in member ";
 

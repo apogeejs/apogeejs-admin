@@ -6,8 +6,7 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
  */
 export default class WebAppConfigManager {
     
-    constructor(workspaceUrl) {
-        this.workspaceUrl = workspaceUrl;
+    constructor() {
     }
     
     /** This method should return a Promise object the loades the
@@ -28,7 +27,7 @@ export default class WebAppConfigManager {
      * that should be loaded
      */
     getInitialWorkspaceFilePromise(app) {
-        return apogeeutil.textRequest(this.workspaceUrl);
+        return null;
     }
     
     /** This method should return the file metadata for the intial workspace.

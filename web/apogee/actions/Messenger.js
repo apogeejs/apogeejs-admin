@@ -4,8 +4,8 @@ import {doAction} from "/apogee/actions/action.js";
  * If the send fails, and exception will be thrown. */
 export default class Messenger {
     
-    constructor(fromMember) {
-        this.workspace = fromMember.getWorkspace();
+    constructor(model,fromMember) {
+        this.model = model;
         this.contextManager = fromMember.getContextManager();
         this.fromMember = fromMember;
     }
@@ -27,21 +27,14 @@ export default class Messenger {
         //set the data for the table, along with triggering updates on dependent tables.
         var actionData = {};
         actionData.action = "updateData";
-        actionData.memberName = member.getFullName();
+        actionData.memberId = member.getId();
         actionData.data = data;
         if(data instanceof Promise) {
             //for now no callback on promise
         }
         
-        //action is done later after the current action completes
-        actionData.onComplete = actionResult => {
-            if(!actionResult.actionDone) {
-                throw new Error("Error setting remote data: " + actionResult.alertMsg);
-            }
-        }
-        
         //return is handled above asynchronously
-        doAction(this.workspace,actionData);
+        doAction(this.model,actionData);
     }
 
     /** This is similar to dataUpdate except is allows multiple values to be set.
@@ -63,7 +56,7 @@ export default class Messenger {
             let data = updateEntry[1];
             
             subActionData.action = "updateData";
-            subActionData.memberName = member.getFullName();
+            subActionData.memberId = member.getId();
             subActionData.data = data;
             if(data instanceof Promise) {
                 //for now no callback on promise
@@ -76,15 +69,8 @@ export default class Messenger {
         actionData.action = "compoundAction";
         actionData.actions = actionList;
         
-        //action is done later after the current action completes
-        actionData.onComplete = actionResult => {
-            if(!actionResult.actionDone) {
-                throw new Error("Error setting remote data: " + actionResult.alertMsg);
-            }
-        }
-        
         //return is handled above asynchronously
-        doAction(this.workspace,actionData);
+        doAction(this.model,actionData);
     }
     
     //=====================
@@ -95,8 +81,8 @@ export default class Messenger {
     /** This method returns the member instance for a given local member name,
      * as defined from the source object context. */
     _getMemberObject(localMemberName) { 
-        var path = localMemberName.split(".");
-        var member = this.contextManager.getMember(path);
+        var pathArray = localMemberName.split(".");
+        var member = this.contextManager.getMember(this.model,pathArray);
         return member;
     }
 }
