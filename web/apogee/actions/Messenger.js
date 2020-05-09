@@ -34,7 +34,14 @@ export default class Messenger {
         }
         
         //return is handled above asynchronously
-        doAction(this.model,actionData);
+        if(this.model.getIsLocked()) {
+            //TEMPORARY HANDLING OF NON_CONTINUING ACTION...
+            //(I think this should be done differently?)
+            this.model.doFutureAction(actionData);
+        }
+        else {
+            doAction(this.model,actionData);
+        }
     }
 
     /** This is similar to dataUpdate except is allows multiple values to be set.
