@@ -126,7 +126,7 @@ function createGeneratorFunction(varInfo, combinedFunctionBody) {
 
     //add the messenger as a local variable
     contextDeclarationText += "var apogeeMessenger\n";
-    initializerBody += "apogeeMessenger = messenger\n";
+    initializerBody += "apogeeMessenger = __messenger\n";
     
     //set the context - here we only defined the variables that are actually used.
 	for(var baseName in varInfo) {        
@@ -139,7 +139,7 @@ function createGeneratorFunction(varInfo, combinedFunctionBody) {
         contextDeclarationText += "var " + baseName + ";\n";
         
         //add to the context setter
-        initializerBody += baseName + ' = contextManager.getValue(model,"' + baseName + '");\n';
+        initializerBody += baseName + ' = __contextManager.getValue(__model,"' + baseName + '");\n';
     }
     
     //create the generator for the object function
@@ -199,7 +199,7 @@ const GENERATOR_FUNCTION_FORMAT_TEXT = [
 "//declare context variables",
 "{0}",
 "//context setter",
-"function __initializer(model,contextManager,messenger) {",
+"function __initializer(__model,__contextManager,__messenger) {",
 "{1}};",
 "",
 "//user code",

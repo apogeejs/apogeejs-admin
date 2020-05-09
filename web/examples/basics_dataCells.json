@@ -1,1 +1,928 @@
-{"fileType":"apogee app js workspace","version":"0.50","references":[],"workspace":{"fileType":"apogee workspace","version":0.2,"name":"Data Cell Basics","data":{"name":"Model","type":"apogee.Folder","children":{"year":{"name":"year","type":"apogee.JsonTable","updateData":{"data":1980}},"jsonTypes":{"name":"jsonTypes","type":"apogee.JsonTable","updateData":{"data":{"numericValue":3.4,"stringValue":"Hello","booleanValue":true,"nullValue":null,"arrayValue":[3.4,"Hello",true,null],"objectValue":{"numericValue":3.4,"stringValue":"Hello","booleanValue":true,"nullValue":null}}}},"url":{"name":"url","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return `http://localhost:8888/examples/population/us${year}.json`;","supplementalCode":""}},"populationData":{"name":"populationData","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"return apogeeutil.jsonRequest(url);","supplementalCode":""}},"errorPopulationData":{"name":"errorPopulationData","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"let errorUrl = url + \"xxx\";\n\n//return apogeeutil.jsonRequest(errorUrl);\nreturn \"comment out the request in the formula to see the error message\";","supplementalCode":""}},"invalidValueTable":{"name":"invalidValueTable","type":"apogee.JsonTable","updateData":{"argList":[],"functionBody":"//return apogeeutil.INVALID_VALUE;\nreturn \"comment out the invale return value in the formula to see the invalid message\";","supplementalCode":""}},"textCell":{"name":"textCell","type":"apogee.JsonTable","updateData":{"data":"This is text. And here I include a solitary quote which has to be escaped in a regular JSON: \"\nAnd I have a second line."}},"gridCell":{"name":"gridCell","type":"apogee.JsonTable","updateData":{"data":[[1,2,3],[4,5,6]]}}}}},"components":{"type":"apogeeapp.app.FolderComponent","treeState":null,"data":{"doc":{"type":"doc","content":[{"type":"heading1","content":[{"type":"text","text":"Basics - Data Cells"}]},{"type":"paragraph","content":[{"type":"text","text":"The inspiration for Apogee is the spreadsheet. The main programming component in Apogee is the data cell, which is analogues to a cell in a spreadsheet. A data cell can be given a static value, which is equivalent to typing in a value to a spreadsheet cell, or the data cell can be given a formula, which is equivalent to a formula in a spreadsheet. The difference is that the value in a data cell is a json valued object rather than just a simple value. And the formula is a javascript function which returns the desired value for the cell."}]},{"type":"paragraph","content":[{"type":"text","text":"There are more differences. The most obvious difference is that the cells don't appear in a grid. That feature in a spreadsheet has some good benefits. You don't have to name each cell, which would be cumbersome, instead you can reference a cell, or a range of cells, by selecting it with the mouse. These benefits are given up in Apogee, in exchange for others. Apogee looks like a Jupyter notebook. This was indeed copied from there, and also from Donald Knuth's literate programming. The reason for this is that in an older version of Apogee, as well as in spreadsheets, it is very easy to write a program but if you look at the program later, or show it to someone else, it is indecipherable what is going on. The idea with of using literate programming is to give better context to what is happening in the cells and the code."}]},{"type":"heading2","content":[{"type":"text","text":"Data Cells"}]},{"type":"paragraph","content":[{"type":"text","text":"First, to create a data cell, press the "},{"type":"text","marks":[{"type":"italic"}],"text":"Data Cell"},{"type":"text","text":" button in the toolbar and give it a name. There is also a selection for \"data view\". That is discussed later on the page. For now, enter the name "},{"type":"text","marks":[{"type":"italic"}],"text":"year"},{"type":"text","text":" and press "},{"type":"text","marks":[{"type":"italic"}],"text":"OK"},{"type":"text","text":", a new data cell appears. Our year cell appears below, in the next section called "},{"type":"text","marks":[{"type":"italic"}],"text":"Static Values"},{"type":"text","text":"."}]},{"type":"paragraph","content":[{"type":"text","text":"The data cell has a type icon and a name. The type icon doubles as a menu. For this cell is has the entries \"Edit Properties\" and \"Delete\". \"Edit Properties\" lets you change the name or other applicable settings. Delete, as expected, deletes the cell. The cell can also be deleted be removing it from the document, such as by selecting it and pressing the delete key."}]},{"type":"paragraph","content":[{"type":"text","text":"In addition there are some view selectors. Using these you can select which views are displayed. In analogy to the spreadsheet, and as is quite obvious, the "},{"type":"text","marks":[{"type":"italic"}],"text":"Data"},{"type":"text","text":" view is the value of the cell and the Formula view is the formula for the cell, if applicable. There is also a "},{"type":"text","marks":[{"type":"italic"}],"text":"Private"},{"type":"text","text":" view where you can place constants and functions that are accessed only from this cells formula. We will look at that later."}]},{"type":"heading2","content":[{"type":"text","text":"Static Values"}]},{"type":"paragraph","content":[{"type":"text","text":"Here is the cell we created above called "},{"type":"text","marks":[{"type":"italic"}],"text":"year"},{"type":"text","text":". We will enter a plain static value for it. To store a static value, just enter type value in the view marked "},{"type":"text","marks":[{"type":"italic"}],"text":"Data"},{"type":"text","text":" and press "},{"type":"text","marks":[{"type":"italic"}],"text":"save"},{"type":"text","text":". The value should be expressed as a JSON value."}]},{"type":"apogeeComponent","attrs":{"name":"year","id":0,"state":""}},{"type":"paragraph","content":[{"type":"text","text":"In the "},{"type":"text","marks":[{"type":"italic"}],"text":"data"},{"type":"text","text":" view, the value should be expressed as a proper JSON. In particular, the keys in a JSON object should be strings using quotes. When typing a JSON object in javascript code, these quotes can be omitted, "}]},{"type":"paragraph","content":[{"type":"text","text":"For reference, here are the different value types in a JSON, expressed below in a JSON object."}]},{"type":"apogeeComponent","attrs":{"name":"jsonTypes","id":0,"state":""}},{"type":"paragraph","content":[{"type":"text","text":"One more note, "},{"type":"text","marks":[{"type":"italic"}],"text":"undefined"},{"type":"text","text":" is not a valid value in a JSON."}]},{"type":"paragraph","content":[{"type":"text","text":"For all this talk about the format of JSONs, the truth is in programming with Apogee I find I don't spend much time typing in JSONs, at least not any more than would in normal javascript programming."}]},{"type":"paragraph","content":[{"type":"text","text":"In fact, the actual lines of code used when programming in Apogee is pretty much the same as the lines code you would use in normal javascript programming. The different is really in the process of writing the code. In Apogee it is much more of an iterative process because you can see the results as you go. "}]},{"type":"paragraph","content":[{"type":"text","text":"(The main exception to this is when dealing with asynchronous operations, which are handled much more easily here.) "}]},{"type":"heading2","content":[{"type":"text","text":"Formulas"}]},{"type":"paragraph","content":[{"type":"text","text":"As in a spreadsheet, a cell can contain static values, as shown above, or a formula that defines the value for that cell. In apogee, the \"formula\" is really a function that returns the value for the cell."}]},{"type":"paragraph","content":[{"type":"text","text":"Below is an example of a formula that takes our year and converts it into a URL for some population data."}]},{"type":"paragraph","content":[{"type":"text","text":"To do this, create another data cell named "},{"type":"text","marks":[{"type":"italic"}],"text":"url"},{"type":"text","text":". Then open the "},{"type":"text","marks":[{"type":"italic"}],"text":"Formula"},{"type":"text","text":" view and type in the function that returns the desired value. "}]},{"type":"paragraph","content":[{"type":"text","text":"In the formula, the values of other cells can be accessed as if they were variables. In the formula I used the javascript template literal to create the properly formatted string."}]},{"type":"paragraph","content":[{"type":"text","text":"The resulting value is populated in the "},{"type":"text","marks":[{"type":"italic"}],"text":"Data"},{"type":"text","text":" view. It appears with a slightly gray background and it can not be edited. If you want to replace the value with a static value you must erase the formula first."}]},{"type":"apogeeComponent","attrs":{"name":"url","id":0,"state":""}},{"type":"heading2","content":[{"type":"text","text":"Asynchronous Formulas"}]},{"type":"paragraph","content":[{"type":"text","text":"Apogee has built in handling for asynchronous functions. To do an asynchronous action, just return a Promise object from the function. Apogee will automatically pause any cell that depends on this asynchronous value until it is resolved."}]},{"type":"paragraph","content":[{"type":"text","text":"Visually, a yellow banner appears on the cell indicating the value is pending. In the example below this should appear briefly after "},{"type":"text","marks":[{"type":"italic"}],"text":"save"},{"type":"text","text":" is pressed in the "},{"type":"text","marks":[{"type":"italic"}],"text":"Formula"},{"type":"text","text":" view."}]},{"type":"paragraph","content":[{"type":"text","text":"The request is made using a library function from apogee which is very similar to javascript's "},{"type":"text","marks":[{"type":"italic"}],"text":"fetch"},{"type":"text","text":". The difference is mainly in error handling. The apogee jsonRequest function throws an error (called an exception in some other languages). As shown below, this is convenient in Apogee for error handling."}]},{"type":"apogeeComponent","attrs":{"name":"populationData","id":0,"state":""}},{"type":"heading2","content":[{"type":"text","text":"Error Handling"}]},{"type":"paragraph","content":[{"type":"text","text":"Apogee also has built in handling for javascript "},{"type":"text","marks":[{"type":"italic"}],"text":"Errors"},{"type":"text","text":". There age mixed views on whether errors/exceptions should be used. In Apogee they are recommended in context where you are working interactively with the code. The idea is that the error is obvious and you will be working to fix it, if that is the appropriate thing to do."}]},{"type":"paragraph","content":[{"type":"text","text":"To demonstrate an error, will repeat the population data example except we will make the url invalid. Incidentally, this also demonstrates the behavior of the jsonRequest function when there is an error."}]},{"type":"paragraph","content":[{"type":"text","text":"Here, a red banner is placed on the cell giving the error message. Any cell that depends on this cell will also get an error banner. The page that is parent to the cell will also get the error, as will the pages parent page. (Technically, the value of the page depends on the value of each cell on the page, as we will illustrate later.)"}]},{"type":"paragraph","content":[{"type":"text","text":"Because we don't want to display the error on this page, because that would be confusing when you try to do the tutorial, we will comment out the offending request. If you want to see the error, just update the comments below."}]},{"type":"apogeeComponent","attrs":{"name":"errorPopulationData","id":0,"state":""}},{"type":"heading2","content":[{"type":"text","text":"Invalid Value"}]},{"type":"paragraph","content":[{"type":"text","text":"There is one final return value for table formulas, apogeeutil.INVALID_VALUE. This causes yet another banner, a gray one. If a table returns apogeeutil.INVALID_VALUE, any table that depends on it will also be given the value apogeeutil.INVALID_VALUE."}]},{"type":"paragraph","content":[{"type":"text","text":"As with the error, we comment out the return to avoid setting the gray banner on this page."}]},{"type":"apogeeComponent","attrs":{"name":"invalidValueTable","id":0,"state":""}},{"type":"heading2","content":[{"type":"text","text":"Data Views"}]},{"type":"paragraph","content":[{"type":"text","text":"There are three different ways to view the data in a data cell. The default is as a JSON. This is the most general way to do it since the value of the data cell is a JSON."}]},{"type":"paragraph","content":[{"type":"text","text":"You can also view the data as plain text or as a grid. To see the JSON value displayed for each of these cells, go to edit properties and select the JSON view."}]},{"type":"paragraph","content":[{"type":"text","text":"Here is the text data view. It is convenient for working with text, so you don't need to deal with escaping characters."}]},{"type":"apogeeComponent","attrs":{"name":"textCell","id":0,"state":""}},{"type":"paragraph","content":[{"type":"text","text":"Here is the grid data view. It is especially convenient for pasting data from or to a spreadsheet. The JSON format for the grid is a array of arrays."}]},{"type":"apogeeComponent","attrs":{"name":"gridCell","id":0,"state":""}},{"type":"paragraph"},{"type":"paragraph"}]},"selection":{"type":"text","anchor":7049,"head":7049}},"children":{"year":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"views":{"Data":{"isViewActive":true,"height":280},"Formula":{"isViewActive":false},"Private":{"isViewActive":false}}},"dataView":"Colorized"},"jsonTypes":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"views":{"Data":{"isViewActive":true,"height":280},"Formula":{"isViewActive":false},"Private":{"isViewActive":false}}},"dataView":"Colorized"},"url":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"views":{"Data":{"isViewActive":true,"height":280},"Formula":{"isViewActive":true,"height":7000},"Private":{"isViewActive":false}}},"dataView":"Colorized"},"populationData":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"views":{"Data":{"isViewActive":true,"height":280},"Formula":{"isViewActive":true,"height":7000},"Private":{"isViewActive":false}}},"dataView":"Colorized"},"errorPopulationData":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"views":{"Data":{"isViewActive":true,"height":280},"Formula":{"isViewActive":true,"height":7000},"Private":{"isViewActive":false}}},"dataView":"Colorized"},"invalidValueTable":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"views":{"Data":{"isViewActive":true,"height":280},"Formula":{"isViewActive":true,"height":7000},"Private":{"isViewActive":false}}},"dataView":"Colorized"},"textCell":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"views":{"Data":{"isViewActive":true,"height":280},"Formula":{"isViewActive":false},"Private":{"isViewActive":false}}},"dataView":"Text Data"},"gridCell":{"type":"apogeeapp.app.JsonTableComponent","windowState":{"views":{"Data":{"isViewActive":true,"height":154},"Formula":{"isViewActive":false},"Private":{"isViewActive":false}}},"dataView":"Grid"}}},"openTabs":["Model"],"activeTabMember":"Model"}
+{
+	"fileType": "apogee app js workspace",
+	"version": "0.60",
+	"references": {
+		"refEntries": []
+	},
+	"code": {
+		"model": {
+			"fileType": "apogee model",
+			"version": 0.3,
+			"name": "Data Cell Basics",
+			"children": {
+				"Model": {
+					"name": "Model",
+					"type": "apogee.Folder",
+					"children": {
+						"year": {
+							"name": "year",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": 1980
+							}
+						},
+						"jsonTypes": {
+							"name": "jsonTypes",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"numericValue": 3.4,
+									"stringValue": "Hello",
+									"booleanValue": true,
+									"nullValue": null,
+									"arrayValue": [
+										3.4,
+										"Hello",
+										true,
+										null
+									],
+									"objectValue": {
+										"numericValue": 3.4,
+										"stringValue": "Hello",
+										"booleanValue": true,
+										"nullValue": null
+									}
+								}
+							}
+						},
+						"url": {
+							"name": "url",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "return `http://localhost:8888/examples/population/us${year}.json`;",
+								"supplementalCode": ""
+							}
+						},
+						"populationData": {
+							"name": "populationData",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "return apogeeutil.jsonRequest(url);",
+								"supplementalCode": ""
+							}
+						},
+						"errorPopulationData": {
+							"name": "errorPopulationData",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "let errorUrl = url + \"xxx\";\n\n//return apogeeutil.jsonRequest(errorUrl);\nreturn \"comment out the request in the formula to see the error message\";",
+								"supplementalCode": ""
+							}
+						},
+						"invalidValueTable": {
+							"name": "invalidValueTable",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "//return apogeeutil.INVALID_VALUE;\nreturn \"comment out the invale return value in the formula to see the invalid message\";",
+								"supplementalCode": ""
+							}
+						},
+						"textCell": {
+							"name": "textCell",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": "This is text. And here I include a solitary quote which has to be escaped in a regular JSON: \"\nAnd I have a second line."
+							}
+						},
+						"gridCell": {
+							"name": "gridCell",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": [
+									[
+										1,
+										2,
+										3
+									],
+									[
+										4,
+										5,
+										6
+									]
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		"components": {
+			"Model": {
+				"type": "apogeeapp.app.FolderComponent",
+				"treeState": null,
+				"data": {
+					"doc": {
+						"type": "doc",
+						"content": [
+							{
+								"type": "heading1",
+								"content": [
+									{
+										"type": "text",
+										"text": "Basics - Data Cells"
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "The inspiration for Apogee is the spreadsheet. The main programming component in Apogee is the data cell, which is analogues to a cell in a spreadsheet. A data cell can be given a static value, which is equivalent to typing in a value to a spreadsheet cell, or the data cell can be given a formula, which is equivalent to a formula in a spreadsheet. The difference is that the value in a data cell is a json valued object rather than just a simple value. And the formula is a javascript function which returns the desired value for the cell."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "There are more differences. The most obvious difference is that the cells don't appear in a grid. That feature in a spreadsheet has some good benefits. You don't have to name each cell, which would be cumbersome, instead you can reference a cell, or a range of cells, by selecting it with the mouse. These benefits are given up in Apogee, in exchange for others. Apogee looks like a Jupyter notebook. This was indeed copied from there, and also from Donald Knuth's literate programming. The reason for this is that in an older version of Apogee, as well as in spreadsheets, it is very easy to write a program but if you look at the program later, or show it to someone else, it is indecipherable what is going on. The idea with of using literate programming is to give better context to what is happening in the cells and the code."
+									}
+								]
+							},
+							{
+								"type": "heading2",
+								"content": [
+									{
+										"type": "text",
+										"text": "Data Cells"
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "First, to create a data cell, press the "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "Data Cell"
+									},
+									{
+										"type": "text",
+										"text": " button in the toolbar and give it a name. There is also a selection for \"data view\". That is discussed later on the page. For now, enter the name "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "year"
+									},
+									{
+										"type": "text",
+										"text": " and press "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "OK"
+									},
+									{
+										"type": "text",
+										"text": ", a new data cell appears. Our year cell appears below, in the next section called "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "Static Values"
+									},
+									{
+										"type": "text",
+										"text": "."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "The data cell has a type icon and a name. The type icon doubles as a menu. For this cell is has the entries \"Edit Properties\" and \"Delete\". \"Edit Properties\" lets you change the name or other applicable settings. Delete, as expected, deletes the cell. The cell can also be deleted be removing it from the document, such as by selecting it and pressing the delete key."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "In addition there are some view selectors. Using these you can select which views are displayed. In analogy to the spreadsheet, and as is quite obvious, the "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "Data"
+									},
+									{
+										"type": "text",
+										"text": " view is the value of the cell and the Formula view is the formula for the cell, if applicable. There is also a "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "Private"
+									},
+									{
+										"type": "text",
+										"text": " view where you can place constants and functions that are accessed only from this cells formula. We will look at that later."
+									}
+								]
+							},
+							{
+								"type": "heading2",
+								"content": [
+									{
+										"type": "text",
+										"text": "Static Values"
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "Here is the cell we created above called "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "year"
+									},
+									{
+										"type": "text",
+										"text": ". We will enter a plain static value for it. To store a static value, just enter type value in the view marked "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "Data"
+									},
+									{
+										"type": "text",
+										"text": " and press "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "save"
+									},
+									{
+										"type": "text",
+										"text": ". The value should be expressed as a JSON value."
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "year",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "In the "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "data"
+									},
+									{
+										"type": "text",
+										"text": " view, the value should be expressed as a proper JSON. In particular, the keys in a JSON object should be strings using quotes. When typing a JSON object in javascript code, these quotes can be omitted, "
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "For reference, here are the different value types in a JSON, expressed below in a JSON object."
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "jsonTypes",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "One more note, "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "undefined"
+									},
+									{
+										"type": "text",
+										"text": " is not a valid value in a JSON."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "For all this talk about the format of JSONs, the truth is in programming with Apogee I find I don't spend much time typing in JSONs, at least not any more than would in normal javascript programming."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "In fact, the actual lines of code used when programming in Apogee is pretty much the same as the lines code you would use in normal javascript programming. The different is really in the process of writing the code. In Apogee it is much more of an iterative process because you can see the results as you go. "
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "(The main exception to this is when dealing with asynchronous operations, which are handled much more easily here.) "
+									}
+								]
+							},
+							{
+								"type": "heading2",
+								"content": [
+									{
+										"type": "text",
+										"text": "Formulas"
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "As in a spreadsheet, a cell can contain static values, as shown above, or a formula that defines the value for that cell. In apogee, the \"formula\" is really a function that returns the value for the cell."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "Below is an example of a formula that takes our year and converts it into a URL for some population data."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "To do this, create another data cell named "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "url"
+									},
+									{
+										"type": "text",
+										"text": ". Then open the "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "Formula"
+									},
+									{
+										"type": "text",
+										"text": " view and type in the function that returns the desired value. "
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "In the formula, the values of other cells can be accessed as if they were variables. In the formula I used the javascript template literal to create the properly formatted string."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "The resulting value is populated in the "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "Data"
+									},
+									{
+										"type": "text",
+										"text": " view. It appears with a slightly gray background and it can not be edited. If you want to replace the value with a static value you must erase the formula first."
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "url",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "heading2",
+								"content": [
+									{
+										"type": "text",
+										"text": "Asynchronous Formulas"
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "Apogee has built in handling for asynchronous functions. To do an asynchronous action, just return a Promise object from the function. Apogee will automatically pause any cell that depends on this asynchronous value until it is resolved."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "Visually, a yellow banner appears on the cell indicating the value is pending. In the example below this should appear briefly after "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "save"
+									},
+									{
+										"type": "text",
+										"text": " is pressed in the "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "Formula"
+									},
+									{
+										"type": "text",
+										"text": " view."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "The request is made using a library function from apogee which is very similar to javascript's "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "fetch"
+									},
+									{
+										"type": "text",
+										"text": ". The difference is mainly in error handling. The apogee jsonRequest function throws an error (called an exception in some other languages). As shown below, this is convenient in Apogee for error handling."
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "populationData",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "heading2",
+								"content": [
+									{
+										"type": "text",
+										"text": "Error Handling"
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "Apogee also has built in handling for javascript "
+									},
+									{
+										"type": "text",
+										"marks": [
+											{
+												"type": "italic"
+											}
+										],
+										"text": "Errors"
+									},
+									{
+										"type": "text",
+										"text": ". There age mixed views on whether errors/exceptions should be used. In Apogee they are recommended in context where you are working interactively with the code. The idea is that the error is obvious and you will be working to fix it, if that is the appropriate thing to do."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "To demonstrate an error, will repeat the population data example except we will make the url invalid. Incidentally, this also demonstrates the behavior of the jsonRequest function when there is an error."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "Here, a red banner is placed on the cell giving the error message. Any cell that depends on this cell will also get an error banner. The page that is parent to the cell will also get the error, as will the pages parent page. (Technically, the value of the page depends on the value of each cell on the page, as we will illustrate later.)"
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "Because we don't want to display the error on this page, because that would be confusing when you try to do the tutorial, we will comment out the offending request. If you want to see the error, just update the comments below."
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "errorPopulationData",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "heading2",
+								"content": [
+									{
+										"type": "text",
+										"text": "Invalid Value"
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "There is one final return value for table formulas, apogeeutil.INVALID_VALUE. This causes yet another banner, a gray one. If a table returns apogeeutil.INVALID_VALUE, any table that depends on it will also be given the value apogeeutil.INVALID_VALUE."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "As with the error, we comment out the return to avoid setting the gray banner on this page."
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "invalidValueTable",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "heading2",
+								"content": [
+									{
+										"type": "text",
+										"text": "Data Views"
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "There are three different ways to view the data in a data cell. The default is as a JSON. This is the most general way to do it since the value of the data cell is a JSON."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "You can also view the data as plain text or as a grid. To see the JSON value displayed for each of these cells, go to edit properties and select the JSON view."
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "Here is the text data view. It is convenient for working with text, so you don't need to deal with escaping characters."
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "textCell",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "Here is the grid data view. It is especially convenient for pasting data from or to a spreadsheet. The JSON format for the grid is a array of arrays."
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "gridCell",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "paragraph"
+							},
+							{
+								"type": "paragraph"
+							}
+						]
+					},
+					"selection": {
+						"type": "text",
+						"anchor": 7049,
+						"head": 7049
+					}
+				},
+				"children": {
+					"year": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"views": {
+								"Data": {
+									"isViewActive": true,
+									"height": 280
+								},
+								"Formula": {
+									"isViewActive": false
+								},
+								"Private": {
+									"isViewActive": false
+								}
+							}
+						},
+						"dataView": "Colorized"
+					},
+					"jsonTypes": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"views": {
+								"Data": {
+									"isViewActive": true,
+									"height": 280
+								},
+								"Formula": {
+									"isViewActive": false
+								},
+								"Private": {
+									"isViewActive": false
+								}
+							}
+						},
+						"dataView": "Colorized"
+					},
+					"url": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"views": {
+								"Data": {
+									"isViewActive": true,
+									"height": 280
+								},
+								"Formula": {
+									"isViewActive": true,
+									"height": 7000
+								},
+								"Private": {
+									"isViewActive": false
+								}
+							}
+						},
+						"dataView": "Colorized"
+					},
+					"populationData": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"views": {
+								"Data": {
+									"isViewActive": true,
+									"height": 280
+								},
+								"Formula": {
+									"isViewActive": true,
+									"height": 7000
+								},
+								"Private": {
+									"isViewActive": false
+								}
+							}
+						},
+						"dataView": "Colorized"
+					},
+					"errorPopulationData": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"views": {
+								"Data": {
+									"isViewActive": true,
+									"height": 280
+								},
+								"Formula": {
+									"isViewActive": true,
+									"height": 7000
+								},
+								"Private": {
+									"isViewActive": false
+								}
+							}
+						},
+						"dataView": "Colorized"
+					},
+					"invalidValueTable": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"views": {
+								"Data": {
+									"isViewActive": true,
+									"height": 280
+								},
+								"Formula": {
+									"isViewActive": true,
+									"height": 7000
+								},
+								"Private": {
+									"isViewActive": false
+								}
+							}
+						},
+						"dataView": "Colorized"
+					},
+					"textCell": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"views": {
+								"Data": {
+									"isViewActive": true,
+									"height": 280
+								},
+								"Formula": {
+									"isViewActive": false
+								},
+								"Private": {
+									"isViewActive": false
+								}
+							}
+						},
+						"dataView": "Text Data"
+					},
+					"gridCell": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"windowState": {
+							"views": {
+								"Data": {
+									"isViewActive": true,
+									"height": 154
+								},
+								"Formula": {
+									"isViewActive": false
+								},
+								"Private": {
+									"isViewActive": false
+								}
+							}
+						},
+						"dataView": "Grid"
+					}
+				}
+			}
+		}
+	}
+}

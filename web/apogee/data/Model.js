@@ -526,17 +526,17 @@ Model.ROOT_FOLDER_NAME = "Main";
 Model.SAVE_FILE_TYPE = "apogee model";
 
 /** This is the supported file version. */
-Model.SAVE_FILE_VERSION = 0.2;
+Model.SAVE_FILE_VERSION = 0.3;
 
 Model.CONSECUTIVE_ACTION_INITIAL_LIMIT = 500;
 
 Model.EMPTY_MODEL_JSON = {
-    "fileType": "apogee model",
-    "version": 0.2,
+    "fileType": Model.SAVE_FILE_TYPE,
+    "version": Model.SAVE_FILE_VERSION,
     "name": Model.DEFAULT_MODEL_NAME,
     "children": {
         "Main": {
-            "name": "Main",
+            "name": Model.ROOT_FOLDER_NAME,
             "type": "apogee.Folder"
         }
     }

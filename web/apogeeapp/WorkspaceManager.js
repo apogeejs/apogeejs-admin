@@ -285,7 +285,7 @@ this.created = false;
 
 }
 
-WorkspaceManager.FILE_VERSION = "0.50";
+WorkspaceManager.FILE_VERSION = "0.60";
 
 
 //=====================================
