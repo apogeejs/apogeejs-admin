@@ -99,8 +99,8 @@ export default class JsonTable extends CodeableMember {
 //============================
 
 JsonTable.generator = {};
-JsonTable.generator.displayName = "Table";
-JsonTable.generator.type = "apogee.JsonTable";
+JsonTable.generator.displayName = "JSON Member";
+JsonTable.generator.type = "apogee.JsonMember";
 JsonTable.generator.createMember = JsonTable.fromJson;
 JsonTable.generator.setDataOk = true;
 JsonTable.generator.setCodeOk = true;

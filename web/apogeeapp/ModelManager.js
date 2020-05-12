@@ -110,7 +110,7 @@ export default class ModelManager extends FieldObject {
         //response - get new member
         var component;
         var componentClass = componentInfo.getComponentClass(componentJson.type);
-        if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
+        if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorMember")) {
             //create empty component
             component = new componentClass(member,this);
 
@@ -551,6 +551,6 @@ export default class ModelManager extends FieldObject {
 //this is the json for an empty model
 ModelManager.EMPTY_MODEL_COMPONENT_JSON = {
     "Main": {
-        "type":"apogeeapp.app.FolderComponent"
+        "type":"apogeeapp.PageComponent"
     }
 };

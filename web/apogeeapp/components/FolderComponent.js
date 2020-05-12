@@ -38,8 +38,8 @@ export default class FolderComponent extends ParentComponent {
 // This is the component generator, to register the component
 //======================================
 
-FolderComponent.displayName = "Folder";
-FolderComponent.uniqueName = "apogeeapp.app.FolderComponent";
+FolderComponent.displayName = "Page";
+FolderComponent.uniqueName = "apogeeapp.PageComponent";
 FolderComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.Folder"
 };

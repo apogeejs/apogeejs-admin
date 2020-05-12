@@ -47,7 +47,7 @@ ErrorComponentView.TABLE_EDIT_SETTINGS = {
 // This is the component generator, to register the component
 //======================================
 
-ErrorComponentView.componentName = "apogeeapp.app.ErrorComponent";
+ErrorComponentView.componentName = "apogeeapp.ErrorCell";
 ErrorComponentView.hasTabEntry = false;
 ErrorComponentView.hasChildEntry = true;
 ErrorComponentView.ICON_RES_PATH = "/componentIcons/genericDataTable.png";

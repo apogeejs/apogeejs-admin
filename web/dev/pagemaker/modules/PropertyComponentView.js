@@ -1,7 +1,7 @@
 //These are in lieue of the import statements
 let getComponentViewClass = apogeeview.getComponentViewClass;
 
-let JsonTableComponentViewClass = getComponentViewClass("apogeeapp.app.JsonTableComponent");
+let JsonTableComponentViewClass = getComponentViewClass("apogeeapp.JsonCell");
 
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods

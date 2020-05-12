@@ -95,7 +95,7 @@ export function createMember(model,parent,memberJson) {
     }
     else {
         //type not found! - create a dummy object and add an error to it
-        let errorTableGenerator = Model.getMemberGenerator("appogee.ErrorTable");
+        let errorTableGenerator = Model.getMemberGenerator("apogee.ErrorMember");
         member = errorTableGenerator.createMember(parent,memberJson);
         member.setError("Member type not found: " + memberJson.type);
         

@@ -184,10 +184,10 @@ CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 // This is the control generator, to register the control
 //======================================
 
-CustomComponent.displayName = "Custom Component";
-CustomComponent.uniqueName = "apogeeapp.app.CustomComponent";
+CustomComponent.displayName = "Custom Cell";
+CustomComponent.uniqueName = "apogeeapp.CustomCell";
 CustomComponent.DEFAULT_MEMBER_JSON = {
-    "type": "apogee.JsonTable"
+    "type": "apogee.JsonMember"
 };
 
 //=====================================

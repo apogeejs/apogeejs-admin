@@ -15,5 +15,5 @@ ButtonComponent.uniqueName = "apogeeapp.app.ButtonComponent";
 
 /** This is the json needed to create the necessary members for the  component */
 ButtonComponent.DEFAULT_MEMBER_JSON = {
-     "type": "apogee.JsonTable"
+     "type": "apogee.JsonMember"
 };

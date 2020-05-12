@@ -155,7 +155,7 @@ export default class FunctionTable extends CodeableMember {
 
 FunctionTable.generator = {};
 FunctionTable.generator.displayName = "Function";
-FunctionTable.generator.type = "apogee.FunctionTable";
+FunctionTable.generator.type = "apogee.FunctionMember";
 FunctionTable.generator.createMember = FunctionTable.fromJson;
 FunctionTable.generator.readProperties = FunctionTable.readProperties;
 FunctionTable.generator.getPropertyUpdateAction = FunctionTable.getPropertyUpdateAction;

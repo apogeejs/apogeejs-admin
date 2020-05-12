@@ -43,29 +43,29 @@ export default class FormDataComponent extends Component {
 // This is the component generator, to register the component
 //======================================
 
-FormDataComponent.displayName = "Form Data Table";
-FormDataComponent.uniqueName = "apogeeapp.app.FormDataComponent";
+FormDataComponent.displayName = "Data Form Cell";
+FormDataComponent.uniqueName = "apogeeapp.DataFormCell";
 FormDataComponent.DEFAULT_MEMBER_JSON = {
         "type": "apogee.Folder",
         "childrenNotWriteable": true,
         "children": {
             "layout": {
                 "name": "layout",
-                "type": "apogee.FunctionTable",
+                "type": "apogee.FunctionMember",
                 "updateData": {
                     "argList":[],
                 }
             },
             "data": {
                 "name": "data",
-                "type": "apogee.JsonTable",
+                "type": "apogee.JsonMember",
                 "updateData": {
                     "data": "",
                 }
             },
             "isInputValid": {
                 "name": "isInputValid",
-                "type": "apogee.FunctionTable",
+                "type": "apogee.FunctionMember",
                 "updateData": {
                     "argList":["formValue"],
                     "functionBody": "//If data valid, return true. If data is invalid, return an error message.\nreturn true;"

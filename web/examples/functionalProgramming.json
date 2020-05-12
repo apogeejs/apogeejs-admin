@@ -16,7 +16,8 @@
 					"children": {
 						"genericValue": {
 							"name": "genericValue",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"data": {
 									"a": true,
@@ -30,7 +31,8 @@
 						},
 						"bad3": {
 							"name": "bad3",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "genericValue = 34;\n\nreturn genericValue;",
@@ -39,7 +41,8 @@
 						},
 						"error1": {
 							"name": "error1",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "//genericValue.b = false;\n\nreturn \"uncomment out the line of code to see the error\";",
@@ -48,7 +51,8 @@
 						},
 						"potentialError2": {
 							"name": "potentialError2",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "//DON'T DO THIS:\n//let locaVariable = genericValue.b;\n//INSTEAD DO THIS:\nlet localVariable = apogeeutil.jsonCopy(genericValue.b);\n\nlocalVariable[1] = \"changed\"\n\nreturn localVariable;",
@@ -57,21 +61,24 @@
 						},
 						"fixedValue1": {
 							"name": "fixedValue1",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"data": 1
 							}
 						},
 						"fixedValue2": {
 							"name": "fixedValue2",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"data": 2
 							}
 						},
 						"derivedValue2": {
 							"name": "derivedValue2",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "let localValue = fixedValue1 * 3;\n\n//here is the line where we use the messenger to set the value of cell fixedValue2\n//apogeeMessenger.dataUpdate(\"fixedValue2\",localValue);\n\nreturn localValue"
@@ -79,7 +86,8 @@
 						},
 						"derivedValue1": {
 							"name": "derivedValue1",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "return fixedValue2 * 3;",
@@ -92,7 +100,8 @@
 		},
 		"components": {
 			"Model": {
-				"type": "apogeeapp.app.FolderComponent",
+				"type": "apogeeapp.PageComponent"
+,
 				"treeState": null,
 				"data": {
 					"doc": {
@@ -533,7 +542,8 @@
 				},
 				"children": {
 					"genericValue": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {
@@ -551,7 +561,8 @@
 						"dataView": "Colorized"
 					},
 					"bad3": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {
@@ -570,7 +581,8 @@
 						"dataView": "Colorized"
 					},
 					"error1": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {
@@ -589,7 +601,8 @@
 						"dataView": "Colorized"
 					},
 					"potentialError2": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {
@@ -608,7 +621,8 @@
 						"dataView": "Colorized"
 					},
 					"fixedValue1": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {
@@ -626,7 +640,8 @@
 						"dataView": "Colorized"
 					},
 					"fixedValue2": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {
@@ -644,7 +659,8 @@
 						"dataView": "Colorized"
 					},
 					"derivedValue2": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {
@@ -663,7 +679,8 @@
 						"dataView": "Colorized"
 					},
 					"derivedValue1": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {

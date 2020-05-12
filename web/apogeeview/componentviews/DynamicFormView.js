@@ -104,7 +104,7 @@ DynamicFormView.TABLE_EDIT_SETTINGS = {
 // This is the component generator, to register the component
 //======================================
 
-DynamicFormView.componentName = "apogeeapp.app.DynamicForm";
+DynamicFormView.componentName = "apogeeapp.ActionFormCell";
 DynamicFormView.hasTabEntry = false;
 DynamicFormView.hasChildEntry = true;
 DynamicFormView.ICON_RES_PATH = "/componentIcons/formControl.png";

@@ -16,7 +16,8 @@
 					"children": {
 						"foo": {
 							"name": "foo",
-							"type": "apogee.FunctionTable",
+							"type": "apogee.FunctionMember"
+,
 							"updateData": {
 								"argList": [
 									"a",
@@ -28,7 +29,8 @@
 						},
 						"dummy1": {
 							"name": "dummy1",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "return foo(2,3);",
@@ -37,7 +39,8 @@
 						},
 						"dummy2": {
 							"name": "dummy2",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "return _foo(2,OTHER_PARAMETER);",
@@ -61,21 +64,24 @@
 									"children": {
 										"a": {
 											"name": "a",
-											"type": "apogee.JsonTable",
+											"type": "apogee.JsonMember"
+,
 											"updateData": {
 												"data": 1
 											}
 										},
 										"b": {
 											"name": "b",
-											"type": "apogee.JsonTable",
+											"type": "apogee.JsonMember"
+,
 											"updateData": {
 												"data": 2
 											}
 										},
 										"c": {
 											"name": "c",
-											"type": "apogee.JsonTable",
+											"type": "apogee.JsonMember"
+,
 											"updateData": {
 												"argList": [],
 												"functionBody": "return a + b;",
@@ -88,7 +94,8 @@
 						},
 						"dummy3": {
 							"name": "dummy3",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "return pageFoo(2,3)",
@@ -101,7 +108,8 @@
 		},
 		"components": {
 			"Model": {
-				"type": "apogeeapp.app.FolderComponent",
+				"type": "apogeeapp.PageComponent"
+,
 				"treeState": null,
 				"data": {
 					"doc": {
@@ -481,7 +489,8 @@
 				},
 				"children": {
 					"foo": {
-						"type": "apogeeapp.app.FunctionComponent",
+						"type": "apogeeapp.FunctionCell"
+,
 						"windowState": {
 							"views": {
 								"Code": {
@@ -495,7 +504,8 @@
 						}
 					},
 					"dummy1": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {
@@ -514,7 +524,8 @@
 						"dataView": "Colorized"
 					},
 					"dummy2": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {
@@ -534,7 +545,8 @@
 						"dataView": "Colorized"
 					},
 					"pageFoo": {
-						"type": "apogeeapp.app.FolderFunctionComponent",
+						"type": "apogeeapp.PageFunctionComponent"
+,
 						"treeState": null,
 						"data": {
 							"doc": {
@@ -667,7 +679,8 @@
 						},
 						"children": {
 							"a": {
-								"type": "apogeeapp.app.JsonTableComponent",
+								"type": "apogeeapp.JsonCell"
+,
 								"windowState": {
 									"views": {
 										"Data": {
@@ -685,7 +698,8 @@
 								"dataView": "Colorized"
 							},
 							"b": {
-								"type": "apogeeapp.app.JsonTableComponent",
+								"type": "apogeeapp.JsonCell"
+,
 								"windowState": {
 									"views": {
 										"Data": {
@@ -703,7 +717,8 @@
 								"dataView": "Colorized"
 							},
 							"c": {
-								"type": "apogeeapp.app.JsonTableComponent",
+								"type": "apogeeapp.JsonCell"
+,
 								"windowState": {
 									"views": {
 										"Data": {
@@ -724,7 +739,8 @@
 						}
 					},
 					"dummy3": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"windowState": {
 							"views": {
 								"Data": {

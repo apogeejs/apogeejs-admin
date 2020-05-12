@@ -1,7 +1,7 @@
 //These are in lieue of the import statements
 let componentInfo = apogeeapp.componentInfo;
 
-let FunctionComponentClass = componentInfo.getComponentClass("apogeeapp.app.FunctionComponent");
+let FunctionComponentClass = componentInfo.getComponentClass("apogeeapp.FunctionCell");
 
 /** This is a simple custom component example. */
 export default class HandlerComponent extends FunctionComponentClass {

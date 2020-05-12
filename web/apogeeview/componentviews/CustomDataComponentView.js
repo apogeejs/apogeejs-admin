@@ -201,7 +201,7 @@ export default class CustomDataComponentView extends ComponentView {
 // This is the control generator, to register the control
 //======================================
 
-CustomDataComponentView.componentName = "apogeeapp.app.CustomDataComponent";
+CustomDataComponentView.componentName = "apogeeapp.CustomDataCell";
 CustomDataComponentView.hasTabEntry = false;
 CustomDataComponentView.hasChildEntry = true;
 CustomDataComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";

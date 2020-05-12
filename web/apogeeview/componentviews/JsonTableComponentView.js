@@ -114,7 +114,7 @@ JsonTableComponentView.DEFAULT_DATA_VIEW = JsonTableComponentView.COLORIZED_DATA
 //===============================
 
 /** This is the component name with which this view is associated. */
-JsonTableComponentView.componentName = "apogeeapp.app.JsonTableComponent";
+JsonTableComponentView.componentName = "apogeeapp.JsonCell";
 
 /** If true, this indicates the component has a tab entry */
 JsonTableComponentView.hasTabEntry = false;

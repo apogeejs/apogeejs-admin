@@ -42,7 +42,7 @@ FolderFunctionComponentView.TABLE_EDIT_SETTINGS = {
 // This is the component generator, to register the component
 //======================================
 
-FolderFunctionComponentView.componentName = "apogeeapp.app.FolderFunctionComponent";
+FolderFunctionComponentView.componentName = "apogeeapp.PageFunctionComponent";
 FolderFunctionComponentView.hasTabEntry = true;
 FolderFunctionComponentView.hasChildEntry = true;
 FolderFunctionComponentView.ICON_RES_PATH = "/componentIcons/folderFunction.png";

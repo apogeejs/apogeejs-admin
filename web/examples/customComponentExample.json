@@ -16,7 +16,8 @@
 					"children": {
 						"testComponent": {
 							"name": "testComponent",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "return initialValue;",
@@ -25,14 +26,16 @@
 						},
 						"initialValue": {
 							"name": "initialValue",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"data": "This is the initial value for the table."
 							}
 						},
 						"sentData": {
 							"name": "sentData",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"data": ""
 							}
@@ -43,7 +46,8 @@
 		},
 		"components": {
 			"Model": {
-				"type": "apogeeapp.app.FolderComponent",
+				"type": "apogeeapp.PageComponent"
+,
 				"treeState": -1,
 				"data": {
 					"doc": {
@@ -118,7 +122,8 @@
 				},
 				"children": {
 					"testComponent": {
-						"type": "apogeeapp.app.CustomComponent",
+						"type": "apogeeapp.CustomCell"
+,
 						"resource": {
 							"html": "<textarea id=\"testComponent_textarea\"></textarea><br>\n<button id=\"testComponent_button\">SEND</button>",
 							"css": "#testComponent_textarea {\n    width: 400px;\n    height: 300px;\n    margin: 10px;\n}\n#testComponent_button {\n    margin: 10px;\n}",
@@ -127,11 +132,13 @@
 						"destroyOnInactive": false
 					},
 					"initialValue": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"dataView": "Text Data"
 					},
 					"sentData": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"dataView": "Text Data"
 					}
 				}

@@ -336,7 +336,7 @@ ChartJSComponentView.TABLE_EDIT_SETTINGS = {
 //===============================
 
 /** This is the component name with which this view is associated. */
-ChartJSComponentView.componentName = "apogeeapp.app.ChartJSComponent";
+ChartJSComponentView.componentName = "apogeeapp.ChartJSCell";
 
 /** If true, this indicates the component has a tab entry */
 ChartJSComponentView.hasTabEntry = false;

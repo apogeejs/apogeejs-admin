@@ -9,12 +9,12 @@ export default class ChartJSComponent extends Component {
 }
 
 /** This is the display name for the type of component */
-ChartJSComponent.displayName = "Chart.js Component";
+ChartJSComponent.displayName = "Chart.js Cell";
 
 /** This is the univeral unique name for the component, used to deserialize the component. */
-ChartJSComponent.uniqueName = "apogeeapp.app.ChartJSComponent";
+ChartJSComponent.uniqueName = "apogeeapp.ChartJSCell";
 
 /** This is the json needed to create the necessary members for the  component */
 ChartJSComponent.DEFAULT_MEMBER_JSON = {
-     "type": "apogee.JsonTable"
+     "type": "apogee.JsonMember"
 };

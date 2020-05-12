@@ -20,7 +20,7 @@ export default class FolderComponentView extends ParentComponentView {
 // This is the component generator, to register the component
 //======================================
 
-FolderComponentView.componentName = "apogeeapp.app.FolderComponent";
+FolderComponentView.componentName = "apogeeapp.PageComponent";
 FolderComponentView.hasTabEntry = true;
 FolderComponentView.hasChildEntry = false;
 FolderComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";

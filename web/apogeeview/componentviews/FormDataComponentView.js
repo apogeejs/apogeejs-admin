@@ -170,7 +170,7 @@ FormDataComponentView.TABLE_EDIT_SETTINGS = {
 //======================================
 
 
-FormDataComponentView.componentName = "apogeeapp.app.FormDataComponent";
+FormDataComponentView.componentName = "apogeeapp.DataFormCell";
 FormDataComponentView.hasTabEntry = false;
 FormDataComponentView.hasChildEntry = true;
 FormDataComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";
