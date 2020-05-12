@@ -56,7 +56,11 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
             let json = baseSource.getData();
 
             var textData;
-            if(json === null) {
+            if(json == apogeeutil.INVALID_VALUE) {
+                //for invalid input, convert to display an empty string
+                textData = "";
+            }
+            else if(json === null) {
                 textData = "null";
             }
             else if(json === undefined) {

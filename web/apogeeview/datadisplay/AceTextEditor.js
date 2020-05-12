@@ -82,9 +82,8 @@ export default class AceTextEditor extends DataDisplay {
     }
     
     setData(text) {
-        if(text == apogeeutil.INVALID_VALUE) {
-            text = "ERROR: Data value is not valid";
-        }
+        //typically set data checks if the data is invalid. That should however be
+        //done for the text input, and an empty value be passed here.
 
         //check data is valid
         if(apogeeutil.getObjectType(text) != "String") {
