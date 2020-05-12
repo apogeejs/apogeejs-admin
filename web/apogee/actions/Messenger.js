@@ -77,7 +77,14 @@ export default class Messenger {
         actionData.actions = actionList;
         
         //return is handled above asynchronously
-        doAction(this.model,actionData);
+        if(this.model.getIsLocked()) {
+            //TEMPORARY HANDLING OF NON_CONTINUING ACTION...
+            //(I think this should be done differently?)
+            this.model.doFutureAction(actionData);
+        }
+        else {
+            doAction(this.model,actionData);
+        }
     }
     
     //=====================

@@ -120,8 +120,8 @@ export function doAction(model,actionData) {
     
     //trigger any pending actions
     //these will be done asynchronously
-    var savedMessengerAction = model.getSavedMessengerAction();
-    if(savedMessengerAction) {
+    var savedMessengerAction;
+    while(savedMessengerAction = model.getSavedMessengerAction()) {
         var runQueuedAction = true;
 
         if(model.checkConsecutiveQueuedActionLimitExceeded()) {
@@ -154,9 +154,8 @@ export function doAction(model,actionData) {
             }
         }
     }
-    else {
-        model.clearConsecutiveQueuedTracking();
-    } 
+    
+    model.clearConsecutiveQueuedTracking(); 
     
     //fire the events
     let changeList = changeMapToChangeList(model.getChangeMap());
