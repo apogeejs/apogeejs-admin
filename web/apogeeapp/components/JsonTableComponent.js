@@ -80,7 +80,7 @@ export default class JsonTableComponent extends Component {
 
 
 /** This is the display name for the type of component */
-JsonTableComponent.displayName = "JSON Cell";
+JsonTableComponent.displayName = "Data Cell";
 /** This is the univeral uniaue name for the component, used to deserialize the component. */
 JsonTableComponent.uniqueName = "apogeeapp.JsonCell";
 

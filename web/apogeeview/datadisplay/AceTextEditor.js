@@ -82,8 +82,12 @@ export default class AceTextEditor extends DataDisplay {
     }
     
     setData(text) {
-        //typically set data checks if the data is invalid. That should however be
-        //done for the text input, and an empty value be passed here.
+        //The data source should give a text value "" if the data in invalid rather than sending
+        //in a json, but we will do this check anyway.
+        if(text == apogeeutil.INVALID_VALUE) {
+            var errorMsg = "ERROR: Data value is not valid"
+            text = "";
+        }
 
         //check data is valid
         if(apogeeutil.getObjectType(text) != "String") {
