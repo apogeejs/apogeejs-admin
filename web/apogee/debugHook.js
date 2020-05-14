@@ -3,7 +3,7 @@
 
 /** The function is called when a member function is called. It
  * is intended for debug purposes, to add a breakpoint. */
-__globals__.__memberFunctionDebugHook = function(memberFullName) {
+__globals__.__memberFunctionDebugHook = function(memberName) {
 }
 
 /** This function is called from the constructor code for a custom control.
