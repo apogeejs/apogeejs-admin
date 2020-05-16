@@ -32,6 +32,7 @@ export default class UiCommandMessenger {
         //populte the update into with the proper member objects
         let childCommands = updateInfo.map( entry => this._createDataUpdateCommand(entry[0],entry[1]) );
 
+        let command = {};
         command.type = "compoundCommand";
         command.childCommands = childCommands;
 

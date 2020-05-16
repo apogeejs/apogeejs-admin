@@ -65,7 +65,7 @@ export default class DynamicFormView extends ComponentView {
                 let layoutFunction = functionMember.getData();
                 let app = this.getModelView().getApp();
                 let admin = {
-                    getMessenger: () => new UiCommandMessenger(app,member)
+                    getMessenger: () => new UiCommandMessenger(app,functionMember)
                 }
                 return layoutFunction(admin);
             },
