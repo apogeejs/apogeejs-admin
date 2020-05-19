@@ -145,7 +145,8 @@ export default class Model extends FieldObject {
      * current when this new action is run. An example of when this is used is to populate a data table in
      * response to a json request completing.  */
     doFutureAction(actionData) {
-        this.runContext.doFutureAction(this.getId(),actionData);
+        //run this action asynchronously
+        setTimeout(() => this.runContext.doActionCommand(this.getId(),actionData),0);
     }
 
     /** This method returns the root object - implemented from RootHolder.  */
