@@ -27,7 +27,11 @@ export default class CodeableMember extends DependentMember {
         super(name,parentId,instanceToCopy,keepUpdatedFixed);
 
         //mixin init where needed. This is not a scoep root. Parent scope is inherited in this object
-        this.contextHolderMixinInit(false); 
+        this.contextHolderMixinInit(false);
+        
+        //this should be set to true by any extending class that supresses the messenger
+        //see the supressMessenger function for details.
+        this.doSupressMessenger = false;
         
         //==============
         //Fields
@@ -255,6 +259,21 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
     }
 
     //===================================
+    // Protected Functions
+    //===================================
+
+    /** This method is used to remove access to the messenger from the formula for
+     * this member. This should be done if the data from the member includes user runnable
+     * code. The messenger should only be called in creating a data result for the member.
+     * (Specifically, calling the messenger is only valid while the member is being calculated.
+     * If it is called after that it will throw an error.) One place this supression is done is
+     * in a FunctionMember.
+     */
+    supressMessenger(doSupressMessenger) {
+        this.doSupressMessenger = doSupressMessenger;
+    }
+
+    //===================================
     // Private Functions
     //===================================
 
@@ -297,7 +316,7 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
                 
                 //set the context
                 let compiledInfo = this.getField("compiledInfo");
-                let messenger = new Messenger(model,this);
+                let messenger = this.doSupressMessenger ? undefined : new Messenger(model,this);
                 compiledInfo.memberFunctionContextInitializer(model,this.getContextManager(),messenger);
                 
                 functionInitializedSuccess = true;

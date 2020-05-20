@@ -2,7 +2,7 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import { UiCommandMessenger } from "/apogeeapp/apogeeAppLib.js";
+import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 
 /** This component represents a table object. */
 export default class DynamicFormView extends ComponentView {
@@ -63,9 +63,8 @@ export default class DynamicFormView extends ComponentView {
             getDisplayData: () => {             
                 let functionMember = this.getComponent().getField("member"); 
                 let layoutFunction = functionMember.getData();
-                let app = this.getModelView().getApp();
                 let admin = {
-                    getMessenger: () => new UiCommandMessenger(app,functionMember)
+                    getCommandMessenger: () => new UiCommandMessenger(this,functionMember.getId())
                 }
                 return layoutFunction(admin);
             },

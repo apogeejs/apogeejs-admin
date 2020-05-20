@@ -1,5 +1,5 @@
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
-import { UiCommandMessenger } from "/apogeeapp/apogeeAppLib.js";
+import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 /** HtmlJsDataDisplay
@@ -36,11 +36,9 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 /** This is the display/editor for the custom control output. */
 export default class HtmlJsDataDisplay extends DataDisplay {
-    constructor(app,displayContainer,dataSource) {
+    constructor(displayContainer,dataSource) {
         
         super(displayContainer,dataSource);
-        
-        this.app = app;
         
         this.isLoaded = false;
         this.cachedData = undefined;
@@ -62,6 +60,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         let dataSource = this.getDataSource();
         let html = dataSource.getHtml();
         let resource = dataSource.getResource();
+        let componentView = this.getDisplayContainer.getComponentView();
         let member = dataSource.getContextMember();
 
         let displayData = dataSource.getDisplayData ? dataSource.getDisplayData() : undefined;
@@ -73,7 +72,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         
         //this gives the ui code access to some data display functions
         var admin = {
-            getMessenger: () => new UiCommandMessenger(this.app,member),
+            getCommandMessenger: () => new UiCommandMessenger(componentView,member.getId()),
             startEditMode: () => this.startEditMode(),
             endEditMode: () => this.endEditMode()
         }

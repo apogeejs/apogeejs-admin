@@ -6,7 +6,11 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 export default class FunctionTable extends CodeableMember {
 
     constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
-        super(name,parentId,instanceToCopy,keepUpdatedFixed);   
+        super(name,parentId,instanceToCopy,keepUpdatedFixed);
+        
+        //The messenger should not be available from the formula for this member
+        //see details in the CodeableMember function below.
+        this.supressMessenger(true);
     }
 
     //------------------------------

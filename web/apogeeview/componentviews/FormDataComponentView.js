@@ -3,7 +3,7 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import { UiCommandMessenger } from "/apogeeapp/apogeeAppLib.js";
+import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form
@@ -128,9 +128,8 @@ export default class FormDataComponentView extends ComponentView {
 
             //save the data - send via messenger to the variable named "data" in code, which is the field 
             //named "member.data", NOT the field named "data"
-            let app = this.modelView.getApp();
-            let commandMessenger = new UiCommandMessenger(app,layoutFunctionMember);
-            commandMessenger.dataUpdate("data",formValue);
+            let commandMessenger = new UiCommandMessenger(this,layoutFunctionMember.getId());
+            commandMessenger.dataCommand("data",formValue);
             return true;
         }
         

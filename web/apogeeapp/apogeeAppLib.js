@@ -2,8 +2,6 @@
 export {default as Apogee} from "/apogeeapp/Apogee.js";
 export {default as BaseFileAccess} from "/apogeeapp/BaseFileAccess.js";
 
-export {default as UiCommandMessenger} from "/apogeeapp/commands/UiCommandMessenger.js";
-
 export {default as Component} from "/apogeeapp/component/Component.js";
 
 export {default as componentInfo} from "/apogeeapp/componentConfig.js";

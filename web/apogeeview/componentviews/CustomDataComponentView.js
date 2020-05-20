@@ -1,9 +1,8 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import { UiCommandMessenger } from "/apogeeapp/apogeeAppLib.js";
+import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 /** This attempt has a single form edit page which returns an object. */
@@ -72,7 +71,7 @@ export default class CustomDataComponentView extends ComponentView {
             case CustomDataComponentView.VIEW_FORM:
                 displayContainer.setDestroyViewOnInactive(this.getComponent().getDestroyOnInactive());
                 var dataDisplaySource = this.getOutputDataDisplaySource();
-                var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,dataDisplaySource);
+                var dataDisplay = new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
                 return dataDisplay;
                 
             case CustomDataComponentView.VIEW_VALUE:
@@ -136,9 +135,8 @@ export default class CustomDataComponentView extends ComponentView {
                 //send value to the table whose variable name is "data"
                 //the context reference is the member called "input" 
                 let inputMember = this.getComponent().getField("member.input");
-                let app = this.modelView.getApp();  
-                let commandMessenger = new UiCommandMessenger(app,inputMember);
-                commandMessenger.dataUpdate("data",formValue);
+                let commandMessenger = new UiCommandMessenger(this,inputMember.getId());
+                commandMessenger.dataCommand("data",formValue);
                 return true;
             },
 

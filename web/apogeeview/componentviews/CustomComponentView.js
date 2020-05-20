@@ -64,7 +64,7 @@ export default class CustomComponentView extends ComponentView {
             case CustomComponentView.VIEW_OUTPUT:
                 displayContainer.setDestroyViewOnInactive(this.getComponent().getDestroyOnInactive());
                 var dataDisplaySource = this.getOutputDataDisplaySource();
-                var dataDisplay = new HtmlJsDataDisplay(app,displayContainer,dataDisplaySource);
+                var dataDisplay = new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
                 return dataDisplay;
                 
             case CustomComponentView.VIEW_CODE:
