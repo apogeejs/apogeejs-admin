@@ -442,12 +442,13 @@ export default class ModelManager extends FieldObject {
     close() {
         //delete all the components - to make sure the are cleaned up
         let componentMap = this.getField("componentMap");
-        for(var key in componentMap) {
-            var componentInfo = componentMap[key];
-            if((componentInfo)&&(componentInfo.component)&&(!componentInfo.componentMember)) {
-                componentInfo.component.onDelete();
-            }
+        for(let key in componentMap) {
+            let component = componentMap[key];
+            component.onDelete();
         }
+
+        let model = this.getModel();
+        model.onClose(model);
     }
 
     /** This saves the model. It the optionalSavedRootFolder is passed in,

@@ -84,3 +84,8 @@ EventManager.callHandler = function(handlerName, handlerData) {
     }
 }
 
+/** This resets all the listeners and handlers */
+EventManager.clearListenersAndHandlers = function() {
+    this.listenerTable = {};
+    this.handlerTable = {};
+}

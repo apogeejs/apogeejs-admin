@@ -102,8 +102,13 @@ export default class CommandManager {
 
         //if the command succceeded, update the workspace manager instance
         if(!commandError) {
-            //success - commit accept change
-            this.app.setWorkspaceManager(newWorkspaceManager);
+            //success - commit accept change - set (or clear) the workspace
+            if(newWorkspaceManager.getIsClosed()) {
+                this.app.clearWorkspaceManager();
+            }
+            else {
+                this.app.setWorkspaceManager(newWorkspaceManager);
+            }
 
             //add to history if the command was done and there is an undo command
             if(undoCommand) {   

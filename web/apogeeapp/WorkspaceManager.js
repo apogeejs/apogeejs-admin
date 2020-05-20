@@ -44,6 +44,8 @@ this.created = false;
 
         //listen to the workspace dirty event from the app
         this.app.addListener("workspaceDirty",() => this.setIsDirty());
+
+        this.isClosed = false;
     }
 
     //====================================
@@ -71,7 +73,12 @@ this.created = false;
     // temporary implementation
     getChangeMap() {
         let changeMap = {};
-        changeMap[this.getId()] = {action: (this.created ? "workspaceManager_created" : "workspaceManager_updated"), instance: this};
+        //workspace always changes
+        let workspaceManagerEvent;
+        if(this.isClosed) workspaceManagerEvent = "workspaceManager_deleted";
+        else if(this.created)  workspaceManagerEvent = "workspaceManager_created"
+        else workspaceManagerEvent = "workspaceManager_updated";
+        changeMap[this.getId()] = {action: workspaceManagerEvent, instance: this};
 
         let referenceManager = this.getReferenceManager();
         let referenceChangeMap = referenceManager.getChangeMap();
@@ -147,6 +154,9 @@ this.created = false;
         this.isDirty = false;
     }
 
+    getIsClosed() {
+        return this.isClosed;
+    }
     
     
     //====================================
@@ -281,6 +291,9 @@ this.created = false;
         //close reference manager
         let referenceManager = this.getReferenceManager();
         referenceManager.close();
+
+        //flag the workspace as closed
+        this.isClosed = true;
     }
 
 }

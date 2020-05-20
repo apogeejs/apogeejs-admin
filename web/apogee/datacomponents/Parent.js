@@ -116,12 +116,12 @@ Parent.removeChild = function(model,child) {
 
 ///** This method is called when the model is closed. 
 //* It should do any needed cleanup for the object. */
-Parent.onClose = function() {
+Parent.onClose = function(model) {
     let childIdMap = this.getField("childIdMap");
     for(var key in childIdMap) {
         var childId = childIdMap[key];
         let child = model.lookupMemberById(childId);
-        if((child)(child.onClose)) child.onClose();
+        if((child)&&(child.onClose)) child.onClose(model);
     }
 
     if(this.onCloseAddition) {

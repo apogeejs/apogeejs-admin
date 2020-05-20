@@ -105,7 +105,7 @@ export default class ReferenceManager extends FieldObject {
         let entryMap = this.getField("referenceEntryMap");
         for(let key in entryMap) {
             let referenceEntry = entryMap[key];
-            referenceEntry.remove();
+            referenceEntry.removeEntry();
         }
     }
 
