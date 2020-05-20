@@ -163,12 +163,13 @@ this.created = false;
     // asynch run context methods
     //====================================
     runFutureCommand(commandData) {
-        this.app.executeCommand(commandData);
+        //run command asynchronously
+        setTimeout(() => this.app.executeCommand(commandData),0);
     }
 
     getModelRunContext() {
         let modelRunContext = {};
-        modelRunContext.doActionCommand = (modelId,action) => {
+        modelRunContext.doFutureCommand = (modelId,action) => {
             //create a command to run this action
             let modelActionCommand = {};
             modelActionCommand.type = "futureModelActionCommand";

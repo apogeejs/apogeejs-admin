@@ -146,7 +146,7 @@ export default class Model extends FieldObject {
      * response to a json request completing.  */
     doFutureAction(actionData) {
         //run this action asynchronously
-        setTimeout(() => this.runContext.doActionCommand(this.getId(),actionData),0);
+        this.runContext.doAsynchActionCommand(this.getId(),actionData);
     }
 
     /** This method returns the root object - implemented from RootHolder.  */

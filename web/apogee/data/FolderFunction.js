@@ -32,7 +32,7 @@ export default class FolderFunction extends DependentMember {
 
         //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         this.temporaryVirtualModelRunContext = {
-            doActionCommand: function(modelId,actionData) {
+            doAsynchActionCommand: function(modelId,actionData) {
                 let msg = "NOT IPLEMENTED: Asynchronous actions in folder function!"
                 alert(msg);
                 throw new Error(msg);

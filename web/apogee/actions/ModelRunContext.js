@@ -10,6 +10,6 @@
 
 let ModelRunContext = {};
 
-ModelRunContext.doActionCommand = function(modelId,actionData) {
+ModelRunContext.doAsynchActionCommand = function(modelId,actionData) {
     //implementation goes here, depending on how the model is wrapped.
 }
