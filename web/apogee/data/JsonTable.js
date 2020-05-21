@@ -35,6 +35,12 @@ export default class JsonTable extends CodeableMember {
         } 
     }
 
+    /** This is an optional method that, when present will allow the member data to be set if the 
+     * member function is cleared. */
+    getDefaultDataValue() {
+        return "";
+    }
+
     //------------------------------
     // Member Methods
     //------------------------------

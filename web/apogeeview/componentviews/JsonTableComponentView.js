@@ -53,11 +53,11 @@ export default class JsonTableComponentView extends ComponentView {
                 }
                 
             case JsonTableComponentView.VIEW_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member");
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member",DEFAULT_DATA_VALUE);
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             case JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE:
-                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member",DEFAULT_DATA_VALUE);
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
             default:
@@ -78,9 +78,11 @@ export default class JsonTableComponentView extends ComponentView {
         }
         return dataDisplaySource;
     }
-
-
 }
+
+/** This is used as the default data value if we clear the code. It really should be a function of the data view,
+ * since in grid mode this is an invalid value. Support for that shold be added. */
+let DEFAULT_DATA_VALUE = "";
 
 //===============================
 // Internal Settings
