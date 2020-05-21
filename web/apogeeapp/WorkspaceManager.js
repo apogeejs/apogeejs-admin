@@ -169,7 +169,7 @@ this.created = false;
 
     getModelRunContext() {
         let modelRunContext = {};
-        modelRunContext.doFutureCommand = (modelId,action) => {
+        modelRunContext.doAsynchActionCommand = (modelId,action) => {
             //create a command to run this action
             let modelActionCommand = {};
             modelActionCommand.type = "futureModelActionCommand";

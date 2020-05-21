@@ -63,10 +63,22 @@ export default class DynamicFormView extends ComponentView {
             getDisplayData: () => {             
                 let functionMember = this.getComponent().getField("member"); 
                 let layoutFunction = functionMember.getData();
-                let admin = {
-                    getCommandMessenger: () => new UiCommandMessenger(this,functionMember.getId())
+
+                //make sure this is a function (could be invalid value, or a user code error)
+                if(layoutFunction instanceof Function) {
+                    let admin = {
+                        getCommandMessenger: () => new UiCommandMessenger(this,functionMember.getId())
+                    }
+                    try {
+                        return layoutFunction(admin);
+                    }
+                    catch(error) {
+                        console.error("Error reading form layout: " + this.getName());
+                        if(error.stack) console.error(error.stack);
+                    }
                 }
-                return layoutFunction(admin);
+                //if we get here there was a problem with the layout
+                return apogeeutil.INVALID_VALUE;
             },
 
             getData: () => {              
