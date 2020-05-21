@@ -14,6 +14,7 @@ import Model from "/apogee/data/Model.js";
  *      - name
  *      - unique table type name
  *      - additional table specific data
+ *      - specialIdValue (this is only to be used in special cases, to set the ID of the created object)
  *  
  * }
  *
@@ -67,6 +68,26 @@ export function createMember(model,parent,memberJson) {
 
     if(generator) {
         member = generator.createMember(parent.getId(),memberJson); 
+
+        //this codde attempts to write  the member ID into the command that created the member.
+        //We want this in our stored commands so we can use it for "redo" and have a member created
+        //with the same ID. That way subsequent redo commands will correctly access the replacement member.
+        //This doesn't seem like an optimal way to add this info to the input command. 
+        //However, for now this is the earliest peice of code that actually touches each create action.
+        //An alternative is to place a predetermined ID in the command before it is executed, in the 
+        //command code. However, I didn't do that for now because there is not a one-to-one map from 
+        //commands to actions. A single command often creates a hierarchy of members, all of which we 
+        //would want to "modify". 
+        try {
+            if(!memberJson.specialIdValue) {
+                memberJson.specialIdValue = member.getId();
+            }
+        }
+        catch(error) {
+            //we couldn't write into the command. It may be immutable
+            //downstream redo commands won't work, but we'll cleanly handle that case then
+            //with a failed redo.
+        }
 
         //pass this child to the parent
         parent.addChild(model,member);

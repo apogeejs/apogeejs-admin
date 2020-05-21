@@ -17,8 +17,8 @@ import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
  * the hierarchy (maybe the model). */
 export default class Member extends FieldObject {
 
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
-        super("member",instanceToCopy,keepUpdatedFixed);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super("member",instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
         
         //==============
         //Fields

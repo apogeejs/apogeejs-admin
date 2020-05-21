@@ -23,8 +23,8 @@ import DependentMember from "/apogee/datacomponents/DependentMember.js"
 export default class CodeableMember extends DependentMember {
 
     /** This initializes the component. argList is the arguments for the object function. */
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
-        super(name,parentId,instanceToCopy,keepUpdatedFixed);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
 
         //mixin init where needed. This is not a scoep root. Parent scope is inherited in this object
         this.contextHolderMixinInit(false);

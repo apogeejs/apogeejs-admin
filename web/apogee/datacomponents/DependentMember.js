@@ -13,8 +13,8 @@ import Member from "/apogee/datacomponents/Member.js";
 export default class DependentMember extends Member {
 
     /** This initializes the component */
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
-        super(name,parentId,instanceToCopy,keepUpdatedFixed);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
 
         //==============
         //Fields

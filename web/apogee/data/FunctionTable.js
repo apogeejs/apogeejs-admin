@@ -5,8 +5,8 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 /** This is a function. */
 export default class FunctionTable extends CodeableMember {
 
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
-        super(name,parentId,instanceToCopy,keepUpdatedFixed);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
         
         //The messenger should not be available from the formula for this member
         //see details in the CodeableMember function below.
@@ -113,7 +113,7 @@ export default class FunctionTable extends CodeableMember {
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
     static fromJson(parentId,json) {
-        let member = new FunctionTable(json.name,parentId);
+        let member = new FunctionTable(json.name,parentId,null,null,json.specialIdValue);
 
         //set initial data
         let initialData = json.updateData;

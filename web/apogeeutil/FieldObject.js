@@ -11,10 +11,19 @@ export default class FieldObject {
      * can be changed with the "keepUpdatedFixed" flag The new instance will be unlocked.
      * - keepUpdatedFixed - This should only be used when an instance is copied. If this is true
      * the copied instance will keep the same fields updated flags. Otherwise they will be cleared.
+     * - specialCaseIdValue - This can be set if you wnt to create a new instance with a specific ID value. 
+     * This should be done only in special circumstances. One example is "redo" creation of an object (after an undo)
+     * subsequent commands for this object will reference its original ID. This is a way to set the ID of the recreaeted
+     * object to match the original.
      */
-    constructor(objectType,instanceToCopy,keepUpdatedFixed) {
+    constructor(objectType,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
         if(!instanceToCopy) {
-            this.id = _createId(objectType);
+            if(specialCaseIdValue) {
+                this.id = specialCaseIdValue;
+            }
+            else {
+                this.id = _createId(objectType);
+            }
             this.objectType = objectType;
         }
         else {
