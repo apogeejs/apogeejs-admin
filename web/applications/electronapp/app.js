@@ -33,5 +33,5 @@ export function appInit() {
 }
 
 export function getWorkspaceIsDirty() {
-    return Apogee.getInstance().getWorkspaceIsDirty();
+    return appView.getApp().getWorkspaceIsDirty();
 }
