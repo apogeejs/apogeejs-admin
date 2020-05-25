@@ -83,22 +83,26 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
             let parentComponentView;
             if(componentViewClass.hasChildEntry) {
                 let parentComponentId = modelManager.getComponentIdByMemberId(parentMemberId);
-                parentComponentView = modelView.getComponentViewByComponentId(parentComponentId);
-                additionalCommandInfo = getAdditionalCommands(parentComponentView,userInputProperties.name);
+                if(parentComponentId) {
+                    parentComponentView = modelView.getComponentViewByComponentId(parentComponentId);
+                    if(!parentComponentView) throw new Error("Parent component not found!");
 
-                //added the editor setup command
-                if(additionalCommandInfo.editorSetupCommand) commands.push(additionalCommandInfo.editorSetupCommand);
+                    additionalCommandInfo = getAdditionalCommands(parentComponentView,userInputProperties.name);
 
-                //add any delete commands
-                if(additionalCommandInfo.deletedComponentCommands){
-                    //make sure the user wants to proceed
-                    let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + additionalCommandInfo.deletedComponentShortNames);
-                    
-                    //return if user rejects
-                    if(!doDelete) return;
+                    //added the editor setup command
+                    if(additionalCommandInfo.editorSetupCommand) commands.push(additionalCommandInfo.editorSetupCommand);
 
-                    commands.push(...additionalCommandInfo.deletedComponentCommands);
-                } 
+                    //add any delete commands
+                    if(additionalCommandInfo.deletedComponentCommands){
+                        //make sure the user wants to proceed
+                        let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + additionalCommandInfo.deletedComponentShortNames);
+                        
+                        //return if user rejects
+                        if(!doDelete) return;
+
+                        commands.push(...additionalCommandInfo.deletedComponentCommands);
+                    } 
+                }
             }
 
             //store create command
@@ -127,7 +131,7 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
             app.executeCommand(commandData);
 
             //give focus back to editor
-            if(componentViewClass.hasChildEntry) {
+            if(parentComponentView) {
                 parentComponentView.giveEditorFocusIfShowing();
             }
 
@@ -166,8 +170,8 @@ export function addAdditionalComponent(appView,app,optionalInitialProperties,opt
     showSelectComponentDialog(componentInfoList,onSelect);
 }
 
+/** This is to get an commands needed to add the a child node onto a parent page. */
 function getAdditionalCommands(parentComponentView,childName) {
-
     //check selection
     let useParentSelection = getUseParentSelection(parentComponentView);
     

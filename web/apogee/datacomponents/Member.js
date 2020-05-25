@@ -65,9 +65,13 @@ export default class Member extends FieldObject {
         }
         else {
             let parent = this.getParent(model);
-            if(parent) {
+            if((parent)&&(parent.isMember)) {
                 return parent.isFullNameUpdated(model); 
             } 
+            else {
+                //if the parent is the model, we don't need to check the full name 
+                return false;
+            }
         }
     }
 

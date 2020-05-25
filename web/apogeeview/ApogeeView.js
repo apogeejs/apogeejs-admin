@@ -198,7 +198,7 @@ export default class ApogeeView {
         if((component.getId() == this.tabFrame.getActiveTab())) {
             //this is pretty messy too... 
             let model = this.workspaceView.getModelView().getModelManager().getModel();
-            if((component.isDisplayNameUpdated())&&(component.getMember().isFullNameUpdated(model))) {
+            if((component.isDisplayNameUpdated())||(component.getMember().isFullNameUpdated(model))) {
                 let tab = this.tabFrame.getTab(component.getId());
                 this.onTabShown(tab);
             }
