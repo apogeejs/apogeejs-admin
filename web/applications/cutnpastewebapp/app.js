@@ -1,4 +1,3 @@
-import "/apogee/webGlobals.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import * as apogee from "/apogee/apogeeCoreLib.js";
 import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
@@ -21,7 +20,7 @@ window.init = function() {
     //initialize the include paths separately
     const includeBasePathStruct = {
         "resources": "resources",
-        "aceIncludes": "ext/ace/ace_1.4.3/ace_includes"
+        "aceIncludes": "ace_includes"
     };
     initIncludePath(includeBasePathStruct);
     

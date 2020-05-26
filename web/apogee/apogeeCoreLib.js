@@ -8,6 +8,3 @@ export {default as Messenger} from "/apogee/actions/Messenger.js";
 //initialize the member and action types
 import "/apogee/memberConfig.js";
 import "/apogee/commandConfig.js";
-
-//used for debugging
-import "/apogee/debugHook.js";

@@ -1,6 +1,6 @@
 {
     "ABOUT": "This version of the config file should be used for a distribution to the Apogee web site",
     "VERSION_RELEASE_HOST": "https://apogeejs.com",
-    "VERSION_NUMBER": "0.9.3",
-    "VERSION_ASSETS_PATH": "/lib/v0.9.3/assets" 
+    "VERSION_NUMBER": "0.9.4",
+    "VERSION_ASSETS_PATH": "/lib/v0.9.4/assets" 
 }

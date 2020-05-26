@@ -15,8 +15,8 @@
 			"version": 0.2,
 			"name": "visjsTimelineComponent",
 			"children": {
-				"Main": {
-					"name": "Main",
+				"main": {
+					"name": "main",
 					"type": "apogee.Folder",
 					"children": {
 						"visjs": {
@@ -89,7 +89,7 @@
 			}
 		},
 		"components": {
-			"Main": {
+			"main": {
 				"type": "apogeeapp.app.FolderComponent",
 				"data": {
 					"doc": {

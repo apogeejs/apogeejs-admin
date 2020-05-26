@@ -93,9 +93,13 @@ function copyAceIncludesTask() {
 // globals definition files
 //----------------
 
-let copyGlobalsFiles = parallel(
+let copyGlobalFiles = parallel(
+    () => copyFilesTask(["../apogee/webGlobals.js"],ASSETS_FOLDER),
+    () => copyFilesTask(["../apogee/debugHook.js"],ASSETS_FOLDER),
     () => copyFilesTask(["../apogee/nodeGlobals.js"],ELECTRON_FOLDER),
+    () => copyFilesTask(["../apogee/debugHook.js"],ELECTRON_FOLDER),
     () => copyFilesTask(["../apogee/nodeGlobals.js"],NODE_FOLDER),
+    () => copyFilesTask(["../apogee/debugHook.js"],NODE_FOLDER),
 )
 
 //==============================
@@ -435,7 +439,7 @@ exports.release = series(
         packageCssTask,
         copyResourcesTask,
         copyAceIncludesTask,
-        copyGlobalsFiles,
+        copyGlobalFiles,
         packageUtilLibTask,
         packageCoreLibTask,
         packageAppLibTask,

@@ -140,7 +140,7 @@ export default class LiteratePageComponentDisplay {
         }
     }
 
-    /** This will move the selection to the end of the document. */
+    /** This will move the selection to the start of the document. */
     selectStartOfDocument() {
         let state = this.componentView.getEditorData();
         let $startPos = state.doc.resolve(0);
@@ -292,8 +292,8 @@ export default class LiteratePageComponentDisplay {
         // this.editorView.updateState(editorData);
         this.initEditor();
 
-        //set the selection to the end of the view
-        this.selectEndOfDocument();
+        //set the selection to the start of the view
+        this.selectStartOfDocument();
     }
 
     initComponentToolbar() {

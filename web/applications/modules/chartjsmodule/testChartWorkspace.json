@@ -35,8 +35,8 @@
 			"version": 0.3,
 			"name": "Workspace",
 			"children": {
-				"Main": {
-					"name": "Main",
+				"main": {
+					"name": "main",
 					"type": "apogee.Folder",
 					"children": {
 						"barChart": {
@@ -249,7 +249,7 @@
 			}
 		},
 		"components": {
-			"Main": {
+			"main": {
 				"type": "apogeeapp.PageComponent",
 				"data": {
 					"doc": {
