@@ -33,6 +33,9 @@ export default class CommandManager {
         this.app = app;
 
         this.commandHistory = new CommandHistory(this,app);
+
+        this.commandInProgress = false;
+        this.commandQueue = [];
     }
     
     /** This method executes the given command and, if applicable, adds it to the queue. 
@@ -40,6 +43,13 @@ export default class CommandManager {
      * undo commands/redo commands.
     */
     executeCommand(command,suppressFromHistory) {
+
+        //make sure we only exectue one command at a time. For now just give up if this happens
+        if(this.commandInProgress) {
+            alert("Command ettempted while another in progress. Ignored");
+            return false;
+        }
+
         //get a mutable workspace manager instance
         let oldWorkspaceManager = this.app.getWorkspaceManager();
         let newWorkspaceManager;
@@ -101,9 +111,15 @@ export default class CommandManager {
         //--------------------------
 
         //if the command succceeded, update the workspace manager instance
+        let commandDone;
         if(!commandError) {
-            //success - commit accept change
-            this.app.setWorkspaceManager(newWorkspaceManager);
+            //success - commit accept change - set (or clear) the workspace
+            if(newWorkspaceManager.getIsClosed()) {
+                this.app.clearWorkspaceManager();
+            }
+            else {
+                this.app.setWorkspaceManager(newWorkspaceManager);
+            }
 
             //add to history if the command was done and there is an undo command
             if(undoCommand) {   
@@ -124,14 +140,17 @@ export default class CommandManager {
                 alert("The command was succesful but there was an error in the history. Undo is not available. Error: " + undoErrorMsg);
             }
 
-            return true;
+            commandDone = true;
         }
         else {
             //failure - keep the old workspace 
             alert("Command failed: " + commandErrrorMsg);
+
+            commandDone = false;
         }
 
-        return false;
+        this.commandInProgress = false;
+        return commandDone;
     }
 
     /** This returns the command history. */

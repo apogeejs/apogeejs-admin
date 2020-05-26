@@ -20,8 +20,8 @@ window.init = function() {
 
     //initialize the include paths separately
     const includeBasePathStruct = {
-        "resources": "/resources",
-        "aceIncludes": "/ext/ace/ace_1.4.3/ace_includes"
+        "resources": "resources",
+        "aceIncludes": "ext/ace/ace_1.4.3/ace_includes"
     };
     initIncludePath(includeBasePathStruct);
     

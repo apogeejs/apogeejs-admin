@@ -2,7 +2,7 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import { UiCommandMessenger } from "/apogeeapp/apogeeAppLib.js";
+import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 
 /** This component represents a table object. */
 export default class DynamicFormView extends ComponentView {
@@ -63,11 +63,22 @@ export default class DynamicFormView extends ComponentView {
             getDisplayData: () => {             
                 let functionMember = this.getComponent().getField("member"); 
                 let layoutFunction = functionMember.getData();
-                let app = this.getModelView().getApp();
-                let admin = {
-                    getMessenger: () => new UiCommandMessenger(app,member)
+
+                //make sure this is a function (could be invalid value, or a user code error)
+                if(layoutFunction instanceof Function) {
+                    let admin = {
+                        getCommandMessenger: () => new UiCommandMessenger(this,functionMember.getId())
+                    }
+                    try {
+                        return layoutFunction(admin);
+                    }
+                    catch(error) {
+                        console.error("Error reading form layout: " + this.getName());
+                        if(error.stack) console.error(error.stack);
+                    }
                 }
-                return layoutFunction(admin);
+                //if we get here there was a problem with the layout
+                return apogeeutil.INVALID_VALUE;
             },
 
             getData: () => {              
@@ -104,7 +115,7 @@ DynamicFormView.TABLE_EDIT_SETTINGS = {
 // This is the component generator, to register the component
 //======================================
 
-DynamicFormView.componentName = "apogeeapp.app.DynamicForm";
+DynamicFormView.componentName = "apogeeapp.ActionFormCell";
 DynamicFormView.hasTabEntry = false;
 DynamicFormView.hasChildEntry = true;
 DynamicFormView.ICON_RES_PATH = "/componentIcons/formControl.png";

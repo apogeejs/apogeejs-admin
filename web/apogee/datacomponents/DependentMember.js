@@ -13,8 +13,8 @@ import Member from "/apogee/datacomponents/Member.js";
 export default class DependentMember extends Member {
 
     /** This initializes the component */
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
-        super(name,parentId,instanceToCopy,keepUpdatedFixed);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
 
         //==============
         //Fields
@@ -87,7 +87,6 @@ export default class DependentMember extends Member {
         for(var idString in dependsOnMap) {
             let dependsOnType = dependsOnMap[idString];
             let impactor = model.lookupMemberById(idString);
-
             if((impactor.isDependent)&&(impactor.getCalcPending())) {
                 impactor.calculate(model);
             }
@@ -141,19 +140,19 @@ export default class DependentMember extends Member {
         for(var idString in newDependsOnMap) {
             if(newDependsOnMap[idString] != oldDependsOnMap[idString]) {
                 dependenciesUpdated = true;
-                if(newDependsOnMap[idString] == apogeeutil.NORMAL_DEPENDENCY) model.addToImpactsList(this.getId(),idString);
+                if(!oldDependsOnMap[idString]) model.addToImpactsList(this.getId(),idString);
             }
         }
         for(var idString in oldDependsOnMap) {
             if(newDependsOnMap[idString] != oldDependsOnMap[idString]) {
                 dependenciesUpdated = true;
-                if(!oldDependsOnMap[idString] == apogeeutil.NORMAL_DEPENDENCY) model.removeFromImpactsList(this.getId(),idString);
+                if(!newDependsOnMap[idString]) model.removeFromImpactsList(this.getId(),idString);
             }
         }
 
         if(dependenciesUpdated) {
             this.setField("dependsOnMap",newDependsOnMap);
-            this.calcPending = true;
+//            this.calcPending = true;
         }
 
         return dependenciesUpdated;

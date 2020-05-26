@@ -45,14 +45,14 @@ function updateCode(model,actionData) {
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member code";
-        return;
+        return actionResult;
     }
     actionResult.member = member;
 
     if((!member.isCodeable)||(!member.getSetCodeOk())) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "can not set code on member: " + member.getFullName(model);
-        return;
+        return actionResult;
     }
           
     member.applyCode(actionData.argList,
@@ -76,14 +76,14 @@ function updateData(model,actionData) {
     if(!member) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Member not found for update member data";
-        return;
+        return actionResult;
     }
     actionResult.member = member;
     
     if(!member.getSetDataOk()) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Can not set data on member: " + member.getFullName(model);
-        return;
+        return actionResult;
     }
         
     var data = actionData.data;

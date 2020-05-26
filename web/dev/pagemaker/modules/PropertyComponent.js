@@ -1,7 +1,7 @@
 //These are in lieue of the import statements
 let componentInfo = apogeeapp.componentInfo;
 
-let JsonTableComponentClass = componentInfo.getComponentClass("apogeeapp.app.JsonTableComponent");
+let JsonTableComponentClass = componentInfo.getComponentClass("apogeeapp.JsonCell");
 
 /** This is a simple custom component example. */
 export default class PropertyComponent extends JsonTableComponentClass {

@@ -28,6 +28,10 @@ export default class WebDisplayContainer {
         this.initUI();
     }
 
+    getComponentView() {
+        return this.componentView;
+    }
+
     //-------------------
     // state management
     //-------------------

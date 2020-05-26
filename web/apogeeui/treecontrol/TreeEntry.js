@@ -272,7 +272,7 @@ TreeEntry.NO_CONTROL = 0;
 TreeEntry.EXPANDED = 1;
 TreeEntry.COLLAPSED = -1;
 
-TreeEntry.DEFAULT_STATE = TreeEntry.COLLAPSED;
+TreeEntry.DEFAULT_STATE = TreeEntry.EXPANDED;
 
 
 

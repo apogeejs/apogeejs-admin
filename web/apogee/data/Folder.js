@@ -8,8 +8,8 @@ import Parent from "/apogee/datacomponents/Parent.js";
 /** This is a folder. */
 export default class Folder extends DependentMember {
 
-    constructor(name,parent,instanceToCopy,keepUpdatedFixed) {
-        super(name,parent,instanceToCopy,keepUpdatedFixed);
+    constructor(name,parent,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,parent,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
 
         //mixin init where needed
         //This is not a root. Scope is inherited from the parent.
@@ -122,7 +122,7 @@ export default class Folder extends DependentMember {
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
     static fromJson(parentId,json) {
-        var folder = new Folder(json.name,parentId);
+        var folder = new Folder(json.name,parentId,null,null,json.specialIdValue);
 
         if(json.childrenNotWriteable) {
             folder.setChildrenWriteable(false);

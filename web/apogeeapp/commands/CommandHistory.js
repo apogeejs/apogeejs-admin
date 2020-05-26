@@ -101,8 +101,8 @@ export default class CommandHistory {
     undo() {
         let command = this._getNextUndoCommand(true);
         if((command)&&(command.undoCmd)) {
-            let commandResult = this.commandManager.executeCommand(command.undoCmd,null,true);
-            if(!commandResult.cmdDone) {
+            let commandSuccess = this.commandManager.executeCommand(command.undoCmd,true);
+            if(!commandSuccess) {
                 this._commandUndoneFailed();
             }
         }
@@ -116,9 +116,9 @@ export default class CommandHistory {
     redo() {
         let command = this._getNextRedoCommand(true);
         if((command)&&(command.redoCmd)) {
-            let commandResult = this.commandManager.executeCommand(command.redoCmd,null,true);
-            if(!commandResult.cmdDone) {
-                this.commandRedoneFailed();
+            let commandSuccess = this.commandManager.executeCommand(command.redoCmd,true);
+            if(!commandSuccess) {
+                this._commandRedoneFailed();
             }
         }
         else {

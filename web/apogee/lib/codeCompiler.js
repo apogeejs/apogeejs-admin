@@ -35,6 +35,7 @@ export function validateTableName(name) {
         //check the pattern
         var nameResult = NAME_PATTERN.exec(name);
         if((!nameResult)||(nameResult[0] !== name)) {
+            if(!nameResult) nameResult = {};
             nameResult.errorMessage = "Illegal name format: " + name;
             nameResult.valid = false;
         }

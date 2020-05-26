@@ -66,7 +66,7 @@ FunctionComponentView.TABLE_EDIT_SETTINGS = {
 // This is the component generator, to register the component
 //======================================
 
-FunctionComponentView.componentName = "apogeeapp.app.FunctionComponent";
+FunctionComponentView.componentName = "apogeeapp.FunctionCell";
 FunctionComponentView.hasTabEntry = false;
 FunctionComponentView.hasChildEntry = true;
 FunctionComponentView.ICON_RES_PATH = "/componentIcons/functionTable.png";

@@ -216,4 +216,8 @@ export default class DataDisplay {
     getDataSource() {
         return this.dataSource;
     }
+
+    getDisplayContainer() {
+        return this.displayContainer;
+    }
 }

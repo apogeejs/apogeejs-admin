@@ -135,7 +135,7 @@ function doRequest(url,onDownload,onFailure) {
 function getMemberJsonFromWorkspaceJson(workspaceJson,componentClass) {
     var memberFolderJson = workspaceJson.workspace.data;
     
-    if(componentClass.uniqueName == "apogeeapp.app.FolderFunctionComponent") {
+    if(componentClass.uniqueName == "apogeeapp.PageFunctionComponent") {
         //I should probably do this conversion in the folder function code, so it is easier to maintain
         var memberFolderFunctionJson = componentClass.DEFAULT_MEMBER_JSON;
         var internalFolderJson = apogeeutil.jsonCopy(memberFolderJson);
@@ -143,7 +143,7 @@ function getMemberJsonFromWorkspaceJson(workspaceJson,componentClass) {
         memberFolderFunctionJson.internalFolder = internalFolderJson;
         return memberFolderFunctionJson;
     }
-    else if(componentClass.uniqueName == "apogeeapp.app.FolderComponent") {
+    else if(componentClass.uniqueName == "apogeeapp.PageComponent") {
         return memberFolderJson;
     }
     else {
@@ -156,7 +156,7 @@ function getMemberJsonFromWorkspaceJson(workspaceJson,componentClass) {
 function getComponentJsonFromWorkspaceJson(workspaceJson,componentClass) {
     var componentFolderJson = workspaceJson.components;
     
-    if(componentClass.uniqueName == "apogeeapp.app.FolderFunctionComponent") {
+    if(componentClass.uniqueName == "apogeeapp.PageFunctionComponent") {
         //I should probably do this conversion in the folder function code, so it is easier to maintain
         var componentFolderFunctionJson = {
             type: componentClass.uniqueName,
@@ -164,7 +164,7 @@ function getComponentJsonFromWorkspaceJson(workspaceJson,componentClass) {
         }
         return componentFolderFunctionJson;
     }
-    else if(componentClass.uniqueName == "apogeeapp.app.FolderComponent") {
+    else if(componentClass.uniqueName == "apogeeapp.PageComponent") {
         return componentFolderJson;
     }
     else {

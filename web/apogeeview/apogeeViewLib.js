@@ -23,6 +23,9 @@ export {registerComponentView,getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} 
 
 export {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 
+
+export {default as UiCommandMessenger} from "/apogeeview/commandseq/UiCommandMessenger.js";
+
 //import the default component views
 import "/apogeeview/componentViewConfig.js";
 

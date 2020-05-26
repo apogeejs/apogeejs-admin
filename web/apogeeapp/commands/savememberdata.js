@@ -8,7 +8,7 @@ import {getSaveDataAction, getMemberStateUndoCommand} from  "/apogeeapp/commands
  *
  * Command JSON format:
  * {
- *   "type":"saveMembeData",
+ *   "type":"saveMemberData",
  *   "memberId":(main member Id),
  *   "data":(member data value)
  * }
@@ -27,7 +27,6 @@ savememberdata.createUndoCommand = function(workspaceManager,commandData) {
 }
 
 savememberdata.executeCommand = function(workspaceManager,commandData) {
-    
     let modelManager = workspaceManager.getMutableModelManager();
     let model = modelManager.getMutableModel();
     

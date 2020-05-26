@@ -40,10 +40,10 @@ export default class FunctionComponent extends Component {
 // This is the component generator, to register the component
 //======================================
 
-FunctionComponent.displayName = "Function";
-FunctionComponent.uniqueName = "apogeeapp.app.FunctionComponent";
+FunctionComponent.displayName = "Function Cell";
+FunctionComponent.uniqueName = "apogeeapp.FunctionCell";
 
 FunctionComponent.DEFAULT_MEMBER_JSON = {
-    "type": "apogee.FunctionTable"
+    "type": "apogee.FunctionMember"
 };
 

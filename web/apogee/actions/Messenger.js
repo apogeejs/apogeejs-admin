@@ -35,9 +35,8 @@ export default class Messenger {
         
         //return is handled above asynchronously
         if(this.model.getIsLocked()) {
-            //TEMPORARY HANDLING OF NON_CONTINUING ACTION...
-            //(I think this should be done differently?)
-            this.model.doFutureAction(actionData);
+            //the messenger would work improperly here
+            throw new Error("Error: Messenger must only be called during member formula calculation.");
         }
         else {
             doAction(this.model,actionData);
@@ -77,7 +76,13 @@ export default class Messenger {
         actionData.actions = actionList;
         
         //return is handled above asynchronously
-        doAction(this.model,actionData);
+        if(this.model.getIsLocked()) {
+            //the messenger would work improperly here
+            throw new Error("Error: Messenger must only be called during member formula calculation.");
+        }
+        else {
+            doAction(this.model,actionData);
+        }
     }
     
     //=====================

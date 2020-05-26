@@ -30,6 +30,10 @@ export default class ApogeeView {
             this.loadUI(containerId);
         }
 
+        this.subscribeToAppEvents();
+    }
+
+    subscribeToAppEvents() {
         //subscribe to events
         this.app.addListener("workspaceManager_created",workspaceManager => this.onWorkspaceCreated(workspaceManager));
         this.app.addListener("workspaceManager_deleted",workspaceManager => this.onWorkspaceClosed(workspaceManager));
@@ -83,6 +87,17 @@ export default class ApogeeView {
         if(this.containerId) {
             this.tree.clearRootEntry();
         }
+
+        //rather than rely on people to clear their own workspace handlers from the app
+        //I clear them all here
+        //I haven't decided the best way to do this. In the app? Here? I see problems
+        //with all of them.
+        //The most obvious is that in clearing them here it could clear listeners from within
+        //the app layer. (There is one now but it is in the workspace anyway)
+        //The only reason I'm doing it here no is that the app doesn't know who all is listening
+        //to it so clearing all that is risky.
+        this.app.clearListenersAndHandlers();
+        this.subscribeToAppEvents();
     }
 
     //=================================
@@ -183,7 +198,7 @@ export default class ApogeeView {
         if((component.getId() == this.tabFrame.getActiveTab())) {
             //this is pretty messy too... 
             let model = this.workspaceView.getModelView().getModelManager().getModel();
-            if((component.isDisplayNameUpdated())&&(component.getMember().isFullNameUpdated(model))) {
+            if((component.isDisplayNameUpdated())||(component.getMember().isFullNameUpdated(model))) {
                 let tab = this.tabFrame.getTab(component.getId());
                 this.onTabShown(tab);
             }

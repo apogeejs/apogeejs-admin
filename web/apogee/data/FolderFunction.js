@@ -10,8 +10,8 @@ import Parent from "/apogee/datacomponents/Parent.js";
  * that is expanded into data objects. */
 export default class FolderFunction extends DependentMember {
 
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
-        super(name,parentId,instanceToCopy,keepUpdatedFixed);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
 
         //mixin init where needed
         this.contextHolderMixinInit();
@@ -32,7 +32,7 @@ export default class FolderFunction extends DependentMember {
 
         //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         this.temporaryVirtualModelRunContext = {
-            doFutureAction: function(modelId,actionData) {
+            doAsynchActionCommand: function(modelId,actionData) {
                 let msg = "NOT IPLEMENTED: Asynchronous actions in folder function!"
                 alert(msg);
                 throw new Error(msg);
@@ -63,7 +63,7 @@ export default class FolderFunction extends DependentMember {
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
     static fromJson(parentId,json) {
-        let member = new FolderFunction(json.name,parentId);
+        let member = new FolderFunction(json.name,parentId,null,null,json.specialIdValue);
 
         //set initial data
         let initialData = json.updateData;

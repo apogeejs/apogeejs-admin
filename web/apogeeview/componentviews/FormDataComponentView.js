@@ -3,7 +3,7 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
-import { UiCommandMessenger } from "/apogeeapp/apogeeAppLib.js";
+import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 
 /** This ccomponent represents a data value, with input being from a configurable form.
  * This is an example of componound component. The data associated with the form
@@ -86,13 +86,19 @@ export default class FormDataComponentView extends ComponentView {
         dataDisplaySource.getDisplayData = () => { 
             let layoutFunctionMember = this.getComponent().getField("member.layout");
             if(layoutFunctionMember.getState() == apogeeutil.STATE_NORMAL) {
-                let layoutFunction = layoutFunctionMember.getData();    
-                return layoutFunction();
+                let layoutFunction = layoutFunctionMember.getData();   
+                if(layoutFunction instanceof Function) {
+                    try { 
+                        return layoutFunction();
+                    }
+                    catch(error) {
+                        console.error("Error reading form layout: " + this.getName());
+                        if(error.stack) console.error(error.stack);
+                    }
+                }
             }
-            else {
-                //return function not valid, return a dummy function
-                return () => [];
-            }
+            //if we get here there was a problem with the return value
+            return  apogeeutil.INVALID_VALUE;
             
         }
         
@@ -114,23 +120,32 @@ export default class FormDataComponentView extends ComponentView {
             let isInputValidFunctionMember = this.getComponent().getField("member.isInputValid");
             //validate input
             var isInputValid = isInputValidFunctionMember.getData();
-            var validateResult = isInputValid(formValue);
+            let validateResult;
+            if(isInputValid instanceof Function) {
+                try {
+                    validateResult = isInputValid(formValue);
+                }
+                catch(error) {
+                    validateResult = "Error running input validation function.";
+                    console.error("Error reading form layout: " + this.getName());
+                }
+            }
+            else {
+                validateResult = "Input validate function not valid";
+            }
+
             if(validateResult !== true) {
-                if(typeof validateResult == 'string') {
-                    alert(validateResult);
-                    return false;
+                if(typeof validateResult != 'string') {
+                    validateResult = "Improper format for isInputValid function. It should return true or an error message";
                 }
-                else {
-                    alert("Improper format for isInputValid function. It should return true or an error message");
-                    return;
-                }
+                alert(validateResult);
+                return false;
             }
 
             //save the data - send via messenger to the variable named "data" in code, which is the field 
             //named "member.data", NOT the field named "data"
-            let app = this.modelView.getApp();
-            let commandMessenger = new UiCommandMessenger(app,layoutFunctionMember);
-            commandMessenger.dataUpdate("data",formValue);
+            let commandMessenger = new UiCommandMessenger(this,layoutFunctionMember.getId());
+            commandMessenger.dataCommand("data",formValue);
             return true;
         }
         
@@ -170,7 +185,7 @@ FormDataComponentView.TABLE_EDIT_SETTINGS = {
 //======================================
 
 
-FormDataComponentView.componentName = "apogeeapp.app.FormDataComponent";
+FormDataComponentView.componentName = "apogeeapp.DataFormCell";
 FormDataComponentView.hasTabEntry = false;
 FormDataComponentView.hasChildEntry = true;
 FormDataComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";

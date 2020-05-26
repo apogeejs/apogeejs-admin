@@ -1,7 +1,7 @@
 //These are in lieue of the import statements
 let getComponentViewClass = apogeeview.getComponentViewClass;
 
-let FunctionComponentViewClass = getComponentViewClass("apogeeapp.app.FunctionComponent");
+let FunctionComponentViewClass = getComponentViewClass("apogeeapp.FunctionCell");
 
 /** This is the base class for a  basic control component. To create a
  * new control component, extend this class implementing the needed methods

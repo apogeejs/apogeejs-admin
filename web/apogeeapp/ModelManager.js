@@ -110,7 +110,7 @@ export default class ModelManager extends FieldObject {
         //response - get new member
         var component;
         var componentClass = componentInfo.getComponentClass(componentJson.type);
-        if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorTable")) {
+        if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorMember")) {
             //create empty component
             component = new componentClass(member,this);
 
@@ -442,12 +442,13 @@ export default class ModelManager extends FieldObject {
     close() {
         //delete all the components - to make sure the are cleaned up
         let componentMap = this.getField("componentMap");
-        for(var key in componentMap) {
-            var componentInfo = componentMap[key];
-            if((componentInfo)&&(componentInfo.component)&&(!componentInfo.componentMember)) {
-                componentInfo.component.onDelete();
-            }
+        for(let key in componentMap) {
+            let component = componentMap[key];
+            component.onDelete();
         }
+
+        let model = this.getModel();
+        model.onClose(model);
     }
 
     /** This saves the model. It the optionalSavedRootFolder is passed in,
@@ -551,6 +552,6 @@ export default class ModelManager extends FieldObject {
 //this is the json for an empty model
 ModelManager.EMPTY_MODEL_COMPONENT_JSON = {
     "Main": {
-        "type":"apogeeapp.app.FolderComponent"
+        "type":"apogeeapp.PageComponent"
     }
 };

@@ -25,14 +25,16 @@
 					"children": {
 						"url": {
 							"name": "url",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"data": "http://localhost:8888/examples/population/us2017.json"
 							}
 						},
 						"populationData": {
 							"name": "populationData",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "return apogeeutil.jsonRequest(url);",
@@ -41,7 +43,8 @@
 						},
 						"rows": {
 							"name": "rows",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "return populationData.map(entry => [entry.age,entry.males,entry.females]);",
@@ -50,7 +53,8 @@
 						},
 						"chart": {
 							"name": "chart",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "\n    return {\n        \"columns\": undefined,\n        \"rows\": rows,\n        \"options\": undefined\n    };",
@@ -59,7 +63,8 @@
 						},
 						"columns": {
 							"name": "columns",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"data": [
 									"Age",
@@ -70,7 +75,8 @@
 						},
 						"chart2": {
 							"name": "chart2",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "\n    return {\n        \"columns\": columns,\n        \"rows\": rows,\n        \"options\": undefined\n    };",
@@ -79,7 +85,8 @@
 						},
 						"options": {
 							"name": "options",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"data": {
 									"hAxis": {
@@ -94,7 +101,8 @@
 						},
 						"chart3": {
 							"name": "chart3",
-							"type": "apogee.JsonTable",
+							"type": "apogee.JsonMember"
+,
 							"updateData": {
 								"argList": [],
 								"functionBody": "\n    return {\n        \"columns\": columns,\n        \"rows\": rows,\n        \"options\": options\n    };",
@@ -107,7 +115,8 @@
 							"children": {
 								"populationChart": {
 									"name": "populationChart",
-									"type": "apogee.JsonTable",
+									"type": "apogee.JsonMember"
+,
 									"updateData": {
 										"argList": [],
 										"functionBody": "\n    return {\n        \"columns\": populationColumns,\n        \"rows\": populationRows,\n        \"options\": options\n    };",
@@ -116,7 +125,8 @@
 								},
 								"years": {
 									"name": "years",
-									"type": "apogee.JsonTable",
+									"type": "apogee.JsonMember"
+,
 									"updateData": {
 										"data": [
 											1980,
@@ -127,7 +137,8 @@
 								},
 								"yearToUrl": {
 									"name": "yearToUrl",
-									"type": "apogee.FunctionTable",
+									"type": "apogee.FunctionMember"
+,
 									"updateData": {
 										"argList": [
 											"year"
@@ -138,7 +149,8 @@
 								},
 								"populationData": {
 									"name": "populationData",
-									"type": "apogee.JsonTable",
+									"type": "apogee.JsonMember"
+,
 									"updateData": {
 										"argList": [],
 										"functionBody": "//this convertes the year list to a list of promises for the request of each year\nlet requestPromiseList = years.map(yearToUrl).map(apogeeutil.jsonRequest);\n\n//we return a single promise, which is the combination of all the requests\nreturn Promise.all(requestPromiseList);",
@@ -147,7 +159,8 @@
 								},
 								"popByAge": {
 									"name": "popByAge",
-									"type": "apogee.JsonTable",
+									"type": "apogee.JsonMember"
+,
 									"updateData": {
 										"argList": [],
 										"functionBody": "let ageYearList = [];\n\npopulationData.forEach( yearAgeList => {\n    yearAgeList.forEach(yearAgeEntry => {\n        let ageYearEntry = ageYearList[yearAgeEntry.age];\n        if(!ageYearEntry) {\n            ageYearEntry = [];\n            ageYearList.push(ageYearEntry);\n        }\n        ageYearEntry.push(yearAgeEntry);\n    });\n});\n\nreturn ageYearList;",
@@ -156,7 +169,8 @@
 								},
 								"populationRows": {
 									"name": "populationRows",
-									"type": "apogee.JsonTable",
+									"type": "apogee.JsonMember"
+,
 									"updateData": {
 										"argList": [],
 										"functionBody": "let numberEntriesPerAge;\n\nreturn popByAge.map( (inAgeEntry, index) => {\n    outAgeEntry = [];\n    //take the age from the first entry\n    outAgeEntry.push(inAgeEntry[0].age);\n    \n    //we are going to make sure all age entries have the same number of year entries.\n    if(index == 0) {\n        numberEntriesPerAge = inAgeEntry.length;\n    }\n    else {\n        if(inAgeEntry.length != numberEntriesPerAge) throw new Error(\"Wrong nubmer of entries for age: \" + inAgeEntry[0].age);    \n    }\n    \n    //append the population for each year\n    inAgeEntry.forEach(yearAgeValue => outAgeEntry.push(yearAgeValue.total));\n    \n    return outAgeEntry;\n    \n})",
@@ -165,7 +179,8 @@
 								},
 								"populationColumns": {
 									"name": "populationColumns",
-									"type": "apogee.JsonTable",
+									"type": "apogee.JsonMember"
+,
 									"updateData": {
 										"argList": [],
 										"functionBody": "let columns = [];\ncolumns[0] = \"age\";\n\npopByAge[0].forEach(yearAgeEntry => columns.push(String(yearAgeEntry.year)));\n\nreturn columns;",
@@ -174,7 +189,8 @@
 								},
 								"options": {
 									"name": "options",
-									"type": "apogee.JsonTable",
+									"type": "apogee.JsonMember"
+,
 									"updateData": {
 										"data": {
 											"hAxis": {
@@ -193,7 +209,8 @@
 		},
 		"components": {
 			"Model": {
-				"type": "apogeeapp.app.FolderComponent",
+				"type": "apogeeapp.PageComponent"
+,
 				"treeState": null,
 				"data": {
 					"doc": {
@@ -474,15 +491,18 @@
 				},
 				"children": {
 					"url": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"dataView": "Colorized"
 					},
 					"populationData": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"dataView": "Colorized"
 					},
 					"rows": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"dataView": "Colorized"
 					},
 					"chart": {
@@ -496,7 +516,8 @@
 						}
 					},
 					"columns": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"dataView": "Colorized"
 					},
 					"chart2": {
@@ -510,7 +531,8 @@
 						}
 					},
 					"options": {
-						"type": "apogeeapp.app.JsonTableComponent",
+						"type": "apogeeapp.JsonCell"
+,
 						"dataView": "Colorized"
 					},
 					"chart3": {
@@ -524,7 +546,8 @@
 						}
 					},
 					"populationComparison": {
-						"type": "apogeeapp.app.FolderComponent",
+						"type": "apogeeapp.PageComponent"
+,
 						"treeState": null,
 						"data": {
 							"doc": {
@@ -842,30 +865,37 @@
 								}
 							},
 							"years": {
-								"type": "apogeeapp.app.JsonTableComponent",
+								"type": "apogeeapp.JsonCell"
+,
 								"dataView": "Colorized"
 							},
 							"yearToUrl": {
-								"type": "apogeeapp.app.FunctionComponent"
+								"type": "apogeeapp.FunctionCell"
+
 							},
 							"populationData": {
-								"type": "apogeeapp.app.JsonTableComponent",
+								"type": "apogeeapp.JsonCell"
+,
 								"dataView": "Colorized"
 							},
 							"popByAge": {
-								"type": "apogeeapp.app.JsonTableComponent",
+								"type": "apogeeapp.JsonCell"
+,
 								"dataView": "Colorized"
 							},
 							"populationRows": {
-								"type": "apogeeapp.app.JsonTableComponent",
+								"type": "apogeeapp.JsonCell"
+,
 								"dataView": "Colorized"
 							},
 							"populationColumns": {
-								"type": "apogeeapp.app.JsonTableComponent",
+								"type": "apogeeapp.JsonCell"
+,
 								"dataView": "Colorized"
 							},
 							"options": {
-								"type": "apogeeapp.app.JsonTableComponent",
+								"type": "apogeeapp.JsonCell"
+,
 								"dataView": "Colorized"
 							}
 						}

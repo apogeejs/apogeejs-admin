@@ -9,6 +9,7 @@ import "/apogeeapp/commands/literatepagetransaction.js";
 import "/apogeeapp/commands/movecomponent.js";
 import "/apogeeapp/commands/openworkspace.js";
 import "/apogeeapp/commands/savemembercode.js";
+import "/apogeeapp/commands/savemembercompound.js";
 import "/apogeeapp/commands/savememberdata.js";
 import "/apogeeapp/commands/updatecomponent.js";
 import "/apogeeapp/commands/updatelink.js";

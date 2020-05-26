@@ -10,12 +10,7 @@ let closeworkspace = {};
 //closeworkspace.createUndoCommand = function(workspaceManager,commandData) {
 
 closeworkspace.executeCommand = function(workspaceManager,commandData) {
-    let modelManager = workspaceManager.getModelManager();
-    let model = modelManager.getModel();
-
-    workspaceManager.getApp().clearWorkspaceManager();
     workspaceManager.close();
-    model.onClose(model);
 }
 
 closeworkspace.commandInfo = {

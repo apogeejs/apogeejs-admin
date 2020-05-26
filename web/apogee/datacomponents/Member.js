@@ -17,8 +17,8 @@ import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
  * the hierarchy (maybe the model). */
 export default class Member extends FieldObject {
 
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed) {
-        super("member",instanceToCopy,keepUpdatedFixed);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super("member",instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
         
         //==============
         //Fields
@@ -65,9 +65,13 @@ export default class Member extends FieldObject {
         }
         else {
             let parent = this.getParent(model);
-            if(parent) {
+            if((parent)&&(parent.isMember)) {
                 return parent.isFullNameUpdated(model); 
             } 
+            else {
+                //if the parent is the model, we don't need to check the full name 
+                return false;
+            }
         }
     }
 

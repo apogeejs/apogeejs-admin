@@ -200,22 +200,22 @@ CustomDataComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
 // This is the control generator, to register the control
 //======================================
 
-CustomDataComponent.displayName = "Custom Data Component";
-CustomDataComponent.uniqueName = "apogeeapp.app.CustomDataComponent";
+CustomDataComponent.displayName = "Custom Data Cell";
+CustomDataComponent.uniqueName = "apogeeapp.CustomDataCell";
 CustomDataComponent.DEFAULT_MEMBER_JSON = {
         "type": "apogee.Folder",
         "childrenNotWriteable": true,
         "children": {
             "input": {
                 "name": "input",
-                "type": "apogee.JsonTable",
+                "type": "apogee.JsonMember",
                 "updateData": {
                     "data":"",
                 }
             },
             "data": {
                 "name": "data",
-                "type": "apogee.JsonTable",
+                "type": "apogee.JsonMember",
                 "updateData": {
                     "data": "",
                 }
