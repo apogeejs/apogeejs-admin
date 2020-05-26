@@ -19,6 +19,7 @@ let appView;
 window.init = function() {
 
     //initialize the include paths separately
+    //NOTE - THIS FILE DIFFERS FROM DEPLOYMENT ONLY IN THESE VALUES
     const includePathInfo = {
         "resources": "/resources",
         "aceIncludes": "/ext/ace/ace_1.4.3/ace_includes"

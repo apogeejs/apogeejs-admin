@@ -1,4 +1,5 @@
 import "/apogee/webGlobals.js";
+import "/apogee/debugHook.js";
 
 export {ApogeeWebView} from "/apogeeview/apogeeViewLib.js";
 import {initIncludePath} from "/apogeeview/apogeeViewLib.js";

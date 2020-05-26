@@ -521,7 +521,7 @@ apogeeutil.mixin(Model,Parent);
 let memberGenerators = {};
 
 Model.DEFAULT_MODEL_NAME = "Workspace";
-Model.ROOT_FOLDER_NAME = "Main";
+Model.ROOT_FOLDER_NAME = "main";
 
 /** This is the supported file type. */
 Model.SAVE_FILE_TYPE = "apogee model";
@@ -536,7 +536,7 @@ Model.EMPTY_MODEL_JSON = {
     "version": Model.SAVE_FILE_VERSION,
     "name": Model.DEFAULT_MODEL_NAME,
     "children": {
-        "Main": {
+        "main": {
             "name": Model.ROOT_FOLDER_NAME,
             "type": "apogee.Folder"
         }

@@ -12,8 +12,8 @@
 			"version": 0.2,
 			"name": "Workspace",
 			"children": {
-				"Main": {
-					"name": "Main",
+				"main": {
+					"name": "main",
 					"type": "apogee.Folder",
 					"children": {
 						"df": {
@@ -69,7 +69,7 @@
 			}
 		},
 		"components": {
-			"Main": {
+			"main": {
 				"type": "apogeeapp.app.FolderComponent",
 				"data": {
 					"doc": {

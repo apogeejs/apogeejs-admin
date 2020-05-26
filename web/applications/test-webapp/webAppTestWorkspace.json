@@ -23,8 +23,8 @@
 			"version": 0.3,
 			"name": "Workspace",
 			"children": {
-				"Main": {
-					"name": "Main",
+				"main": {
+					"name": "main",
 					"type": "apogee.Folder",
 					"children": {
 						"a": {
@@ -59,7 +59,7 @@
 			}
 		},
 		"components": {
-			"Main": {
+			"main": {
 				"type": "apogeeapp.PageComponent",
 				"data": {
 					"doc": {

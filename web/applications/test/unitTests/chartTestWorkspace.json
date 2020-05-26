@@ -15,8 +15,8 @@
 			"version": 0.2,
 			"name": "chartjsCustomComponent",
 			"children": {
-				"Main": {
-					"name": "Main",
+				"main": {
+					"name": "main",
 					"type": "apogee.Folder",
 					"children": {
 						"chart": {
@@ -93,7 +93,7 @@
 			}
 		},
 		"components": {
-			"Main": {
+			"main": {
 				"type": "apogeeapp.app.FolderComponent",
 				"data": {
 					"doc": {
