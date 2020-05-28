@@ -1,3 +1,5 @@
+import Chart from "./chartjs.esm.js";
+
 //These are in lieue of the import statements
 let { DataDisplay,ComponentView,ConfigurableFormEditor,AceTextEditor} = apogeeview;
 
