@@ -1,10 +1,10 @@
-import ElectronFileAccess from "./ElectronFileAccess.js";
+import ElectronBridgeFileAccess from "./ElectronBridgeFileAccess.js";
 
 /** 
  * This is the format of the AppConfigManager. This class does not need
  * to be extended. It has not internal functionality.
  */
-export default class ElectronAppConfigManager {
+export default class ElectronBridgeAppConfigManager {
     
     constructor() {
     }
@@ -43,7 +43,7 @@ export default class ElectronAppConfigManager {
      * if an alternate is not loaded in configuration.
      */
     getDefaultFileAccessObject(app) {
-        return new ElectronFileAccess();
+        return new ElectronBridgeFileAccess();
     }
     
     /** This method should return a promise for the initial workspace

@@ -12,6 +12,8 @@ export function openWorkspace(app,fileAccessObject) {
         return;
     }    
 
+    let onOpen = (err,workspaceData,fileMetadata) => onWorkspaceData(err,app,workspaceData,fileMetadata);
+
     fileAccessObject.openFile(app,onOpen);
 }
 
@@ -20,7 +22,7 @@ export function openWorkspace(app,fileAccessObject) {
 //=====================================
 
 /** This method should be called when workspace data is opened, to create the workspace. */
-function onOpen(err,app,workspaceData,fileMetadata) {
+function onWorkspaceOpen(err,app,workspaceData,fileMetadata) {
 
     if(err) {
         var errorMessage = "There was an error opening the file";
@@ -28,7 +30,7 @@ function onOpen(err,app,workspaceData,fileMetadata) {
         alert(errorMessage);
         return;
     }
-    else {
+    else if(workspaceData) {
         if(app.getWorkspaceManager()) {
             alert("There is already an open workspace");
             return;

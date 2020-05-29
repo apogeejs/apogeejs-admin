@@ -20,16 +20,23 @@ export function saveWorkspace(app,fileAccessObject,doDirectSave) {
     }
 
     //clear workspace dirty flag on completion of save
-    var onSaveSuccess = (updatedFileMetadata) => {
-        var workspaceManager = app.getWorkspaceManager();
-        workspaceManager.setFileMetadata(updatedFileMetadata);
-        workspaceManager.clearIsDirty();
+    var onSave = (err,fileSaved,updatedFileMetadata) => {
+        if(err) {
+            alert("There was an error saving the file: " + err.toString());
+        }
+        else if(fileSaved) {
+            var workspaceManager = app.getWorkspaceManager();
+            workspaceManager.clearIsDirty();
+            if(updatedFileMetadata) {
+                workspaceManager.setFileMetadata(updatedFileMetadata);
+            }
+        }
     }
 
     if((!doDirectSave)||(!fileMetadata)||(!fileMetadata.directSaveOk)) {
-        fileAccessObject.showSaveDialog(fileMetadata,workspaceText,onSaveSuccess);
+        fileAccessObject.showFileAs(fileMetadata,workspaceText,onSave);
     }
     else {
-        fileAccessObject.saveFile(fileMetadata,workspaceText,onSaveSuccess);
+        fileAccessObject.saveFile(fileMetadata,workspaceText,onSave);
     }
 }

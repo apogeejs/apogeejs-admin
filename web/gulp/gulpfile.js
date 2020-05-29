@@ -20,8 +20,8 @@ const ASSETS_FOLDER = RELEASE_FOLDER + "/assets";
 
 
 const WEBAPP_FOLDER = RELEASE_FOLDER + "/webapp";
-const ELECTRON_FOLDER = RELEASE_FOLDER + "/electronapp";
-const ELECTRON2_FOLDER = RELEASE_FOLDER + "/electronapp2";
+const ELECTRON_NODE_FOLDER = RELEASE_FOLDER + "/electronnodeapp";
+const ELECTRON_BRIDGE_FOLDER = RELEASE_FOLDER + "/electronbridgeapp";
 const NODE_FOLDER = RELEASE_FOLDER + "/nodelib";
 const TEMP_FOLDER = "temp";
 
@@ -62,8 +62,8 @@ function packageCssTask() {
     return src(CSS_FILES)
         .pipe(concat(CSS_BUNDLE_FILENAME))
         .pipe(dest(ASSETS_FOLDER))
-        .pipe(dest(ELECTRON_FOLDER))
-        .pipe(dest(ELECTRON2_FOLDER))
+        .pipe(dest(ELECTRON_BRIDGE_FOLDER))
+        .pipe(dest(ELECTRON_NODE_FOLDER))
 }
 
 
@@ -77,8 +77,8 @@ const RESOURCES_FOLDER_NAME = "resources";
 function copyResourcesTask() {
     return src('../resources/**/*')
         .pipe(dest(ASSETS_FOLDER + '/' + RESOURCES_FOLDER_NAME))
-        .pipe(dest(ELECTRON_FOLDER + '/' + RESOURCES_FOLDER_NAME))
-        .pipe(dest(ELECTRON2_FOLDER + '/' + RESOURCES_FOLDER_NAME))
+        .pipe(dest(ELECTRON_BRIDGE_FOLDER + '/' + RESOURCES_FOLDER_NAME))
+        .pipe(dest(ELECTRON_NODE_FOLDER + '/' + RESOURCES_FOLDER_NAME))
 }
 
 //----------------
@@ -89,8 +89,8 @@ const ACE_INCLUDES_FOLDER_NAME = "ace_includes";
 function copyAceIncludesTask() {
     return src('../ext/ace/ace_1.4.3/ace_includes/**/*')
         .pipe(dest(ASSETS_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
-        .pipe(dest(ELECTRON_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
-        .pipe(dest(ELECTRON2_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
+        .pipe(dest(ELECTRON_BRIDGE_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
+        .pipe(dest(ELECTRON_NODE_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
 }
 
 //----------------
@@ -100,10 +100,10 @@ function copyAceIncludesTask() {
 let copyGlobalFiles = parallel(
     () => copyFilesTask(["../apogee/webGlobals.js"],ASSETS_FOLDER),
     () => copyFilesTask(["../apogee/debugHook.js"],ASSETS_FOLDER),
-    () => copyFilesTask(["../apogee/nodeGlobals.js"],ELECTRON_FOLDER),
-    () => copyFilesTask(["../apogee/debugHook.js"],ELECTRON_FOLDER),
-    () => copyFilesTask(["../apogee/webGlobals.js"],ELECTRON2_FOLDER),
-    () => copyFilesTask(["../apogee/debugHook.js"],ELECTRON2_FOLDER),
+    () => copyFilesTask(["../apogee/nodeGlobals.js"],ELECTRON_NODE_FOLDER),
+    () => copyFilesTask(["../apogee/debugHook.js"],ELECTRON_NODE_FOLDER),
+    () => copyFilesTask(["../apogee/webGlobals.js"],ELECTRON_BRIDGE_FOLDER),
+    () => copyFilesTask(["../apogee/debugHook.js"],ELECTRON_BRIDGE_FOLDER),
     () => copyFilesTask(["../apogee/nodeGlobals.js"],NODE_FOLDER),
     () => copyFilesTask(["../apogee/debugHook.js"],NODE_FOLDER),
 )
@@ -188,27 +188,27 @@ function packageClientLibTask() {
 }
 
 //==============================
-// Package Electron
+// Package Electron Node App
 //==============================
 
-const ELECTRON_APP_JS_FILENAME = "apogeeElectronApp.js";
+const ELECTRON_NODE_APP_JS_FILENAME = "apogeeElectronNodeApp.js";
 
 const ELECTRON_ADDED_FILES = [
-    "../applications/electronapp/apogee.html",
-    "../applications/electronapp/main.js"
+    "../applications/electronnodeapp/apogee.html",
+    "../applications/electronnodeapp/main.js"
 ]
 
 //this releases the eletron app. It depends on the creation of the css
 //bundle.
-let releaseElectronTask = parallel( 
-    packageElectronSourceTask,
-    prepareElectronPackageJsonTask,
+let releaseElectronNodeTask = parallel( 
+    packageElectronNodeSourceTask,
+    prepareElectronNodePackageJsonTask,
     () => copyFilesTask(ELECTRON_ADDED_FILES,ELECTRON_FOLDER)
 );
 
-function packageElectronSourceTask() {
+function packageElectronNodeSourceTask() {
     return rollup.rollup({
-        input: '../applications/electronapp/app.js',
+        input: '../applications/electronnodeapp/app.js',
 		external: ['fs'],
 		plugins: [
 			{resolveId}
@@ -216,17 +216,17 @@ function packageElectronSourceTask() {
     }).then(bundle => {
         return bundle.write(
             {
-                file: ELECTRON_FOLDER + "/" + ELECTRON_APP_JS_FILENAME,
+                file: ELECTRON_NODE_FOLDER + "/" + ELECTRON_NODE_APP_JS_FILENAME,
                 format: 'cjs'
             }
         );
     });
 }
 
-function prepareElectronPackageJsonTask() {
-    return src('../applications/electronapp/package.json')
+function prepareElectronNodePackageJsonTask() {
+    return src('../applications/electronnodeapp/package.json')
         .pipe(replace('VERSION', versionConfig.VERSION_NUMBER))
-        .pipe(dest(ELECTRON_FOLDER));
+        .pipe(dest(ELECTRON_NODE_FOLDER));
 }
 
 
@@ -234,41 +234,41 @@ function prepareElectronPackageJsonTask() {
 // Package Electron2
 //==============================
 
-const ELECTRON2_APP_JS_FILENAME = "apogeeElectronApp2.js";
+const ELECTRON_BRIDGE_APP_JS_FILENAME = "apogeeElectronBridgeApp.js";
 
-const ELECTRON2_ADDED_FILES = [
-    "../applications/electronapp2/apogee.html",
-    "../applications/electronapp2/main.js"
+const ELECTRON_BRIDGE_ADDED_FILES = [
+    "../applications/electronbridgeapp/apogee.html",
+    "../applications/electronbridgeapp/main.js"
 ]
 
 //this releases the eletron app. It depends on the creation of the css
 //bundle.
-let releaseElectron2Task = parallel( 
-    packageElectron2SourceTask,
-    prepareElectron2PackageJsonTask,
-    () => copyFilesTask(ELECTRON2_ADDED_FILES,ELECTRON2_FOLDER)
+let releaseElectronBridgeTask = parallel( 
+    packageElectronBridgeSourceTask,
+    prepareElectronBridgePackageJsonTask,
+    () => copyFilesTask(ELECTRON_BRIDGE_ADDED_FILES,ELECTRON_BRIDGE_FOLDER)
 );
 
-function packageElectron2SourceTask() {
+function packageElectronBridgeSourceTask() {
     return rollup.rollup({
-        input: '../applications/electronapp2/app.js',
+        input: '../applications/electronbridgeapp/app.js',
 		plugins: [
 			{resolveId}
 		]
     }).then(bundle => {
         return bundle.write(
             {
-                file: ELECTRON2_FOLDER + "/" + ELECTRON2_APP_JS_FILENAME,
+                file: ELECTRON_BRIDGE_FOLDER + "/" + ELECTRON_BRIDGE_APP_JS_FILENAME,
                 format: 'es'
             }
         );
     });
 }
 
-function prepareElectron2PackageJsonTask() {
-    return src('../applications/electronapp2/package.json')
+function prepareElectronBridgePackageJsonTask() {
+    return src('../applications/electronbridgeapp/package.json')
         .pipe(replace('VERSION', versionConfig.VERSION_NUMBER))
-        .pipe(dest(ELECTRON2_FOLDER));
+        .pipe(dest(ELECTRON_BRIDGE_FOLDER));
 }
 
 
@@ -468,19 +468,6 @@ function cleanTask()  {
 //This cleans the release folder
 exports.clean = cleanTask; 
 
-/*
-copyReleaseInfoTask
-packageUtilLibTask
-packageCoreLibTask
-packageAppLibTask
-packageCssTask
-copyResourcesTask
-copyAceIncludesTask
-releaseWebAppTask
-releaseWebClientLibTask
-releaseElectronTask
-*/
-
 //This task executes the complete release
 exports.release = series(
     //cleanTask,
@@ -497,7 +484,7 @@ exports.release = series(
         //packageViewLibTask,
         releaseWebAppTask,
         releaseWebClientLibTask,
-        releaseElectronTask,
-        releaseElectron2Task
+        releaseElectronNodeTask,
+        releaseElectronBridgeTask
     )
 );

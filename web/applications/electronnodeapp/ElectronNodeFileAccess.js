@@ -3,7 +3,7 @@ import {BaseFileAccess} from "/apogeeapp/apogeeAppLib.js";
 /* 
  * This class provides file open and save in electron.
  */
-export default class ElectronFileAccess extends BaseFileAccess {
+export default class ElectronNodeFileAccess extends BaseFileAccess {
     
     //========================================
     // Public
@@ -32,16 +32,15 @@ export default class ElectronFileAccess extends BaseFileAccess {
      * This method opens a file, including dispalying a dialog
      * to select the file.
      */
-    openFile(app,onOpen) {
+    openFile(onOpen) {
         //show file open dialog
-        var electron = require('electron').remote;
-        var dialog = electron.dialog;
+        var {dialog} = require('electron').remote;
 
         var fileList = dialog.showOpenDialog({properties: ['openFile']});
         if((fileList)&&(fileList.length > 0)) {
-            var fileMetadata = ElectronFileAccess.createFileMetaData(fileList[0]);
+            var fileMetadata = createFileMetaData(fileList[0]);
             var onFileOpen = function(err,data) {
-                onOpen(err,app,data,fileMetadata);
+                onOpen(err,data,fileMetadata);
             }
 
             var fs = require('fs');
@@ -50,9 +49,8 @@ export default class ElectronFileAccess extends BaseFileAccess {
     }
 
     /** This  method shows a save dialog and saves the file. */
-    showSaveDialog(fileMetadata,data,onSaveSuccess) {
-        var electron = require('electron').remote;
-        var dialog = electron.dialog;
+    saveFileAs(fileMetadata,data,onSave) {
+        var {dialog} = require('electron').remote;
 
         //show file save dialog
         var options = {};
@@ -60,42 +58,37 @@ export default class ElectronFileAccess extends BaseFileAccess {
         var newPath = dialog.showSaveDialog(options);
 
         //save file
-        var updatedFileMetadata = ElectronFileAccess.createFileMetaData(newPath);
+        var updatedFileMetadata = createFileMetaData(newPath);
         if(updatedFileMetadata) {
-            this.saveFile(updatedFileMetadata,data,onSaveSuccess);
+            this.saveFile(updatedFileMetadata,data,onSave);
         }
         else {
-            return false;
+            onSave(null,false,null);
         }
     }
 
     /** 
      * This method saves a file to the give location. 
      */
-    saveFile(fileMetadata,data,onSaveSuccess) {
-        var onComplete = function(err,data) {
+    saveFile(fileMetadata,data,onSave) {
+        var onComplete = function(err) {
             if(err) {
                 alert("Error: " + err.message);
             }
             else {
-                if(onSaveSuccess) {
-                    onSaveSuccess(fileMetadata);
+                if(onSave) {
+                    onSave(null,true,fileMetadata);
                 }
-                alert("Saved!");
             }
         }
 
         var fs = require('fs');
         fs.writeFile(fileMetadata.path,data,onComplete);
     }
-
-    //================
-    //static methods
-    //================
-
-    /** This creates the file metadata for a given path. */
-    static createFileMetaData(path) {
-        return {"path":path};
-    } 
 }
+
+/** This creates the file metadata for a given path. */
+function createFileMetaData(path) {
+    return {"path":path};
+} 
 

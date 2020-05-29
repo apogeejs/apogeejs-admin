@@ -1,10 +1,10 @@
-import ElectronFileAccess from "./ElectronFileAccess.js";
+import ElectronNodeFileAccess from "./ElectronNodeFileAccess.js";
 
 /** 
  * This is the format of the AppConfigManager. This class does not need
  * to be extended. It has not internal functionality.
  */
-export default class ElectronAppConfigManager {
+export default class ElectronNodeAppConfigManager {
     
     constructor() {
     }
@@ -41,7 +41,7 @@ export default class ElectronAppConfigManager {
      * if an alternate is not loaded in configuration.
      */
     getDefaultFileAccessObject(app) {
-        return new ElectronFileAccess();
+        return new ElectronNodeFileAccess();
     }
     
     /** This method should return a promise for the initial workspace

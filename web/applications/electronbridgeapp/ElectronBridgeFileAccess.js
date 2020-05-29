@@ -3,7 +3,7 @@ import {BaseFileAccess} from "/apogeeapp/apogeeAppLib.js";
 /* 
  * This class provides file open and save in electron.
  */
-export default class ElectronFileAccess extends BaseFileAccess {
+export default class ElectronBridgeFileAccess extends BaseFileAccess {
     
     //========================================
     // Public
@@ -28,21 +28,22 @@ export default class ElectronFileAccess extends BaseFileAccess {
         return ((fileMetadata)&&(fileMetadata.path));
     }
 
-    /**
-     * This method opens a file, including dispalying a dialog
-     * to select the file.
-     */
-    openFile(app,onFileOpen) {
+    /**  This method shows a file open dialog and then opens the 
+     * selected file. */
+    openFile(onOpen) {
         //use the context bridge api
-        var onOpen = function(err,data,fileMetadata) {
-            onFileOpen(err,app,data,fileMetadata);
-        }
         openSaveApi.openFile(onOpen);
     }
 
-    /** This  method shows a save dialog and saves the file. */
-    showSaveDialog(fileMetadata,data,onSave) {
+    /** This method shows a save dialog and then saves to the 
+     * selected file. */
+    saveFileAs(fileMetadata,data,onSave) {
         openSaveApi.saveFile(fileMetadata,data,onSave)
+    }
+
+    /** This method directly saves the file to the given file location. */
+    saveFile(fileMetadata,data,onSave) {
+        openSaveApi.saveFileAs(fileMetadata,data,onSave)
     }
 
 }

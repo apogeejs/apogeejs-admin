@@ -35,9 +35,9 @@ export default class CutNPasteFileAccess extends BaseFileAccess {
      * This method opens a file, including dispalying a dialog
      * to select the file.
      */
-    openFile(app,onOpen) {
-        var onFileOpen = function(data) {
-            onOpen(null,app,data,null);
+    openFile(onOpen) {
+        var onDataEntered = function(data) {
+            onOpen(null,data,null);
             return true;
         }
 
@@ -45,11 +45,11 @@ export default class CutNPasteFileAccess extends BaseFileAccess {
         options.title = "Open Workspace";
         options.instructions = "Paste saved workspace data in the space below.";
         options.submitLabel = "Open";
-        showTextIoDialog(options,onFileOpen);
+        showTextIoDialog(options,onDataEntered);
     }
 
     /** This  method shows a save dialog and saves the file. */
-    showSaveDialog(fileMetadata,data,onSaveSuccess) {
+    saveFileAs(fileMetadata,data,onSave) {
         var onSubmit = () => true;
         var options = {};
         options.title = "Save Workspace";
@@ -59,14 +59,14 @@ export default class CutNPasteFileAccess extends BaseFileAccess {
         showTextIoDialog(options,onSubmit);
 
         //I should maybe only do this if you do not press cancel?
-        if(onSaveSuccess) onSaveSuccess();
+        if(onSaveSuccess) onSave(null,true,null);
     }
 
     /** 
      * This method saves a file to the give location. 
      */
-    saveFile(fileMetadata,data,onSaveSuccess) {
-        this.showSaveDialog(fileMetadata,data,onSaveSuccess);
+    saveFile(fileMetadata,data,onSave) {
+        this.saveFileAs(fileMetadata,data,onSave);
     }
 
 

@@ -4,33 +4,33 @@ import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
 import * as apogeeui from "/apogeeui/apogeeUiLib.js";
 import * as apogeeview from "/apogeeview/apogeeViewLib.js";
 import { ApogeeView, initIncludePath } from "/apogeeview/apogeeViewLib.js";
-import ElectronAppConfigManager from "/applications/electronapp2/ElectronAppConfigManager.js";
+import ElectronNodeAppConfigManager from "./ElectronNodeAppConfigManager.js";
 
 //expose these apogee libraries globally so plugins can use them
-window.apogeeutil = apogeeutil;
-window.apogee = apogee;
-window.apogeeapp = apogeeapp;
-window.apogeeui = apogeeui;
-window.apogeeview = apogeeview;
+__globals__.apogeeutil = apogeeutil;
+__globals__.apogee = apogee;
+__globals__.apogeeapp = apogeeapp;
+__globals__.apogeeui = apogeeui;
+__globals__.apogeeview = apogeeview;
 
 let appView;
 
-window.init = function() {
+export function appInit() {
 
     //initialize the include paths separately
-    const includeBasePathStruct = {
-        "resources": "resources",
-        "aceIncludes": "ace_includes"
+    const includePathInfo = {
+        "resources": "./resources",
+        "aceIncludes": "./ace_includes"
     };
-    initIncludePath(includeBasePathStruct);
+    initIncludePath(includePathInfo);
     
     //use cutnpaste file access
-    let appConfigManager = new ElectronAppConfigManager();
+    let appConfigManager = new ElectronNodeAppConfigManager();
     
     //create the application
     appView = new ApogeeView("appContainer",appConfigManager);
 }
 
-window.getWorkspaceIsDirty = function() {
+export function getWorkspaceIsDirty() {
     return appView.getApp().getWorkspaceIsDirty();
 }

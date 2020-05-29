@@ -15,34 +15,50 @@ contextBridge.exposeInMainWorld('openSaveApi', {
 		}
         else { 
             //if there is no config file, just return an "empty" promise
-            onOpen(null,null);
+            onOpen(null,false,null);
         }
 	},
 	
 	/** Saves file; onSave has on argument, the new metadata. If it is null the file was not saved. */
-	saveFile: (fileMetadata,data,onSave) => {
-		var electron = require('electron').remote;
-        var dialog = electron.dialog;
+	saveFileAs: (fileMetadata,data,onSave) => {
+		var {dialog} = require('electron').remote;
 
         //show file save dialog
         var options = {};
         if((fileMetadata)&&(fileMetadata.path)) options.defaultPath = fileMetadata.path;
-        var newPath = dialog.showSaveDialog(options);
-
-        //save file
-        var updatedFileMetadata = ElectronFileAccess.createFileMetaData(newPath);
-		if(updatedFileMetadata) {
-            saveFileImpl(updatedFileMetadata,data,onSaveSuccess);
+        var fileSavePromise = dialog.showSaveDialog(options);
+        fileSavePromise.then( dialogResult => {
+            if((!dialogResult.canceled)&&(dialogResult.filePath)) {
+                //save file to the given location
+                var updatedFileMetadata = createFileMetaData(dialogResult.filePath);
+                saveFileImpl(updatedFileMetadata,data,onSave);
+            }
+            else {
+                onSave(null,false,null);
+            }
+        })
+        .catch(err => {
+            onSave(err,false,null);
+        })
+    },
+    
+    /** Saves file; onSave has on argument, the new metadata. If it is null the file was not saved. */
+	saveFile: (fileMetadata,data,onSave) => {
+        //show an alert dialog as a precaution to tell user we are writing to file system
+        let saveOk = confirm("Save to file location: " + createDisplayPath(fileMetadata));
+        if(saveOk) {
+            //save file to the given location
+            saveFileImpl(updatedFileMetadata,data,onSave);
         }
-		else {
-			onSaveSucces(null);
-		}
-	},
+        else {
+            onSave(null,false,null);
+        }
+    },
+    
 	/** This opens a file. the argument onOpen is the callback with the args (err,data,fileMetadata). All null on not opened */
 	openFile: (onOpen) => {
 		//show file open dialog
-        var electron = require('electron').remote;
-        var dialog = electron.dialog;
+        var {dialog} = require('electron').remote;
 
         var fileOpenPromise = dialog.showOpenDialog({properties: ['openFile']});
 		fileOpenPromise.then( fileOpenResult => {
@@ -68,6 +84,7 @@ contextBridge.exposeInMainWorld('openSaveApi', {
 
 let CONFIG_FILE_PATH = "./config.json";
 
+/** This method saves the file to the given file */
 function saveFileImpl(fileMetadata,data,onSaveSuccess) {
 	var onComplete = function(err,data) {
 		if(err) {
@@ -88,3 +105,7 @@ function saveFileImpl(fileMetadata,data,onSaveSuccess) {
 function createFileMetaData(path) {
 	return {"path":path};
 } 
+
+function createDisplayPath(fileMetadata) {
+    return fileMetadata.path;
+}

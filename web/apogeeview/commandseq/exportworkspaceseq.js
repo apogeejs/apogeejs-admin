@@ -33,9 +33,15 @@ export function exportWorkspace(app,fileAccessObject) {
             return;
         }
 
+        let onSave = (err,fileSaved,fileMetadata) => {
+            if(err) {
+                alert("There was an error saving the file: " + err.toString());
+            }
+        }
+
         //no command used here - we should add thatlogic in
         //along with having proper error handling
-        fileAccessObject.showSaveDialog(null,workspaceText,null);
+        fileAccessObject.saveFileAs(null,workspaceText,onSave);
 
         //return true to close the dialog
         return true;

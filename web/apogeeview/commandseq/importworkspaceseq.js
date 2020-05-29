@@ -14,19 +14,19 @@ import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
         return false;
     }    
 
-    var onOpen = function(err,app,workspaceData,fileMetadata) {
+    var onOpen = function(err,workspaceData,fileMetadata) {
         if(err) {
             alert("Error importing workspace: " + err);
             return false;
         }
-        else {
+        else if(workspaceData) {
             //open workspace
             return openWorkspace(appView,app,componentClass,workspaceData,fileMetadata);
         }
     }
 
     //use open file from open workspace
-    fileAccessObject.openFile(app,onOpen);
+    fileAccessObject.openFile(onOpen);
 }
 
 //=====================================
