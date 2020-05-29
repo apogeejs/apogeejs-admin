@@ -53,7 +53,7 @@ contextBridge.exposeInMainWorld('openSaveApi', {
 				}
 
 				var fs = require('fs');
-				fs.readFile(fileMetadata.path,onFileOpen);
+				fs.readFile(fileMetadata.path,'utf8',onFileOpen);
 			}
 			else {
 				onOpen(null,null,null);
