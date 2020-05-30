@@ -17,13 +17,13 @@ export default class ElectronNodeAppConfigManager {
         var fileLoadPromise;
         
         //load file if it exists
-        if(fs.existsSync(ElectronAppConfigManager.CONFIG_FILE_PATH)) {
+        if(fs.existsSync(ElectronNodeAppConfigManager.CONFIG_FILE_PATH)) {
             var promiseFunction = (resolve,reject) => {
                 var onFileOpen = function(err,data) {
                     if(err) reject(err);
                     else resolve(JSON.parse(data));                    
                 }              
-                fs.readFile(ElectronAppConfigManager.CONFIG_FILE_PATH,onFileOpen);
+                fs.readFile(ElectronNodeAppConfigManager.CONFIG_FILE_PATH,onFileOpen);
             }
 
             var configFilePromise = new Promise(promiseFunction);
@@ -63,4 +63,4 @@ export default class ElectronNodeAppConfigManager {
     }
 }
 
-ElectronAppConfigManager.CONFIG_FILE_PATH = "./config.json";
+ElectronNodeAppConfigManager.CONFIG_FILE_PATH = "./config.json";

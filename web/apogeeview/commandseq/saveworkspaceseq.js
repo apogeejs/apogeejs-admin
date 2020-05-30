@@ -4,15 +4,18 @@
 // UI Entry Point
 //=====================================
 
-export function saveWorkspace(app,fileAccessObject,doDirectSave) {
+export function saveWorkspace(app,fileAccessObject,requestDirectSave) {
 
     var activeWorkspaceManager = app.getWorkspaceManager();
     var workspaceText;
     var fileMetadata;
+    var doDirectSave = false;
     if(activeWorkspaceManager) {
         var workspaceJson = activeWorkspaceManager.toJson();
         workspaceText = JSON.stringify(workspaceJson);
         fileMetadata = activeWorkspaceManager.getFileMetadata();
+        //see if we can do a direct save
+        if(requestDirectSave) doDirectSave = fileAccessObject.directSaveOk(fileMetadata);
     }
     else {
         alert("There is no workspace open.");
@@ -33,10 +36,10 @@ export function saveWorkspace(app,fileAccessObject,doDirectSave) {
         }
     }
 
-    if((!doDirectSave)||(!fileMetadata)||(!fileMetadata.directSaveOk)) {
-        fileAccessObject.showFileAs(fileMetadata,workspaceText,onSave);
+    if(doDirectSave) {
+        fileAccessObject.saveFile(fileMetadata,workspaceText,onSave);
     }
     else {
-        fileAccessObject.saveFile(fileMetadata,workspaceText,onSave);
+        fileAccessObject.saveFileAs(fileMetadata,workspaceText,onSave);
     }
 }

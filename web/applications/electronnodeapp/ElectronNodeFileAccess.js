@@ -71,6 +71,10 @@ export default class ElectronNodeFileAccess extends BaseFileAccess {
      * This method saves a file to the give location. 
      */
     saveFile(fileMetadata,data,onSave) {
+        
+        //make sure we have file metadata
+        if((!fileMetadata)||(!fileMetadata.path)) return saveFileAs(fileMetadata,data,onSave);
+        
         var onComplete = function(err) {
             if(err) {
                 alert("Error: " + err.message);

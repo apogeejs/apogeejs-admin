@@ -24,21 +24,23 @@ export default class WorkspaceManager extends FieldObject {
             let referenceManager = new ReferenceManager(this.app);
             this.setField("referenceManager",referenceManager);
 
-//temporary
-this.created = true;
+            //this is not a field like above because when we do not require a command to change it
+            this.fileMetadata = null;
+
+            //temporary
+            this.created = true;
         }
-else {
-this.created = false;
-}
+        else {
+            //this is not a field like above because when we do not require a command to change it
+            this.fileMetadata = instanceToCopy.fileMetadata;
+
+            //temporary
+            this.created = false;
+        }
 
         //==============
         //Working variables
         //==============
-        //I am calling this working even though it has an extended lifetime
-        //this will be updated when the file changes
-        //TBR when we work more on file saving
-        this.fileMetadata = null;
-
         this.viewStateCallback = null;
         this.cachedViewState = null;
 

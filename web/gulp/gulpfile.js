@@ -193,7 +193,7 @@ function packageClientLibTask() {
 
 const ELECTRON_NODE_APP_JS_FILENAME = "apogeeElectronNodeApp.js";
 
-const ELECTRON_ADDED_FILES = [
+const ELECTRON_NODE_ADDED_FILES = [
     "../applications/electronnodeapp/apogee.html",
     "../applications/electronnodeapp/main.js"
 ]
@@ -203,7 +203,7 @@ const ELECTRON_ADDED_FILES = [
 let releaseElectronNodeTask = parallel( 
     packageElectronNodeSourceTask,
     prepareElectronNodePackageJsonTask,
-    () => copyFilesTask(ELECTRON_ADDED_FILES,ELECTRON_FOLDER)
+    () => copyFilesTask(ELECTRON_NODE_ADDED_FILES,ELECTRON_NODE_FOLDER)
 );
 
 function packageElectronNodeSourceTask() {
@@ -231,14 +231,15 @@ function prepareElectronNodePackageJsonTask() {
 
 
 //==============================
-// Package Electron2
+// Package Electron Bridge
 //==============================
 
 const ELECTRON_BRIDGE_APP_JS_FILENAME = "apogeeElectronBridgeApp.js";
 
 const ELECTRON_BRIDGE_ADDED_FILES = [
     "../applications/electronbridgeapp/apogee.html",
-    "../applications/electronbridgeapp/main.js"
+    "../applications/electronbridgeapp/main.js",
+    "../applications/electronbridgeapp/preload.js"
 ]
 
 //this releases the eletron app. It depends on the creation of the css
@@ -470,7 +471,7 @@ exports.clean = cleanTask;
 
 //This task executes the complete release
 exports.release = series(
-    //cleanTask,
+    cleanTask,
     parallel(
         copyReleaseInfoTask,
         packageCssTask,

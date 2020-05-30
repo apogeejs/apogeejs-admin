@@ -12,9 +12,9 @@ export function openWorkspace(app,fileAccessObject) {
         return;
     }    
 
-    let onOpen = (err,workspaceData,fileMetadata) => onWorkspaceData(err,app,workspaceData,fileMetadata);
+    let onOpen = (err,workspaceData,fileMetadata) => onWorkspaceOpen(err,app,workspaceData,fileMetadata);
 
-    fileAccessObject.openFile(app,onOpen);
+    fileAccessObject.openFile(onOpen);
 }
 
 //=====================================

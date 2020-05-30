@@ -44,11 +44,12 @@ contextBridge.exposeInMainWorld('openSaveApi', {
     
     /** Saves file; onSave has on argument, the new metadata. If it is null the file was not saved. */
 	saveFile: (fileMetadata,data,onSave) => {
+
         //show an alert dialog as a precaution to tell user we are writing to file system
         let saveOk = confirm("Save to file location: " + createDisplayPath(fileMetadata));
         if(saveOk) {
             //save file to the given location
-            saveFileImpl(updatedFileMetadata,data,onSave);
+            saveFileImpl(fileMetadata,data,onSave);
         }
         else {
             onSave(null,false,null);
@@ -85,16 +86,11 @@ contextBridge.exposeInMainWorld('openSaveApi', {
 let CONFIG_FILE_PATH = "./config.json";
 
 /** This method saves the file to the given file */
-function saveFileImpl(fileMetadata,data,onSaveSuccess) {
-	var onComplete = function(err,data) {
-		if(err) {
-			alert("Error: " + err.message);
-		}
-		else {
-			if(onSaveSuccess) {
-				onSaveSuccess(fileMetadata);
-			}
-			alert("Saved!");
+function saveFileImpl(fileMetadata,data,onSave) {
+	var onComplete = function(err) {
+		if(onSave) {
+			let fileSaved = err ? false : true;
+			onSave(err,fileSaved,fileMetadata);
 		}
 	}
 

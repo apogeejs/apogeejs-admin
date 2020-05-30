@@ -27,25 +27,11 @@ export default class BaseFileAccess {
     getNewFileMetadata() {
         
     }
-}
 
-export default class CutNPasteFileAccess extends BaseFileAccess {
-    
-    //========================================
-    // Public
-    //========================================
-    
-    constructor() {
-        super();
-    }
-   
-    /**
-     * This method returns fileMetadata appropriate for a new workspace.
-     */
-    getNewFileMetadata() {
-        return null;
-    }
-    
+    //===============================
+    // The following methods must be implmented by the extending class
+    //===============================
+
     /**
      * This method returns true if the workspace has an existing file to which 
      * is can be saved without opening a save dialog. 
@@ -53,10 +39,6 @@ export default class CutNPasteFileAccess extends BaseFileAccess {
     directSaveOk(fileMetadata) {
         return false;
     }
-
-    //===============================
-    // The following methods must be implmented by the extending class
-    //===============================
     
     /**
      * This method opens a file, including dispalying a dialog

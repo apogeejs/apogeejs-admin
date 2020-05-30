@@ -36,6 +36,7 @@ function createWindow () {
         isDirtyPromise.then( (isDirty) => {
             var doClose;
             if(isDirty) {
+				console.log("about to show dialog");
                 var resultIndex = dialog.showMessageBox({
                     message: "There is unsaved data. Are you sure you want to exit?",
                     buttons: ["Exit","Stay"]
@@ -50,7 +51,8 @@ function createWindow () {
                 win.destroy();
             }
         }).catch( (msg) => {
-            console.log("Error checking if app has saved data - Exiting! Message: " + msg);
+            //just detroy
+            console.log("Error in close check. Exiting");
             win.destroy();
         })
         

@@ -38,12 +38,19 @@ export default class ElectronBridgeFileAccess extends BaseFileAccess {
     /** This method shows a save dialog and then saves to the 
      * selected file. */
     saveFileAs(fileMetadata,data,onSave) {
-        openSaveApi.saveFile(fileMetadata,data,onSave)
+        openSaveApi.saveFileAs(fileMetadata,data,onSave)
     }
 
     /** This method directly saves the file to the given file location. */
     saveFile(fileMetadata,data,onSave) {
-        openSaveApi.saveFileAs(fileMetadata,data,onSave)
+        
+		if((fileMetadata)&&(fileMetadata.path)) {
+            //make sure we have file metadata
+            openSaveApi.saveFile(fileMetadata,data,onSave);
+        }
+        else {
+            openSaveApi.saveFileAs(fileMetadata,data,onSave)
+        }
     }
 
 }

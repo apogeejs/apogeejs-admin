@@ -8,8 +8,16 @@ import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
 /** This file initializes the reference class types available. */
 
 let referenceClassArray = [];
-if(__APOGEE_ENVIRONMENT__ == "WEB") referenceClassArray.push(EsModuleEntry);
-if(__APOGEE_ENVIRONMENT__ == "NODE") referenceClassArray.push(NpmModuleEntry);
-referenceClassArray.push(JsScriptEntry);
-referenceClassArray.push(CssEntry);
+if(__APOGEE_ENVIRONMENT__ == "WEB") {
+    referenceClassArray.push(EsModuleEntry);
+    referenceClassArray.push(JsScriptEntry);
+    referenceClassArray.push(CssEntry);
+}
+else if(__APOGEE_ENVIRONMENT__ == "NODE") {
+    referenceClassArray.push(NpmModuleEntry);
+}
+else {
+    console.log("Warning - apogee environment not recognized!");
+}
+
 ReferenceManager.setReferenceClassArray(referenceClassArray);
