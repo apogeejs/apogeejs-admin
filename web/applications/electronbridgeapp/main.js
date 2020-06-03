@@ -1,6 +1,26 @@
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, protocol} = require('electron')
 const path = require('path')
 const url = require('url')
+
+//====================================
+//This source code is imported from the following link, to enable importing es modules from the local file system
+// https://gist.github.com/smotaal/f1e6dbb5c0420bfd585874bd29f11c43
+
+// Base path used to resolve modules
+const base = app.getAppPath();
+
+// Protocol will be "app://./…"
+const scheme = 'app';
+
+{ /* Protocol */
+    // Registering must be done before app::ready fires
+    // (Optional) Technically not a standard scheme but works as needed
+    //protocol.registerStandardSchemes([scheme], { secure: true });
+  
+    // Create protocol
+    require('./create-protocol')(scheme, base);
+}
+//=======================================
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -34,20 +54,17 @@ function createWindow () {
  
         var isDirtyPromise = win.webContents.executeJavaScript("getWorkspaceIsDirty()");
         isDirtyPromise.then( (isDirty) => {
-            var doClose;
             if(isDirty) {
 				console.log("about to show dialog");
-                var resultIndex = dialog.showMessageBox({
+                var resultPromise = dialog.showMessageBox({
                     message: "There is unsaved data. Are you sure you want to exit?",
                     buttons: ["Exit","Stay"]
                 });
-                doClose = (resultIndex == 0);
+                resultPromise.then( result => {
+                    if(result.response == 0) win.destroy();
+                })
             }
             else {
-                doClose = true;
-            }
-            
-            if(doClose) {
                 win.destroy();
             }
         }).catch( (msg) => {

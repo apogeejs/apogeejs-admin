@@ -36,16 +36,24 @@ export default class ElectronNodeFileAccess extends BaseFileAccess {
         //show file open dialog
         var {dialog} = require('electron').remote;
 
-        var fileList = dialog.showOpenDialog({properties: ['openFile']});
-        if((fileList)&&(fileList.length > 0)) {
-            var fileMetadata = createFileMetaData(fileList[0]);
-            var onFileOpen = function(err,data) {
-                onOpen(err,data,fileMetadata);
-            }
+        var fileOpenPromise = dialog.showOpenDialog({properties: ['openFile']});
+		fileOpenPromise.then( fileOpenResult => {
+			if((!fileOpenResult.canceled)&&(fileOpenResult.filePaths.length > 0)) {
+				var fileMetadata = createFileMetaData(fileOpenResult.filePaths[0]);
+				var onFileOpen = function(err,data) {
+					onOpen(err,data,fileMetadata);
+				}
 
-            var fs = require('fs');
-            fs.readFile(fileMetadata.path,onFileOpen);
-        }
+				var fs = require('fs');
+				fs.readFile(fileMetadata.path,'utf8',onFileOpen);
+			}
+			else {
+				onOpen(null,null,null);
+			}
+		})
+		.catch(err => {
+			onOpen(err,null,null);
+		});
     }
 
     /** This  method shows a save dialog and saves the file. */
@@ -55,16 +63,20 @@ export default class ElectronNodeFileAccess extends BaseFileAccess {
         //show file save dialog
         var options = {};
         if((fileMetadata)&&(fileMetadata.path)) options.defaultPath = fileMetadata.path;
-        var newPath = dialog.showSaveDialog(options);
-
-        //save file
-        var updatedFileMetadata = createFileMetaData(newPath);
-        if(updatedFileMetadata) {
-            this.saveFile(updatedFileMetadata,data,onSave);
-        }
-        else {
-            onSave(null,false,null);
-        }
+        var fileSavePromise = dialog.showSaveDialog(options);
+        fileSavePromise.then( dialogResult => {
+            if((!dialogResult.canceled)&&(dialogResult.filePath)) {
+                //save file to the given location
+                var updatedFileMetadata = createFileMetaData(dialogResult.filePath);
+                this.saveFile(updatedFileMetadata,data,onSave);
+            }
+            else {
+                onSave(null,false,null);
+            }
+        })
+        .catch(err => {
+            onSave(err,false,null);
+        })
     }
 
     /** 

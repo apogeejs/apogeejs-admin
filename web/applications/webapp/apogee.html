@@ -8,6 +8,12 @@
         <script type="text/javascript" src="/apogee/webGlobals.js"></script>
         <script type="text/javascript" src="/apogee/debugHook.js"></script>
         <script type="module" src="app.js"></script>
+        <script tyep="text/javascript">
+            const includeBasePathInfo = {
+                "resources": "/resources",
+                "aceIncludes": "/ext/ace/ace_1.4.3/ace_includes"
+            };
+        </script>
 
         <link rel="stylesheet" type="text/css" href="/prosemirror/lib/compiledCss/editor.css">
         <link rel="stylesheet" type="text/css" href="/apogeeview/apogeeapp.css">
@@ -24,7 +30,7 @@
         <link rel="stylesheet" type="text/css" href="/ext/handsontable/handsontable_6.2.0/handsontable.full.min.css">
         
 	</head>
-    <body onload="init()">
+    <body onload="init(includeBasePathInfo)">
         <div id="appContainer"></div>
 	</body>
 </html>

@@ -15,14 +15,9 @@ window.apogeeview = apogeeview;
 
 let appView;
 
-window.init = function() {
-
+window.init = function(includeBasePathInfo) {
     //initialize the include paths separately
-    const includeBasePathStruct = {
-        "resources": "resources",
-        "aceIncludes": "ace_includes"
-    };
-    initIncludePath(includeBasePathStruct);
+    initIncludePath(includeBasePathInfo);
     
     //use cutnpaste file access
     let appConfigManager = new ElectronBridgeAppConfigManager();

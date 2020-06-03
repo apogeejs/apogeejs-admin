@@ -8,10 +8,15 @@
         <script type="text/javascript" src="webGlobals.js"></script>
         <script type="text/javascript" src="debugHook.js"></script>
         <script type="module" src="apogeeWebApp.js"></script>
+        <script tyep="text/javascript">
+            const includeBasePathInfo = {
+                "resources": "resources",
+                "aceIncludes": "ace_includes"
+            };
+        </script>
         <link rel="stylesheet" type="text/css" href="cssBundle.css">
-        
 	</head>
-    <body onload="init()">
+    <body onload="init(includeBasePathInfo)">
         <div id="appContainer"></div>
 	</body>
 </html>

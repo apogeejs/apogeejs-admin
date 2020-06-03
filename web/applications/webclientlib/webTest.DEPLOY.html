@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <link rel="stylesheet" type="text/css" href="/lib/v1.0.0/assets/cssBundle.css">
+   
+        
+        <script type="module">
+            import {ApogeeWebView} from "/lib/v1.0.0/assets/apogeeWebClientLib.es.js";
+        
+            //configure app and load the workspace
+            let workspaceUrl = "webAppTestWorkspace.json";
+            let appView;
+
+			window.init = function() {
+                appView = new ApogeeWebView();
+
+                appView.addDisplay("main.a","aDisplayElement",true,"Data");
+                appView.addDisplay("main.b","bDisplayElement",true,"Data");
+
+                appView.openWorkspace(workspaceUrl);
+            }
+            
+		</script>
+	</head>
+    <body onload="init()">
+        This is element "a":
+        <div id="aDisplayElement"></div>
+
+        This is element "b":
+        <div id="bDisplayElement"></div>
+	</body>
+</html>

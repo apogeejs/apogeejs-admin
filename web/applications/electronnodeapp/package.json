@@ -7,7 +7,7 @@
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "~3.0.0",
+    "electron": "~9.0.0",
 	  "esprima": "~2.7.3",
     "handsontable": "~6.2.0",
     "ace-builds": "~1.4.3",

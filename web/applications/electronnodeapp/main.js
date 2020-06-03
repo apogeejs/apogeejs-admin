@@ -32,23 +32,22 @@ function createWindow () {
  
         var isDirtyPromise = win.webContents.executeJavaScript("getWorkspaceIsDirty()");
         isDirtyPromise.then( (isDirty) => {
-            var doClose;
             if(isDirty) {
-                var resultIndex = dialog.showMessageBox({
+				console.log("about to show dialog");
+                var resultPromise = dialog.showMessageBox({
                     message: "There is unsaved data. Are you sure you want to exit?",
                     buttons: ["Exit","Stay"]
                 });
-                doClose = (resultIndex == 0);
+                resultPromise.then( result => {
+                    if(result.response == 0) win.destroy();
+                })
             }
             else {
-                doClose = true;
-            }
-            
-            if(doClose) {
                 win.destroy();
             }
         }).catch( (msg) => {
-            console.log("Error checking if app has saved data - Exiting! Message: " + msg);
+            //just detroy
+            console.log("Error in close check. Exiting");
             win.destroy();
         })
         

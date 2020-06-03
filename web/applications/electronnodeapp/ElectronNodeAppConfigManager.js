@@ -14,7 +14,6 @@ export default class ElectronNodeAppConfigManager {
      */
     getConfigPromise(app) {
         var fs = require('fs');
-        var fileLoadPromise;
         
         //load file if it exists
         if(fs.existsSync(ElectronNodeAppConfigManager.CONFIG_FILE_PATH)) {

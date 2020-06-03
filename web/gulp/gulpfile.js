@@ -120,7 +120,7 @@ let releaseWebAppTask = parallel(
 function copyWebAppPageTask() {
     let baseHref = versionConfig.VERSION_ASSETS_PATH + "/";
 
-    return src('../applications/cutnpastewebapp/apogee.html')
+    return src('../applications/webapp/apogee.DEPLOY.html')
         .pipe(replace("BASE_HREF",baseHref))
         .pipe(dest(WEBAPP_FOLDER));
 }
@@ -129,7 +129,7 @@ const WEB_APP_JS_FILENAME = "apogeeWebApp.js";
 
 function packageWebAppTask() {
     return rollup.rollup({
-        input: '../applications/cutnpastewebapp/app.js',
+        input: '../applications/webapp/app.js',
         plugins: [
             {resolveId}
         ]
@@ -239,7 +239,9 @@ const ELECTRON_BRIDGE_APP_JS_FILENAME = "apogeeElectronBridgeApp.js";
 const ELECTRON_BRIDGE_ADDED_FILES = [
     "../applications/electronbridgeapp/apogee.html",
     "../applications/electronbridgeapp/main.js",
-    "../applications/electronbridgeapp/preload.js"
+    "../applications/electronbridgeapp/preload.js",
+    "../applications/electronbridgeapp/create-protocol.js",
+    "../applications/electronbridgeapp/mime-types.js"
 ]
 
 //this releases the eletron app. It depends on the creation of the css
@@ -268,7 +270,7 @@ function packageElectronBridgeSourceTask() {
 
 function prepareElectronBridgePackageJsonTask() {
     return src('../applications/electronbridgeapp/package.json')
-        .pipe(replace('VERSION', versionConfig.VERSION_NUMBER))
+        .pipe(replace('0.0.0', versionConfig.VERSION_NUMBER))
         .pipe(dest(ELECTRON_BRIDGE_FOLDER));
 }
 
