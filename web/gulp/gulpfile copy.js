@@ -14,12 +14,15 @@ let resolveId = createResolveIdPlugin(__dirname,BUNDLE_PATH);
 //==============================
 // Top Level Values
 //==============================
-const DIST_FOLDER = "../releases";
-const WEB_FOLDER = DIST_FOLDER + "/web";
-const LIB_FOLDER = DIST_FOLDER + "/lib";
+const DIST_FOLDER = "dist";
+const RELEASE_FOLDER = DIST_FOLDER + "/v" + versionConfig.VERSION_NUMBER;
+const ASSETS_FOLDER = RELEASE_FOLDER + "/assets";
 
-const WEB_RELEASE_FOLDER = WEB_FOLDER + "/v" + versionConfig.VERSION_NUMBER;
-const LIB_RELEASE_FOLDER = LIB_FOLDER + "/v" + versionConfig.VERSION_NUMBER;
+
+const WEBAPP_FOLDER = RELEASE_FOLDER + "/webapp";
+const ELECTRON_NODE_FOLDER = RELEASE_FOLDER + "/electronnodeapp";
+const ELECTRON_BRIDGE_FOLDER = RELEASE_FOLDER + "/electronbridgeapp";
+const NODE_FOLDER = RELEASE_FOLDER + "/nodelib";
 const TEMP_FOLDER = "temp";
 
 //======================================
@@ -31,10 +34,7 @@ const BASE_FILES = [
     "versionConfig.json"
 ]
 
-let copyReleaseInfoTask = parallel(
-    () => copyFilesTask(BASE_FILES,WEB_RELEASE_FOLDER),
-    () => copyFilesTask(BASE_FILES,LIB_RELEASE_FOLDER)
-)
+let copyReleaseInfoTask = () => copyFilesTask(BASE_FILES,RELEASE_FOLDER);
 
 //=================================
 // Package CSS
@@ -61,8 +61,9 @@ const CSS_BUNDLE_FILENAME = "cssBundle.css";
 function packageCssTask() {
     return src(CSS_FILES)
         .pipe(concat(CSS_BUNDLE_FILENAME))
-        .pipe(dest(WEB_RELEASE_FOLDER))
-        .pipe(dest(LIB_RELEASE_FOLDER))
+        .pipe(dest(ASSETS_FOLDER))
+        .pipe(dest(ELECTRON_BRIDGE_FOLDER))
+        .pipe(dest(ELECTRON_NODE_FOLDER))
 }
 
 
@@ -75,8 +76,9 @@ const RESOURCES_FOLDER_NAME = "resources";
 
 function copyResourcesTask() {
     return src('../resources/**/*')
-        .pipe(dest(WEB_RELEASE_FOLDER + '/' + RESOURCES_FOLDER_NAME))
-        .pipe(dest(LIB_RELEASE_FOLDER + '/' + RESOURCES_FOLDER_NAME))
+        .pipe(dest(ASSETS_FOLDER + '/' + RESOURCES_FOLDER_NAME))
+        .pipe(dest(ELECTRON_BRIDGE_FOLDER + '/' + RESOURCES_FOLDER_NAME))
+        .pipe(dest(ELECTRON_NODE_FOLDER + '/' + RESOURCES_FOLDER_NAME))
 }
 
 //----------------
@@ -86,8 +88,9 @@ const ACE_INCLUDES_FOLDER_NAME = "ace_includes";
 
 function copyAceIncludesTask() {
     return src('../ext/ace/ace_1.4.3/ace_includes/**/*')
-        .pipe(dest(WEB_RELEASE_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
-        .pipe(dest(LIB_RELEASE_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
+        .pipe(dest(ASSETS_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
+        .pipe(dest(ELECTRON_BRIDGE_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
+        .pipe(dest(ELECTRON_NODE_FOLDER + '/' + ACE_INCLUDES_FOLDER_NAME))
 }
 
 //----------------
@@ -95,11 +98,14 @@ function copyAceIncludesTask() {
 //----------------
 
 let copyGlobalFiles = parallel(
-    () => copyFilesTask(["../apogee/webGlobals.js"],WEB_RELEASE_FOLDER),
-    () => copyFilesTask(["../apogee/debugHook.js"],WEB_RELEASE_FOLDER),
-    () => copyFilesTask(["../apogee/webGlobals.js"],LIB_RELEASE_FOLDER),
-    () => copyFilesTask(["../apogee/nodeGlobals.js"],LIB_RELEASE_FOLDER),
-    () => copyFilesTask(["../apogee/debugHook.js"],LIB_RELEASE_FOLDER),
+    () => copyFilesTask(["../apogee/webGlobals.js"],ASSETS_FOLDER),
+    () => copyFilesTask(["../apogee/debugHook.js"],ASSETS_FOLDER),
+    () => copyFilesTask(["../apogee/nodeGlobals.js"],ELECTRON_NODE_FOLDER),
+    () => copyFilesTask(["../apogee/debugHook.js"],ELECTRON_NODE_FOLDER),
+    () => copyFilesTask(["../apogee/webGlobals.js"],ELECTRON_BRIDGE_FOLDER),
+    () => copyFilesTask(["../apogee/debugHook.js"],ELECTRON_BRIDGE_FOLDER),
+    () => copyFilesTask(["../apogee/nodeGlobals.js"],NODE_FOLDER),
+    () => copyFilesTask(["../apogee/debugHook.js"],NODE_FOLDER),
 )
 
 //==============================
@@ -116,8 +122,7 @@ function copyWebAppPageTask() {
 
     return src('../applications/webapp/apogee.DEPLOY.html')
         .pipe(replace("BASE_HREF",baseHref))
-        .pipe(rename('apogee.html'))
-        .pipe(dest(WEB_RELEASE_FOLDER));
+        .pipe(dest(WEBAPP_FOLDER));
 }
 
 const WEB_APP_JS_FILENAME = "apogeeWebApp.js";
@@ -131,7 +136,7 @@ function packageWebAppTask() {
     }).then(bundle => {
         return bundle.write(
             { 
-                file: WEB_RELEASE_FOLDER + "/" + WEB_APP_JS_FILENAME,
+                file: ASSETS_FOLDER + "/" + WEB_APP_JS_FILENAME,
                 format: 'es'
             }
         );
@@ -174,13 +179,103 @@ function packageClientLibTask() {
         return Promise.all[
             bundle.write(
                  { 
-                    file: WEB_RELEASE_FOLDER + "/" + CLIENT_LIB_ES_FILENAME, 
+                    file: ASSETS_FOLDER + "/" + CLIENT_LIB_ES_FILENAME, 
                     format: 'es'
                 }
             )
         ]
     });
 }
+
+//==============================
+// Package Electron Node App
+//==============================
+
+const ELECTRON_NODE_APP_JS_FILENAME = "apogeeElectronNodeApp.js";
+
+const ELECTRON_NODE_ADDED_FILES = [
+    "../applications/electronnodeapp/apogee.html",
+    "../applications/electronnodeapp/main.js"
+]
+
+//this releases the eletron app. It depends on the creation of the css
+//bundle.
+let releaseElectronNodeTask = parallel( 
+    packageElectronNodeSourceTask,
+    prepareElectronNodePackageJsonTask,
+    () => copyFilesTask(ELECTRON_NODE_ADDED_FILES,ELECTRON_NODE_FOLDER)
+);
+
+function packageElectronNodeSourceTask() {
+    return rollup.rollup({
+        input: '../applications/electronnodeapp/app.js',
+		external: ['fs'],
+		plugins: [
+			{resolveId}
+		]
+    }).then(bundle => {
+        return bundle.write(
+            {
+                file: ELECTRON_NODE_FOLDER + "/" + ELECTRON_NODE_APP_JS_FILENAME,
+                format: 'cjs'
+            }
+        );
+    });
+}
+
+function prepareElectronNodePackageJsonTask() {
+    return src('../applications/electronnodeapp/package.json')
+        .pipe(replace('VERSION', versionConfig.VERSION_NUMBER))
+        .pipe(dest(ELECTRON_NODE_FOLDER));
+}
+
+
+//==============================
+// Package Electron Bridge
+//==============================
+
+const ELECTRON_BRIDGE_APP_JS_FILENAME = "apogeeElectronBridgeApp.js";
+
+const ELECTRON_BRIDGE_ADDED_FILES = [
+    "../applications/electronbridgeapp/apogee.html",
+    "../applications/electronbridgeapp/main.js",
+    "../applications/electronbridgeapp/preload.js",
+    "../applications/electronbridgeapp/create-protocol.js",
+    "../applications/electronbridgeapp/mime-types.js"
+]
+
+//this releases the eletron app. It depends on the creation of the css
+//bundle.
+let releaseElectronBridgeTask = parallel( 
+    packageElectronBridgeSourceTask,
+    prepareElectronBridgePackageJsonTask,
+    () => copyFilesTask(ELECTRON_BRIDGE_ADDED_FILES,ELECTRON_BRIDGE_FOLDER)
+);
+
+function packageElectronBridgeSourceTask() {
+    return rollup.rollup({
+        input: '../applications/electronbridgeapp/app.js',
+		plugins: [
+			{resolveId}
+		]
+    }).then(bundle => {
+        return bundle.write(
+            {
+                file: ELECTRON_BRIDGE_FOLDER + "/" + ELECTRON_BRIDGE_APP_JS_FILENAME,
+                format: 'es'
+            }
+        );
+    });
+}
+
+function prepareElectronBridgePackageJsonTask() {
+    return src('../applications/electronbridgeapp/package.json')
+        .pipe(replace('0.0.0', versionConfig.VERSION_NUMBER))
+        .pipe(dest(ELECTRON_BRIDGE_FOLDER));
+}
+
+
+
 
 //==============================
 // Package Util Lib
@@ -200,13 +295,13 @@ function packageUtilLibTask() {
         return Promise.all([
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + UTIL_LIB_ES_FILE_NAME,
-                    format: 'es'
+                    file: ELECTRON_FOLDER + "/" + UTIL_LIB_CJS_FILE_NAME,
+                    format: 'cjs'
                 }
             ),
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + UTIL_LIB_CJS_FILE_NAME,
+                    file: NODE_FOLDER + "/" + UTIL_LIB_CJS_FILE_NAME,
                     format: 'cjs'
                 }
             )
@@ -233,16 +328,16 @@ function packageCoreLibTask() {
         return Promise.all([
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + CORE_LIB_ES_FILE_NAME,
-                    format: 'es',
+                    file: ELECTRON_FOLDER + "/" + CORE_LIB_CJS_FILE_NAME,
+                    format: 'cjs',
                     paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js"
+                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
                     }
                 }
             ),
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + CORE_LIB_CJS_FILE_NAME,
+                    file: NODE_FOLDER + "/" + CORE_LIB_CJS_FILE_NAME,
                     format: 'cjs',
                     paths: {
                         "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
@@ -272,17 +367,7 @@ function packageAppLibTask() {
         return Promise.all([
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + APP_LIB_ES_FILE_NAME,
-                    format: 'es',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js",
-                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.es.js"
-                    }
-                }
-            ),
-            bundle.write(
-                { 
-                    file: LIB_RELEASE_FOLDER + "/" + APP_LIB_CJS_FILE_NAME,
+                    file: ELECTRON_FOLDER + "/" + APP_LIB_CJS_FILE_NAME,
                     format: 'cjs',
                     paths: {
                         "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
@@ -313,16 +398,7 @@ function packageUiLibTask() {
         return Promise.all([
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + UI_LIB_ES_FILE_NAME,
-                    format: 'es',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js"
-                    }
-                }
-            ),
-            bundle.write(
-                { 
-                    file: LIB_RELEASE_FOLDER + "/" + UI_LIB_CJS_FILE_NAME,
+                    file: ELECTRON_FOLDER + "/" + UI_LIB_CJS_FILE_NAME,
                     format: 'cjs',
                     paths: {
                         "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
@@ -352,19 +428,7 @@ function packageViewLibTask() {
         return Promise.all([
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + VIEW_LIB_ES_FILE_NAME,
-                    format: 'es',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js",
-                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.es.js",
-                        "/apogeeapp/apogeeAppLib.js": "./apogeeAppLib.es.js",
-                        "/apogeeui/apogeeUiLib.js": "./apogeeUiLib.es.js"
-                    }
-                }
-            ),
-            bundle.write(
-                { 
-                    file: LIB_RELEASE_FOLDER + "/" + VIEW_LIB_CJS_FILE_NAME,
+                    file: ELECTRON_FOLDER + "/" + VIEW_LIB_CJS_FILE_NAME,
                     format: 'cjs',
                     paths: {
                         "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
@@ -400,13 +464,16 @@ function copyFilesTask(fileList,destFolder) {
 // Exports
 //============================
 
-// let cleanTask = parallel(
-//     () => cleanFolderTask(BASE_FILES,WEB_RELEASE_FOLDER),
-//     () => cleanFolderTask(BASE_FILES,LIB_RELEASE_FOLDER)
-// )
+function cleanTask()  {
+    return cleanFolderTask(RELEASE_FOLDER);
+}
+
+//This cleans the release folder
+exports.clean = cleanTask; 
 
 //This task executes the complete release
 exports.release = series(
+    cleanTask,
     parallel(
         copyReleaseInfoTask,
         packageCssTask,
@@ -415,10 +482,12 @@ exports.release = series(
         copyGlobalFiles,
         packageUtilLibTask,
         packageCoreLibTask,
-        packageAppLibTask,
-        packageUiLibTask,
-        packageViewLibTask,
+        //packageAppLibTask,
+        //packageUiLibTask,
+        //packageViewLibTask,
         releaseWebAppTask,
         releaseWebClientLibTask,
+        releaseElectronNodeTask,
+        releaseElectronBridgeTask
     )
 );
