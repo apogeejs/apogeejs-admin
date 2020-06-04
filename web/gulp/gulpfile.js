@@ -4,23 +4,36 @@ const clean = require('gulp-clean');
 const versionConfig = require('./versionConfig.json');
 const rollup = require('rollup');
 const replace = require('gulp-replace');
-var rename = require('gulp-rename');
+const rename = require('gulp-rename');
 const createResolveIdPlugin = require("./absoluteRefPlugin.js");
 
 //for absolute references
 const BUNDLE_PATH = "\\gulp";
 let resolveId = createResolveIdPlugin(__dirname,BUNDLE_PATH);
 
+//version header for js files
+function getJsFileHeader(fileName) {
+    return "// File: " + fileName + "\n" +
+        "// Version: " + versionConfig.VERSION_NUMBER + "\n" +
+        "// Copyright (c) 2016-2020 Dave Sutter\n" + 
+        "// License: MIT\n";
+}
+
 //==============================
 // Top Level Values
 //==============================
-const DIST_FOLDER = "../releases";
+const DIST_FOLDER = versionConfig.OFFICIAL_RELEASE ? "../releases" : "../releases-dev";
 const WEB_FOLDER = DIST_FOLDER + "/web";
 const LIB_FOLDER = DIST_FOLDER + "/lib";
 
 const WEB_RELEASE_FOLDER = WEB_FOLDER + "/v" + versionConfig.VERSION_NUMBER;
 const LIB_RELEASE_FOLDER = LIB_FOLDER + "/v" + versionConfig.VERSION_NUMBER;
 const TEMP_FOLDER = "temp";
+
+const fs = require("fs");
+if((fs.existsSync(WEB_RELEASE_FOLDER))||(fs.existsSync(LIB_RELEASE_FOLDER))) {
+    throw new Error("The release folder already exists! Please verify this is the proper destination and clear it.");
+}
 
 //======================================
 // Release Info
@@ -132,7 +145,8 @@ function packageWebAppTask() {
         return bundle.write(
             { 
                 file: WEB_RELEASE_FOLDER + "/" + WEB_APP_JS_FILENAME,
-                format: 'es'
+                format: 'es',
+                banner: getJsFileHeader(WEB_APP_JS_FILENAME)
             }
         );
     });
@@ -175,7 +189,8 @@ function packageClientLibTask() {
             bundle.write(
                  { 
                     file: WEB_RELEASE_FOLDER + "/" + CLIENT_LIB_ES_FILENAME, 
-                    format: 'es'
+                    format: 'es',
+                    banner: getJsFileHeader(CLIENT_LIB_ES_FILENAME)
                 }
             )
         ]
@@ -183,16 +198,16 @@ function packageClientLibTask() {
 }
 
 //==============================
-// Package Util Lib
+// Package Core Bundle
 //==============================
 
-const UTIL_LIB_BASE_FILE_NAME = "apogeeUtilLib";
-const UTIL_LIB_ES_FILE_NAME = UTIL_LIB_BASE_FILE_NAME + ".es.js"
-const UTIL_LIB_CJS_FILE_NAME = UTIL_LIB_BASE_FILE_NAME + ".cjs.js"
+const CORE_BUNDLE_BASE_FILE_NAME = "apogeeCoreBundle";
+const CORE_BUNDLE_ES_FILE_NAME = CORE_BUNDLE_BASE_FILE_NAME + ".es.js"
+const CORE_BUNDLE_CJS_FILE_NAME = CORE_BUNDLE_BASE_FILE_NAME + ".cjs.js"
 
-function packageUtilLibTask() {
+function packageCoreBundleTask() {
     return rollup.rollup({
-        input: '../apogeeutil/apogeeUtilLib.js',
+        input: '../applications/librarybundles/apogeeCoreBundle.js',
 		plugins: [
 			{resolveId}
 		]
@@ -200,14 +215,16 @@ function packageUtilLibTask() {
         return Promise.all([
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + UTIL_LIB_ES_FILE_NAME,
-                    format: 'es'
+                    file: LIB_RELEASE_FOLDER + "/" + CORE_BUNDLE_ES_FILE_NAME,
+                    format: 'es',
+                    banner: getJsFileHeader(CORE_BUNDLE_ES_FILE_NAME)
                 }
             ),
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + UTIL_LIB_CJS_FILE_NAME,
-                    format: 'cjs'
+                    file: LIB_RELEASE_FOLDER + "/" + CORE_BUNDLE_CJS_FILE_NAME,
+                    format: 'cjs',
+                    banner: getJsFileHeader(CORE_BUNDLE_CJS_FILE_NAME)
                 }
             )
         ])
@@ -215,163 +232,33 @@ function packageUtilLibTask() {
 }
 
 //==============================
-// Package Core Lib
+// Package App Bundle
 //==============================
 
-const CORE_LIB_BASE_FILE_NAME = "apogeeCoreLib";
-const CORE_LIB_ES_FILE_NAME = CORE_LIB_BASE_FILE_NAME + ".es.js"
-const CORE_LIB_CJS_FILE_NAME = CORE_LIB_BASE_FILE_NAME + ".cjs.js"
+const APP_BUNDLE_BASE_FILE_NAME = "apogeeAppBundle";
+const APP_BUNDLE_ES_FILE_NAME = APP_BUNDLE_BASE_FILE_NAME + ".es.js"
+const APP_BUNDLE_CJS_FILE_NAME = APP_BUNDLE_BASE_FILE_NAME + ".cjs.js"
 
-function packageCoreLibTask() {
+function packageAppBundleTask() {
     return rollup.rollup({
-        input: '../apogee/apogeeCoreLib.js',
-        external: ["/apogeeutil/apogeeUtilLib.js"],
+        input: '../applications/librarybundles/apogeeAppBundle.js',
 		plugins: [
 			{resolveId}
-        ]
+		]
     }).then(bundle => {
         return Promise.all([
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + CORE_LIB_ES_FILE_NAME,
+                    file: LIB_RELEASE_FOLDER + "/" + APP_BUNDLE_ES_FILE_NAME,
                     format: 'es',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js"
-                    }
+                    banner: getJsFileHeader(APP_BUNDLE_ES_FILE_NAME)
                 }
             ),
             bundle.write(
                 { 
-                    file: LIB_RELEASE_FOLDER + "/" + CORE_LIB_CJS_FILE_NAME,
+                    file: LIB_RELEASE_FOLDER + "/" + APP_BUNDLE_CJS_FILE_NAME,
                     format: 'cjs',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
-                    }
-                }
-            ),
-        ])
-    });
-}
-
-//==============================
-// Package App Lib
-//==============================
-
-const APP_LIB_BASE_FILE_NAME = "apogeeAppLib";
-const APP_LIB_ES_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".es.js";
-const APP_LIB_CJS_FILE_NAME = APP_LIB_BASE_FILE_NAME + ".cjs.js";
-
-function packageAppLibTask() {
-    return rollup.rollup({
-        input: '../apogeeapp/apogeeAppLib.js',
-        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js"],
-		plugins: [
-			{resolveId}
-        ]
-    }).then(bundle => {
-        return Promise.all([
-            bundle.write(
-                { 
-                    file: LIB_RELEASE_FOLDER + "/" + APP_LIB_ES_FILE_NAME,
-                    format: 'es',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js",
-                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.es.js"
-                    }
-                }
-            ),
-            bundle.write(
-                { 
-                    file: LIB_RELEASE_FOLDER + "/" + APP_LIB_CJS_FILE_NAME,
-                    format: 'cjs',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
-                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.cjs.js"
-                    }
-                }
-            )
-        ])
-    });
-}
-
-//==============================
-// Package UI Lib
-//==============================
-
-const UI_LIB_BASE_FILE_NAME = "apogeeUiLib";
-const UI_LIB_ES_FILE_NAME = UI_LIB_BASE_FILE_NAME + ".es.js"
-const UI_LIB_CJS_FILE_NAME = UI_LIB_BASE_FILE_NAME + ".cjs.js"
-
-function packageUiLibTask() {
-    return rollup.rollup({
-        input: '../apogeeui/apogeeUiLib.js',
-        external: ["/apogeeutil/apogeeUtilLib.js"],
-		plugins: [
-			{resolveId}
-        ]
-    }).then(bundle => {
-        return Promise.all([
-            bundle.write(
-                { 
-                    file: LIB_RELEASE_FOLDER + "/" + UI_LIB_ES_FILE_NAME,
-                    format: 'es',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js"
-                    }
-                }
-            ),
-            bundle.write(
-                { 
-                    file: LIB_RELEASE_FOLDER + "/" + UI_LIB_CJS_FILE_NAME,
-                    format: 'cjs',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js"
-                    }
-                }
-            )
-        ])
-    });
-}
-
-//==============================
-// Package View Lib
-//==============================
-
-const VIEW_LIB_BASE_FILE_NAME = "apogeeViewLib";
-const VIEW_LIB_ES_FILE_NAME = VIEW_LIB_BASE_FILE_NAME + ".es.js"
-const VIEW_LIB_CJS_FILE_NAME = VIEW_LIB_BASE_FILE_NAME + ".cjs.js"
-
-function packageViewLibTask() {
-    return rollup.rollup({
-        input: '../apogeeview/apogeeViewLib.js',
-        external: ["/apogeeutil/apogeeUtilLib.js","/apogee/apogeeCoreLib.js","/apogeeapp/apogeeAppLib.js","/apogeeui/apogeeUiLib.js"],
-		plugins: [
-			{resolveId}
-        ]
-    }).then(bundle => {
-        return Promise.all([
-            bundle.write(
-                { 
-                    file: LIB_RELEASE_FOLDER + "/" + VIEW_LIB_ES_FILE_NAME,
-                    format: 'es',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.es.js",
-                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.es.js",
-                        "/apogeeapp/apogeeAppLib.js": "./apogeeAppLib.es.js",
-                        "/apogeeui/apogeeUiLib.js": "./apogeeUiLib.es.js"
-                    }
-                }
-            ),
-            bundle.write(
-                { 
-                    file: LIB_RELEASE_FOLDER + "/" + VIEW_LIB_CJS_FILE_NAME,
-                    format: 'cjs',
-                    paths: {
-                        "/apogeeutil/apogeeUtilLib.js": "./apogeeUtilLib.cjs.js",
-                        "/apogee/apogeeCoreLib.js": "./apogeeCoreLib.cjs.js",
-                        "/apogeeapp/apogeeAppLib.js": "./apogeeAppLib.cjs.js",
-                        "/apogeeui/apogeeUiLib.js": "./apogeeUiLib.cjs.js"
-                    }
+                    banner: getJsFileHeader(APP_BUNDLE_CJS_FILE_NAME)
                 }
             )
         ])
@@ -413,11 +300,8 @@ exports.release = series(
         copyResourcesTask,
         copyAceIncludesTask,
         copyGlobalFiles,
-        packageUtilLibTask,
-        packageCoreLibTask,
-        packageAppLibTask,
-        packageUiLibTask,
-        packageViewLibTask,
+        packageCoreBundleTask,
+        packageAppBundleTask,
         releaseWebAppTask,
         releaseWebClientLibTask,
     )
