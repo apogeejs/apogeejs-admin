@@ -4,22 +4,7 @@
 		<title></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        
-        <link rel="stylesheet" type="text/css" href="/prosemirror/lib/compiledCss/editor.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeview/apogeeapp.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeview/componentdisplay/literatepage/LiteratePage.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeview/editor/toolbar/ApogeeToolbar.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeui/window/WindowFrame.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeui/window/dialog.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeui/displayandheader/DisplayAndHeader.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeui/menu/Menu.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeui/splitpane/SplitPane.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeui/tabframe/TabFrame.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeui/treecontrol/TreeControl.css">
-        <link rel="stylesheet" type="text/css" href="/apogeeui/configurablepanel/ConfigurablePanel.css">     
-        <link rel="stylesheet" type="text/css" href="/ext/handsontable/handsontable_6.2.0/handsontable.full.min.css">
-        <!-- <link rel="stylesheet" type="text/css" href="/gulp/dist/v0.9.0a/assets/cssBundle.css"> -->
-
+        <link rel="stylesheet" type="text/css" href="http://apogeejs.com/lib/v1.0.0-p1/cssBundle.css">
         <style>
             body {
                 padding: 10px;
@@ -28,10 +13,8 @@
                 width: 600px;
             }
         </style>
-   
-        
         <script type="module">
-            import {ApogeeWebView} from "/applications/webclientlib/webClientLib.js";
+            import {ApogeeWebView} from "http://apogeejs.com/lib/v1.0.0-p1/apogeeWebClientLib.es.js";
         
             //configure app and load the workspace
             let workspaceUrl = "webAppTestWorkspace.json";
@@ -47,7 +30,7 @@
 
                 //this adds a listener for creation or updated to a component
                 //should be done before workspace is loaded
-                let callback = component => alert("Demo of listener: " + component.getName() + " value updated!");
+                let callback = component => alert(component.getName() + " value updated!");
                 appView.addComponentListener("main.outputCell",callback);
 
                 appView.openWorkspace(workspaceUrl);
@@ -59,10 +42,10 @@
         <h1>Simple Example of Embedding a Apogee Workspace in a Web Page.</h1>
         <p>You can expose the display elements from an Apogee workspace in a web application. This page is very ugly but you can make it much prettier.</p>
 
-        <p>This is input cell:</p>
+        <p>This is the input cell:</p>
         <div class="cellViewContainer" id="inputDisplayElement"></div>
 
-        <p>This is output cell:</p>
+        <p>This is the output cell:</p>
         <div class="cellViewContainer" id="outputDisplayElement"></div>
 	</body>
 </html>

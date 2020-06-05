@@ -25,9 +25,10 @@ function getJsFileHeader(fileName) {
 const DIST_FOLDER = versionConfig.OFFICIAL_RELEASE ? "../releases" : "../releases-dev";
 const WEB_FOLDER = DIST_FOLDER + "/web";
 const LIB_FOLDER = DIST_FOLDER + "/lib";
+const RELEASE_NAME = "v" + versionConfig.VERSION_NUMBER;
 
-const WEB_RELEASE_FOLDER = WEB_FOLDER + "/v" + versionConfig.VERSION_NUMBER;
-const LIB_RELEASE_FOLDER = LIB_FOLDER + "/v" + versionConfig.VERSION_NUMBER;
+const WEB_RELEASE_FOLDER = WEB_FOLDER + "/" + RELEASE_NAME;
+const LIB_RELEASE_FOLDER = LIB_FOLDER + "/" + RELEASE_NAME;
 const TEMP_FOLDER = "temp";
 
 const fs = require("fs");
@@ -165,10 +166,24 @@ let CLIENT_LIB_ASSETS_BASE_URL = versionConfig.VERSION_RELEASE_HOST + versionCon
 //this releases the web lib
 let releaseWebClientLibTask = series(
     () => cleanFolderTask(TEMP_FOLDER),
+    copyClientWebExampleWorkspace,
+    copyClientWebExamplePage,
     prepareClientLibTask,
     packageClientLibTask,
     () => cleanFolderTask(TEMP_FOLDER)
 );
+
+function copyClientWebExamplePage() {
+    return src('../applications/webclientLib/webTest.DEPLOY.html')
+        .pipe(replace("__VERSION_FOLDER__",RELEASE_NAME))
+        .pipe(rename('webTest.html'))
+        .pipe(dest(WEB_RELEASE_FOLDER));
+}
+
+function copyClientWebExampleWorkspace() {
+    return src('../applications/webclientLib/webAppTestWorkspace.json')
+        .pipe(dest(WEB_RELEASE_FOLDER));
+}
 
 function prepareClientLibTask() {
 

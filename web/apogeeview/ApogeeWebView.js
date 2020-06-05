@@ -67,6 +67,7 @@ export default class ApogeeWebView {
             componentInfo = {};
             componentInfo.memberName = memberName;
             componentInfo.displayViews = [];
+            componentInfo.listeners = [];
             //this will be filled in later
             componentInfo.componentView = null;
             componentInfo.id = null;
@@ -88,11 +89,41 @@ export default class ApogeeWebView {
         componentInfo.displayViews.push(displayViewInfo);
     }
 
+    /** This method allows the user to add a listener for a component. Note that a listener can only be added
+     * either before the workspace is loaded or, if after the workspace is loaded, for a component that had
+     * a display or listener set before the workspace was loaded. 
+     * The callback will be a called when the component is created or updated. It will pass a component
+     * abject as the single argument. */
+    addComponentListener(memberName,callback) {
+        let componentInfo = this.componentByNameMap[memberName];
+        if(!componentInfo) {
+            componentInfo = {};
+            componentInfo.memberName = memberName;
+            componentInfo.displayViews = [];
+            componentInfo.listeners = [];
+            //this will be filled in later
+            componentInfo.componentView = null;
+            componentInfo.id = null;
+
+            this.componentByNameMap[memberName] = componentInfo;
+        }
+
+        componentInfo.listeners.push(callback);
+    }
+
+    /** This method removes a listener that had been added for a component. */
+    removeComponentListener(memberName,callback) {
+        let componentInfo = this.componentByNameMap[memberName];
+        if(componentInfo) {
+            componentInfo.listeners = componentInfo.listeners.filter(activeCallback => activeCallback != callback);
+        }
+    }
+
     /** If the DOM element is loaded or unloaded, this method should be called to update
      * the state. This state is available to all component displays and is used by some of them.
      */
     setIsShowing(memberName,viewName,parentIsShowing) {
-        let displayViewInfo = this._lookuPDisplayViewInfo(memberName,viewName);
+        let displayViewInfo = this._lookupDisplayView(memberName,viewName);
         if(displayViewInfo) {
             displayViewInfo.parentIsShowing = parentIsShowing;
             if(displayViewInfo.componentDisplay) {
@@ -101,11 +132,14 @@ export default class ApogeeWebView {
         }
     }
 
+    //This method is obsolete. However, we should have some way to tell a specific display that its width
+    //has changed, if they care. Currently I think only the HandsonGridEditor cares(?). And now the only
+    //way to notify it is to say all widths (the frame width) has changed.
     // /** If the DOM element is resized this method should be called. This information is available
     //  * to all component display and is used by some of them.
     //  */
     // onResize(memberName,viewName) {
-    //     let displayViewInfo = this._lookuPDisplayViewInfo(memberName,viewName);
+    //     let displayViewInfo = this._lookupDisplayViewInfo(memberName,viewName);
     //     if((displayViewInfo)&&(displayViewInfo.componentDisplay)) {
     //         displayViewInfo.componentDisplay.onResize();
     //     }
@@ -183,6 +217,17 @@ export default class ApogeeWebView {
             //leave out? TBD
             //do view state initialization
             //componentView.loadViewStateFromComponent();
+
+            //callback any listeners from the user
+            if(componentInfo.listeners.length > 0) {
+                try {
+                    componentInfo.listeners.forEach(callback => callback(component));
+                }
+                catch(error) {
+                    console.error("Error calling users listener " + error.toString());
+                    if(error.stack) console.error(error.stack);
+                }
+            }
         }
         catch(error) {
             if(error.stack) console.error(error.stack);
@@ -194,7 +239,22 @@ export default class ApogeeWebView {
     _onComponentUpdated(component) {
         try {
             let componentInfo = this.componentByIdMap[component.getId()];
-            if((componentInfo)&&(componentInfo.componentView)) componentInfo.componentView.componentUpdated(component);
+            if(componentInfo) { 
+
+                //update the component views, if applicable
+                if(componentInfo.componentView) componentInfo.componentView.componentUpdated(component);
+
+                //callback any listeners from the user
+                if(componentInfo.listeners.length > 0) {
+                    try {
+                        componentInfo.listeners.forEach(callback => callback(component));
+                    }
+                    catch(error) {
+                        console.error("Error calling users listener " + error.toString());
+                        if(error.stack) console.error(error.stack);
+                    }
+                }
+            }
         }
         catch(error) {
             if(error.stack) console.error(error.stack);
