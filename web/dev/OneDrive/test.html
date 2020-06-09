@@ -1,0 +1,108 @@
+<html>
+    <head>
+        <script type="text/javascript" src="https://js.live.net/v7.2/OneDrive.js"></script>
+        <script type="text/javascript">
+            function launchOneDrivePicker(){
+                var odOptions = {
+                    clientId: "d87a2f91-7064-41d0-85b2-3e0775068ac2",
+                    action: "download",
+                    multiSelect: false,
+                    advanced: {
+                    },
+                    success: onOpenSuccess,
+                    cancel: onOpenCancel,
+                    error: onOpenError
+                }
+              OneDrive.open(odOptions);
+            }
+
+            function onOpenSuccess(responseObject) {
+                alert("File opened!");
+
+
+                let editor = document.getElementById("fileContent");
+
+                let itemList = responseObject.value;
+                if((itemList)&&(itemList.length > 0)) {
+                    let item = itemList[0];
+                    //this gives me the metadata???
+                    let downloadUrl = item["@microsoft.graph.downloadUrl"];
+                    fetch(downloadUrl).then(response => response.text()).then(data => {
+                        editor.value = data;
+                    })
+
+                    // //let url = item.endpoint + "/drives/" + item.parentReference.driveId + "/items/" + item.id;
+                    // let url = responseObject.apiEndpoint + "drives/" + item.parentReference.driveId + "/items/" + item.id;
+                    // let editor = document.getElementById("fileContent");
+                    // fetch(url,{
+                    //     headers: {
+                    //         Authorization: "bearer " + responseObject.accessToken
+                    //     }
+                    // })
+                    // .then(response => response.json())
+                    // .then(data => {
+                    //     editor.value = JSON.stringify(data);
+
+                        
+                    .catch(error => alert("error retrieving file: " + error.toString()));
+                }
+            }
+
+            function onOpenCancel() {
+                alert("File open canceled!");
+            }
+
+            function onOpenError(error) {
+                alert("Error opening file: " + error.toString());
+            }
+
+            function launchSaveToOneDrive() {
+
+                let editor = document.getElementById("fileContent");
+
+                let fileName = "test.json";
+                let dataUrl = "data:application/json," + encodeURI(editor.value);
+
+                let odOptions = {
+                    clientId: "d87a2f91-7064-41d0-85b2-3e0775068ac2",
+                    action: "save",
+                    sourceUri: dataUrl,
+                    fileName: fileName,
+                    viewType: "files",
+                    openInNewWindow: true,
+                    advanced: {},
+                    success: onSaveSuccess,
+                    progress: onSaveProgress,
+                    cancel: onSaveCancel,
+                    error: onSaveError
+                };
+                OneDrive.save(odOptions);
+            }
+
+            function onSaveSuccess(response) {
+                alert("File saved!");
+                console.log(JSON.stringify(response));
+            }
+
+            function onSaveProgress(percent) {
+                console.log("Save percent complete: " + percent + "%");
+            }
+
+            function onSaveCancel() {
+                alert("File save canceled!");
+            }
+
+            function onSaveError(error) {
+                alert("Error saving file: " + error.toString());
+            }
+          </script>
+
+    </head>
+    <body>
+        
+        <textarea id="fileContent"></textarea>
+        <button onClick="launchOneDrivePicker()">Open from OneDrive</button>
+        <button onClick="launchSaveToOneDrive()">Save to OneDrive</button>
+
+    </body>
+</html>
