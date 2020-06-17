@@ -3,3 +3,4 @@ dist/
 package-lock.json
 lib/
 releases-dev/
+prosemirror_NEW/

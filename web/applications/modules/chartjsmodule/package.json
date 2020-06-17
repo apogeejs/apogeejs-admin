@@ -13,10 +13,8 @@
     "rollup-plugin-node-resolve": "^5.1.0"
   },
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "test": "node test/test.js",
-    "pretest": "npm run build"
+    "buildmodule": "rollup --config rollup.moduleconfig.js",
+    "buildlib": "rollup --config rollup.libconfig.js"
   },
   "files": [
     "dist"
