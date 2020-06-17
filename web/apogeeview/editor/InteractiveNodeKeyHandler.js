@@ -1,6 +1,6 @@
-import {keydownHandler}  from "/prosemirror/lib/prosemirror-keymap/src/keymap.js";
-import {NodeSelection}  from "/prosemirror/lib/prosemirror-state/src/selection.js";
-import {Plugin}  from "/prosemirror/lib/prosemirror-state/src/index.js";
+import {keydownHandler}  from "/prosemirror/dist/prosemirror-keymap.es.js";
+import {NodeSelection}  from "/prosemirror/dist/prosemirror-state.es.js";
+import {Plugin}  from "/prosemirror/dist/prosemirror-state.es.js";
 
 const dummyFunction = () => true;
 

@@ -6,9 +6,9 @@
 // - don't convert included lists to be the specified type
 // - don't handle tabs at the start of non-list items, beign converted to child lists
 
-import { findWrapping, ReplaceStep, ReplaceAroundStep } from "/prosemirror/lib/prosemirror-transform/src/index.js";
-import { Slice, NodeRange, Fragment } from "/prosemirror/lib/prosemirror-model/src/index.js"
-import { Selection } from "/prosemirror/lib/prosemirror-state/src/index.js"
+import { findWrapping, ReplaceStep, ReplaceAroundStep } from "/prosemirror/dist/prosemirror-transform.es.js";
+import { Slice, NodeRange, Fragment } from "/prosemirror/dist/prosemirror-model.es.js"
+import { Selection } from "/prosemirror/dist/prosemirror-state.es.js"
 
 //--------------------------------------------------------
 // Commands
@@ -849,7 +849,7 @@ function addListIndent(nodeType,indentInfo,listInsideEndPos,transform,refStep) {
 
 import { createParagraphNear, splitBlock, deleteSelection, 
   joinBackward, joinForward, selectNodeBackward, selectNodeForward, selectAll,
-  chainCommands  }  from "/prosemirror/lib/prosemirror-commands/src/commands.js";
+  chainCommands  }  from "/prosemirror/dist/prosemirror-commands.es.js";
 
 let enter = chainCommands(exitList, createParagraphNear, liftEmptyChildList, splitBlock);
 let backspace = chainCommands(exitList,deleteSelection, joinBackward, selectNodeBackward);

@@ -5,6 +5,9 @@ const HARDCODE_PATH_MAP = {
     "prosemirror-model": "/prosemirror/lib/prosemirror-model/src/index.js"
 }
 
+//This codde remaps urls. For now it is not read from a config file. You have to code in
+//tghe remapping you want.
+
 function mapPath(inPath) {
     //Remap any file in theprose miror directory
     if(inPath.startsWith(PROSE_MIRROR_REQUEST_START)) {

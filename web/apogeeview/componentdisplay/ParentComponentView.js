@@ -2,9 +2,9 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatepage/proseMirrorSetup.js";
 
-import { TextSelection, NodeSelection, EditorState, Selection } from "/prosemirror/lib/prosemirror-state/src/index.js";
-import { Step } from "/prosemirror/lib/prosemirror-transform/src/index.js";
-import { Mark }  from "/prosemirror/lib/prosemirror-model/src/index.js";
+import { TextSelection, NodeSelection, EditorState, Selection } from "/prosemirror/dist/prosemirror-state.es.js";
+import { Step } from "/prosemirror/dist/prosemirror-transform.es.js";
+import { Mark }  from "/prosemirror/dist/prosemirror-model.es.js";
 
 //this constant is used (or hopefully not) in correctCreateInfoforRepeatedNames
 const MAX_SUFFIX_INDEX = 99999;

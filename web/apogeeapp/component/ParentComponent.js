@@ -2,7 +2,7 @@ import Component from "/apogeeapp/component/Component.js";
 
 import "/apogeeapp/commands/literatepagetransaction.js";
 import { createFolderSchema } from "/apogeeapp/document/apogeeSchema.js";
-import { DOMParser, Node as ProseMirrorNode }  from "/prosemirror/lib/prosemirror-model/src/index.js";
+import { DOMParser, Node as ProseMirrorNode }  from "/prosemirror/dist/prosemirror-model.es.js";
 
 /** This is the base class for a parent component (an object that has children),
  * It extends the component class. */

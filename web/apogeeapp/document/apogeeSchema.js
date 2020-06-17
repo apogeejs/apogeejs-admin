@@ -3,7 +3,7 @@
 // Apogee Schema
 //===================================
 
-import { Schema } from "/prosemirror/lib/prosemirror-model/src/index.js";
+import { Schema } from "/prosemirror/dist/prosemirror-model.es.js";
 
 // :: Schema
 // This the schema for the apogee page editor

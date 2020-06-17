@@ -13,13 +13,13 @@ import {getInteractiveNodePlugin} from "/apogeeview/editor/InteractiveNodeKeyHan
 
 import { baseKeymap } from "/apogeeview/editor/apogeeCommands.js";
 
-import {Plugin}  from "/prosemirror/lib/prosemirror-state/src/index.js";
-import { EditorState, Selection,  }  from "/prosemirror/lib/prosemirror-state/src/index.js";
-import { DOMParser, Node as ProseMirrorNode, Mark }  from "/prosemirror/lib/prosemirror-model/src/index.js";
-import { EditorView }  from "/prosemirror/lib/prosemirror-view/src/index.js";
-import { Step }  from "/prosemirror/lib/prosemirror-transform/src/index.js";
-import { keymap }  from "/prosemirror/lib/prosemirror-keymap/src/keymap.js";
-import {gapCursor} from "/prosemirror/lib/prosemirror-gapcursor/src/index.js";
+import {Plugin}  from "/prosemirror/dist/prosemirror-state.es.js";
+import { EditorState, Selection,  }  from "/prosemirror/dist/prosemirror-state.es.js";
+import { DOMParser, Node as ProseMirrorNode, Mark }  from "/prosemirror/dist/prosemirror-model.es.js";
+import { EditorView }  from "/prosemirror/dist/prosemirror-view.es.js";
+import { Step }  from "/prosemirror/dist/prosemirror-transform.es.js";
+import { keymap }  from "/prosemirror/dist/prosemirror-keymap.es.js";
+import {gapCursor} from "/prosemirror/dist/prosemirror-gapcursor.es.js";
 
 import ApogeeComponentView from "/apogeeview/editor/ApogeeComponentView.js";
 

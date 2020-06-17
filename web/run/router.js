@@ -8,7 +8,9 @@ module.exports.route = function(request,response) {
 
     console.log(inPath);
 
-    var outPath = mapPath(inPath);
+    //this is if we want to remap path names
+    //var outPath = mapPath(inPath);
+    var outPath = inPath;
 
     processFileRequest(outPath,response);
 }

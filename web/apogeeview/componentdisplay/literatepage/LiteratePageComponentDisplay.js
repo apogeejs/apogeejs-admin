@@ -8,7 +8,7 @@ import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 
 import {uiutil,Tab,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
 
-import {selectionBetween} from "/prosemirror/lib/prosemirror-view/src/selection.js";
+import { TextSelection } from "/prosemirror/dist/prosemirror-state.es.js";
 
 
 
@@ -425,3 +425,14 @@ apogeeutil.mixin(LiteratePageComponentDisplay,EventManager);
 
 /** This is the data to load an empty page. */
 LiteratePageComponentDisplay.EMPTY_PAGE_BODY = [];
+
+
+
+//TEMPORARY
+//This is not exported from the current prosemirror lib but I was using it before 
+//I reproced the code here. I should fix this..
+
+function selectionBetween(view, $anchor, $head, bias) {
+    return view.someProp("createSelectionBetween", f => f(view, $anchor, $head))
+      || TextSelection.between($anchor, $head, bias)
+  }

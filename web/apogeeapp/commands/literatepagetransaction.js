@@ -1,5 +1,5 @@
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
-import { Transform, Step } from "/prosemirror/lib/prosemirror-transform/src/index.js";
+import { Transform, Step } from "/prosemirror/dist/prosemirror-transform.es.js";
 
 /** Update Component Command
  *
