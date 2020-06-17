@@ -1,7 +1,7 @@
 
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
-import ace from "/ext/ace/ace_1.4.3/ace_to_es6.js";
+import ace from "/ext/ace/ace_1.4.3/ace.es.js";
 
 export {default as ApogeeView} from "/apogeeview/ApogeeView.js";
 export {default as ApogeeWebView} from "/apogeeview/ApogeeWebView.js";

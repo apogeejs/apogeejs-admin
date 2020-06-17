@@ -1,3 +1,10 @@
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var esprima = createCommonjsModule(function (module, exports) {
 /*
   Copyright (c) jQuery Foundation, Inc. and Contributors, All Rights Reserved.
 
@@ -23,21 +30,15 @@
 */
 
 (function (root, factory) {
-    'use strict';
 
     // Universal Module Definition (UMD) to support AMD, CommonJS/Node.js,
     // Rhino, and plain browser loading.
 
     /* istanbul ignore next */
-    if (typeof define === 'function' && define.amd) {
-        define(['exports'], factory);
-    } else if (typeof exports !== 'undefined') {
+    {
         factory(exports);
-    } else {
-        factory((root.esprima = {}));
     }
-}(this, function (exports) {
-    'use strict';
+}(commonjsGlobal, function (exports) {
 
     var Token,
         TokenName,
@@ -3089,9 +3090,6 @@
             expr.type = Syntax.AssignmentPattern;
             reinterpretExpressionAsPattern(expr.left);
             break;
-        default:
-            // Allow other node type for tolerant parsing.
-            break;
         }
     }
 
@@ -3615,9 +3613,6 @@
         case '/':
         case '%':
             prec = 11;
-            break;
-
-        default:
             break;
         }
 
@@ -4758,8 +4753,6 @@
                 return parseEmptyStatement(node);
             case '(':
                 return parseExpressionStatement(node);
-            default:
-                break;
             }
         } else if (type === Token.Keyword) {
             switch (lookahead.value) {
@@ -4791,8 +4784,6 @@
                 return parseWhileStatement(node);
             case 'with':
                 return parseWithStatement(node);
-            default:
-                break;
             }
         }
 
@@ -5738,3 +5729,6 @@
 
 }));
 /* vim: set sw=4 ts=4 et tw=80 : */
+});
+
+export default esprima;

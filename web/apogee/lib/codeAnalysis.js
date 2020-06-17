@@ -1,4 +1,4 @@
-import esprima from "/ext/esprima/esprima_2.7.3/esprima_to_es6.js";
+import esprima from "/ext/esprima/esprima_2.7.3/esprima.es.js";
 
 /** This function parses the code and returns a table that gives the variable use
  * in the passed function. The var info table has the following content
