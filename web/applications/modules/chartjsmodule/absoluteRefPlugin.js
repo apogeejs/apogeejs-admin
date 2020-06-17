@@ -1,21 +1,15 @@
 const path = require('path');
 
 //Call this with current system directory, from where the script is being run
-//Optionally "pathFromAbsBaseToCurrentSystem" can be added.
-//"pathFromAbsBaseToCurrentSystem" is the path from the desired absolute root
-//to the current system directory, if they are different.
-function createResolveIdPlugin(currentSystemDirectory,pathFromAbsBaseToCurrentSystem) {
+//Optionally "pathFromCurrentSystemDirToDesiredAbsoluteRoot" can be added.
+//THis gives the path from the current system directory to the desired absolute root directory,
+//if it is different from the current system directory.
+function createResolveIdPlugin(currentSystemDirectory,pathFromCurrentSystemDirToDesiredAbsoluteRoot) {
 
     //get the base directory for any absolute reference
     let ABS_IMPORT_BASE_DIR;
-    if(pathFromAbsBaseToCurrentSystem) {
-        if(currentSystemDirectory.endsWith(pathFromAbsBaseToCurrentSystem)) {
-            let baseLength = currentSystemDirectory.length - pathFromAbsBaseToCurrentSystem.length;
-            ABS_IMPORT_BASE_DIR = currentSystemDirectory.substr(0,baseLength);
-        }
-        else {
-            throw new Error("Configuration error: unexpected input directory: " + currentSystemDirectory + "  " + pathFromAbsBaseToCurrentSystem);
-        }
+    if(pathFromCurrentSystemDirToDesiredAbsoluteRoot) {
+        ABS_IMPORT_BASE_DIR = path.join(currentSystemDirectory,pathFromCurrentSystemDirToDesiredAbsoluteRoot);
     }
     else {
         ABS_IMPORT_BASE_DIR = currentSystemDirectory;

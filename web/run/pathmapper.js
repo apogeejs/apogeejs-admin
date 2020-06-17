@@ -1,32 +1,18 @@
-const path = require('path');
+const PROSE_MIRROR_DIST_FOLDER = "/prosemirror/dist/";
+const PROSE_MIRROR_DEV_IMPORTS_FOLDER = "/prosemirror/devimports/";
 
-const PROSE_MIRROR_REQUEST_START = "/prosemirror/";
-const HARDCODE_PATH_MAP = {
-    "prosemirror-model": "/prosemirror/lib/prosemirror-model/src/index.js"
-}
-
-//This codde remaps urls. For now it is not read from a config file. You have to code in
+//This code remaps urls. For now it is not read from a config file. You have to code in
 //tghe remapping you want.
 
 function mapPath(inPath) {
-    //Remap any file in theprose miror directory
-    if(inPath.startsWith(PROSE_MIRROR_REQUEST_START)) {
-        let hardcodeRemap = getHardcodeRemap(inPath);
-        if(hardcodeRemap) {
-            return hardCodeRemap;
-        }
-        else if(path.extname(inPath) == "") {
-            return inPath + ".js";
-        }
+    //pull prose mirror modules from the dev imports directory
+    //these use the source rather than the compiled libraries
+    if(inPath.startsWith(PROSE_MIRROR_DIST_FOLDER)) {
+        return PROSE_MIRROR_DEV_IMPORTS_FOLDER + inPath.substring(PROSE_MIRROR_DIST_FOLDER.length);
     }
 
     //if we get here there was no remap
     return inPath;
-}
-
-function getHardcodeRemap(inPath) {
-    let baseName = path.basename(inPath);
-    return HARDCODE_PATH_MAP[baseName];
 }
 
 module.exports.mapPath = mapPath;

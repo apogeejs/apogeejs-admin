@@ -1,0 +1,1 @@
+export * from "../repos/prosemirror-gapcursor/src/index.js"

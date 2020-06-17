@@ -1,9 +1,6 @@
 {
   "name": "prosemirror-extlibs",
   "version": "0.0.1",
-  "npm_module": "dist/chartjsmodule.cjs.js",
-  "es_module": "dist/chartjsmodule.esm.js",
-  "chart_lib": "src/chartjs.esm.js",
   "dependencies": {
     "rope-sequence": "^1.3.0",
     "w3c-keyname": "^2.2.0",
@@ -16,10 +13,8 @@
     "rollup-plugin-node-resolve": "^5.1.0"
   },
   "scripts": {
-    "buildextlib": "rollup --config rollup.libconfig.js",
+    "buildextlib": "rollup --config rollup.extlibconfig.js",
+    "buildlib": "rollup --config rollup.libconfig.js",
     "packagecss": "rollup --config rollup.cssconfig.js"
-  },
-  "files": [
-    "dist"
-  ]
+  }
 }

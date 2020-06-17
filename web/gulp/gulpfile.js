@@ -8,8 +8,8 @@ const rename = require('gulp-rename');
 const createResolveIdPlugin = require("./absoluteRefPlugin.js");
 
 //for absolute references
-const BUNDLE_PATH = "\\gulp";
-let resolveId = createResolveIdPlugin(__dirname,BUNDLE_PATH);
+const PATH_TO_ABSOLUTE_ROOT = "..";
+let resolveId = createResolveIdPlugin(__dirname,PATH_TO_ABSOLUTE_ROOT);
 
 //version header for js files
 function getJsFileHeader(fileName) {

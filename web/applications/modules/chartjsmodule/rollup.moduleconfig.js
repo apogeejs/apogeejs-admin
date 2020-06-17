@@ -4,8 +4,8 @@ import pkg from './package.json';
 const createResolveIdPlugin = require("./absoluteRefPlugin.js");
 
 //for absolute references
-const BUNDLE_PATH = "";
-let resolveId = createResolveIdPlugin(__dirname,BUNDLE_PATH);
+const PATH_TO_ABSOLUTE_ROOT = ".";
+let resolveId = createResolveIdPlugin(__dirname,PATH_TO_ABSOLUTE_ROOT);
 
 export default [
 
