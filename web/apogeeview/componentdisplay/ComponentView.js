@@ -442,7 +442,7 @@ export default class ComponentView {
     // Action UI Entry Points
     //=============================
 
-    /** This method creates a callback for deleting the component. 
+    /** This method creates a callback for opening the component. 
      *  @private */
     createOpenCallback() {
         var openCallback;
@@ -463,14 +463,14 @@ export default class ComponentView {
             openCallback = () => {
                 makeTabActive(this);
 
-                //allow time for UI to be created and then select start fo doc
-                //this will also give the doc focus
-                setTimeout(() => {
-                    let tabDisplay = this.getTabDisplay();
-                    if(tabDisplay.selectStartOfDocument) {
-                        tabDisplay.selectStartOfDocument();
-                    }
-                },0);
+                // //allow time for UI to be created and then select start fo doc
+                // //this will also give the doc focus
+                // setTimeout(() => {
+                //     let tabDisplay = this.getTabDisplay();
+                //     if(tabDisplay.selectStartOfDocument) {
+                //         tabDisplay.selectStartOfDocument();
+                //     }
+                // },0);
             }
         }
         else {
@@ -483,6 +483,12 @@ export default class ComponentView {
                     makeTabActive(parentComponentView);
 
                     parentComponentView.showChild(this);
+      
+                    alert("Implement show child here!!!")
+                    // let commandData = this.selectApogeeNode(childComponentView.getName());
+                    // if(commandData) {
+                    //     ???
+                    // }
 
                 }
             }

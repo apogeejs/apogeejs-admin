@@ -1,8 +1,7 @@
 import Component from "/apogeeapp/component/Component.js";
 
 import "/apogeeapp/commands/literatepagetransaction.js";
-import { createFolderSchema } from "/apogeeapp/document/apogeeSchema.js";
-import { DOMParser, Node as ProseMirrorNode }  from "/prosemirror/dist/prosemirror-model.es.js";
+import { createFolderSchema, createEditorState, EMPTY_DOC_JSON } from "/apogeeapp/document/apogeeSchema.js";
 
 /** This is the base class for a parent component (an object that has children),
  * It extends the component class. */
@@ -18,13 +17,7 @@ export default class ParentComponent extends Component {
         //The following fields are added by the parent component. In order to add these, the method
         //"initializeSchema" must be called. See the notes on that method.
         //"schema"
-        //"document"
-
-        //==============
-        //Working variables
-        //==============
-        this.tempEditorStateInfo = null;
- 
+        //"editorState"
     }
 
     getSchema() {
@@ -33,27 +26,13 @@ export default class ParentComponent extends Component {
 
     /** This method sets the document. It also allows for temporarily storing some editor info 
      * to accompany a set document */
-    setDocument(document,editorStateInfo) {
+    setEditorState(editorState) {
         //for now set dummy data to show a change
-        this.setField("document",document);
-
-        //set the temporary editor state, to be used with the new document
-        if(editorStateInfo) this.tempEditorStateInfo = editorStateInfo;
+        this.setField("editorState",editorState);
     }
 
-    getDocument() {
-        return this.getField("document");
-    }
-
-    /** This method retrieves the editor state info that acompanies the set document.
-     * The argument doClearInfo, if true, will trigger the stored state info to be cleared.
-     * This field is meant purely as a temporary storage and should be cleared once it is read. */
-    getEditorStateInfo(doClearInfo) {
-        let tempEditorStateInfo = this.tempEditorStateInfo;
-        if(doClearInfo) {
-            this.tempEditorStateInfo = null;
-        }
-        return tempEditorStateInfo;
+    getEditorState() {
+        return this.getField("editorState");
     }
 
     instantiateTabDisplay() {
@@ -70,8 +49,8 @@ export default class ParentComponent extends Component {
         let schema = createFolderSchema(modelManager.getApp(),pageFolderMember.getId());
         this.setField("schema",schema);
         //initialize with an empty document
-        let document = this._createEmptyDocument(schema);
-        this.setField("document",document);
+        let editorState = createEditorState(schema,EMPTY_DOC_JSON);
+        this.setField("editorState",editorState);
     }
 
     //==============================
@@ -81,8 +60,9 @@ export default class ParentComponent extends Component {
     /** This serializes the table component. */
     writeToJson(json,modelManager) {
         //save the editor state
-        let document = this.getField("document");
-        if(document) {
+        let editorState = this.getField("editorState");
+        if(editorState) {
+            let document = editorState.doc;
             json.data = {};
             json.data.doc = document.toJSON();
         }
@@ -108,19 +88,19 @@ export default class ParentComponent extends Component {
     }
 
     readDataFromJson(json) {
-        let document;
-        let schema = this.getField("schema");
-
+        let editorState;
+        let docJson;
         //read the editor state
         if((json.data)&&(json.data.doc)) {
             //parse the saved document
-            document = ProseMirrorNode.fromJSON(schema,json.data.doc);
+            docJson = json.data.doc;
         }
         else {
             //no document stored - create an empty document
-            document = this._createEmptyDocument(schema);
+            docJson = EMPTY_DOC_JSON;
         }
-        this.setField("document",document);
+        editorState = createEditorState(this.getSchema(),docJson);
+        this.setField("editorState",editorState);
     }
 
     /** This method loads the children for this component */
@@ -137,11 +117,6 @@ export default class ParentComponent extends Component {
             };
 
         }
-    }
-
-    /** This method makes an empty document */
-    _createEmptyDocument(schema) {
-        return DOMParser.fromSchema(schema).parse("");
     }
 
 }

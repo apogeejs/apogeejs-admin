@@ -14,10 +14,7 @@ import {getInteractiveNodePlugin} from "/apogeeview/editor/InteractiveNodeKeyHan
 import { baseKeymap } from "/apogeeview/editor/apogeeCommands.js";
 
 import {Plugin}  from "/prosemirror/dist/prosemirror-state.es.js";
-import { EditorState, Selection,  }  from "/prosemirror/dist/prosemirror-state.es.js";
-import { DOMParser, Node as ProseMirrorNode, Mark }  from "/prosemirror/dist/prosemirror-model.es.js";
 import { EditorView }  from "/prosemirror/dist/prosemirror-view.es.js";
-import { Step }  from "/prosemirror/dist/prosemirror-transform.es.js";
 import { keymap }  from "/prosemirror/dist/prosemirror-keymap.es.js";
 import {gapCursor} from "/prosemirror/dist/prosemirror-gapcursor.es.js";
 
@@ -140,22 +137,16 @@ export function createProseMirrorManager(app,schema) {
   //set up the export functions
   //===============================
 
-  proseMirror.createEditorState = function(document,optionalSelection,optionalStoredMarks) {
-    var state = EditorState.create({
-      doc: document,
-      selection: optionalSelection,
-      storedMarks: optionalStoredMarks,
-      plugins: [
-        getInteractiveNodePlugin(),
-        keymap({ "Mod-z": undo, "Mod-y": redo }),
-        keymap(baseKeymap),
-        gapCursor(),
-        toolbarPlugin,
-        stateCheckPlugin
-      ]
-    });
-    return state;
-  }
+  let plugins = [
+    getInteractiveNodePlugin(),
+    keymap({ "Mod-z": undo, "Mod-y": redo }),
+    keymap(baseKeymap),
+    gapCursor(),
+    toolbarPlugin,
+    stateCheckPlugin
+  ];
+
+  proseMirror.getPlugins = () => plugins;
 
   proseMirror.createEditorView = function (containerElement, pageDisplay, editorData) {
 

@@ -61,8 +61,8 @@ export default class LiteratePageComponentDisplay {
             this.tab.setTitle(this.componentView.getName());
         }
 
-        if(component.isFieldUpdated("document")) {
-            let editorData = this.componentView.getEditorData();
+        if(component.isFieldUpdated("editorState")) {
+            let editorData = this.componentView.getEditorState();
             this.editorView.updateState(editorData);
         }
 
@@ -70,14 +70,6 @@ export default class LiteratePageComponentDisplay {
             this._setBannerState();
         }
     }
-
-    //#############################################################################
-    //Argh! See ntoes and fix this
-    nonComponentDocumentUpdate() {
-        let editorData = this.componentView.getEditorData();
-        this.editorView.updateState(editorData);
-    }
-    //##############################################################################
 
     getChildComponentDisplay(name) {
         let folderComponent = this.componentView.getComponent();
@@ -138,29 +130,6 @@ export default class LiteratePageComponentDisplay {
             //set the component display
             childComponentView.setComponentDisplay(childComponentDisplay);
         }
-    }
-
-    /** This will move the selection to the start of the document. */
-    selectStartOfDocument() {
-        let state = this.componentView.getEditorData();
-        let $startPos = state.doc.resolve(0);
-        let selection = selectionBetween(this.editorView, $startPos, $startPos);
-        let transaction = state.tr.setSelection(selection).scrollIntoView();
-        this.componentView.applyTransaction(transaction);
-
-        this.componentView.giveEditorFocusIfShowing();
-    }
-
-    /** This will move the selection to the end of the document. */
-    selectEndOfDocument() {
-        let state = this.componentView.getEditorData();
-        let endPos = state.doc.content.size;
-        let $endPos = state.doc.resolve(endPos);
-        let selection = selectionBetween(this.editorView, $endPos, $endPos);
-        let transaction = state.tr.setSelection(selection).scrollIntoView();
-        this.componentView.applyTransaction(transaction);
-
-        this.componentView.giveEditorFocusIfShowing();
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -288,12 +257,7 @@ export default class LiteratePageComponentDisplay {
             }
         }
         
-        // var editorData = this.componentView.getEditorData();
-        // this.editorView.updateState(editorData);
         this.initEditor();
-
-        //set the selection to the start of the view
-        this.selectStartOfDocument();
     }
 
     initComponentToolbar() {
@@ -359,7 +323,7 @@ export default class LiteratePageComponentDisplay {
     initEditor() {
         
         //start with an empty component display
-        var initialEditorState = this.componentView.getEditorData();
+        var initialEditorState = this.componentView.getEditorState();
         
         this.editorView = this.editorManager.createEditorView(this.contentElement,this,initialEditorState);
 
@@ -373,7 +337,10 @@ export default class LiteratePageComponentDisplay {
     /** This is used to select the end of the document if the page is clicked below the document end. */
     onClickContentElement(event) {
         if(event.target == this.contentElement) {
-            this.selectEndOfDocument();    
+            //this.componentView.giveEditorFocusIfShowing();
+            let command = this.componentView.getSelectEndOfDocumentCommand();
+            let app = this.componentView.getModelView().getApp();
+            app.executeCommand(command);
         }    
     }
 

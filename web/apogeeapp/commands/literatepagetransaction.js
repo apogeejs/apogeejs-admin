@@ -6,8 +6,23 @@ import { Transform, Step } from "/prosemirror/dist/prosemirror-transform.es.js";
  * Command JSON format:
  * {
  *   "type":"literatePageTransaction",
- *   "memberId":(main member full name),
- *   "steps":(steps json)
+ *   "componentId":(component id),
+ * 
+ *   ============================
+ *   == with initial commands 
+ *   =============================
+ *   "transaction":(the transaction - this is only passed on initial commands. Redo and undo commands do not have it and
+ *          must reconstruct the transaction from the steps json),
+  *  "initialSelection":(selection before command - only needed for commands that have undo/redo),
+ *   "initialMarks":(marks before command - only needed for commands that have undo/redo),
+ * 
+ *   ============================
+ *   == with redo/undo commands NOTE: we modify the command object to remove transaction and other initial data.
+ *   == This is because of an impedence mismatch between apogee and prosemirror command structures.
+ *   ============================
+ *   "steps":(steps json - needed if transaction not present),
+ *   "selection": (selection json - needed if transaction no present)
+ *   "marks": (marks json - needed if transaction not present)
  * }
  */ 
 let literatepagetransaction = {};
@@ -17,73 +32,65 @@ let literatepagetransaction = {};
 //=====================================
 
 literatepagetransaction.createUndoCommand = function(workspaceManager,commandData) {
+
+    //no undo/redo if the document is not changed. This is just an editor state change
+    if(!commandData.transaction.docChanged) return null;
+
+    //if we do want to add to history we want to 
+
+    //WE NEED TO GO BACK AND PUT THIS IN!!!
+    else return null;
+
+
+
+    // var stepsJson = [];
+    // var inverseStepsJson = [];
+
+    // for(var i = 0; i < transaction.steps.length; i++) {
+    //     var step = transaction.steps[i];
+    //     stepsJson.push(step.toJSON());
+    //     var stepDoc = transaction.docs[i];
+    //     var inverseStep = step.invert(stepDoc);
+    //     //this is in the wrong order - we will reverse it below
+    //     inverseStepsJson.push(inverseStep.toJSON()); 
+    // }
+
+    // //fix the order of inverse commands
+    // inverseStepsJson.reverse();
+    // commandData.steps = stepsJson;
+    // commandData.undoSteps = inverseStepsJson;
+
+    // if(optionalInitialSelection) commandData.startSelection = optionalInitialSelection.toJSON();
+    // if(optionalInitialMarks) commandData.startMarks = optionalInitialMarks.map(mark => mark.toJSON());;
+
+    // if(transaction.selection) commandData.endSelection = transaction.selection.toJSON();
+    // if(transaction.marks) commandData.endMarks = transaction.marks.map(mark => mark.toJSON());
+
     
-    if(commandData.undoSteps) {
-        //temporary implementation
-        var undoCommandData = {};
-        undoCommandData.type = literatepagetransaction.commandInfo.type;
-        undoCommandData.steps = commandData.undoSteps;
-        undoCommandData.startSelection = commandData.endSelection;
-        undoCommandData.startMarks = commandData.endMarks;
-        undoCommandData.endSelection = commandData.startSelection;
-        undoCommandData.endMarks = commandData.startMarks;
-        undoCommandData.memberId = commandData.memberId;
-        return undoCommandData;
-    }
-    else {
-        return null;
-    }
+
+    //     //temporary implementation
+    //     var undoCommandData = {};
+    //     undoCommandData.type = literatepagetransaction.commandInfo.type;
+    //     undoCommandData.steps = commandData.undoSteps;
+    //     undoCommandData.startSelection = commandData.endSelection;
+    //     undoCommandData.startMarks = commandData.endMarks;
+    //     undoCommandData.endSelection = commandData.startSelection;
+    //     undoCommandData.endMarks = commandData.startMarks;
+    //     undoCommandData.memberId = commandData.memberId;
+    //     return undoCommandData;
+
 }
 
 
 literatepagetransaction.executeCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getMutableModelManager();
-    let componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
-    let component = modelManager.getMutableComponentByComponentId(componentId);
+    let component = modelManager.getMutableComponentByComponentId(commandData.componentId);
 
-    let oldDocument = component.getDocument();
-    let schema = component.getSchema();
-            
-    let newDocument = updateDocument(oldDocument,schema,commandData);
+    let oldEditorState = component.getEditorState();
 
-    if(newDocument) {
-        //create the editor state info if we have it
-        let editorStateInfo
-        if((commandData.endSelection)||(commandData.endMarks)) {
-            editorStateInfo = {};
-            editorStateInfo.selection = commandData.endSelection;
-            editorStateInfo.storedMarks = commandData.endMarks;
-        }
-
-        //set the document. Also set some editor state that accompanies the document.
-        //this editor state inof should only be stored temporarily, and not be maintained in the component.
-        component.setDocument(newDocument,editorStateInfo);
-    }
-    else {
-        throw new Error("Unknown error updating document");
-    }
+    let newEditorState = oldEditorState.apply(commandData.transaction);
+    component.setEditorState(newEditorState);
 }
-
-function updateDocument(initialDocument, schema, commandData) {
-
-    //apply the editor transaction
-    var transform = new Transform(initialDocument);
-
-    //apply the steps
-    commandData.steps.forEach(stepJson => {
-      try {
-        var step = Step.fromJSON(schema, stepJson);
-        transform = transform.step(step);
-      }
-      catch (error) {
-        if(error.stack) console.error(error.stack);
-        console.log("Step failed: " + JSON.stringify(stepJson));
-        return null;
-      }
-    });
-
-    return transform.doc;
-  }
 
 literatepagetransaction.commandInfo = {
     "type": "literatePageTransaction",

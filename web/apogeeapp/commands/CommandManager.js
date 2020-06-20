@@ -49,6 +49,7 @@ export default class CommandManager {
             alert("Command ettempted while another in progress. Ignored");
             return false;
         }
+        this.commandInProgress = true;
 
         //get a mutable workspace manager instance
         let oldWorkspaceManager = this.app.getWorkspaceManager();

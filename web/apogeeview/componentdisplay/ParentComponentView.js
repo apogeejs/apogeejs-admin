@@ -20,8 +20,13 @@ export default class ParentComponentView extends ComponentView {
         //ccreate the editor manager
         this.editorManager = createProseMirrorManager(modelView.getApp(),component.getSchema());
 
-        this.editorData = null;
-        this._loadEditorData(component);
+        //we need to call a command to set the plugins on the editor state for the associated component
+        let command = {};
+        command.type = "literatePagePlugins";
+        command.componentId = component.getId();
+        command.plugins = this.editorManager.getPlugins();
+        let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
+        workspaceManager.runFutureCommand(command);
     }
 
     createTreeDisplay() {
@@ -50,13 +55,6 @@ export default class ParentComponentView extends ComponentView {
     //----------------------
     // Parent Methods
     //----------------------
-
-    /** This brings the child component to the front and takes any other actions
-     * to show the child in the open parent. */
-    showChild(childComponentView) {
-        if(childComponentView.getParentComponentView() != this) return;
-        this.selectApogeeNode(childComponentView.getName());
-    }
 
     /** This function adds a fhile componeent to the displays for this parent component. */
     removeChild(childComponent) {
@@ -88,252 +86,216 @@ export default class ParentComponentView extends ComponentView {
         }
     }
 
-    //==============================
-    // TEMP
-    //==============================
-
-    /** This overides the super method to first intercept the new document and save the editor data */
-    componentUpdated(component) {
-        //set the document data
-        if(component.isFieldUpdated("document")) {
-            this._loadEditorData(component);
-        }
-
-        //update the component and its ui elements
-        super.componentUpdated(component);
-    }
-
-    _loadEditorData(component) {
-        let document = component.getDocument();
-        let editorStateInfo = component.getEditorStateInfo(true);
-        let schema = component.getSchema();
-
-        let selection;
-        let storedMarks;
-        if(editorStateInfo) {
-            //load the saved selection
-            let selectionJson = editorStateInfo.selection;
-            if(selectionJson) {
-                selection = Selection.fromJSON(document,selectionJson);
-            }
-
-            //load the saved marks
-            let storedMarksJson = editorStateInfo.storedMarks;
-            if(storedMarksJson) {
-                storedMarks = storedMarksJson.map(markJson => Mark.fromJson(schema,markJson));
-            }
-        }
-
-        this.editorData = this.editorManager.createEditorState(document,selection,storedMarks);
-    }
 
     //###########################################################################################################
     //start page code
     
-    getEditorData() {
-        return this.editorData;
+    getEditorState() {
+        return this.getComponent().getEditorState();
     }
-
-    // setEditorData(editorData) {
-    //     this.editorData = editorData;
-        
-    //     //this should be in an event for the change
-    //     var tabDisplay = this.getTabDisplay();
-    //     if(tabDisplay) {
-    //         tabDisplay.updateDocumentData(this.editorData);
-    //     }
-    // }
 
     getEditorManager() {
         return this.editorManager;
     }
 
+    getSchema() {
+        return this.getComponent().getSchema();
+    }
+
     //----------------------------------------
     // Editor Command Processing
     //----------------------------------------
+
+    /** This function turns a transaction into an application command. This is used
+     * for the command path for commands generated outside the editor. */
+    createEditorCommand(transaction,optionalInitialSelection,optionalInitialMarks) {
+
+        var commandData = {};
+        commandData.type = "literatePageTransaction";
+        commandData.componentId = this.getComponent().getId();
+
+        //we include the transaction because that is how prose mirror modiies state
+        //it will be deleted from any command saved in the history so there is only JSON objects left.
+        //If a command from history is used, the transaction will be reconstructed from the history.
+        commandData.transaction = transaction;
+
+        //the initial selection and marks should be included if this is a document changing transaction, 
+        //they are used to make the undo command.
+        if(optionalInitialSelection) commandData.initialSelection = optionalInitialSelection;
+        if(optionalInitialMarks) commandData.initialMarks = optionalInitialMarks;
+            
+        return commandData;
+    }
+
     
     /** This method is called to respond to transactions created in the editor. */
     applyTransaction(transaction) {
         
         //console.log("New Transaction:");
         //console.log("Doc changed: " + transaction.docChanged);
+        let editorState = this.getEditorState();
 
-        if(transaction.docChanged) {
+        //this will hold the resulting command
+        let apogeeCommand;
 
-            //this will hold the resulting command
-            let apogeeCommand;
+        let initialSelection = editorState.selection;
+        let initialMarks = editorState.marks;
 
-            let initialSelection = this.editorData.selection;
-            let initialMarks = this.editorData.marks;
+        if(this.transactionUpdatesModel(transaction)) {
 
-            if(this.transactionUpdatesModel(transaction)) {
+            let commandList = [];
+            let allDeletedNames = [];
 
-                let commandList = [];
-                let allDeletedNames = [];
+            //record if the transaction sets the selection or markSet
+            let finalSelection = transaction.selectionSet ? transaction.selection : null;
+            let finalStoredMarks = transaction.storedMarksSet ? transaction.storedMarks : null;
 
-                //record if the transaction sets the selection or markSet
-                let finalSelection = transaction.selectionSet ? transaction.selection : null;
-                let finalStoredMarks = transaction.storedMarksSet ? transaction.storedMarks : null;
+            let workingInitialSelection = initialSelection;
+            let workingInitialMarks = initialMarks;
 
-                let workingInitialSelection = initialSelection;
-                let workingInitialMarks = initialMarks;
+            //process each step, mapping to new steps
+            let activeNameMap = this.createActiveNameMap();
+            let modifiedTransaction = editorState.tr;
+            let transactionModified = false;
+            transaction.steps.forEach( (oldStep, index) => {
 
-                //process each step, mapping to new steps
-                let activeNameMap = this.createActiveNameMap();
-                let modifiedTransaction = this.editorData.tr;
-                let transactionModified = false;
-                transaction.steps.forEach( (oldStep, index) => {
+                let oldStepDoc = transaction.docs[index];
+                let oldStepJson = oldStep.toJSON();
 
-                    let oldStepDoc = transaction.docs[index];
-                    let oldStepJson = oldStep.toJSON();
+                //--------------------------------------
+                //process the step for deleted components
+                //--------------------------------------
+                let deleteComponentCommands;
+                let deletedComponentShortNames = this.getStepDeletedComponentShortNames(oldStep,oldStepDoc);
+                if(deletedComponentShortNames.length > 0) {
+                    //update active name map
+                    this.updateActiveNameMapForDelete(activeNameMap,deletedComponentShortNames);
 
-                    //--------------------------------------
-                    //process the step for deleted components
-                    //--------------------------------------
-                    let deleteComponentCommands;
-                    let deletedComponentShortNames = this.getStepDeletedComponentShortNames(oldStep,oldStepDoc);
-                    if(deletedComponentShortNames.length > 0) {
-                        //update active name map
-                        this.updateActiveNameMapForDelete(activeNameMap,deletedComponentShortNames);
+                    //get delete commands
+                    deleteComponentCommands = this.createDeleteComponentCommands(deletedComponentShortNames);
 
-                        //get delete commands
-                        deleteComponentCommands = this.createDeleteComponentCommands(deletedComponentShortNames);
-
-                        //save the deleted names so we can warn the user about the delete
-                        allDeletedNames = allDeletedNames.concat(deletedComponentShortNames);
-                    }
-
-                    //--------------------------------------
-                    //process the step for any added components including potentially modifying the slice
-                    //--------------------------------------
-                    let createComponentCommands;
-                    let { newSliceContentJson, createdComponentInfos } = this.processForStepComponentCreateCommands(oldStep,oldStepJson,activeNameMap);
-                    if(createdComponentInfos.length > 0) {
-                        //get the create commands
-                        createComponentCommands = this.createCreateComponentCommands(createdComponentInfos);
-
-                        //perhaps confusingly, the activeNameMap is updated in place in the above function so we don't have to 
-                        //do it here.
-                    }
-
-                    //--------------------------------------
-                    // Update the new transaction and commands
-                    //--------------------------------------
-                    if((deleteComponentCommands)||(createComponentCommands)) {
-                        //we want to modify the step and insert the delete and/or create component commands
-
-                        //----------------------------------
-                        //create the remove step (if needed)
-                        //-----------------------------------
-                        let removeStep = this.createRemoveStep(oldStepJson);
-                        if(removeStep) {
-                            modifiedTransaction.step(removeStep);
-                            transactionModified = true;
-                        }
-
-                        //close out the old transaction if needed, starting a new one
-                        if(transactionModified) {
-                            //save the transaction as a command (so we can add the model commands now)
-                            let editorCommand = this.createEditorCommand(modifiedTransaction,workingInitialSelection,workingInitialMarks);
-                            commandList.push(editorCommand);
-
-                            //create a new transaction
-                            let config = {};
-                            config.doc = modifiedTransaction.doc;
-                            config.selection = modifiedTransaction.selection;
-                            config.storedMarks = modifiedTransaction.storedMarks;
-                            let intermediateState = EditorState.create(config);
-
-                            modifiedTransaction = intermediateState.tr;
-                            workingInitialSelection = config.selection;
-                            workingInitialMarks = config.storedMarks;
-                            transactionModified = false;
-                        }
-
-                        //----------------------------
-                        //insert any model commands
-                        //----------------------------
-                        if(deleteComponentCommands) commandList.push(...deleteComponentCommands);
-                        if(createComponentCommands) commandList.push(...createComponentCommands);
-
-                        //----------------------------
-                        //create the editor insert step (if needed)
-                        //----------------------------
-                        let insertStep = this.createInsertStep(oldStepJson,newSliceContentJson);
-                        if(insertStep) {
-                            modifiedTransaction.step(insertStep);
-                            transactionModified = true;
-                        }    
-                    }
-                    else {
-                        //add the old step to the current modified transaction
-                        modifiedTransaction.step(oldStep);
-                    }
-
-                })
-
-                //if the selection or stored marks was explicitly set in the transaction, add these back to the final new transaction
-                if(finalSelection) {
-                    let fixedSelection = this.convertSelectionToNewDoc(finalSelection,modifiedTransaction.doc);
-                    modifiedTransaction.setSelection(fixedSelection);
-                    transactionModified = true;
-                }
-                if(finalStoredMarks) {
-                    modifiedTransaction.setStoredMarks(finalStoredMarks);
-                    transactionModified = true;
+                    //save the deleted names so we can warn the user about the delete
+                    allDeletedNames = allDeletedNames.concat(deletedComponentShortNames);
                 }
 
-                //close out the final transaction, if needed
-                if(transactionModified) {
-                    //make sure we scroll into view
-                    modifiedTransaction.scrollIntoView();
+                //--------------------------------------
+                //process the step for any added components including potentially modifying the slice
+                //--------------------------------------
+                let createComponentCommands;
+                let { newSliceContentJson, createdComponentInfos } = this.processForStepComponentCreateCommands(oldStep,oldStepJson,activeNameMap);
+                if(createdComponentInfos.length > 0) {
+                    //get the create commands
+                    createComponentCommands = this.createCreateComponentCommands(createdComponentInfos);
 
-                    //save the transaction as a command (so we can add the model commands now)
-                    let editorCommand = this.createEditorCommand(modifiedTransaction,workingInitialSelection,workingInitialMarks);
-                    commandList.push(editorCommand);
+                    //perhaps confusingly, the activeNameMap is updated in place in the above function so we don't have to 
+                    //do it here.
                 }
 
-                //-------------------
-                // Get verificaion if we are deleting anything
-                //-------------------
-                if(allDeletedNames.length > 0) {
-                    let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + allDeletedNames);
-                    if(!doDelete) return;
+                //--------------------------------------
+                // Update the new transaction and commands
+                //--------------------------------------
+                if((deleteComponentCommands)||(createComponentCommands)) {
+                    //we want to modify the step and insert the delete and/or create component commands
+
+                    //----------------------------------
+                    //create the remove step (if needed)
+                    //-----------------------------------
+                    let removeStep = this.createRemoveStep(oldStepJson);
+                    if(removeStep) {
+                        modifiedTransaction.step(removeStep);
+                        transactionModified = true;
+                    }
+
+                    //close out the old transaction if needed, starting a new one
+                    if(transactionModified) {
+                        //save the transaction as a command (so we can add the model commands now)
+                        let editorCommand = this.createEditorCommand(modifiedTransaction,workingInitialSelection,workingInitialMarks);
+                        commandList.push(editorCommand);
+
+                        //create a new transaction
+                        let config = {};
+                        config.doc = modifiedTransaction.doc;
+                        config.selection = modifiedTransaction.selection;
+                        config.storedMarks = modifiedTransaction.storedMarks;
+                        let intermediateState = EditorState.create(config);
+
+                        modifiedTransaction = intermediateState.tr;
+                        workingInitialSelection = config.selection;
+                        workingInitialMarks = config.storedMarks;
+                        transactionModified = false;
+                    }
+
+                    //----------------------------
+                    //insert any model commands
+                    //----------------------------
+                    if(deleteComponentCommands) commandList.push(...deleteComponentCommands);
+                    if(createComponentCommands) commandList.push(...createComponentCommands);
+
+                    //----------------------------
+                    //create the editor insert step (if needed)
+                    //----------------------------
+                    let insertStep = this.createInsertStep(oldStepJson,newSliceContentJson);
+                    if(insertStep) {
+                        modifiedTransaction.step(insertStep);
+                        transactionModified = true;
+                    }    
+                }
+                else {
+                    //add the old step to the current modified transaction
+                    modifiedTransaction.step(oldStep);
                 }
 
-                //-------------------------
-                //create the apogee command for the input transaction
-                //-------------------------
-                apogeeCommand = {};
-                apogeeCommand.type = "compoundCommand";
-                apogeeCommand.childCommands = commandList;
+            })
+
+            //if the selection or stored marks was explicitly set in the transaction, add these back to the final new transaction
+            if(finalSelection) {
+                let fixedSelection = this.convertSelectionToNewDoc(finalSelection,modifiedTransaction.doc);
+                modifiedTransaction.setSelection(fixedSelection);
+                transactionModified = true;
             }
-            else {
-                //--------------------------
-                //There is no change to the model. Convert the transaction directly to an editor command
-                //--------------------------
-                apogeeCommand = this.createEditorCommand(transaction,initialSelection,initialMarks);
+            if(finalStoredMarks) {
+                modifiedTransaction.setStoredMarks(finalStoredMarks);
+                transactionModified = true;
+            }
+
+            //close out the final transaction, if needed
+            if(transactionModified) {
+                //make sure we scroll into view
+//TEST:CHANGE SCROLL INTO VIEW
+//                    modifiedTransaction.scrollIntoView();
+
+                //save the transaction as a command (so we can add the model commands now)
+                let editorCommand = this.createEditorCommand(modifiedTransaction,workingInitialSelection,workingInitialMarks);
+                commandList.push(editorCommand);
             }
 
             //-------------------
-            //execute the command
+            // Get verificaion if we are deleting anything
             //-------------------
-            if(apogeeCommand) {
-                this.getModelView().getApp().executeCommand(apogeeCommand);
+            if(allDeletedNames.length > 0) {
+                let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + allDeletedNames);
+                if(!doDelete) return;
             }
+
+            //-------------------------
+            //create the apogee command for the input transaction
+            //-------------------------
+            apogeeCommand = {};
+            apogeeCommand.type = "compoundCommand";
+            apogeeCommand.childCommands = commandList;
         }
         else {
-            //------------------------------
-            //this is a editor state change that doesn't change the saved data
-            //------------------------------
-            this.editorData = this.editorData.apply(transaction);
-            
-            //##############################################
-            //DOH! this is bad. I need to update the split between view and app for the editor
-            //-I  shouldn't update the view editor data without updating the component editor data. But I have to as is.
-            if(this.tabDisplay) {
-                this.tabDisplay.nonComponentDocumentUpdate();
-            }
+            //--------------------------
+            //There is no change to the model. Convert the transaction directly to an editor command
+            //--------------------------
+            apogeeCommand = this.createEditorCommand(transaction,initialSelection,initialMarks);
+        }
+
+        //-------------------
+        //execute the command
+        //-------------------
+        if(apogeeCommand) {
+            this.getModelView().getApp().executeCommand(apogeeCommand);
         }
     }
 
@@ -343,6 +305,9 @@ export default class ParentComponentView extends ComponentView {
 
     /** This function checks if the editor transaction creates or deletes any apogee components. */
     transactionUpdatesModel(transaction) {
+
+        if(!transaction.docChanged) return false;
+
         let modelUpdated = false;
 
         //check for deleted components
@@ -564,7 +529,7 @@ export default class ParentComponentView extends ComponentView {
             throw new Error("Unknown editor step type: " + oldStepJson.stepType);
         }
 
-        return newStepJson ? Step.fromJSON(this.editorData.schema, newStepJson) : null;
+        return newStepJson ? Step.fromJSON(this.getSchema(), newStepJson) : null;
     }
     
     /** This method takes an input step that includes a delete and/or create and makes the associated insert step. 
@@ -592,7 +557,7 @@ export default class ParentComponentView extends ComponentView {
                 throw new Error("Unknown editor step type: " + oldStepJson.stepType);
             }
 
-            return  Step.fromJSON(this.editorData.schema, newStepJson);
+            return  Step.fromJSON(this.getSchema(), newStepJson);
         }
         else {
             //no insert done
@@ -634,45 +599,12 @@ export default class ParentComponentView extends ComponentView {
     // Editor command processing from commands created outside the editor
     //------------------------------------------
 
-    /** This function turns a transaction into an application command. This is used
-     * for the command path for commands generated outside the editor. */
-    createEditorCommand(transaction,optionalInitialSelection,optionalInitialMarks) {
-        var stepsJson = [];
-        var inverseStepsJson = [];
-
-        for(var i = 0; i < transaction.steps.length; i++) {
-            var step = transaction.steps[i];
-            stepsJson.push(step.toJSON());
-            var stepDoc = transaction.docs[i];
-            var inverseStep = step.invert(stepDoc);
-            //this is in the wrong order - we will reverse it below
-            inverseStepsJson.push(inverseStep.toJSON()); 
-        }
-
-        //fix the order of inverse commands
-        inverseStepsJson.reverse();
-
-        var commandData = {};
-        commandData.type = "literatePageTransaction";
-        commandData.memberId = this.getComponent().getMemberId();
-        commandData.steps = stepsJson;
-        commandData.undoSteps = inverseStepsJson;
-
-        if(optionalInitialSelection) commandData.startSelection = optionalInitialSelection.toJSON();
-        if(optionalInitialMarks) commandData.startMarks = optionalInitialMarks.map(mark => mark.toJSON());;
-
-        if(transaction.selection) commandData.endSelection = transaction.selection.toJSON();
-        if(transaction.marks) commandData.endMarks = transaction.marks.map(mark => mark.toJSON());
-        
-        return commandData;
-    }
-
     /** This method removes the node of the given name frmo the folder. If no
      * transaction argument is included, a new transaction will be created. If the
      * transaction object is included, the remove action will be added to it. 
      */
-    selectApogeeNode(childShortName) {
-        var state = this.getEditorData();
+    getSelectApogeeNodeCommand(childShortName) {
+        var state = this.getEditorState();
       
         let {found,from,to} = this.getComponentRange(state,childShortName);
         //end test
@@ -680,11 +612,32 @@ export default class ParentComponentView extends ComponentView {
         if(found) {
             let $from = state.doc.resolve(from);
             let selection = new NodeSelection($from);
-            let transaction = state.tr.setSelection(selection).scrollIntoView();
-            this.applyTransaction(transaction);
+            let transaction = state.tr.setSelection(selection)//.scrollIntoView(); //TEST:CHANGE SCROLL INTO VIEW
+            return this.createEditorCommand(transaction);
+        }
+        else {
+            return null;
         }
     }
 
+    /** This will move the selection to the start of the document. */
+    getSelectStartOfDocumentCommand() {
+        let state = this.getEditorState();
+        let $startPos = state.doc.resolve(0);
+        let selection = selectionBetween(this.editorView, $startPos, $startPos);
+        let transaction = state.tr.setSelection(selection).scrollIntoView();
+        return this.createEditorCommand(transaction);
+    }
+
+    /** This will move the selection to the end of the document. */
+    getSelectEndOfDocumentCommand() {
+        let state = this.getEditorState();
+        let endPos = state.doc.content.size;
+        let $endPos = state.doc.resolve(endPos);
+        let selection = selectionBetween(this.editorView, $endPos, $endPos);
+        let transaction = state.tr.setSelection(selection).scrollIntoView();
+        return this.createEditorCommand(transaction);
+    }
     
     getComponentRange(editorData,componentShortName) {
         let doc = editorData.doc;
@@ -725,7 +678,7 @@ export default class ParentComponentView extends ComponentView {
      * transaction object is included, the remove action will be added to it. 
      */
     getInsertApogeeNodeOnPageCommands(shortName,insertAtEnd) {
-        let state = this.getEditorData();
+        let state = this.getEditorState();
         let schema = state.schema;
         let setupTransaction;
         let commandInfo = {};
@@ -784,7 +737,8 @@ export default class ParentComponentView extends ComponentView {
 
         //finish the document transaction
         addTransaction = addTransaction.replaceSelectionWith(schema.nodes.apogeeComponent.create({ "name": shortName }));
-        addTransaction.scrollIntoView();
+//TEST:CHANGE SCROLL INTO VIEW
+//        addTransaction.scrollIntoView();
         commandInfo.editorAddCommand = this.createEditorCommand(addTransaction,initial2Selection,initial2Marks);
 
         return commandInfo;
@@ -814,13 +768,13 @@ export default class ParentComponentView extends ComponentView {
      * transaction object is included, the remove action will be added to it. 
      */
     getRemoveApogeeNodeFromPageCommand(childShortName) {
-        var state = this.getEditorData();
+        var state = this.getEditorState();
       
         let {found,from,to} = this.getComponentRange(state,childShortName);
         //end test
 
         if(found) {
-            let transaction = state.tr.delete(from, to).scrollIntoView();
+            let transaction = state.tr.delete(from, to)//.scrollIntoView();//TEST:CHANGE SCROLL INTO VIEW
             var commandData = this.createEditorCommand(transaction,state.selection,state.marks);
             return commandData;
         }
@@ -834,7 +788,7 @@ export default class ParentComponentView extends ComponentView {
      * transaction object is included, the remove action will be added to it. 
      */
     getRenameApogeeNodeCommands(memberId,oldShortName,newShortName) {
-        var state = this.getEditorData();
+        var state = this.getEditorState();
         let {found,from,to} = this.getComponentRange(state,oldShortName);
 
         let commands = {};

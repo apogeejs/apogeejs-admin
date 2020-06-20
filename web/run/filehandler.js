@@ -26,7 +26,7 @@ function processFileRequest(path,response) {
 
     var onData = (err,data) => {
         if(err) {
-            console.log(err.msg);
+            console.log(err.toString());
             response.writeHead(500, {"Content-Type":"text/plain"});
             response.write("Error!");
         }

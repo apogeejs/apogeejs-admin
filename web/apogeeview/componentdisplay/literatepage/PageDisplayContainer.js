@@ -447,10 +447,16 @@ export default class PageDisplayContainer {
         }
         //select the associated node in the document.
         let parentComponentView = this.componentView.getParentComponentView();
-        if(parentComponentView) {
-            let name = this.componentView.getComponent().getName();
-            parentComponentView.selectApogeeNode(name);
-        }
+
+        //OMIT THIS FOR NOW
+        // if(parentComponentView) {
+        //     let name = this.componentView.getComponent().getName();
+        //     let commandData = parentComponentView.getSelectApogeeNodeCommand(name);
+        //     if(commandData) {
+        //         ???
+        //     }
+        // }
+
         //give the editor focus
         parentComponentView.giveEditorFocusIfShowing();
 

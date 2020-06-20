@@ -4,6 +4,8 @@
 //===================================
 
 import { Schema } from "/prosemirror/dist/prosemirror-model.es.js";
+import { EditorState }  from "/prosemirror/dist/prosemirror-state.es.js";
+import { Node as ProseMirrorNode }  from "/prosemirror/dist/prosemirror-model.es.js";
 
 // :: Schema
 // This the schema for the apogee page editor
@@ -264,3 +266,23 @@ export function createFolderSchema(app,pageMemberId) {
 
   return new Schema({ nodes, marks })
 }
+
+/** This method creates an editor state with no plugins and
+ * default selection and marks.
+ * If the editor view uses l=plugins, those must be added to the editor state.
+ */
+export function createEditorState(schema, docJson) {
+  let document = ProseMirrorNode.fromJSON(schema,docJson);
+  let editorState = EditorState.create({
+    doc: document
+  });
+  return editorState;
+}
+
+/** This method attaches plugins to the given editor state, returning
+ * a new editor state. */
+export function attachPluginsToEditorState(editorState,plugins) {
+  return editorState.reconfigure({plugins: plugins});
+}
+
+export let EMPTY_DOC_JSON = {"type":"doc","content":[{"type":"paragraph"}]};
