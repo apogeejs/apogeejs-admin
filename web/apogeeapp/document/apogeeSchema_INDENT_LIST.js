@@ -1,4 +1,9 @@
 
+/*****************************************************************
+THIS IS A VERSION OF THE APOGEE SCHEMA WHERE I DID LIST INDENTING. I REMOVED IT BECAUSE I DIDN'T
+HAVE IT WORKING PROPERLY. I WANTED TO SAVE THIS CODE THOUGH.
+******************************************************************/
+
 //===================================
 // Apogee Schema
 //===================================
@@ -61,7 +66,7 @@ export function createFolderSchema(app,pageMemberId) {
     },
 
     bulletList: {
-      content: "listItem+",
+      content: "(listItem | list)+",
       group: "list",
       defining: true,
       parseDOM: [{ tag: "ul" }],
@@ -69,7 +74,7 @@ export function createFolderSchema(app,pageMemberId) {
     },
 
     numberedList: {
-      content: "listItem+",
+      content: "(listItem | list)+",
       group: "list",
       defining: true,
       parseDOM: [{ tag: "ol" }],
