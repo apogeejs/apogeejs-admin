@@ -145,6 +145,15 @@ export default class ApogeeWebView {
     //     }
     // }
 
+    ///////////////////////////////////////////////////////////////////////////////////
+    // OOPS - this is here because for now componet views think this is the model view.
+    //I need to find out what problems this causes. One is that the ui messenger uses it
+    //to find the model manager. I am sure there are more.
+    getModelManager() {
+        return this.app.getWorkspaceManager().getModelManager();
+    }
+    /////////////////////////////////////////////////////////////////////////////////////
+
     //---------------------------------
     // Width resize events - for tab frame and tree frame
     //---------------------------------
