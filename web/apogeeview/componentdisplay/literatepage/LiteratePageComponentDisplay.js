@@ -64,6 +64,7 @@ export default class LiteratePageComponentDisplay {
         if(component.isFieldUpdated("editorState")) {
             let editorData = this.componentView.getEditorState();
             this.editorView.updateState(editorData);
+            this._checkSelectionForNodeHighlights(editorData);
         }
 
         if(component.isMemberFieldUpdated("member","state")) {
@@ -85,15 +86,14 @@ export default class LiteratePageComponentDisplay {
             let childComponentDisplay;
             if (childComponentView) {
                 childComponentDisplay = childComponentView.getComponentDisplay();
-                //   //CLUDGE ALERT - fix this when I reorganize the code
-                //   var tabDisplay = this.folderComponentView.getTabDisplay();
-                //   tabDisplay.addChild(componentView);
-                //   componentDisplay = componentView.getComponentDisplay();
             }
             else {
-                //this component view has not been created yet. Make a standing
-                childComponentDisplay = new PageChildComponentDisplay(null, this);
-                this.standInChildComponentDisplays[name] = childComponentDisplay;
+                //hold a standin if it is requested before we create it.
+                childComponentDisplay = this.standInChildComponentDisplays[name];
+                if(!childComponentDisplay) {
+                    childComponentDisplay = new PageChildComponentDisplay(null, this);
+                    this.standInChildComponentDisplays[name] = childComponentDisplay;
+                }
             }
 
             return childComponentDisplay
@@ -344,6 +344,36 @@ export default class LiteratePageComponentDisplay {
         }    
     }
 
+    /** This function sets any apogee nodes included in the selection to be highlighted. */
+    _checkSelectionForNodeHighlights(editorData) {
+        let { empty, from, to } = editorData.selection;
+        if(empty) {
+            from = -1;
+            to = -1;
+        }
+ 
+        let document = editorData.doc;
+        let schema = editorData.schema;
+        //travers doc, finding apogee nodes and setting their selection state
+        document.forEach( (node,offset) => {
+            if(node.type === schema.nodes.apogeeComponent) {
+                let inSelection = ((offset >= from)&&(offset < to));
+                let nodeName = node.attrs["name"];
+                this._setApogeeNodeHighlight(nodeName,inSelection);
+            }
+            //do not recurse into children
+            return false;
+        });
+
+    }
+
+    /** This function sets the highlight state for the given node. */
+    _setApogeeNodeHighlight(childName,inSelection) {
+        let childComponentDisplay = this.getChildComponentDisplay(childName);
+        if(childComponentDisplay) childComponentDisplay.setHighlight(inSelection); 
+    }
+    
+
     /** This should be called by the parent component when it is discarding the 
      * page display.  
      * @protected */
@@ -392,14 +422,3 @@ apogeeutil.mixin(LiteratePageComponentDisplay,EventManager);
 
 /** This is the data to load an empty page. */
 LiteratePageComponentDisplay.EMPTY_PAGE_BODY = [];
-
-
-
-//TEMPORARY
-//This is not exported from the current prosemirror lib but I was using it before 
-//I reproced the code here. I should fix this..
-
-function selectionBetween(view, $anchor, $head, bias) {
-    return view.someProp("createSelectionBetween", f => f(view, $anchor, $head))
-      || TextSelection.between($anchor, $head, bias)
-  }

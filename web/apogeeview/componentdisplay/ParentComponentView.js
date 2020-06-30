@@ -4,7 +4,6 @@ import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatep
 
 import { TextSelection, NodeSelection, EditorState, Selection } from "/prosemirror/dist/prosemirror-state.es.js";
 import { Step } from "/prosemirror/dist/prosemirror-transform.es.js";
-import { Mark }  from "/prosemirror/dist/prosemirror-model.es.js";
 
 //this constant is used (or hopefully not) in correctCreateInfoforRepeatedNames
 const MAX_SUFFIX_INDEX = 99999;
@@ -624,7 +623,7 @@ export default class ParentComponentView extends ComponentView {
     getSelectStartOfDocumentCommand() {
         let state = this.getEditorState();
         let $startPos = state.doc.resolve(0);
-        let selection = selectionBetween(this.editorView, $startPos, $startPos);
+        let selection = TextSelection.between($startPos, $startPos);
         let transaction = state.tr.setSelection(selection).scrollIntoView();
         return this.createEditorCommand(transaction);
     }
@@ -634,7 +633,7 @@ export default class ParentComponentView extends ComponentView {
         let state = this.getEditorState();
         let endPos = state.doc.content.size;
         let $endPos = state.doc.resolve(endPos);
-        let selection = selectionBetween(this.editorView, $endPos, $endPos);
+        let selection = TextSelection.between($endPos, $endPos);
         let transaction = state.tr.setSelection(selection).scrollIntoView();
         return this.createEditorCommand(transaction);
     }
@@ -821,3 +820,10 @@ export default class ParentComponentView extends ComponentView {
 
 /** This is used to flag this as an edit component. */
 ParentComponentView.isParentComponentView = true;
+
+
+//temporary? See if we need this. 
+function selectionBetween(view, $anchor, $head, bias) {
+    return view.someProp("createSelectionBetween", f => f(view, $anchor, $head))
+      || TextSelection.between($anchor, $head, bias)
+  }

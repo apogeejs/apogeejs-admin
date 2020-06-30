@@ -122,8 +122,7 @@ export function createFolderSchema(app,pageMemberId) {
     apogeeComponent: {
       marks: "",
       atom: true,
-      defining: true,
-      isolating: true,
+      selectable: true,
 
       //TEMP TEST////
       hasInteractiveSelection: true,
