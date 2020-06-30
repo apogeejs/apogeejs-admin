@@ -298,6 +298,7 @@ export default class ApogeeWebView {
     _createComponentDisplay(componentInfo,displayViewInfo) {
         let componentDisplay = new WebComponentDisplay(componentInfo.componentView, displayViewInfo.viewName);
         componentInfo.componentView.setComponentDisplay(componentDisplay);
+        displayViewInfo.componentDisplay = componentDisplay;
 
         //look up the parent element 
         let parentElement = document.getElementById(displayViewInfo.parentElementId);
