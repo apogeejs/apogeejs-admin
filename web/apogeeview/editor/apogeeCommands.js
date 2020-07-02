@@ -42,7 +42,7 @@ export function exitFromStartOfList(state, dispatch) {
  // :: (EditorState, ?(tr: Transaction)) → bool
 // If we are at the end of a top level list and the next block is a text block, this pulls
 // that text block into the list.
-export function convertNextBlockToListFromEnd(state,dispatch) {
+export function joinNextBlockToListFromEnd(state,dispatch) {
     let { empty, $head } = state.selection;
     let schema = state.schema;
     if((empty) && //empty selection
@@ -50,13 +50,43 @@ export function convertNextBlockToListFromEnd(state,dispatch) {
             ($head.parentOffset == $head.parent.content.size) && //at end of list item
             ($head.index($head.depth-1)+1 == $head.node($head.depth-1).childCount) //last list item
         ) { 
+        //WE ARE ASSUMING ONLY SINGLE LEVEL LISTS HERE!!!
         let nextNodeStartPos = $head.after($head.depth-1);
         let nextNode = state.doc.resolve(nextNodeStartPos).nodeAfter;
         //only pull next node in if it is a text block
-        if(nextNode.isTextblock) {
+        if((nextNode)&&(nextNode.isTextblock)) {
             let $insideNextNode = state.doc.resolve(nextNodeStartPos+1);
             //get the selection up to the inside of the next node
             let newSelection = new TextSelection($head,$insideNextNode)
+            let tr = state.tr.setSelection(newSelection).deleteSelection();
+            if(dispatch) {
+                dispatch(tr.scrollIntoView())
+            }
+        }
+        
+        //if we get here the command is not valid
+        return true;
+    }
+}
+
+ // :: (EditorState, ?(tr: Transaction)) → bool
+// If we are at the end of a top level list and the next block is a text block, this pulls
+// that text block into the list.
+export function joinNextBlockFromListFromEnd(state,dispatch) {
+    let { empty, $head } = state.selection;
+    if((empty) && //empty selection
+            ($head.parent.isTextblock) && //in a text block
+            ($head.depth == 1) && //at the top level
+            ($head.parentOffset == $head.parent.content.size) //at end
+        ) { 
+        let nextNodeStartPos = $head.after($head.depth);
+        let nextNode = state.doc.resolve(nextNodeStartPos).nodeAfter;
+        //only pull next node in if it is in a list
+        if((nextNode)&&(nextNode.type.spec.group == "list")) {
+            //WE ARE ASSUMING ONLY SINGLE LEVEL LISTS HERE!!!
+            let $insideNextListItemNode = state.doc.resolve(nextNodeStartPos+2);
+            //get the selection up to the inside of the next node
+            let newSelection = new TextSelection($head,$insideNextListItemNode)
             let tr = state.tr.setSelection(newSelection).deleteSelection();
             if(dispatch) {
                 dispatch(tr.scrollIntoView())
@@ -456,7 +486,7 @@ import { createParagraphNear, splitBlock, deleteSelection,
 
 let enter = chainCommands(exitEmptyList, createParagraphNear, splitBlock);
 let backspace = chainCommands(exitEmptyList,deleteSelection, joinBackward, exitFromStartOfList);
-let del = chainCommands(deleteSelection, joinForward, convertNextBlockToListFromEnd);
+let del = chainCommands(deleteSelection, joinForward, joinNextBlockToListFromEnd, joinNextBlockFromListFromEnd);
 
 // :: Object
 // A keymap for the apogee schema
