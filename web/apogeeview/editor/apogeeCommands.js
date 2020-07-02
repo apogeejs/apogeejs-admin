@@ -8,85 +8,65 @@
 
 import { findWrapping, /*ReplaceStep,*/ ReplaceAroundStep } from "/prosemirror/dist/prosemirror-transform.es.js";
 import { Slice, NodeRange, Fragment } from "/prosemirror/dist/prosemirror-model.es.js"
-import { Selection } from "/prosemirror/dist/prosemirror-state.es.js"
+import { TextSelection } from "/prosemirror/dist/prosemirror-state.es.js"
 
 //--------------------------------------------------------
 // Commands
 //--------------------------------------------------------
 
 // :: (EditorState, ?(tr: Transaction)) → bool
-// When the selection is an empty list item in a top level list (not a child list)
-// this creates a default block after the list
-export function exitList(state, dispatch) {
+// If we are in a top level list, this will convert the line to a paragraph type block
+export function exitEmptyList(state, dispatch) {
     let { $head } = state.selection;
     let schema = state.schema;
     //make sure this is an empty list item in the root of a list
     if (($head.parent.type != schema.nodes.listItem) || ($head.depth != 2) || ($head.parent.content.size != 0)) return false;
 
-    //only apply this for the last list item
-    if( $head.node(1).childCount-1 > $head.index(1) ) return false;
-
-    let above = $head.node(-2), after = $head.indexAfter(-2), type = above.contentMatchAt(after).defaultType
-    if (!above.canReplaceWith(after, after, type)) return false
-    if (dispatch) {
-        let transform = state.tr;
-
-        transform = transform.delete($head.pos - 1, $head.pos + 1);
-
-        let inListAtEndPos = transform.mapping.map($head.pos);
-        let afterListPos = inListAtEndPos + 1;
-
-        transform = transform.replaceWith(afterListPos, afterListPos, type.createAndFill());
-
-        let newTextBlockPos = afterListPos;
-
-        transform.setSelection(Selection.near(transform.doc.resolve(newTextBlockPos), 1))
-        dispatch(transform.scrollIntoView());
-    }
-    return true;
+    //set this block type to default
+    return setBlockType(schema.nodes.paragraph, state, dispatch);
 }
 
-export function liftEmptyChildList(state, dispatch) {
+// :: (EditorState, ?(tr: Transaction)) → bool
+// If we are in a top level list at the start of the line, this will convert the line to a paragraph type block
+export function exitFromStartOfList(state, dispatch) {
     let { $head } = state.selection;
-    let listItemDepth = $head.depth;
     let schema = state.schema;
-    //make sure this is an empty list item in the root of a list
-    if (($head.parent.type != schema.nodes.listItem) || (listItemDepth < 3) || ($head.parent.content.size != 0)) return false;
-
-    //only apply this for the last list item
-    if( $head.node(-1).childCount-1 > $head.index(-1) ) return false;
-
-    if(dispatch) {
-        //lift the list item
-        let listDepth = listItemDepth-1;
-        let transform = state.tr;
-        transform = liftContent($head, $head, listDepth, transform);
-
-        dispatch(transform.scrollIntoView());
+    if((empty)&&($head.parent.type == schema.nodes.listItem)&&($head.parentOffset == 0)) {
+        return setBlockType(schema.nodes.paragraph, state, dispatch);
     }
+    else {
+        return false;
+    }
+ }
 
-    return true;
+ // :: (EditorState, ?(tr: Transaction)) → bool
+// If we are at the end of a top level list and the next block is a text block, this pulls
+// that text block into the list.
+export function convertNextBlockToListFromEnd(state,dispatch) {
+    let { empty, $head } = state.selection;
+    let schema = state.schema;
+    if((empty) && //empty selection
+            ($head.parent.type == schema.nodes.listItem) && //in a list item
+            ($head.parentOffset == $head.parent.content.size) && //at end of list item
+            ($head.index($head.depth-1)+1 == $head.node($head.depth-1).childCount) //last list item
+        ) { 
+        let nextNodeStartPos = $head.after($head.depth-1);
+        let nextNode = state.doc.resolve(nextNodeStartPos).nodeAfter;
+        //only pull next node in if it is a text block
+        if(nextNode.isTextblock) {
+            let $insideNextNode = state.doc.resolve(nextNodeStartPos+1);
+            //get the selection up to the inside of the next node
+            let newSelection = new TextSelection($head,$insideNextNode)
+            let tr = state.tr.setSelection(newSelection).deleteSelection();
+            if(dispatch) {
+                dispatch(tr.scrollIntoView())
+            }
+        }
+        
+        //if we get here the command is not valid
+        return true;
+    }
 }
-
-// // :: (EditorState, ?(tr: Transaction)) → bool
-// // If the cursor is in an empty textblock that can be lifted, lift the
-// // block.
-// export function liftEmptyBlock(state, dispatch) {
-//     let {$cursor} = state.selection
-//     if (!$cursor || $cursor.parent.content.size) return false
-//     if ($cursor.depth > 1 && $cursor.after() != $cursor.end(-1)) {
-//       let before = $cursor.before()
-//       if (canSplit(state.doc, before)) {
-//         if (dispatch) dispatch(state.tr.split(before).scrollIntoView())
-//         return true
-//       }
-//     }
-//     let range = $cursor.blockRange(), target = range && liftTarget(range)
-//     if (target == null) return false
-//     if (dispatch) dispatch(state.tr.lift(range, target).scrollIntoView())
-//     return true
-// }
-
 
 export function setMark(markType, attrs, state, dispatch) {
     let { empty, $cursor, ranges } = state.selection
@@ -471,12 +451,12 @@ function pathToModPath(path) {
  //========================================
 
 import { createParagraphNear, splitBlock, deleteSelection, 
-  joinBackward, joinForward, selectNodeBackward, selectNodeForward, selectAll,
+  joinBackward, joinForward, selectAll,
   chainCommands  }  from "/prosemirror/dist/prosemirror-commands.es.js";
 
-let enter = chainCommands(exitList, createParagraphNear, liftEmptyChildList, splitBlock);
-let backspace = chainCommands(exitList,deleteSelection, joinBackward, selectNodeBackward);
-let del = chainCommands(deleteSelection, joinForward, selectNodeForward);
+let enter = chainCommands(exitEmptyList, createParagraphNear, splitBlock);
+let backspace = chainCommands(exitEmptyList,deleteSelection, joinBackward, exitFromStartOfList);
+let del = chainCommands(deleteSelection, joinForward, convertNextBlockToListFromEnd);
 
 // :: Object
 // A keymap for the apogee schema
