@@ -134,7 +134,7 @@ export default class Apogee {
 
     /** This method should be called to execute commands. */
     executeCommand(command) {
-        this.commandManager.executeCommand(command);
+        return this.commandManager.executeCommand(command);
     }
 
     /** This method is intended for the UI for the undo/redo functionality */

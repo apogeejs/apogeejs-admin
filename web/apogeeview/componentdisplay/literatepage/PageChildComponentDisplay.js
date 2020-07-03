@@ -22,6 +22,7 @@ export default class PageChildComponentDisplay {
 
         //make the container
         this.mainElement = uiutil.createElementWithClass("div","visiui_pageChild_mainClass",null);
+        this.isHighlighted = false;
     
         //this is the window in which the component is displayed
         if(componentView) this.loadComponentDisplay();
@@ -128,6 +129,15 @@ export default class PageChildComponentDisplay {
         }
     }
 
+    /** This function sets this child display to highlighted. It is intended for when this display is
+     * inside the current text selection. */
+    setHighlight(isHighlighted) {
+        if(this.isHighlighted != isHighlighted) {
+            this.mainElement.className = isHighlighted ? "visiui_pageChild_mainClass_highlighted" : "visiui_pageChild_mainClass";
+            this.isHighlighted = isHighlighted;
+        }  
+    }
+
 
     //===============================
     // Private Functions
@@ -143,7 +153,11 @@ export default class PageChildComponentDisplay {
         this.mainElement.onclick = () => {
             let name = this.componentView.getName();
             let parentComponentView = this.componentView.getParentComponentView();
-            parentComponentView.selectApogeeNode(name);
+            let command = parentComponentView.getSelectApogeeNodeCommand(name);
+            if(command) {
+                let app = this.componentView.getModelView().getApp();
+                app.executeCommand(command);
+            }
         }
         
         //add title bar

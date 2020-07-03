@@ -19,41 +19,190 @@
         <link rel="stylesheet" type="text/css" href="/apogeeui/configurablepanel/ConfigurablePanel.css">     
         <link rel="stylesheet" type="text/css" href="/ext/handsontable/handsontable_6.2.0/handsontable.full.min.css">
         <!-- <link rel="stylesheet" type="text/css" href="/gulp/dist/v0.9.0a/assets/cssBundle.css"> -->
+
+        <style> 
+        body {
+            color: rgb(14,0,62);
+            background-color: rgb(209, 209, 216);
+            padding: 10px;
+        }
+        .selectedTabClass {
+            display: inline-block;
+            position: relative;
+            bottom: -4px;
+            padding: 4px;
+            background-color: rgb(209, 209, 216);
+            border-top: 2px solid rgb(129, 123, 151);
+            border-right: 2px solid rgb(129, 123, 151);
+            border-left: 2px solid rgb(129, 123, 151);
+            border-top-left-radius: 4px; 
+            border-top-right-radius: 10px;
+            height: 15px;
+            width: 75px;
+            z-index: 2;
+            font-weight: bold;
+        }
+        .normalTabClass {
+            display: inline-block;
+            position: relative;
+            bottom: -4px;
+            padding: 4px;
+            background-color: rgb(209, 209, 216);
+            border: 2px solid rgb(129, 123, 151);
+            border-top-left-radius: 4px; 
+            border-top-right-radius: 10px;
+            height: 15px;
+            width: 75px;
+            z-index: 0;
+            font-weight: bold;
+        }
+        .selectedPageClass {
+            position: relative;
+            padding: 5px;
+            background-color: rgb(209, 209, 216);
+            border: 2px solid rgb(129, 123, 151);
+            z-index: 1;
+        }
+
+        .hiddenPageClass {
+            display: none;
+        }
+        </style>
    
         
         <script type="module">
-            import "/apogee/webGlobals.js";
-            import {ApogeeWebView} from "/apogeeview/apogeeViewLib.js";
+            import {ApogeeWebView} from "/applications/webclientlib/webClientLib.js";
         
-            let workspaceUrl = "covidWorkspaceACTIVE4.json";
+            let workspaceUrl = "covidWorkspace.json";
             let appView;
+            let stateTab,countyTab,statePage,countyPage;
 
+            const COMPONENT_INDEX = 0;
+            const ELEMENT_INDEX = 1;
+            const VIEW_INDEX = 2;
+
+            //state page components we want to show
+            let stateComponentInfo = [
+                ["usStatePlots.graphingOptions","stateGraphOptionsElement","Form"],
+                ["usStatePlots.stateSelector","stateSelectElement","Form"],
+                ["usStatePlots.scaledCasesChart","stateCasesElement","Chart"],
+                ["usStatePlots.scaledNewCasesChart","stateNewCasesElement","Chart"],
+                ["usStatePlots.scaledDeathsChart","stateDeathsElement","Chart"],
+                ["usStatePlots.scaledNewDeathsChart","stateNewDeathsElement","Chart"]
+            ];
+
+            //county page components we want to show
+            let countyComponentInfo = [
+                ["usCountyPlots.graphingOptions","countyGraphOptionsElement","Form"],
+                ["usCountyPlots.stateSelector","countySelectElement","Form"],
+                ["usCountyPlots.scaledCasesChart","countyCasesElement","Chart"],
+                ["usCountyPlots.scaledNewCasesChart","countyNewCasesElement","Chart"],
+                ["usCountyPlots.scaledDeathsChart","countyDeathsElement","Chart"],
+                ["usCountyPlots.scaledNewDeathsChart","countyNewDeathsElement","Chart"]
+            ];
+
+            /** This does initialization after the page loads */
 			window.init = function() {
+                //we will preload some ui elements
+                stateTab = document.getElementById('stateTab');
+                countyTab = document.getElementById('countyTab');
+                statePage = document.getElementById('statePage');
+                countyPage = document.getElementById('countyPage');
+
+                //---------------------------------------------
+                //initialize the apogee workspace into the page
+                //---------------------------------------------
                 appView = new ApogeeWebView();
 
-                appView.addDisplay("usCountyPlots.graphingOptions","graphOptionsElement",true,"Form");
-                appView.addDisplay("usCountyPlots.stateSelector","stateElement",true,"Form");
-                appView.addDisplay("usCountyPlots.scaledCasesChart","casesElement",true,"Chart");
-                appView.addDisplay("usCountyPlots.scaledNewCasesChart","newCasesElement",true,"Chart");
-                appView.addDisplay("usCountyPlots.scaledDeathsChart","deathsElement",true,"Chart");
-                appView.addDisplay("usCountyPlots.scaledNewDeathsChart","newDeathsElement",true,"Chart");
+                //initialise the cells we want to display on the page
+                stateComponentInfo.forEach( info => appView.addDisplay(info[COMPONENT_INDEX],info[ELEMENT_INDEX],true,info[VIEW_INDEX]) );
+                countyComponentInfo.forEach( info => appView.addDisplay(info[COMPONENT_INDEX],info[ELEMENT_INDEX],false,info[VIEW_INDEX]) );
 
+                //open the workspace
                 appView.openWorkspace(workspaceUrl);
+
+                //update the UI to show one tab
+                tabSelected("state");    
+            }
+
+            /** This controls the tab visiblility */
+            window.tabSelected = function(tabName) {
+                if(tabName == "state") {
+                    stateTab.className = "selectedTabClass";
+                    countyTab.className = "normalTabClass";
+                    statePage.className = "selectedPageClass";
+                    countyPage.className = "hiddenPageClass";
+
+                    //we need to say when components are shown or hidden from the page
+                    setShowingState(stateComponentInfo,true);
+                    setShowingState(countyComponentInfo,false);
+
+                }
+                else {
+                    countyTab.className = "selectedTabClass";
+                    stateTab.className = "normalTabClass";
+                    countyPage.className = "selectedPageClass";
+                    statePage.className = "hiddenPageClass";
+
+                    //we need to say when components are shown or hidden from the page
+                    setShowingState(stateComponentInfo,false);
+                    setShowingState(countyComponentInfo,true);
+                }
+            }
+
+            /** This function sets the components in the given list as showing or not showing. */
+            function setShowingState(componentInfoList,isShowing) {
+                componentInfoList.forEach(info => appView.setIsShowing(info[COMPONENT_INDEX],info[VIEW_INDEX],isShowing));
             }
             
 		</script>
 	</head>
     <body onload="init()" style="overflow:auto">
-        <h2>Graphing Options</h2>
-        <div id="graphOptionsElement"></div>
+        <h1>US Covid Data</h1>
+        <p>This page renders the COVID-19 data as compiled by Johns Hopkins. This page is not intended for policy making or research purposes.</p>
+        <div id="tabBar">
+            <div id="stateTab" onclick="tabSelected('state')">
+                State
+            </div>
+            <div id="countyTab" onclick="tabSelected('county')">
+                County
+            </div>
+        </div>
+        <div id="statePage">
+            <h2>State Plots</h2>
+            <h3>Graphing Options</h3>
+            <div id="stateGraphOptionsElement"></div>
 
-        <h2>State and County Selection</h2>
-        <div id="stateElement"></div>
+            <h3>State Selection</h3>
+            <div id="stateSelectElement"></div>
 
-        <h2>Charts</h2>
-        <div id="casesElement"></div>
-        <div id="newCasesElement"></div>
-        <div id="deathsElement"></div>
-        <div id="newDeathsElement"></div>
+            <h3>Charts</h3>
+            <div id="stateCasesElement"></div>
+            <div id="stateNewCasesElement"></div>
+            <div id="stateDeathsElement"></div>
+            <div id="stateNewDeathsElement"></div>
+        </div>
+        <div id="countyPage">
+            <h2>County Plots</h2>
+            <h3>Graphing Options</h3>
+            <div id="countyGraphOptionsElement"></div>
+
+            <h3>State and County Selection</h3>
+            <div id="countySelectElement"></div>
+
+            <h3>Charts</h3>
+            <div id="countyCasesElement"></div>
+            <div id="countyNewCasesElement"></div>
+            <div id="countyDeathsElement"></div>
+            <div id="countyNewDeathsElement"></div>
+        </div>
+        <h2>NOTES</h2>
+        <ul> 
+            <li>The filtered data shows a flattening at the end of the new cases/deaths graph. This is an artifact of the 
+                current filtering process and should not be viewed as a trend in the data.
+            </li>
+            <li> The repository for the source data is  <a href="https://github.com/CSSEGISandData/COVID-19">https://github.com/CSSEGISandData/COVID-19</a>.</li>
+        </ul>
+        
 	</body>
 </html>

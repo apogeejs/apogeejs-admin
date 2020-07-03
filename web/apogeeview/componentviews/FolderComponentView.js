@@ -1,4 +1,3 @@
-import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import ParentComponentView from "/apogeeview/componentdisplay/ParentComponentView.js";
 import LiteratePageComponentDisplay from "/apogeeview/componentdisplay/literatepage/LiteratePageComponentDisplay.js";
 

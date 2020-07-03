@@ -11,19 +11,16 @@ import ActionButton from "/apogeeview/editor/toolbar/ActionButton.js";
 import StateCheck from "/apogeeview/editor/StateCheck.js";
 import {getInteractiveNodePlugin} from "/apogeeview/editor/InteractiveNodeKeyHandler.js";
 
-import { baseKeymap } from "/apogeeview/editor/apogeeCommands.js";
+import {baseKeymap} from "/apogeeview/editor/apogeeCommands.js";
 
 import {Plugin}  from "/prosemirror/dist/prosemirror-state.es.js";
-import { EditorState, Selection,  }  from "/prosemirror/dist/prosemirror-state.es.js";
-import { DOMParser, Node as ProseMirrorNode, Mark }  from "/prosemirror/dist/prosemirror-model.es.js";
-import { EditorView }  from "/prosemirror/dist/prosemirror-view.es.js";
-import { Step }  from "/prosemirror/dist/prosemirror-transform.es.js";
-import { keymap }  from "/prosemirror/dist/prosemirror-keymap.es.js";
+import {EditorView}  from "/prosemirror/dist/prosemirror-view.es.js";
+import {keymap}  from "/prosemirror/dist/prosemirror-keymap.es.js";
 import {gapCursor} from "/prosemirror/dist/prosemirror-gapcursor.es.js";
 
 import ApogeeComponentView from "/apogeeview/editor/ApogeeComponentView.js";
 
-import {convertToNonListBlockType, convertToListBlockType, indentSelection, unindentSelection } from "/apogeeview/editor/apogeeCommands.js";
+import {setBlockType} from "/apogeeview/editor/apogeeCommands.js";
 
 export function createProseMirrorManager(app,schema) {
 
@@ -33,15 +30,13 @@ export function createProseMirrorManager(app,schema) {
   //===========================
   //create the toolbar
   //===========================
-  let convertToParagraphCommand = (state,dispatch) => convertToNonListBlockType(schema.nodes.paragraph, state, dispatch);
-  let convertToH1Command = (state,dispatch) => convertToNonListBlockType(schema.nodes.heading1, state, dispatch);
-  let convertToH2Command = (state,dispatch) => convertToNonListBlockType(schema.nodes.heading2, state, dispatch);
-  let convertToH3Command = (state,dispatch) => convertToNonListBlockType(schema.nodes.heading3, state, dispatch);
-  let convertToH4Command = (state,dispatch) => convertToNonListBlockType(schema.nodes.heading4, state, dispatch);
-  let convertToBulletCommand = (state,dispatch) => convertToListBlockType(schema.nodes.bulletList, state, dispatch);
-  let convertToNumberedCommand = (state,dispatch) => convertToListBlockType(schema.nodes.numberedList, state, dispatch);
-  let indentCommand = (state,dispatch) => indentSelection(state, dispatch);
-  let unindentCommand = (state,dispatch) => unindentSelection(state, dispatch);
+  let convertToParagraphCommand = (state,dispatch) => setBlockType(schema.nodes.paragraph, state, dispatch);
+  let convertToH1Command = (state,dispatch) => setBlockType(schema.nodes.heading1, state, dispatch);
+  let convertToH2Command = (state,dispatch) => setBlockType(schema.nodes.heading2, state, dispatch);
+  let convertToH3Command = (state,dispatch) => setBlockType(schema.nodes.heading3, state, dispatch);
+  let convertToH4Command = (state,dispatch) => setBlockType(schema.nodes.heading4, state, dispatch);
+  let convertToBulletCommand = (state,dispatch) => setBlockType(schema.nodes.bulletList, state, dispatch);
+  let convertToNumberedCommand = (state,dispatch) => setBlockType(schema.nodes.numberedList, state, dispatch);
 
   //this function determines if the block button is highlighted
   let getBlockIsHighlightedFunction = (nodeType) => {
@@ -49,12 +44,6 @@ export function createProseMirrorManager(app,schema) {
       let blockTypes = selectionInfo.blocks.blockTypes;
       return ((blockTypes.length === 1)&&(blockTypes[0] == nodeType));
     }
-  }
-
-  //this determines if the list indent buttons are active
-  let listIndentIsActive = (selectionInfo) => {
-    let blockTypes = selectionInfo.blocks.blockTypes;
-    return ((blockTypes.length === 1)&&(blockTypes[0].spec.group == "list"));
   }
 
   let toolbarItems = [
@@ -65,8 +54,6 @@ export function createProseMirrorManager(app,schema) {
     new ActionButton(convertToH4Command,getBlockIsHighlightedFunction(schema.nodes.heading4),null,"H4","atb_h4_style","Heading 4"),
     new ActionButton(convertToBulletCommand,getBlockIsHighlightedFunction(schema.nodes.bulletList),null,'\u2022',"atb_ul_style","Bullet List"),
     new ActionButton(convertToNumberedCommand,getBlockIsHighlightedFunction(schema.nodes.numberedList),null,"1.","atb_ol_style","Nubmered List"),
-    new ActionButton(indentCommand, null, listIndentIsActive, ">>", "atb_lindent_style", "Indent List"),
-    new ActionButton(unindentCommand, null, listIndentIsActive, "<<", "atb_lunindent_style", "Unindent List"),
     new MarkToggleItem(schema.marks.bold, null, "B", "atb_bold_style", "Bold"),
     new MarkToggleItem(schema.marks.italic, null, "I", "atb_italic_style", "Italic"),
     new MarkDropdownItem(schema.marks.fontfamily, "fontfamily", [["Sans-serif","Sans-serif"], ["Serif","Serif"], ["Monospace","Monospace"]],"Sans-serif"),
@@ -140,22 +127,16 @@ export function createProseMirrorManager(app,schema) {
   //set up the export functions
   //===============================
 
-  proseMirror.createEditorState = function(document,optionalSelection,optionalStoredMarks) {
-    var state = EditorState.create({
-      doc: document,
-      selection: optionalSelection,
-      storedMarks: optionalStoredMarks,
-      plugins: [
-        getInteractiveNodePlugin(),
-        keymap({ "Mod-z": undo, "Mod-y": redo }),
-        keymap(baseKeymap),
-        gapCursor(),
-        toolbarPlugin,
-        stateCheckPlugin
-      ]
-    });
-    return state;
-  }
+  let plugins = [
+    getInteractiveNodePlugin(),
+    keymap({ "Mod-z": undo, "Mod-y": redo }),
+    keymap(baseKeymap),
+    gapCursor(),
+    toolbarPlugin,
+    stateCheckPlugin
+  ];
+
+  proseMirror.getPlugins = () => plugins;
 
   proseMirror.createEditorView = function (containerElement, pageDisplay, editorData) {
 
