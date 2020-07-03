@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="http://apogeejs.com/lib/v1.0.0-p2/cssBundle.css">
+        <style>
+            body {
+                padding: 10px;
+            }
+            .cellViewContainer {
+                width: 600px;
+            }
+        </style>
+        <script type="module">
+            import {ApogeeWebView} from "http://apogeejs.com/lib/v1.0.0-p2/apogeeWebClientLib.es.js";
+        
+            //configure app and load the workspace
+            let workspaceUrl = "webAppTestWorkspace.json";
+            let appView;
+
+			window.init = function() {
+                appView = new ApogeeWebView();
+
+                //this adds a display view to the page to the given element
+                //should be done before the workspace is loaded.
+                appView.addDisplay("main.inputCell","inputDisplayElement",true,"Data");
+                appView.addDisplay("main.outputCell","outputDisplayElement",true,"Data");
+
+                //this adds a listener for creation or updated to a component
+                //should be done before workspace is loaded
+                let callback = component => alert(component.getName() + " value updated!");
+                appView.addComponentListener("main.outputCell",callback);
+
+                appView.openWorkspace(workspaceUrl);
+            }
+            
+		</script>
+	</head>
+    <body onload="init()">
+        <h1>Simple Example of Embedding a Apogee Workspace in a Web Page.</h1>
+        <p>You can expose the display elements from an Apogee workspace in a web application. This page is very ugly but you can make it much prettier.</p>
+
+        <p>This is the input cell:</p>
+        <div class="cellViewContainer" id="inputDisplayElement"></div>
+
+        <p>This is the output cell:</p>
+        <div class="cellViewContainer" id="outputDisplayElement"></div>
+	</body>
+</html>
