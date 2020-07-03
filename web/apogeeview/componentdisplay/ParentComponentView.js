@@ -120,8 +120,8 @@ export default class ParentComponentView extends ComponentView {
 
         //the initial selection and marks should be included if this is a document changing transaction, 
         //they are used to make the undo command.
-        if(optionalInitialSelection) commandData.initialSelection = optionalInitialSelection;
-        if(optionalInitialMarks) commandData.initialMarks = optionalInitialMarks;
+        if(optionalInitialSelection) commandData.initialSelection = optionalInitialSelection.toJSON();
+        if(optionalInitialMarks) commandData.initialMarks = optionalInitialMarks.map(mark => mark.toJSON());
             
         return commandData;
     }

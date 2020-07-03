@@ -1,5 +1,7 @@
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
-import { Transform, Step } from "/prosemirror/dist/prosemirror-transform.es.js";
+import { Step } from "/prosemirror/dist/prosemirror-transform.es.js";
+import { TextSelection, NodeSelection }  from "/prosemirror/dist/prosemirror-state.es.js";
+import { GapCursor } from "/prosemirror/dist/prosemirror-gapcursor.es.js";
 
 /** Update Component Command
  *
@@ -33,51 +35,43 @@ let literatepagetransaction = {};
 
 literatepagetransaction.createUndoCommand = function(workspaceManager,commandData) {
 
+    let transaction = commandData.transaction;
+    if(!transaction) return null;
+
     //no undo/redo if the document is not changed. This is just an editor state change
-    if(!commandData.transaction.docChanged) return null;
+    if(!transaction.docChanged) return null;
 
-    //if we do want to add to history we want to 
+    //if we do want to add to history we want to store the transaction as data, not objects
+    //we will _modify_ the command passed in below, partially due to a slight mismatch between
+    //prosemirror and apogee
+    let stepsJson = [];
+    let inverseStepsJson = [];
+    for(let i = 0; i < transaction.steps.length; i++) {
+        let step = transaction.steps[i];
+        stepsJson.push(step.toJSON());
+        let stepDoc = transaction.docs[i];
+        let inverseStep = step.invert(stepDoc);
+        //this is in the wrong order - we will reverse it below
+        inverseStepsJson.push(inverseStep.toJSON()); 
+    }
 
-    //WE NEED TO GO BACK AND PUT THIS IN!!!
-    else return null;
+    //fix the order of inverse commands
+    inverseStepsJson.reverse();
 
+    //modify the command to save the raw data for he transaction
+    commandData.steps = stepsJson;
+    if(transaction.selection) commandData.selection = transaction.selection.toJSON();
+    if(transaction.marks) commandData.marks = transaction.marks.map(mark => mark.toJSON());
 
+    //create the undo commans
+    let undoCommandData = {};
+    undoCommandData.type = literatepagetransaction.commandInfo.type;
+    undoCommandData.componentId = commandData.componentId;
+    undoCommandData.steps = inverseStepsJson;
+    if(commandData.initialSelection) undoCommandData.selection = commandData.initialSelection;
+    if(commandData.initialMarks) undoCommandData.marks = commandData.initialMarks;
 
-    // var stepsJson = [];
-    // var inverseStepsJson = [];
-
-    // for(var i = 0; i < transaction.steps.length; i++) {
-    //     var step = transaction.steps[i];
-    //     stepsJson.push(step.toJSON());
-    //     var stepDoc = transaction.docs[i];
-    //     var inverseStep = step.invert(stepDoc);
-    //     //this is in the wrong order - we will reverse it below
-    //     inverseStepsJson.push(inverseStep.toJSON()); 
-    // }
-
-    // //fix the order of inverse commands
-    // inverseStepsJson.reverse();
-    // commandData.steps = stepsJson;
-    // commandData.undoSteps = inverseStepsJson;
-
-    // if(optionalInitialSelection) commandData.startSelection = optionalInitialSelection.toJSON();
-    // if(optionalInitialMarks) commandData.startMarks = optionalInitialMarks.map(mark => mark.toJSON());;
-
-    // if(transaction.selection) commandData.endSelection = transaction.selection.toJSON();
-    // if(transaction.marks) commandData.endMarks = transaction.marks.map(mark => mark.toJSON());
-
-    
-
-    //     //temporary implementation
-    //     var undoCommandData = {};
-    //     undoCommandData.type = literatepagetransaction.commandInfo.type;
-    //     undoCommandData.steps = commandData.undoSteps;
-    //     undoCommandData.startSelection = commandData.endSelection;
-    //     undoCommandData.startMarks = commandData.endMarks;
-    //     undoCommandData.endSelection = commandData.startSelection;
-    //     undoCommandData.endMarks = commandData.startMarks;
-    //     undoCommandData.memberId = commandData.memberId;
-    //     return undoCommandData;
+    return undoCommandData;
 
 }
 
@@ -88,8 +82,50 @@ literatepagetransaction.executeCommand = function(workspaceManager,commandData) 
 
     let oldEditorState = component.getEditorState();
 
-    let newEditorState = oldEditorState.apply(commandData.transaction);
-    component.setEditorState(newEditorState);
+    let transaction = commandData.transaction;
+    //we do not want to store the transaction in history. See note above in create undo command.
+    delete commandData.transaction;
+
+    //if the transaction is not serialized, serilized it
+    if(!transaction) {
+        if(!commandData.steps) {
+            console.log("Document transaction with no steps!");
+            return;
+        }
+        let schema = oldEditorState.schema;
+
+        transaction = oldEditorState.tr;
+        commandData.steps.forEach( stepJSON => {
+            transaction.step(Step.fromJSON(schema,stepJSON));
+        })
+
+        if(commandData.selection) {
+            let selection = deserializeSelection(transaction.doc,commandData.selection);
+            if(selection) transaction.setSelection(selection);
+        }
+
+        if(commandData.marks) {
+            transaction.setStoredMarks(commandData.marks.map(markJson => Mark.fromJSON(schema,markJson)));
+        }
+    }
+
+    let newEditorState = oldEditorState.apply(transaction);
+    component.setEditorState(newEditorState);    
+}
+
+function deserializeSelection(doc,selectionJson) {
+    if(selectionJson.type == "text") {
+        return TextSelection.fromJSON(doc,selectionJson);
+    }
+    else if(selectionJson.type == "node") {
+        return NodeSelection.fromJSON(doc,selectionJson);
+    }
+    else if(selectionJson.type == "gapcursor") {
+        return GapCursor.fromJSON(doc,selectionJson);
+    }
+    else {
+        return null;
+    }
 }
 
 literatepagetransaction.commandInfo = {

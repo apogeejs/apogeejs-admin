@@ -11,7 +11,9 @@ const PASSTHROUGH_KEYMAP = {
     "ArrowLeft": dummyFunction,
     "ArrowRight": dummyFunction,
     "ArrowUp": dummyFunction,
-    "ArrowDown": dummyFunction
+    "ArrowDown": dummyFunction,
+    "Mod-z": dummyFunction,
+    "Mod-y": dummyFunction
 }
 
 //key handler args: state, dispatch, view
