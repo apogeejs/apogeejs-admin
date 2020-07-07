@@ -16,10 +16,11 @@ compoundcommand.createUndoCommand = function(workspaceManager,commandData) {
         let childCommandJson = commandData.childCommands[i];
         let childCommandObject = CommandManager.getCommandObject(childCommandJson.type);
         let childUndoCommandJson = childCommandObject.createUndoCommand(workspaceManager,childCommandJson);
-        undoCommandJson.childCommands.push(childUndoCommandJson);
+        if(childUndoCommandJson) undoCommandJson.childCommands.push(childUndoCommandJson);
     }
     
-    return undoCommandJson;
+    if(undoCommandJson.childCommands.length > 0) return undoCommandJson;
+    else return null;
 }
 
 /** This method is used for updating property values from the property dialog. 
