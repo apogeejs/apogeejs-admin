@@ -140,14 +140,14 @@ export default class CommandHistory {
         let oldLastCmdIndex = this.lastUsedCmdIndex;
         let oldFirstCmdIndex = this.firstUsedCmdIndex;
         
-        let insertArrayIndex = this._getArrayIndex(this.nextInsertCmdIndex);
+        let insertArrayIndex = this._getArrayIndex(oldNextCmdIndex);
         this.undoQueue[insertArrayIndex] = command;
         
         //update cmd index vlues
         // -last used index is the one just added
-        this.lastUsedCmdIndex = this.nextInsertCmdIndex;
+        this.lastUsedCmdIndex = oldNextCmdIndex;
         // -next insert index is one more than the previous (wrapping is NOT done in the cmd index values, only in the array index values)
-        this.nextInsertCmdIndex++;
+        this.nextInsertCmdIndex = oldNextCmdIndex + 1;
         
         // -set the first used index
         if(oldFirstCmdIndex > oldLastCmdIndex) {
@@ -157,7 +157,7 @@ export default class CommandHistory {
         else {
             //check for wrapping commands
             let oldFirstArrayIndex = this._getArrayIndex(oldFirstCmdIndex);
-            if(insertArrayIndex == oldFirstArrayIndex) {
+            if((insertArrayIndex == oldFirstArrayIndex)&&(oldFirstCmdIndex != oldNextCmdIndex)) {
                 this.firstUsedCmdIndex++;
             }
         }
