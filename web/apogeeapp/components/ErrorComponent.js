@@ -14,12 +14,12 @@ export default class ErrorComponent extends Component {
 
     /** This overrides the save method to return the original input. */
     toJson(modelManager) {
-        return this.completeJson;
+        return this.getField("completeJson");
     }
 
     /** This overrides the open deserialize method to save the entire json. */
     loadStoredData(json) {
-        this.completeJson = json;
+        this.setField("completeJson",json);
     }
 
     //======================================

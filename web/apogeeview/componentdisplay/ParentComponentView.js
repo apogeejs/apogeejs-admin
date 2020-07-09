@@ -4,6 +4,7 @@ import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatep
 
 import { TextSelection, NodeSelection, EditorState, Selection } from "/prosemirror/dist/prosemirror-state.es.js";
 import { Step } from "/prosemirror/dist/prosemirror-transform.es.js";
+import { Slice } from "/prosemirror/dist/prosemirror-model.es.js"
 
 //this constant is used (or hopefully not) in correctCreateInfoforRepeatedNames
 const MAX_SUFFIX_INDEX = 99999;
@@ -152,14 +153,18 @@ export default class ParentComponentView extends ComponentView {
             let workingInitialSelection = initialSelection;
             let workingInitialMarks = initialMarks;
 
-            //process each step, mapping to new steps
+            //-----------------------------------------
+            //process each step, looking for inserted or deleted apogee nodes
+            //if there are any, intercept these commands and modify them to do the proper
+            //actions on the model and update the transaction so the apogee components 
+            //are created/deleted at the proper time relative to their insert/remove from the document.
+            //-------------------------------------------
             let activeNameMap = this.createActiveNameMap();
             let modifiedTransaction = editorState.tr;
             let transactionModified = false;
             transaction.steps.forEach( (oldStep, index) => {
 
                 let oldStepDoc = transaction.docs[index];
-                let oldStepJson = oldStep.toJSON();
 
                 //--------------------------------------
                 //process the step for deleted components
@@ -181,7 +186,7 @@ export default class ParentComponentView extends ComponentView {
                 //process the step for any added components including potentially modifying the slice
                 //--------------------------------------
                 let createComponentCommands;
-                let { newSliceContentJson, createdComponentInfos } = this.processForStepComponentCreateCommands(oldStep,oldStepJson,activeNameMap);
+                let { insertSlice, createdComponentInfos } = this.processForStepComponentCreateCommands(oldStep,activeNameMap);
                 if(createdComponentInfos.length > 0) {
                     //get the create commands
                     createComponentCommands = this.createCreateComponentCommands(createdComponentInfos);
@@ -191,18 +196,49 @@ export default class ParentComponentView extends ComponentView {
                 }
 
                 //--------------------------------------
-                // Update the new transaction and commands
+                // Update the new transaction and commands if an apogee nodes are created and/or deleted
                 //--------------------------------------
                 if((deleteComponentCommands)||(createComponentCommands)) {
                     //we want to modify the step and insert the delete and/or create component commands
 
+                    //right now we are assuming and only supporting the case that the command that creates or
+                    //deleted components is a REPLACE step (not a REPLACE AROUND or anything else)
+                    if(oldStep.jsonID != "replace") {
+                        throw new Error("Component add/remove in a non-replace step: " + oldStep.jsonID + "; NOT CURRRENTLY SUPPORTED!");
+                    }
+
                     //----------------------------------
                     //create the remove step (if needed)
                     //-----------------------------------
-                    let removeStep = this.createRemoveStep(oldStepJson);
-                    if(removeStep) {
-                        modifiedTransaction.step(removeStep);
+                    //this is the range in which we wil insert the new content
+                    let insertFrom = oldStep.from;
+                    let insertTo;
+
+                    //if there is content removed, do this in an explicit delete step and, if needed, a later insert after any components are created/deleted
+                    if(oldStep.from != oldStep.to) {
+                        //store the initial modified step count
+                        let initialStepCount = modifiedTransaction.steps.length;
+
+                        //rather than replacing the content including the new apogee node, just DELETE for now.
+                        //we must delete issue a create component command before we insert it into the doc.
+                        modifiedTransaction.deleteRange(oldStep.from,oldStep.to);
                         transactionModified = true;
+
+                        //we want to look at the steps we created, so we can update these with our new content
+                        //for now we will support only one replace step is created.
+                        let addedRemoveSliceLength = 0;
+                        let newStepCount = modifiedTransaction.steps.length;
+                        if(newStepCount - initialStepCount != 1) {
+                            let addedStep = modifiedTransaction.steps[newStepCount-1];
+                            if((addedStep.slice)&&(addedStep.slice.content)) {
+                                addedRemoveSliceLength = addedStep.slice.content.size;
+                            }
+                        }
+
+                        insertTo = oldStep.from + addedRemoveSliceLength;
+                    }
+                    else {
+                        insertTo = oldStep.from;
                     }
 
                     //close out the old transaction if needed, starting a new one
@@ -233,9 +269,8 @@ export default class ParentComponentView extends ComponentView {
                     //----------------------------
                     //create the editor insert step (if needed)
                     //----------------------------
-                    let insertStep = this.createInsertStep(oldStepJson,newSliceContentJson);
-                    if(insertStep) {
-                        modifiedTransaction.step(insertStep);
+                    if(insertSlice) {
+                        modifiedTransaction.replaceRange(insertFrom,insertTo,insertSlice);
                         transactionModified = true;
                     }    
                 }
@@ -385,18 +420,22 @@ export default class ParentComponentView extends ComponentView {
      * - it checks if the name is available. If not, it modifying the name.
      * The passed in variable "activeNameMap" is modified in place as new names are added
      */
-    processForStepComponentCreateCommands(oldStep,oldStepJson,activeNameMap) {
-        let newSliceContentJson;
+    //let { insertSlice, createdComponentInfos } = this.processForStepComponentCreateCommands(oldStep,oldStepJson,activeNameMap);
+    processForStepComponentCreateCommands(oldStep,activeNameMap) {
+        let insertSlice;
         let createdComponentInfos = [];
 
         if(!this.stepHasCreateComponentNode(oldStep)) {
             //no modified step or create component commands needed
-            if(oldStepJson.slice) newSliceContentJson = oldStepJson.slice.content;
+            insertSlice = oldStep.slice;
             createdComponentInfos = [];
         }
         else {
-            newSliceContentJson = [];
-            if((oldStepJson.stepType == "replace")||(oldStepJson.stepType == "replaceAround")) {
+            //we will check each apogee node to see if we need to change the name of any of them
+            //it might be a little cumbersome how I do this.
+            let newSliceContentJson = [];
+            let oldStepJson = oldStep.toJSON();
+            if(oldStepJson.stepType == "replace"){
                 oldStepJson.slice.content.forEach( oldNodeJson => {
 
                     if(oldNodeJson.type == "apogeeComponent") {
@@ -435,10 +474,20 @@ export default class ParentComponentView extends ComponentView {
                     }
                 })
             }
+            else {
+                //we are assuming this will be a replace, and we will not currently support otherwise
+            }
+
+            let newSliceJson = {};
+            Object.assign(newSliceJson,oldStepJson.slice);
+            newSliceJson.content = newSliceContentJson;
+            insertSlice = Slice.fromJSON(this.getSchema(),newSliceJson);
         }
 
+        
+
         //return the new step
-        return { newSliceContentJson, createdComponentInfos };
+        return { insertSlice, createdComponentInfos };
     }
 
     /** This method checks the name of a created component and returns the proper name to 
@@ -492,76 +541,6 @@ export default class ParentComponentView extends ComponentView {
             throw new Exception("Unknown selection type: " + selection.constructor.name);
         }
         
-    }
-
-    /** This method takes an input step that includes a delete and/or create and makes the associated remove step. 
-     * The insert step is made in createInsertStep. This method returns null if there is no remove step.
-     * The new step will keep the same bounds for the replace but it will remove the slice that is inserted.
-     */
-    createRemoveStep(oldStepJson) {
-        let newStepJson;
-        if(oldStepJson.stepType == "replace") {
-            if(oldStepJson.from != oldStepJson.to) {
-                newStepJson = {};
-                newStepJson.stepType = "replace";
-                newStepJson.from = oldStepJson.from;
-                newStepJson.to = oldStepJson.to;
-            }
-            else {
-                newStepJson = null;
-            }
-        }
-        else if(oldStepJson.stepType == "replaceAround") {
-            if((oldStepJson.from != oldStepJson.gapFrom)&&(oldStepJson.gapTo != oldStepJson.to)) {
-                newStepJson = {};
-                newStepJson.stepType = "replaceAround";
-                newStepJson.from = oldStepJson.from;
-                newStepJson.gapFrom = oldStepJson.gapFrom;
-                newStepJson.gapTo = oldStepJson.gapTo;
-                newStepJson.to = oldStepJson.to;
-            }
-            else {
-                newStepJson = null;
-            }
-        }
-        else {
-            throw new Error("Unknown editor step type: " + oldStepJson.stepType);
-        }
-
-        return newStepJson ? Step.fromJSON(this.getSchema(), newStepJson) : null;
-    }
-    
-    /** This method takes an input step that includes a delete and/or create and makes the associated insert step. 
-     * The remove step is made in createRemoveStep. This method returns null if there is no insert step.
-     * The new step will keep the same slice for the insert but it will remove no content.
-     */
-    createInsertStep(oldStepJson,newSliceContentJson) {
-        if(newSliceContentJson) {
-            //make a copy to keep the old slice info - but we will insert the potentiall modified content
-            let newStepJson = apogeeutil.jsonCopy(oldStepJson);
-            newStepJson.slice.content = newSliceContentJson
-            //update the locations
-            if(oldStepJson.stepType == "replace") {
-                newStepJson.from = oldStepJson.from;
-                newStepJson.to = oldStepJson.from;
-            }
-            else if(oldStepJson.stepType == "replaceAround") {
-                newStepJson.from = oldStepJson.from;
-                newStepJson.gapFrom = newStepJson.from;
-                let gapSize = oldStepJson.gapTo - oldStepJson.gapFrom;
-                newStepJson.gapTo = newStepJson.gapFrom + gapSize;
-                newStepJson.to = newStepJson.gapTo;
-            }
-            else {
-                throw new Error("Unknown editor step type: " + oldStepJson.stepType);
-            }
-
-            return  Step.fromJSON(this.getSchema(), newStepJson);
-        }
-        else {
-            //no insert done
-            return null;
-        }
     }
 
     /** This method maps the list of component names to a list of delete commands. */

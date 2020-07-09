@@ -59,7 +59,7 @@ export default class CutNPasteFileAccess extends BaseFileAccess {
         showTextIoDialog(options,onSubmit);
 
         //I should maybe only do this if you do not press cancel?
-        if(onSaveSuccess) onSave(null,true,null);
+        if(onSave) onSave(null,true,null);
     }
 
     /** 

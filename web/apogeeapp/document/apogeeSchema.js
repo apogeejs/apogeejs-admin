@@ -94,7 +94,7 @@ export function createFolderSchema(app,pageMemberId) {
     text: {
       group: "inline"
     },
-
+/*
     // :: NodeSpec An inline image (`<img>`) node. Supports `src`,
     // `alt`, and `href` attributes. The latter two default to the empty
     // string.
@@ -118,6 +118,7 @@ export function createFolderSchema(app,pageMemberId) {
       }],
       toDOM(node) { let { src, alt, title } = node.attrs; return ["img", { src, alt, title }] }
     },
+  */
 
     apogeeComponent: {
       marks: "",
@@ -176,6 +177,7 @@ export function createFolderSchema(app,pageMemberId) {
 
   // :: Object [Specs](#model.MarkSpec) for the marks in the schema.
   const marks = {
+/*
     // :: MarkSpec A link. Has `href` and `title` attributes. `title`
     // defaults to the empty string. Rendered and parsed as an `<a>`
     // element.
@@ -192,6 +194,7 @@ export function createFolderSchema(app,pageMemberId) {
       }],
       toDOM(node) { let { href, title } = node.attrs; return ["a", { href, title }, 0] }
     },
+*/
 
     // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
     // Has parse rules that also match `<i>` and `font-style: italic`.
