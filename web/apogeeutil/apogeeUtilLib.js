@@ -213,7 +213,7 @@ apogeeutil.jsonEquals = function(json1,json2) {
  * This is intended for the purpose of comparing json objects. 
  * 
  *  @param {JSON} json1 - This is a JSON valued object 
- *  @returns {Boolean}  - Returns whether or not the objects are equal
+ *  @returns {JSON} - Returns a order-modified version of the object
  */  
 apogeeutil.getNormalizedCopy = function(json) {
     var copiedJson;
