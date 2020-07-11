@@ -1,0 +1,63 @@
+/** Obverall container. Width, height tbd */
+.listElement_listContainer {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    margin: 10px;
+    padding: 5px;
+    min-height: 100px;
+    border: 1px solid gray;
+    background-color: lightblue;
+}
+/** The control bar has a width determined by its content buttons. */
+.listElement_listControlBar {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    background-color: cyan;
+    padding: 5px;
+}
+/** We will stack the content buttons, if there are multiple. There will be an add
+button for each type of entry allowed. The label will indicate the associated type. */
+.listElement_addButton {
+    position: relative;
+    margin-bottom: 5px;
+}
+/** the element container is left of the control bar. Width tbd. */
+.listElement_elementContainer {
+    position: relative;
+    display: inline-block;
+    height: calc(100% - 10px);
+    background-color: yellow;
+    padding: 5px;
+    overflow: auto;
+}
+
+
+
+.listElement_itemElement {
+    position: relative;
+    background-color: orange;
+    border: 1px solid black;
+    margin: 2px;
+}
+.listElement_itemControlBar {
+    position: relative;
+    display: inline-block;
+    width: 55px;
+    height: 55px;
+    vertical-align: top;
+    background-color: red;
+}
+/** width tbd */
+.listElement_itemContent {
+    position: relative;
+    display: inline-block;
+    padding: 5px; 
+    background-color: blue;
+}
+.listElement_itemButton {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+}

@@ -6,6 +6,7 @@ import DropdownElement from "/apogeeui/configurablepanel/elements/DropdownElemen
 import HeadingElement from "/apogeeui/configurablepanel/elements/HeadingElement.js";
 import HTMLDisplayElement from "/apogeeui/configurablepanel/elements/HTMLDisplayElement.js";
 import InvisibleElement from "/apogeeui/configurablepanel/elements/InvisibleElement.js";
+import ListElement from "/apogeeui/configurablepanel/elements/ListElement.js";
 import PanelElement from "/apogeeui/configurablepanel/elements/PanelElement.js";
 import RadioGroupElement from "/apogeeui/configurablepanel/elements/RadioGroupElement.js";
 import SpacerElement from "/apogeeui/configurablepanel/elements/SpacerElement.js";
@@ -20,6 +21,7 @@ ConfigurablePanel.addConfigurableElement(DropdownElement);
 ConfigurablePanel.addConfigurableElement(HeadingElement);
 ConfigurablePanel.addConfigurableElement(HTMLDisplayElement);
 ConfigurablePanel.addConfigurableElement(InvisibleElement);
+ConfigurablePanel.addConfigurableElement(ListElement);
 ConfigurablePanel.addConfigurableElement(PanelElement);
 ConfigurablePanel.addConfigurableElement(RadioGroupElement);
 ConfigurablePanel.addConfigurableElement(SpacerElement);
