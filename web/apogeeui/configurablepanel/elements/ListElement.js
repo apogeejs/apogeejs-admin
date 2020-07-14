@@ -1,6 +1,7 @@
 import ConfigurableElement from "/apogeeui/configurablepanel/ConfigurableElement.js";
 import ConfigurablePanel from "/apogeeui/configurablepanel/ConfigurablePanel.js";
 import ConfigurablePanelConstants from "/apogeeui/configurablepanel/ConfigurablePanelConstants.js";
+import uiutil from "/apogeeui/uiutil.js";
 
 /** This is a list element.
  * 
@@ -8,9 +9,13 @@ import ConfigurablePanelConstants from "/apogeeui/configurablepanel/Configurable
  */
 export default class ListElement extends ConfigurableElement {
     constructor(form,elementInitData) {
-        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_NO_MARGIN);
+        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_STANDARD);
 
         var containerElement = this.getElement();
+
+        this.upUrl = uiutil.getResourcePath("/up_black.png");
+        this.downUrl = uiutil.getResourcePath("/down_black.png");
+        this.closeUrl = uiutil.getResourcePath("/close_black.png");
         
         //label
         if(elementInitData.label) {
@@ -24,7 +29,15 @@ export default class ListElement extends ConfigurableElement {
         }
         
         //initialize the list
-        this.entryTypes = elementInitData.entryTypes;
+        if(elementInitData.entryType) {
+            this.entryTypes = [elementInitData.entryType];
+            this.isMultitypeList = false;
+        }
+        else if(elementInitData.entryTypes) {
+            this.entryTypes = elementInitData.entryTypes;
+            this.isMultitypeList = true;
+        }
+        
         this.listEntries = [];
         this.elementContainer = null;
         this.listElement = this._createListContainer(); 
@@ -42,10 +55,16 @@ export default class ListElement extends ConfigurableElement {
             if(elementObject.getState() != ConfigurablePanelConstants.STATE_INACTIVE) {
                 var elementValue = elementObject.getValue();
                 if(elementValue !== undefined) {
-                    let valueEntry = {};
-                    valueEntry.key = elementObject.getKey();
-                    valueEntry.value = elementValue;
-                    listValue.push(valueEntry);
+                    //we return the values differently for multilists and non-multitype lists
+                    if(this.isMultitypeList) {
+                        let valueEntry = {};
+                        valueEntry.key = elementObject.getKey();
+                        valueEntry.value = elementValue;
+                        listValue.push(valueEntry);
+                    }
+                    else {
+                        listValue.push(elementValue);
+                    }
                 }
             }
         });
@@ -68,17 +87,28 @@ export default class ListElement extends ConfigurableElement {
 
                 //create a new entry for each value
                 listValue.forEach( (valueEntry,index) => {
-                    if((valueEntry.key !== undefined)&&(valueEntry.value != undefined)) {
-                        let entryTypeJson = this._lookupEntryTypeJson(valueEntry.key);
-                        if(entryTypeJson) {
-                            this._insertElement(entryTypeJson,valueEntry.value);
+                    if(this.isMultitypeList) {
+                        if((valueEntry.key !== undefined)&&(valueEntry.value != undefined)) {
+                            let entryTypeJson = this._lookupEntryTypeJson(valueEntry.key);
+                            if(entryTypeJson) {
+                                this._insertElement(entryTypeJson,valueEntry.value);
+                            }
+                            else {
+                                console.log("List Entry key not found: " + valueEntry.key);
+                            }
                         }
                         else {
-                            console.log("List Entry key not found: " + valueEntry.key)
+                            console.log("Improperly formatted list value for multitypelist!");
                         }
                     }
                     else {
-                        console.log("Improperly formatted list value!");
+                        let entryTypeJson = this.entryTypes[0];
+                        if(entryTypeJson) {
+                            this._insertElement(entryTypeJson,valueEntry);
+                        }
+                        else {
+                            console.log("NO entry type set!");
+                        }
                     }
                 });
             }
@@ -118,23 +148,28 @@ export default class ListElement extends ConfigurableElement {
         var listContainer = document.createElement("div");
         listContainer.className = "listElement_listContainer";
 
+        //element container - houses elements
+        let elementContainerWrapper = document.createElement("div");
+        elementContainerWrapper.className = "listElement_elementContainerWrapper";
+        listContainer.appendChild(elementContainerWrapper);
+
+        this.elementContainer = document.createElement("div");
+        this.elementContainer.className = "listElement_elementContainer";
+        elementContainerWrapper.appendChild(this.elementContainer);
+
         //control bar = has "add" buttons
         let controlBar = document.createElement("div");
         controlBar.className = "listElement_listControlBar";
         this.entryTypes.forEach(entryTypeJson => {
             let addButton= document.createElement("button");
             addButton.className = "listElement_addButton";
-            addButton.innerHTML = entryTypeJson.label;
+            let labelText = entryTypeJson.label ? "+ "+ entryTypeJson.label : "+";
+            addButton.innerHTML = labelText;
             addButton.onclick = () => this._insertElement(entryTypeJson);
             controlBar.appendChild(addButton);
             controlBar.appendChild(document.createElement("br"));
         });
         listContainer.appendChild(controlBar);
-
-        //element container - houses elements
-        this.elementContainer = document.createElement("div");
-        this.elementContainer.className = "listElement_elementContainer";
-        listContainer.appendChild(this.elementContainer);
 
         return listContainer;
     }
@@ -188,47 +223,48 @@ export default class ListElement extends ConfigurableElement {
 
     _createListDomElement(listEntry) {
         let contentElement = listEntry.elementObject.getElement();
+
         //list element
         let listElement = document.createElement("div");
         listElement.className = "listElement_itemElement";
-        //control bar
-        let controlBar = document.createElement("div");
-        controlBar.className = "listElement_itemControlBar";
-        let upButton = document.createElement("button");
-        upButton.className = "listElement_itemButton";
-        upButton.style.position = "absolute";
-        upButton.style.top = "5px";
-        upButton.style.left = "5px";
-        upButton.innerHTML = "^";
-        upButton.onclick = () => this._moveListEntryUp(listEntry);
-        controlBar.appendChild(upButton);
-   
-        let downButton = document.createElement("button");
-        downButton.className = "listElement_itemButton";
-        downButton.style.position = "absolute";
-        downButton.style.top = "30px";
-        downButton.style.left = "5px";
-        downButton.innerHTML = "v";
-        downButton.onclick = () => this._moveListEntryDown(listEntry);
-        controlBar.appendChild(downButton);
-   
-        let deleteButton = document.createElement("button");
-        deleteButton.className = "listElement_itemButton";
-        deleteButton.style.position = "absolute";
-        deleteButton.style.top = "5px";
-        deleteButton.style.left = "30px";
-        deleteButton.innerHTML = "x";
-        deleteButton.onclick = () => this._removeListEntry(listEntry);
-        controlBar.appendChild(deleteButton);
-   
-        listElement.appendChild(controlBar);
-        
+
         //content
         this.contentContainer = document.createElement("div");
         this.contentContainer.className = "listElement_itemContent";
         listElement.appendChild(this.contentContainer);
+
+        //control bar
+        let controlBar = document.createElement("div");
+        controlBar.className = "listElement_itemControlBar";
+        let upButton = document.createElement("img");
+        upButton.src = this.upUrl;
+        upButton.className = "listElement_itemButton";
+        upButton.style.position = "absolute";
+        upButton.style.top = "2px";
+        upButton.style.left = "2px";
+        upButton.onclick = () => this._moveListEntryUp(listEntry);
+        controlBar.appendChild(upButton);
    
+        let downButton = document.createElement("img");
+        downButton.src = this.downUrl;
+        downButton.className = "listElement_itemButton";
+        downButton.style.position = "absolute";
+        downButton.style.top = "15px";
+        downButton.style.left = "2px";
+        downButton.onclick = () => this._moveListEntryDown(listEntry);
+        controlBar.appendChild(downButton);
+   
+        let deleteButton = document.createElement("img");
+        deleteButton.src = this.closeUrl;
+        deleteButton.className = "listElement_itemButton";
+        deleteButton.style.position = "absolute";
+        deleteButton.style.top = "2px";
+        deleteButton.style.left = "20px";
+        deleteButton.onclick = () => this._removeListEntry(listEntry);
+        controlBar.appendChild(deleteButton);
+        
         this.contentContainer.appendChild(contentElement);
+        listElement.appendChild(controlBar);
    
         return listElement;
     }

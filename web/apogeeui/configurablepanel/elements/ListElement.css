@@ -3,18 +3,12 @@
     position: relative;
     display: inline-block;
     vertical-align: top;
-    margin: 10px;
-    padding: 5px;
-    min-height: 100px;
-    border: 1px solid gray;
-    background-color: lightblue;
 }
 /** The control bar has a width determined by its content buttons. */
 .listElement_listControlBar {
     position: relative;
     display: inline-block;
     vertical-align: top;
-    background-color: cyan;
     padding: 5px;
 }
 /** We will stack the content buttons, if there are multiple. There will be an add
@@ -22,42 +16,54 @@ button for each type of entry allowed. The label will indicate the associated ty
 .listElement_addButton {
     position: relative;
     margin-bottom: 5px;
+    white-space: nowrap;
+}
+/** the element container is left of the control bar. Width tbd. */
+.listElement_elementContainerWrapper {
+    position: relative;
+    display: inline-block;
+    height: calc(100% - 10px);
+    padding: 5px;
 }
 /** the element container is left of the control bar. Width tbd. */
 .listElement_elementContainer {
     position: relative;
-    display: inline-block;
-    height: calc(100% - 10px);
-    background-color: yellow;
-    padding: 5px;
-    overflow: auto;
+    display: table;
+    height: 100%;
 }
 
 
 
 .listElement_itemElement {
     position: relative;
-    background-color: orange;
-    border: 1px solid black;
+    display: table-row;
+    border: 1px solid rgba(0,0,0,.4);
     margin: 2px;
 }
 .listElement_itemControlBar {
     position: relative;
-    display: inline-block;
-    width: 55px;
-    height: 55px;
+    display: table-cell;
+    width: 33px;
+    height: 27px;
     vertical-align: top;
-    background-color: red;
 }
 /** width tbd */
 .listElement_itemContent {
     position: relative;
-    display: inline-block;
-    padding: 5px; 
-    background-color: blue;
+    display: table-cell;
 }
 .listElement_itemButton {
     position: absolute;
-    width: 20px;
-    height: 20px;
+    border: 1px solid rgba(0,0,0,.4);
+}
+.listElement_itemButton:hover {
+    position: absolute;
+    background-color: rgba(0,0,255,.2);
+    border: 1px solid rgba(0,0,0,.4);
+}
+.listElement_itemButton:active {
+    position: absolute;
+    background-color: rgba(0,0,255,.2);
+    border-style: inset;
+    border: 1px solid rgba(0,0,0,.7);
 }
