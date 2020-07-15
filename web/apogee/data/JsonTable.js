@@ -2,7 +2,10 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import Model from "/apogee/data/Model.js";
 import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 
-/** This class encapsulatees a data table for a JSON object */
+/** This class encapsulatees a data table for a JSON object. 
+ * (This object does also support function objects as elements of the json, though
+ * objects using this, such as the JsonTableComponent, may not.)
+*/
 export default class JsonTable extends CodeableMember {
 
     constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {

@@ -8,6 +8,9 @@ import CustomComponent from "/apogeeapp/components/CustomComponent.js";
 import CustomDataComponent from "/apogeeapp/components/CustomDataComponent.js";
 import ErrorComponent from "/apogeeapp/components/ErrorComponent.js";
 
+//JSON PLUS COMPONENT
+import JsonPlusTableComponent from "/apogeeapp/components/JsonPlusTableComponent.js";
+
 /** This module initializes the default component classes. */
 
 let componentInfo = {};
@@ -101,6 +104,10 @@ componentInfo.registerPageComponent(FolderFunctionComponent);
 //other components
 componentInfo.FOLDER_COMPONENT_CLASS = FolderComponent;
 componentInfo.ERROR_COMPONENT_CLASS = ErrorComponent;
+
+
+//JSON PLUS COMPONENT
+componentInfo.registerComponent(JsonPlusTableComponent);
 
 
 
