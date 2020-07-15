@@ -70,11 +70,14 @@ export default class DynamicFormView extends ComponentView {
                         getCommandMessenger: () => new UiCommandMessenger(this,functionMember.getId())
                     }
                     try {
-                        return layoutFunction(admin);
+                        let layout = layoutFunction(admin);
+                        if(layout) return layout;
+                        else return ConfigurableFormEditor.getEmptyLayout();
                     }
                     catch(error) {
-                        console.error("Error reading form layout: " + this.getName());
+                        console.error("Error reading form layout " + this.getName() + ": " + error.toString());
                         if(error.stack) console.error(error.stack);
+                        return ConfigurableFormEditor.getErrorLayout("Error in layout: " + error.toString())
                     }
                 }
                 //if we get here there was a problem with the layout

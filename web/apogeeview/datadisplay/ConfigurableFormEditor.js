@@ -64,5 +64,17 @@ export default class ConfigurableFormEditor extends DataDisplay {
             this.panel.addOnChange(onChange);
         }     
     }
+
+    //===========================
+    // Utilities for special form layouts
+    //===========================
+
+    static getErrorLayout(errorMsg) {
+        return ConfigurablePanel.getErrorMessageLayoutInfo(errorMsg);
+    }
+
+    static getEmptyLayout() {
+        return ConfigurablePanel.EMPTY_LAYOUT;
+    }
 }
 

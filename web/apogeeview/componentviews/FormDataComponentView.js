@@ -89,11 +89,14 @@ export default class FormDataComponentView extends ComponentView {
                 let layoutFunction = layoutFunctionMember.getData();   
                 if(layoutFunction instanceof Function) {
                     try { 
-                        return layoutFunction();
+                        let layout = layoutFunction();
+                        if(layout) return layout;
+                        else return ConfigurableFormEditor.getEmptyLayout();
                     }
                     catch(error) {
-                        console.error("Error reading form layout: " + this.getName());
+                        console.error("Error reading form layout " + this.getName() + ": " + error.toString());
                         if(error.stack) console.error(error.stack);
+                        return ConfigurableFormEditor.getErrorLayout("Error in layout: " + error.toString())
                     }
                 }
             }
