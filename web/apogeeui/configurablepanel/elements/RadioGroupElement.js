@@ -28,6 +28,7 @@ export default class RadioGroupElement extends ConfigurableElement {
         //radio buttons
         this.buttonList = [];
         var groupName = elementInitData.groupName;
+        if(!groupName) groupName = getRandomString();
         var addButton = buttonInfo => {
             var buttonContainer = uiutil.createElement("div");
             buttonContainer.style.display = elementInitData.horizontal ? "inline-block" : "block";
@@ -103,4 +104,8 @@ export default class RadioGroupElement extends ConfigurableElement {
 }
 
 RadioGroupElement.TYPE_NAME = "radioButtonGroup";
+
+function getRandomString() {
+    return Math.random().toString(36).substring(2, 15);
+}
 
