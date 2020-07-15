@@ -58,7 +58,7 @@ export default class FunctionTable extends CodeableMember {
         }
 
         //this is called from separate code to make debugging more readable
-        return __functionTableWrapper(initMember);
+        return __functionTableWrapper(initMember,this.getName());
     }
 
     /** Add to the base lock function - The function is lazy initialized so it can call itself without a 

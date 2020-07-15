@@ -201,6 +201,7 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
             
                 //this is an error in the code
                 if(error.stack) {
+                    console.error("Error calculating member " + this.getFullName(model));
                     console.error(error.stack);
                 }
 
