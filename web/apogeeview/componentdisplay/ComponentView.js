@@ -479,16 +479,12 @@ export default class ComponentView {
                 var parentComponentView = this.getParentComponentView();
                 if((parentComponentView)&&(parentComponentView.constructor.hasTabEntry)) {
 
+                    //execute command to select child
+                    let command = parentComponentView.getSelectApogeeNodeCommand(this.getName());
+                    this.getModelView().getApp().executeCommand(command);
+
                     //open the parent and bring this child to the front
                     makeTabActive(parentComponentView);
-
-                    //parentComponentView.showChild(this);
-      
-                    alert("Implement show child here!!!")
-                    // let commandData = this.selectApogeeNode(childComponentView.getName());
-                    // if(commandData) {
-                    //     ???
-                    // }
 
                 }
             }

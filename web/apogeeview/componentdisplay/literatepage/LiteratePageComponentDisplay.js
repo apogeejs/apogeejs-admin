@@ -288,7 +288,7 @@ export default class LiteratePageComponentDisplay {
                 //add handler
                 buttonElement.onclick = () => {
 
-                    this.editorView.dom.focus();
+                    this.editorView.focus();
 
                     var initialValues = {};
                     var parentMember = pageComponent.getParentFolderForChildren();
@@ -305,7 +305,7 @@ export default class LiteratePageComponentDisplay {
         textElement.innerHTML = "Additional Components...";
         buttonElement.onclick = () => {
 
-            this.editorView.dom.focus();
+            this.editorView.focus();
 
             var initialValues = {};
             var parentMember = pageComponent.getParentFolderForChildren();
@@ -400,6 +400,14 @@ export default class LiteratePageComponentDisplay {
     /** @protected */
     tabShown() {
         this.isShowing = true;
+        if(this.editorView) {
+            this.editorView.focus();
+            if(this.editorView.state) {
+                let tr = this.editorView.state.tr;
+                tr.scrollIntoView();
+                setTimeout(() => this.editorView.dispatch(tr),0);
+            }
+        }
         this.dispatchEvent(uiutil.SHOWN_EVENT,this);
     }
 
