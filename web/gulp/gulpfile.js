@@ -65,7 +65,8 @@ const CSS_FILES = [
     "../apogeeui/splitpane/SplitPane.css",
     "../apogeeui/tabframe/TabFrame.css",
     "../apogeeui/treecontrol/TreeControl.css",
-    "../apogeeui/configurablepanel/ConfigurablePanel.css", 
+    "../apogeeui/configurablepanel/ConfigurablePanel.css",
+    "../apogeeui/configurablepanel/elements/listElement.css",  
     "../prosemirror/compiledCss/editor.css",    
     "../ext/handsontable/handsontable_6.2.0/handsontable.full.min.css"
 ]

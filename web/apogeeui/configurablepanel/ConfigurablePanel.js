@@ -22,7 +22,7 @@ export default class ConfigurablePanel {
         
         //check for an invalid input
         if((!formInitData)||(!formInitData.layout)||(formInitData.layout.constructor != Array)) {
-            formInitData = ConfigurablePanel.getErrorMessageLayoutInfo("Invalid for layout!");
+            formInitData = ConfigurablePanel.getErrorMessageLayoutInfo("Invalid form layout!");
         }
         
         //clear data
