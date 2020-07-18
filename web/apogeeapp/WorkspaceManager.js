@@ -24,6 +24,8 @@ export default class WorkspaceManager extends FieldObject {
             let referenceManager = new ReferenceManager(this.app);
             this.setField("referenceManager",referenceManager);
 
+            this.setField("isDirty",false);
+
             //this is not a field like above because when we do not require a command to change it
             this.fileMetadata = null;
 
@@ -43,9 +45,6 @@ export default class WorkspaceManager extends FieldObject {
         //==============
         this.viewStateCallback = null;
         this.cachedViewState = null;
-
-        //listen to the workspace dirty event from the app
-        this.app.addListener("workspaceDirty",() => this.setIsDirty());
 
         this.isClosed = false;
     }
@@ -144,16 +143,15 @@ export default class WorkspaceManager extends FieldObject {
     }
 
     getIsDirty() {
-        return this.isDirty;
-        
+        return this.getField("isDirty");
     }
     
     setIsDirty() {
-        this.isDirty = true;
+        this.setField("isDirty",true);
     }
     
     clearIsDirty() {
-        this.isDirty = false;
+        this.setField("isDirty",false);
     }
 
     getIsClosed() {

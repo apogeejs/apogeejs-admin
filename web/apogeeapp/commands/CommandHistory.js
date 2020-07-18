@@ -35,7 +35,7 @@ export default class CommandHistory {
         
         this._saveCommand(command);
 
-        //set workspace dirty whenever a command is added to history (description as argument thrown in gratuitiously, or now)
+        //set workspace dirty whenever a command is added to history (description as argument thrown in gratuitiously, for now)
         this.eventManager.dispatchEvent("workspaceDirty",command.desc);
     }
     

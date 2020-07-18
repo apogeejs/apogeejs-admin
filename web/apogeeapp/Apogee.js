@@ -57,6 +57,9 @@ export default class Apogee {
         
         //command manager
         this.commandManager = new CommandManager(this);
+
+        //listen to the workspace dirty event from the app
+        this.addListener("workspaceDirty",() => this._setWorkspaceIsDirty());
         
         //----------------------------------
         //configure the application
@@ -156,6 +159,17 @@ export default class Apogee {
     clearWorkspaceIsDirty() {
         if(this.workspaceManager) {
             return this.workspaceManager.clearIsDirty();
+        }
+        else {
+            return false;
+        }
+    }
+
+    /** This method returns true if the workspcae contains unsaved data. 
+     * @private */
+    _setWorkspaceIsDirty() {
+        if(this.workspaceManager) {
+            return this.workspaceManager.setIsDirty();
         }
         else {
             return false;
