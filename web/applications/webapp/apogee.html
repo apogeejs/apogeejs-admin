@@ -31,7 +31,7 @@
         <link rel="stylesheet" type="text/css" href="/ext/handsontable/handsontable_6.2.0/handsontable.full.min.css">
         
 	</head>
-    <body onload="init(includeBasePathInfo)">
+    <body onload="init(includeBasePathInfo)" onbeforeunload="return beforeUnloadHandler()">
         <div id="appContainer"></div>
 	</body>
 </html>

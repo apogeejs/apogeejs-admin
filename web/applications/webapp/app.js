@@ -26,16 +26,12 @@ window.init = function(includeBasePathInfo) {
     appView = new ApogeeView("appContainer",appConfigManager);
 }
 
-function beforeUnloadHandler(e) {
+window.beforeUnloadHandler = function(e) {
     var app = appView.getApp();
     if((app)&&(app.getWorkspaceIsDirty())) {
-        console.log("Closing with unsaved data - It should query the user!");
-        e.preventDefault();
         return "There is unsaved data. Exit?";
     }
     else {
         return undefined;
     }
 }
-
-window.addEventListener("beforeunload", beforeUnloadHandler);
