@@ -5,6 +5,7 @@ import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatep
 import { TextSelection, NodeSelection, EditorState, Selection } from "/prosemirror/dist/prosemirror-state.es.js";
 import { Step } from "/prosemirror/dist/prosemirror-transform.es.js";
 import { Slice } from "/prosemirror/dist/prosemirror-model.es.js"
+import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 //this constant is used (or hopefully not) in correctCreateInfoforRepeatedNames
 const MAX_SUFFIX_INDEX = 99999;
@@ -137,6 +138,8 @@ export default class ParentComponentView extends ComponentView {
 
         //this will hold the resulting command
         let apogeeCommand;
+        let commandsDeleteComponent = false;
+        let deleteMsg;
 
         let initialSelection = editorState.selection;
         let initialMarks = editorState.marks;
@@ -307,8 +310,9 @@ export default class ParentComponentView extends ComponentView {
             // Get verificaion if we are deleting anything
             //-------------------
             if(allDeletedNames.length > 0) {
-                let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + allDeletedNames);
-                if(!doDelete) return;
+                //flag a delete will be done
+                commandsDeleteComponent = true
+                deleteMsg = "Are you sure you want to delete these apogee nodes: " + allDeletedNames + "?";
             }
 
             //-------------------------
@@ -329,7 +333,23 @@ export default class ParentComponentView extends ComponentView {
         //execute the command
         //-------------------
         if(apogeeCommand) {
-            this.getModelView().getApp().executeCommand(apogeeCommand);
+
+            let doAction = () => {
+                this.getModelView().getApp().executeCommand(apogeeCommand);
+                this.giveEditorFocusIfShowing();
+            }
+
+            if(commandsDeleteComponent) {
+                //if there is a delete, verify the user wants to do this
+                let cancelAction = () => {
+                    this.giveEditorFocusIfShowing();
+                };
+                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
+            }
+            else {
+                //otherwise just take the action
+                doAction();
+            }
         }
     }
 

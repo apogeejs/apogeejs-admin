@@ -2,6 +2,7 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
 
 import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
+import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 //=====================================
 // UI Entry Point
@@ -39,6 +40,8 @@ export function updateComponent(componentView) {
             }
         }
         
+        let commandsDeleteComponent = false;
+        let deleteMsg;
         var commands = [];
         
         //--------------
@@ -146,9 +149,9 @@ export function updateComponent(componentView) {
                         if(newParentCommands.editorSetupCommand) commands.push(newParentCommands.editorSetupCommand);
                         //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
                         if(newParentCommands.deletedComponentCommands) {
-                            //make sure the user wants to proceed
-                            let deletedComponentNames = newParentCommands.deletedComponentCommands.map(command => command.memberId);
-                            let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
+                            //flag a delete will be done
+                            commandsDeleteComponent = true
+                            deleteMsg = "Are you sure you want to delete these apogee nodes: " + deletedComponentNames + "?";
                             
                             //return if user rejects
                             if(!doDelete) return;
@@ -196,12 +199,26 @@ export function updateComponent(componentView) {
             command = commands[0];
         }
         
-        //execute command
-        if(command) {   
-            modelManager.getApp().executeCommand(command);
+        //command action
+        let doAction = () => {
+            if(command) {   
+                modelManager.getApp().executeCommand(command);
+            }
+
+            returnToEditor(componentView,submittedValues.name);
         }
 
-        returnToEditor(componentView,submittedValues.name);
+        if(commandsDeleteComponent) {
+            //if there is a delete, verify the user wants to do this
+            let cancelAction = () => {
+                returnToEditor(componentView,submittedValues.name);
+            };
+            showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
+        }
+        else {
+            //otherwise just take the action
+            doAction();
+        }
 
         //return true to close the dialog
         return true;

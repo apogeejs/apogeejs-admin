@@ -1,13 +1,27 @@
-
-
+import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 
 export function deleteComponent(componentView) {
 
-    var doDelete = confirm("Are you sure you want to delete this object?");
-    if(!doDelete) {
-        return;
+    let doDelete = () => {
+        deleteComponentImpl(componentView);
+        returnToEditor(componentView);
     }
+
+    let doCancel = () => {
+        returnToEditor(componentView);
+    };
+    showSimpleActionDialog("Are you sure you want to delete this object:" + componentView.getName() + "?",["OK","Cancel"],[doDelete,doCancel]);
+}
+
+function returnToEditor(componentView) {
+    let parentComponentView = componentView.getParentComponentView();
+    if(parentComponentView) {
+        parentComponentView.giveEditorFocusIfShowing();
+    }
+}
+
+function deleteComponentImpl(componentView) {
 
     var modelManager = componentView.getModelView().getModelManager(); 
     var component = componentView.getComponent();

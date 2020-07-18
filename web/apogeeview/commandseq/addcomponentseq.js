@@ -5,6 +5,7 @@ import {getPropertiesDialogLayout} from "/apogeeview/commandseq/updatecomponents
 import {Component,componentInfo} from "/apogeeapp/apogeeAppLib.js";
 import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog.js";
+import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 
 //=====================================
@@ -69,6 +70,8 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
             let modelManager = modelView.getModelManager();
             let parentMemberId = userInputProperties.parentId;
 
+            let commandsDeleteComponent = false;
+            let deleteMsg;
             let commands = [];
             
             //create the model command
@@ -94,11 +97,9 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
 
                     //add any delete commands
                     if(additionalCommandInfo.deletedComponentCommands){
-                        //make sure the user wants to proceed
-                        let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + additionalCommandInfo.deletedComponentShortNames);
-                        
-                        //return if user rejects
-                        if(!doDelete) return;
+                        //flag a delete will be done
+                        commandsDeleteComponent = true
+                        deleteMsg = "Are you sure you want to delete these apogee nodes: " + additionalCommandInfo.deletedComponentShortNames + "?";
 
                         commands.push(...additionalCommandInfo.deletedComponentCommands);
                     } 
@@ -128,15 +129,33 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
             }
             
             //execute command
-            app.executeCommand(commandData);
+            let doAction = () => {
+                app.executeCommand(commandData);
 
-            //give focus back to editor
-            if(parentComponentView) {
-                parentComponentView.giveEditorFocusIfShowing();
+                //give focus back to editor
+                if(parentComponentView) {
+                    parentComponentView.giveEditorFocusIfShowing();
+                }
+            }
+
+            if(commandsDeleteComponent) {
+                //if there is a delete, verify the user wants to do this
+                let cancelAction = () => {
+                    //give focus back to editor
+                    if(parentComponentView) {
+                        parentComponentView.giveEditorFocusIfShowing();
+                    }
+                };
+                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
+            }
+            else {
+                //otherwise just take the action
+                doAction();
             }
 
             //return true to close the dialog
             return true;
+
         }
 
         //give foxus back to editor
