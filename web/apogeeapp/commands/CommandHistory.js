@@ -105,6 +105,10 @@ export default class CommandHistory {
             if(!commandSuccess) {
                 this._commandUndoneFailed();
             }
+            else {
+                //flag workspace as dirty
+                this.eventManager.dispatchEvent("workspaceDirty",command.desc);
+            }
         }
         else {
             //the ui should not let us get here
@@ -119,6 +123,10 @@ export default class CommandHistory {
             let commandSuccess = this.commandManager.executeCommand(command.redoCmd,true);
             if(!commandSuccess) {
                 this._commandRedoneFailed();
+            }
+            else {
+                //flag workspace as dirty
+                this.eventManager.dispatchEvent("workspaceDirty",command.desc);
             }
         }
         else {

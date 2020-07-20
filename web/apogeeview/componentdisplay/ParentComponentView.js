@@ -336,15 +336,18 @@ export default class ParentComponentView extends ComponentView {
 
             let doAction = () => {
                 this.getModelView().getApp().executeCommand(apogeeCommand);
-                this.giveEditorFocusIfShowing();
             }
 
             if(commandsDeleteComponent) {
+                let okAction = () => {
+                    doAction();
+                    this.giveEditorFocusIfShowing();
+                }
                 //if there is a delete, verify the user wants to do this
                 let cancelAction = () => {
                     this.giveEditorFocusIfShowing();
                 };
-                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
+                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[okAction,cancelAction]);
             }
             else {
                 //otherwise just take the action

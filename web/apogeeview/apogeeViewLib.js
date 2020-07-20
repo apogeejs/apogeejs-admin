@@ -22,7 +22,7 @@ export {default as HtmlJsDataDisplay} from "/apogeeview/datadisplay/HtmlJsDataDi
 export {registerComponentView,getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeeview/componentViewInfo.js";
 
 export {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
-
+export {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 export {default as UiCommandMessenger} from "/apogeeview/commandseq/UiCommandMessenger.js";
 

@@ -1,5 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
+import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 const DIALOG_LAYOUT_URL_LINE = {
     "type": "inputElement",
@@ -131,19 +132,17 @@ export function updateLink(app,referenceEntry,displayInfo) {
 /** This method deletes a link in the workspace. */
 export function removeLink(app,referenceEntry,displayInfo) {
 
-    var doDelete= confirm("Are you sure you want to delete this link?");
-
-    //create on submit callback
-    if(doDelete) {
-        
-        var commandData = {};
+    var commandData = {};
         commandData.type = "deleteLink";
         commandData.entryType = displayInfo.REFERENCE_TYPE;
         commandData.url = referenceEntry.getUrl();
 
-        //run command
-        app.executeCommand(commandData);
-    }
+    //create on submit callback
+    let doAction = () => app.executeCommand(commandData);
+    let cancelAction = () => true;
+
+    //verify the delete
+    showSimpleActionDialog("Are you sure you want to delete this link?",["Delete","Cancel"],[doAction,cancelAction]);
 }
 
 

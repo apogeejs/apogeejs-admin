@@ -24,10 +24,8 @@ export default class WorkspaceManager extends FieldObject {
             let referenceManager = new ReferenceManager(this.app);
             this.setField("referenceManager",referenceManager);
 
-            this.setField("isDirty",false);
-
             //this is not a field like above because when we do not require a command to change it
-            this.fileMetadata = null;
+            this.isDirty = false;
 
             //temporary
             this.created = true;
@@ -35,6 +33,7 @@ export default class WorkspaceManager extends FieldObject {
         else {
             //this is not a field like above because when we do not require a command to change it
             this.fileMetadata = instanceToCopy.fileMetadata;
+            this.isDirty = instanceToCopy.isDirty;
 
             //temporary
             this.created = false;
@@ -143,15 +142,15 @@ export default class WorkspaceManager extends FieldObject {
     }
 
     getIsDirty() {
-        return this.getField("isDirty");
+        return this.isDirty;
     }
     
     setIsDirty() {
-        this.setField("isDirty",true);
+        this.isDirty = true;
     }
     
     clearIsDirty() {
-        this.setField("isDirty",false);
+        this.isDirty = false;
     }
 
     getIsClosed() {
