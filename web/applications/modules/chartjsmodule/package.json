@@ -1,8 +1,9 @@
 {
   "name": "chartjs-module",
-  "version": "0.0.1",
-  "npm_module": "dist/chartjsmodule.cjs.js",
-  "es_module": "dist/chartjsmodule.esm.js",
+  "officialRelease": false,
+  "version": "1.0.0-p2",
+  "npm_module": "chartjsmodule.cjs.js",
+  "es_module": "chartjsmodule.esm.js",
   "chart_lib": "src/chartjs.esm.js",
   "dependencies": {
     "chart.js": "2.9.3"
