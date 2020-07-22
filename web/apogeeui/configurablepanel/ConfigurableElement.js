@@ -9,12 +9,18 @@ export default class ConfigurableElement {
     constructor(form,elementInitData,optionalContainerClassName = ConfigurableElement.CONTAINER_CLASS_STANDARD) {
         this.form = form;
         this.key = elementInitData.key;
+        this.meta = elementInitData.meta;
         this.domElement = uiutil.createElement("div",{"className":optionalContainerClassName});
     }
     
     /** This method returns the key for this ConfigurableElement within this panel. */
     getKey() {
         return this.key;
+    }
+
+    /** This method returns the configured meta value for this element. */
+    getMeta() {
+        return this.meta;
     }
 
     /** This method returns value for this given element, if applicable. If not applicable

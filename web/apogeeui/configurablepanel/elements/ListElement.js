@@ -42,6 +42,28 @@ export default class ListElement extends ConfigurableElement {
         this.elementContainer = null;
         this.listElement = this._createListContainer(); 
         containerElement.appendChild(this.listElement); 
+
+        //update the meta value to add the children
+        if(this.meta) {
+            this.meta = apogeeutil.jsonCopy(this.meta);
+            if(this.isMultiTypeList) {
+                let childMeta = {};
+                this.entryTypes.forEach( entryType => {
+                    let childEntryMeta = entryType.getMeta();
+                    let childKey = entryType.getKey();
+                    if((childEntryMeta)&&(childKey)) {
+                        childMeta[childKey] = childEntryMeta;
+                    }
+                })
+                this.meta.childMeta = childMeta;
+            }
+            else {
+                let childEntryMeta = entryType.getMeta();
+                if(childEntryMeta) {
+                    this.meta.entryMeta = childEntryMeta;
+                }
+            }
+        }
         
         this._postInstantiateInit(elementInitData);
     }

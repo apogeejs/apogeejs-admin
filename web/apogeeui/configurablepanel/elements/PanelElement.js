@@ -18,7 +18,13 @@ export default class PanelElement extends ConfigurableElement {
         this.panel.configureForm(formInitData);
         var panelElement = this.panel.getElement();
         panelElement.className = "apogee_configurablePanelPanelLine";
-        containerElement.appendChild(panelElement);  
+        containerElement.appendChild(panelElement);
+        
+        //update the meta value to add the children
+        if(this.meta) {
+            this.meta = apogeeutil.jsonCopy(this.meta);
+            this.meta.childMeta = this.panel.getMeta();
+        }
         
         this._postInstantiateInit(elementInitData);
     }

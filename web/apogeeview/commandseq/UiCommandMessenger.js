@@ -18,6 +18,8 @@ export default class UiCommandMessenger {
         command.type = "saveMemberData";
         command.memberId = this._getLocalMemberId(updateMemberName);
         command.data = data;
+
+        //if the member is not found we will error out with this command
         return this.app.executeCommand(command);
     }
     
@@ -50,7 +52,13 @@ export default class UiCommandMessenger {
 
         var pathArray = localMemberName.split(".");
         var member = contextManager.getMember(model,pathArray);
-        return member.getId();
+        if(member) {
+            return member.getId();
+        }
+        else {
+            console.error("Member not found: " + pathArray.join("."));
+            return null;
+        }
     }
 
     
