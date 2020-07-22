@@ -3,9 +3,9 @@ import Chart from "./chartjs.esm.js";
 //These are in lieue of the import statements
 let { DataDisplay,ComponentView,ConfigurableFormEditor,AceTextEditor} = apogeeview;
 
-/** This is the base class for a  basic control component. To create a
- * new control component, extend this class implementing the needed methods
- * and create a generator. */
+/** This is a graphing component using ChartJS. It consists of a single data table that is set to
+ * hold the generated chart data. The input is configured with a form, which gives multiple options
+ * for how to set the data. */
 export default class ChartJSComponentView extends ComponentView {
 
     constructor(modelView,component) {
@@ -85,7 +85,7 @@ export default class ChartJSComponentView extends ComponentView {
         }
     }
 
-    /** This is the input source for the chart data display */
+    /** This shows the raw data value for the component data member. */
     _getConfigDebugDataSource() {
 
         return {
