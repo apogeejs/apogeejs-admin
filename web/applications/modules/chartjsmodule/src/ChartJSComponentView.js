@@ -78,7 +78,7 @@ export default class ChartJSComponentView extends ComponentView {
                 let reloadDataDisplay = false;
                 return {reloadData,reloadDataDisplay};
             }, 
-            getDisplayData: () => _getFormLayout(this.getName()),
+            getDisplayData: () => _getFormLayout(),
             getData: () => this._getFormData(),
             getEditOk: () => true,
             saveData: (formData) => this._onSubmit(formData)
@@ -124,83 +124,101 @@ export default class ChartJSComponentView extends ComponentView {
         try {
             //chart data is held as member value, calculated by formula generated from form input
             let memberData = this.getComponent().getMember().getData();
-            if((!memberData)||(memberData === apogeeutil.INVALID_VALUE)) memberData = DEFAULT_FORM_DATA_VALUES;
 
-            //---------------------------
-            //get the values, factoring in defaults and calculated items
-            //---------------------------
-            let chartType = memberData.chartType;
-            
-            //general/graph options
-            let generalOptions = memberData.generalOptions;
+            let chartConfig;
 
-            //x value input type
-            let xValuesInputType = memberData.xValuesInputType;
-
-            //data sets
-            let datasetsInput = memberData.datasets;
-            let maxYArrayLength = 0;
-            let datasets = datasetsInput.map( datasetEntry => {
-                let entry = {};
-                //set options values
-                
-                let datasetOptions = datasetEntry.datasetOptions;
-                if(!datasetOptions) datasetOptions = {};
-                Object.assign(entry,datasetOptions);
-
-                //construct data array, according to input type
-                let plotDataXInput = datasetEntry.xArray;
-                let plotDataYInput = datasetEntry.yArray;
-                if(xValuesInputType == "paired") {
-                    //construct data array as a point object list
-                    entry.data = [];
-                    for(let i = 0; i < plotDataXInput.length; i++) {
-                        entry.data.push( {x:plotDataXInput[i], y:plotDataYInput[i]} );
-                    }
-                }
-                else {
-                    //construct data array as simple value list
-                    entry.data = plotDataYInput;
-                }
-
-                //count the longest data array, in case we need to make a default x value array
-                if(entry.data.length > maxYArrayLength) maxYArrayLength = entry.data.length
-
-
-                return entry;
-            })
-
-            //common x value array
-            let commonXValueArray;
-            if(xValuesInputType == "common") {
-                commonXValueArray = memberData.commonXValueArray
-                
-                //construct a default array if values not specified and we have datasets
-                if((commonXValueArray.length == 0)&&(maxYArrayLength > 0)) {
-                    commonXValueArray = [];
-                    for(let i = 0; i < maxYArrayLength; i++) {
-                        commonXValueArray.push(i);
-                    }
-                }
+            if((memberData)&&(memberData.chartConfig)) {
+                //raw chart config entered
+                //for chart js, this must be a editable, so we will make a copy
+                chartConfig = apogeeutil.jsonCopy(memberData.chartConfig);
             }
-
-            //---------------------------
-            //construct the chart config
-            //---------------------------
-            let chartConfig = {};
-            chartConfig.type = chartType;
-
-            chartConfig.data = {};
-            if(xValuesInputType == "common") chartConfig.data.labels = commonXValueArray;
-            chartConfig.data.datasets = datasets;
-            chartConfig.options = generalOptions;
+            else {
+                //read the module form data (use default if needed)
+                let chartData = memberData.chartData;
+                if(!chartData) chartData = DEFAULT_CHART_DATA_INFO;
+                
+                chartConfig = this._getModuleJsonChartConfig(chartData);
+            }
 
             return chartConfig;
         }
         catch(error) {
-            if(error.stack) console.log(error.stack);
+            if(error.stack) console.error(error.stack);
             return {};
         }
+    }
+
+    /** This function reads the chart data in the local module format and converts it to 
+     * ChartJS format. */
+    _getModuleJsonChartConfig(chartData) {
+        //---------------------------
+        //get the values, factoring in defaults and calculated items
+        //---------------------------
+        let chartType = chartData.chartType;
+        
+        //general/graph options
+        let chartOptions = chartData.chartOptions;
+
+        //x value input type
+        let commonXValues = chartData.xValues;
+        let missingSeriesXValues = false;
+
+        //data sets
+        let dataSeriesInput = chartData.dataSeries;
+        let maxYValuesCount = 0;
+        let dataSeries = dataSeriesInput.map( dataSeriesEntry => {
+            let entry = {};
+            //set options values
+            
+            let seriesOptions = dataSeriesEntry.seriesOptions;
+            if(!seriesOptions) seriesOptions = {};
+            Object.assign(entry,seriesOptions);
+
+            //construct data array, according to input type
+            let seriesXValues = dataSeriesEntry.xValues;
+            let seriesYValues = dataSeriesEntry.yValues;
+            if(seriesXValues) {
+                //construct data array as a point object list
+                entry.data = [];
+                let minLength = (seriesXValues.length < seriesXValues.length) ? seriesXValues.length : seriesYValues.length;
+                for(let i = 0; i < minLength; i++) {
+                    entry.data.push( {x:seriesXValues[i], y:seriesYValues[i]} );
+                }
+            }
+            else {
+                //construct data array as simple value list
+                entry.data = seriesYValues;
+                missingSeriesXValues = true;
+            }
+
+            //count the longest data array, in case we need to make a default x value array
+            if(entry.data.length > maxYValuesCount) maxYValuesCount = entry.data.length
+
+
+            return entry;
+        })
+
+        //common x values array - assign as integers if used but not provided
+        if((missingSeriesXValues)&&((!commonXValues)||((commonXValues.length == 0)&&(maxYValuesCount > 0)))) {
+            commonXValues = [];
+            for(let i = 0; i < maxYValuesCount; i++) {
+                commonXValues.push(i);
+            }
+        }
+
+        //---------------------------
+        //construct the chart config
+        //---------------------------
+        let chartConfig = {};
+        chartConfig.type = chartType;
+
+        chartConfig.data = {};
+        if(missingSeriesXValues) chartConfig.data.labels = commonXValues;
+        chartConfig.data.datasets = dataSeries;
+        chartConfig.options = chartOptions;
+
+        return chartConfig;
+
     }
     
     /** This method receives the form input data. It does validation to accept or reject the data. If data is saved here
@@ -208,22 +226,33 @@ export default class ChartJSComponentView extends ComponentView {
     _onSubmit(formData) {
 
         let errorMessages = [];
-        
-        //read in and validate all data
-        let chartType = formData.chartType;
-        if(CHART_TYPE_VALUES.indexOf(chartType) < 0) errorMessages.push("The chart type must be set");
+        let chartDataInfo;
+        let chartDataType;
 
-        let xValuesInputType = formData.xValuesInputType;
-        if(X_INPUT_TYPE_VALUES.indexOf(xValuesInputType) < 0) errorMessages.push("The X value specification type must be set");
-        
-        let commonXValueArray = formData.commonXValueArray;
-        if(commonXValueArray == "") commonXValueArray = "[]";
-
-        let datasets = formData.datasets;
-        if(datasets == "") datasets = "[]";
-
-        let generalOptions = formData.generalOptions;
-        if(generalOptions == "") generalOptions = "{}";
+        try {
+            let inputFormat = formData.inputType;
+            if(inputFormat == "form") {
+                chartDataInfo = this.getFormChartDataInfo(formData.formPanel,errorMessages);
+                chartDataType = "moduleJson";
+            }
+            else if(inputFormat == "json") {
+                chartDataInfo = this.getJsonInputFunctionBody(formData.jsonPanel,errorMessages);
+                chartDataType = "moduleJson";
+            }
+            else if(inputFormat == "rawConfig") {
+                chartDataInfo = this.getRawInputFunctionBody(formData.configPanel,errorMessages);
+                chartDataType = "chartJSJson";
+            }
+            else {
+                errorMessages.push("Input form selection must be 'Form' or 'JSON Config'");
+            }
+        }
+        catch(error) {
+            errorMessages.push("Error reading form input: " + error.toString());
+            if(error.stack) console.error(error.stack);
+            chartDataInfo = DEFAULT_CHART_DATA_INFO;
+            chartDataType = "moduleJson";
+        }
 
         //handle error case here
         if(errorMessages.length > 0) {
@@ -235,15 +264,22 @@ export default class ChartJSComponentView extends ComponentView {
 
         //compile the function body
         //I think it is just a little hokey putting the form data in with the formula, but I am not sure of a better option.
-        var functionBody = `
-    return {
-        "chartType": "${chartType}",
-        "xValuesInputType": "${xValuesInputType}",
-        "commonXValueArray": ${commonXValueArray},
-        "datasets": ${datasets},
-        "generalOptions": ${generalOptions},
-        "storedData": ${JSON.stringify(formData)}
-    };`;
+        let functionBody;
+
+        if(chartDataType == "moduleJson") {
+            functionBody = `
+                return {
+                    "chartData":  ${chartDataInfo},
+                    "storedData": ${JSON.stringify(formData)}
+                };`;
+        }
+        else {
+            functionBody = `
+                return {
+                    "chartConfig":  ${chartDataInfo},
+                    "storedData": ${JSON.stringify(formData)}
+                };`;
+        }
 
         //set the code
         var member = this.getComponent().getMember();
@@ -262,6 +298,64 @@ export default class ChartJSComponentView extends ComponentView {
         return true;
     }       
 
+    //this gets the config data when in json config mode
+    getFormChartDataInfo(formPanelValue,errorMessages) {
+        
+        //read in and validate all data
+        let chartType = formPanelValue.chartType;
+        if(CHART_TYPE_VALUES.indexOf(chartType) < 0) errorMessages.push("The chart type must be set");
+
+        let xValuesType = formPanelValue.xValuesType;
+        if(X_TYPE_VALUES.indexOf(xValuesType) < 0) errorMessages.push("The X value specification type must be set");
+        
+        let xValues = formPanelValue.xValues;
+        if(xValues == "") xValues = "[]";
+
+        let dataSeries = formPanelValue.dataSeries;
+        if(dataSeries == "") dataSeries = "[]";
+
+        let chartOptions = formPanelValue.chartOptions;
+        if(chartOptions == "") chartOptions = "{}";
+
+        let formChartDataInfo;
+        if(xValuesType == "common") {
+            formChartDataInfo = `{
+                "chartType": "${chartType}",
+                "xValues": ${xValues},
+                "dataSeries": ${dataSeries},
+                "chartOptions": ${chartOptions}
+            }`;
+        }
+        else {
+            formChartDataInfo = `{
+                "chartType": "${chartType}",
+                "dataSeries": ${dataSeries},
+                "chartOptions": ${chartOptions}
+            }`;
+        }
+
+
+        return formChartDataInfo;
+    }
+
+    //this gets the config data when in json config mode
+    getJsonInputFunctionBody(jsonPanelValue,errorMessages) {
+        if(!jsonPanelValue.jsonConfigFile) errorMessages.push("The JSON config file must be set in JSON Config mode");
+
+        let jsonChartDataInfo = `${jsonPanelValue.jsonConfigFile}`;
+
+        return jsonChartDataInfo;
+    }
+
+    //this gets the config data when in json config mode
+    getRawInputFunctionBody(configPanelValue,errorMessages) {
+        if(!configPanelValue.configFile) errorMessages.push("The ChartJS config file must be set in Raw ChartJS Config mode");
+
+        let configChartDataInfo = `${configPanelValue.configFile}`;
+
+        return configChartDataInfo;
+    }
+
 }
 
 let DEFAULT_FORM_DATA_EXPORT = {
@@ -269,47 +363,107 @@ let DEFAULT_FORM_DATA_EXPORT = {
 }
 
 let DEFAULT_FORM_DATA_VALUES = {
+    "inputType": "form",
+    "formPanel": {
+        "chartType": "line",
+        "xValuesType": "common",
+        "xValues": [],
+        "dataSeries": [],
+        "chartOptions": {}
+    }
+}
+
+let DEFAULT_CHART_DATA_INFO = {
     "chartType": "line",
-    "xValuesInputType": "common",
-    "commonXValueArray": [],
-    "datasets": [],
-    "generalOptions": {}
+    "dataSeries": []
 }
 
 let CHART_TYPE_VALUES = ["bar","line"];
-let X_INPUT_TYPE_VALUES = ["common","paired"];
+let X_TYPE_VALUES = ["common","paired"];
 
-function _getFormLayout(componentName) {
+function _getFormLayout() {
     return [
-        {   
-            type: "dropdown",
-            label: "Chart Type: ",
-            entries: [["Bar","bar"],["Line","line"]],
-            value: "line", //initial default
-            key: "chartType"
-        },
-        {   
+        {
             type: "radioButtonGroup",
-            label: "Specifying X Values: ",
-            entries: [["One Common Array","common"],["Per Series Arrays","paired"]],
-            value: "common", //initial default
-            groupName: componentName + "|xType",
-            key: "xValuesInputType"
+            label: "Input Type: ",
+            entries: [["Form","form"],["JSON","json"],["Raw ChartJS Config","rawConfig"]],
+            horizontal: true,
+            value: "form", //initial default
+            key: "inputType"
+        },    
+        {
+            type: "panel",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "json"
+            },
+            formData: [
+                {
+                    type: "textField",
+                    label: "JSON Config: ",
+                    key: "jsonConfigFile"
+                }
+            ],
+            key: "jsonPanel"
         },
-        {   
-            type: "textField",
-            label: "Common X Value Array: ",
-            key: "commonXValueArray"
+        {
+            type: "panel",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "rawConfig"
+            },
+            formData: [ 
+                {
+                    type: "textField",
+                    label: "ChartJS Config: ",
+                    key: "configFile"
+                }
+            ],
+            key: "configPanel"
         },
-        {   
-            type: "textField",
-            label: "Plot Series Data: ",
-            key: "datasets"
-        },
-        {   
-            type: "textField",
-            label: "General Options: ",
-            key: "generalOptions"
+        {
+            type: "panel",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "form"
+            },
+            formData: [
+                {   
+                    type: "dropdown",
+                    label: "Chart Type: ",
+                    entries: [["Bar","bar"],["Line","line"]],
+                    value: "line", //initial default
+                    key: "chartType"
+                },  
+                {   
+                    type: "radioButtonGroup",
+                    label: "Specifying X Values: ",
+                    entries: [["Common Values","common"],["Per Series Values","paired"]],
+                    value: "common", //initial default
+                    horizontal: true,
+                    key: "xValuesType"
+                },
+                {   
+                    type: "textField",
+                    label: "Common X Values: ",
+                    key: "xValues",
+                    selector: {
+                        parentKey: "xValuesType",
+                        parentValue: "common"
+                    },
+                },
+                {   
+                    type: "textField",
+                    label: "Plot Series Data: ",
+                    key: "dataSeries"
+                },
+                {   
+                    type: "textField",
+                    label: "Chart Options: ",
+                    key: "chartOptions"
+                }
+            ],
+            key: "formPanel"
         }
     ];
 }
@@ -395,7 +549,13 @@ class ChartJSDisplay extends DataDisplay {
         if((!this.chart)||(!apogeeutil.jsonEquals(this.prevOptions,config.options))) {
             if(this.chart) this.chart.destroy();
             this.config = config;
-            this.chart = new Chart(this.canvasElement,this.config);
+            try {
+                this.chart = new Chart(this.canvasElement,this.config);
+            }
+            catch(error) {
+                console.log("Error loading chart: " + error.toString());
+                if(error.stack) console.error(error.stack);
+            }
         }
         else {
             //we need to copy our new data into the existing config object
@@ -404,7 +564,13 @@ class ChartJSDisplay extends DataDisplay {
             //the chart modifies the data so we will make a copy
             this.config.data = apogeeutil.jsonCopy(config.data);
 
-            this.chart.update();
+            try {
+                this.chart.update();
+            }
+            catch(error) {
+                console.log("Error loading chart: " + error.toString());
+                if(error.stack) console.error(error.stack);
+            }
         }
 
         //save the options for next time

@@ -29,7 +29,7 @@ export function exitEmptyList(state, dispatch) {
 // :: (EditorState, ?(tr: Transaction)) → bool
 // If we are in a top level list at the start of the line, this will convert the line to a paragraph type block
 export function exitFromStartOfList(state, dispatch) {
-    let { $head } = state.selection;
+    let { $head, empty } = state.selection;
     let schema = state.schema;
     if((empty)&&($head.parent.type == schema.nodes.listItem)&&($head.parentOffset == 0)) {
         return setBlockType(schema.nodes.paragraph, state, dispatch);
