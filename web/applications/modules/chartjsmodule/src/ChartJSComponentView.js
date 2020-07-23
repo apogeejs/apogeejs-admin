@@ -232,13 +232,13 @@ export default class ChartJSComponentView extends ComponentView {
     _onSubmit(formData) {
         //load the form meta - we have to look it up from the data display (this is a little clumsy)
         let formMeta;
-        let componentDisplay = this.getComponentDisplay();
-        if(componentDisplay) {
-            let formEditor = componentDisplay.getDataDisplay(ChartJSComponentView.VIEW_INPUT);
+        let formEditor = this.getCurrentDataDisplayInstance(ChartJSComponentView.VIEW_INPUT);
+        if(formEditor) {
             formMeta = formEditor.getFormMeta();
         }
 
         if(!formMeta) {
+            //data display should be present if the person submitted the form
             console.error("Unknown error loading the form meta value.");
             //return true indicates the submit is completed
             return true;

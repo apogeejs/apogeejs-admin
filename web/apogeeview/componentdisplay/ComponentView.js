@@ -282,6 +282,17 @@ export default class ComponentView {
         return this.childComponentDisplay;
     }
 
+    /** This gets the data display instance that is currently loaded in the display. It returns null 
+     * if the data display is not loaded. */
+    getCurrentDataDisplayInstance(viewType) {
+        if(this.childComponentDisplay) {
+            return this.childComponentDisplay.getDataDisplay(viewType);
+        }
+        else {
+            return null;
+        }
+    }
+
     closeComponentDisplay() {
         if(this.childComponentDisplay) {
             //first store the window state
