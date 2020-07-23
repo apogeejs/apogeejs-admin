@@ -32,6 +32,10 @@ export default class WebDisplayContainer {
         return this.componentView;
     }
 
+    getDataDisplay() {
+        return this.dataDisplay;
+    }
+
     //-------------------
     // state management
     //-------------------

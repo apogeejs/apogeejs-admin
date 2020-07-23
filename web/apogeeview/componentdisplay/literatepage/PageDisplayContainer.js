@@ -54,6 +54,10 @@ export default class PageDisplayContainer {
         return this.componentView;
     }
 
+    getDataDisplay() {
+        return this.dataDisplay;
+    }
+
     //-------------------
     // state management
     //-------------------

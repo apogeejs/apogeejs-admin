@@ -11,6 +11,7 @@ export {default as TreeControl} from "/apogeeui/treecontrol/TreeControl.js";
 export {default as TreeEntry} from "/apogeeui/treecontrol/TreeEntry.js";
 export {default as DisplayAndHeader} from "/apogeeui/displayandheader/DisplayAndHeader.js";
 export {default as ConfigurablePanel} from "/apogeeui/configurablepanel/ConfigurablePanel.js";
+export {getFormResultFunctionBody} from "/apogeeui/configurablepanel/ConfigurablePanelUtil.js";
 
 //this loads the standard configurable panel elements
 import "/apogeeui/configurablepanel/ConfigurablePanelInit.js";

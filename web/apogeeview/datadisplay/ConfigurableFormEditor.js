@@ -37,6 +37,11 @@ export default class ConfigurableFormEditor extends DataDisplay {
         this.changeReferenceValue = this.panel.getValue();
         return this.changeReferenceValue;
     }
+
+    /** This returns the form meta value. */
+    getFormMeta() {
+        return this.panel.getMeta();
+    }
     
     /** This is passed the data form the data callback, which should be the extended data  - including layout + value */
     setData(data) {
@@ -66,7 +71,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
     }
 
     //===========================
-    // Utilities for special form layouts
+    // Utilities for forms
     //===========================
 
     static getErrorLayout(errorMsg) {

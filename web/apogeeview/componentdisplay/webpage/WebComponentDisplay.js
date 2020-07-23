@@ -42,6 +42,15 @@ export default class WebComponentDisplay {
         return this.componentView;
     }
 
+    getDataDisplay(viewType) {
+        if((viewType == this.activeView)&&(this.displayContainer)) {
+            return this.displayContainer.getDataDisplay();
+        }
+        else {
+            return null;
+        }
+    }
+
     componentUpdated(component) {
         //update the banner
         // var bannerDiv;

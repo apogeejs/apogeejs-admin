@@ -47,6 +47,20 @@ export default class PageChildComponentDisplay {
         return this.componentView;
     }
 
+    getPageDisplayContainer(viewType) {
+        return this.displayContainerMap[viewType];
+    }
+
+    getDataDisplay(viewType) {
+        let pageDisplayContainer = this.getPageDisplayContainer(viewType);
+        if(pageDisplayContainer) {
+            return pageDisplayContainer.getDataDisplay();
+        }
+        else {
+            return null;
+        }
+    }
+
     // getMember() {
     //     return this.member;
     // }

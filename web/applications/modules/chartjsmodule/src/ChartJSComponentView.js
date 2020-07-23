@@ -2,6 +2,7 @@ import Chart from "./chartjs.esm.js";
 
 //These are in lieue of the import statements
 let { DataDisplay,ComponentView,ConfigurableFormEditor,AceTextEditor} = apogeeview;
+let { getFormResultFunctionBody } = apogeeui;
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
@@ -99,7 +100,8 @@ export default class ChartJSComponentView extends ComponentView {
             },
 
             getData: () => {
-                return JSON.stringify(this._getChartConfig(),null,"\t");
+                //return JSON.stringify(this._getChartConfig(),null,"\t");
+                return JSON.stringify(this.getComponent().getMember().getData(),null,"\t");
             },
         }
     }
@@ -111,8 +113,8 @@ export default class ChartJSComponentView extends ComponentView {
     /** This method gets the form value data that will be passed to the input form. */
     _getFormData() {
         let memberData = this.getComponent().getMember().getData();
-        if((memberData)&&(memberData.storedData)) {
-            return memberData.storedData;
+        if((memberData)&&(memberData.storedFormValue)) {
+            return memberData.storedFormValue;
         }
         else {
             return DEFAULT_FORM_DATA_EXPORT;
@@ -127,17 +129,18 @@ export default class ChartJSComponentView extends ComponentView {
 
             let chartConfig;
 
-            if((memberData)&&(memberData.chartConfig)) {
+            if(memberData.inputType == "rawConfig") {
                 //raw chart config entered
                 //for chart js, this must be a editable, so we will make a copy
-                chartConfig = apogeeutil.jsonCopy(memberData.chartConfig);
+                chartConfig = apogeeutil.jsonCopy(memberData.configData);
             }
-            else {
-                //read the module form data (use default if needed)
-                let chartData = memberData.chartData;
-                if(!chartData) chartData = DEFAULT_CHART_DATA_INFO;
-                
-                chartConfig = this._getModuleJsonChartConfig(chartData);
+            else if(memberData.inputType == "json") {
+                let chartJson = memberData.jsonData;
+                chartConfig = this._getModuleJsonChartConfig(chartJson);
+            }
+            else if(memberData.inputType == "form") {
+                let chartJson = memberData.formData;
+                chartConfig = this._getModuleJsonChartConfig(chartJson);
             }
 
             return chartConfig;
@@ -151,6 +154,9 @@ export default class ChartJSComponentView extends ComponentView {
     /** This function reads the chart data in the local module format and converts it to 
      * ChartJS format. */
     _getModuleJsonChartConfig(chartData) {
+
+        //ADD ERROR CHECKING!
+
         //---------------------------
         //get the values, factoring in defaults and calculated items
         //---------------------------
@@ -221,65 +227,25 @@ export default class ChartJSComponentView extends ComponentView {
 
     }
     
-    /** This method receives the form input data. It does validation to accept or reject the data. If data is saved here
-     * it should meet minimum validate criteria. Otherwise there should be an error when the user tries to save. */
+    /** This method saves the form result converted to a function body that handles expression inputs.
+     * This is saved to the formula for the member object. */
     _onSubmit(formData) {
-
-        let errorMessages = [];
-        let chartDataInfo;
-        let chartDataType;
-
-        try {
-            let inputFormat = formData.inputType;
-            if(inputFormat == "form") {
-                chartDataInfo = this.getFormChartDataInfo(formData.formPanel,errorMessages);
-                chartDataType = "moduleJson";
-            }
-            else if(inputFormat == "json") {
-                chartDataInfo = this.getJsonInputFunctionBody(formData.jsonPanel,errorMessages);
-                chartDataType = "moduleJson";
-            }
-            else if(inputFormat == "rawConfig") {
-                chartDataInfo = this.getRawInputFunctionBody(formData.configPanel,errorMessages);
-                chartDataType = "chartJSJson";
-            }
-            else {
-                errorMessages.push("Input form selection must be 'Form' or 'JSON Config'");
-            }
-        }
-        catch(error) {
-            errorMessages.push("Error reading form input: " + error.toString());
-            if(error.stack) console.error(error.stack);
-            chartDataInfo = DEFAULT_CHART_DATA_INFO;
-            chartDataType = "moduleJson";
+        //load the form meta - we have to look it up from the data display (this is a little clumsy)
+        let formMeta;
+        let componentDisplay = this.getComponentDisplay();
+        if(componentDisplay) {
+            let formEditor = componentDisplay.getDataDisplay(ChartJSComponentView.VIEW_INPUT);
+            formMeta = formEditor.getFormMeta();
         }
 
-        //handle error case here
-        if(errorMessages.length > 0) {
-            //reject for input
-            let errorMsg = errorMessages.join("; ");
-            alert(errorMsg);
-            return false;
+        if(!formMeta) {
+            console.error("Unknown error loading the form meta value.");
+            //return true indicates the submit is completed
+            return true;
         }
-
-        //compile the function body
-        //I think it is just a little hokey putting the form data in with the formula, but I am not sure of a better option.
-        let functionBody;
-
-        if(chartDataType == "moduleJson") {
-            functionBody = `
-                return {
-                    "chartData":  ${chartDataInfo},
-                    "storedData": ${JSON.stringify(formData)}
-                };`;
-        }
-        else {
-            functionBody = `
-                return {
-                    "chartConfig":  ${chartDataInfo},
-                    "storedData": ${JSON.stringify(formData)}
-                };`;
-        }
+        
+        //get the function body
+        let functionBody = getFormResultFunctionBody(formData,formMeta);
 
         //set the code
         var member = this.getComponent().getMember();
@@ -297,64 +263,6 @@ export default class ChartJSComponentView extends ComponentView {
         //if we got this far the form save should be accepted
         return true;
     }       
-
-    //this gets the config data when in json config mode
-    getFormChartDataInfo(formPanelValue,errorMessages) {
-        
-        //read in and validate all data
-        let chartType = formPanelValue.chartType;
-        if(CHART_TYPE_VALUES.indexOf(chartType) < 0) errorMessages.push("The chart type must be set");
-
-        let xValuesType = formPanelValue.xValuesType;
-        if(X_TYPE_VALUES.indexOf(xValuesType) < 0) errorMessages.push("The X value specification type must be set");
-        
-        let xValues = formPanelValue.xValues;
-        if(xValues == "") xValues = "[]";
-
-        let dataSeries = formPanelValue.dataSeries;
-        if(dataSeries == "") dataSeries = "[]";
-
-        let chartOptions = formPanelValue.chartOptions;
-        if(chartOptions == "") chartOptions = "{}";
-
-        let formChartDataInfo;
-        if(xValuesType == "common") {
-            formChartDataInfo = `{
-                "chartType": "${chartType}",
-                "xValues": ${xValues},
-                "dataSeries": ${dataSeries},
-                "chartOptions": ${chartOptions}
-            }`;
-        }
-        else {
-            formChartDataInfo = `{
-                "chartType": "${chartType}",
-                "dataSeries": ${dataSeries},
-                "chartOptions": ${chartOptions}
-            }`;
-        }
-
-
-        return formChartDataInfo;
-    }
-
-    //this gets the config data when in json config mode
-    getJsonInputFunctionBody(jsonPanelValue,errorMessages) {
-        if(!jsonPanelValue.jsonConfigFile) errorMessages.push("The JSON config file must be set in JSON Config mode");
-
-        let jsonChartDataInfo = `${jsonPanelValue.jsonConfigFile}`;
-
-        return jsonChartDataInfo;
-    }
-
-    //this gets the config data when in json config mode
-    getRawInputFunctionBody(configPanelValue,errorMessages) {
-        if(!configPanelValue.configFile) errorMessages.push("The ChartJS config file must be set in Raw ChartJS Config mode");
-
-        let configChartDataInfo = `${configPanelValue.configFile}`;
-
-        return configChartDataInfo;
-    }
 
 }
 
@@ -392,34 +300,28 @@ function _getFormLayout() {
             key: "inputType"
         },    
         {
-            type: "panel",
+            type: "textField",
+            label: "JSON Config: ",
+            key: "jsonData",
             selector: {
                 parentKey: "inputType",
                 parentValue: "json"
             },
-            formData: [
-                {
-                    type: "textField",
-                    label: "JSON Config: ",
-                    key: "jsonConfigFile"
-                }
-            ],
-            key: "jsonPanel"
+            meta: {
+                "expression": "simple"
+            }
         },
         {
-            type: "panel",
+            type: "textField",
+            label: "ChartJS Config: ",
+            key: "configData",
             selector: {
                 parentKey: "inputType",
                 parentValue: "rawConfig"
             },
-            formData: [ 
-                {
-                    type: "textField",
-                    label: "ChartJS Config: ",
-                    key: "configFile"
-                }
-            ],
-            key: "configPanel"
+            meta: {
+                "expression": "simple"
+            }
         },
         {
             type: "panel",
@@ -451,19 +353,31 @@ function _getFormLayout() {
                         parentKey: "xValuesType",
                         parentValue: "common"
                     },
+                    meta: {
+                        "expression": "simple"
+                    }
                 },
                 {   
                     type: "textField",
                     label: "Plot Series Data: ",
-                    key: "dataSeries"
+                    key: "dataSeries",
+                    meta: {
+                        "expression": "simple"
+                    }
                 },
                 {   
                     type: "textField",
                     label: "Chart Options: ",
-                    key: "chartOptions"
+                    key: "chartOptions",
+                    meta: {
+                        "expression": "simple"
+                    }
                 }
             ],
-            key: "formPanel"
+            key: "formData",
+            meta: {
+                "expression": "object"
+            }
         }
     ];
 }
