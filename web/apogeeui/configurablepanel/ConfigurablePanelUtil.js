@@ -22,7 +22,7 @@ const STORED_FORM_VALUE_NAME = "storedFormValue";
 
 /** This loads a value to an assignee, as part of the form result function body. */
 function _loadEntry(assigneeName,value,meta,functionLines) {
-    if((value === undefined)||(value === null)||((meta)&&(meta.excludeValue)&&(meta.excludeValue === value))) {
+    if((value === undefined)||(value === null)||((meta)&&(meta.excludeValue !== undefined)&&(meta.excludeValue === value))) {
         //value excluded
         //handle value === undefined!!
         return false;

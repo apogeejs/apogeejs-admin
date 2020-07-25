@@ -20,12 +20,6 @@ export default class PanelElement extends ConfigurableElement {
         panelElement.className = "apogee_configurablePanelPanelLine";
         containerElement.appendChild(panelElement);
         
-        //update the meta value to add the children
-        if(this.meta) {
-            this.meta = apogeeutil.jsonCopy(this.meta);
-            this.meta.childMeta = this.panel.getMeta();
-        }
-        
         this._postInstantiateInit(elementInitData);
     }
     
@@ -39,6 +33,19 @@ export default class PanelElement extends ConfigurableElement {
      * to see if this method is applicable. */
     setValue(value) {
         this.panel.setValue(value);
+    }
+
+    /** This overrides the get meta element to calculate it on the fly. Because of list elements,
+     * the meta value depends on the content. */
+    getMeta() {
+        if(this.meta) {
+            let fullMeta = apogeeutil.jsonCopy(this.meta);
+            fullMeta.childMeta = this.panel.getMeta();
+            return fullMeta;
+        }
+        else {
+            return null;
+        }
     }
     
     /** This will call the handler is this panel changes value. */

@@ -48,17 +48,6 @@ export default class ConfigurablePanel {
             if(formInitData.disabled) {
                 this.setDisabled(true);
             }
-
-            //create the meta value
-            this.meta = {};
-            this.elementObjects.forEach(elementObject => {
-                let childMeta = elementObject.getMeta();
-                let childKey = elementObject.getKey();
-                if((childMeta)&&(childKey)) {
-                    this.meta[childKey] = childMeta;
-                }
-            })
-
         }
         catch(error) {
             var errorMsg = "Error in panel: " + error.message;
@@ -79,7 +68,16 @@ export default class ConfigurablePanel {
 
     /** This returns the meta value for the panel. */
     getMeta() {
-        return this.meta;
+        //create the meta value
+        let meta = {};
+        this.elementObjects.forEach(elementObject => {
+            let childMeta = elementObject.getMeta();
+            let childKey = elementObject.getKey();
+            if((childMeta)&&(childKey)) {
+                meta[childKey] = childMeta;
+            }
+        })
+        return meta;
     }
 
     /** This method returns the data value object for this given panel. */

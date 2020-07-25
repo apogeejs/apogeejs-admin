@@ -42,28 +42,6 @@ export default class ListElement extends ConfigurableElement {
         this.elementContainer = null;
         this.listElement = this._createListContainer(); 
         containerElement.appendChild(this.listElement); 
-
-        //update the meta value to add the children
-        if(this.meta) {
-            this.meta = apogeeutil.jsonCopy(this.meta);
-            if(this.isMultiTypeList) {
-                let childMeta = {};
-                this.entryTypes.forEach( entryType => {
-                    let childEntryMeta = entryType.getMeta();
-                    let childKey = entryType.getKey();
-                    if((childEntryMeta)&&(childKey)) {
-                        childMeta[childKey] = childEntryMeta;
-                    }
-                })
-                this.meta.childMeta = childMeta;
-            }
-            else {
-                let childEntryMeta = entryType.getMeta();
-                if(childEntryMeta) {
-                    this.meta.entryMeta = childEntryMeta;
-                }
-            }
-        }
         
         this._postInstantiateInit(elementInitData);
     }
@@ -139,6 +117,37 @@ export default class ListElement extends ConfigurableElement {
         }
         else {
             console.log("Value being set for list is not an array!");
+        }
+    }
+
+    /** This overrides the get meta element to calculate it on the fly. Because of list elements,
+     * the meta value depends on the content. */
+    getMeta() {
+        if(this.meta) {
+            let fullMeta = apogeeutil.jsonCopy(this.meta);
+            if(this.isMultiTypeList) {
+                let childMeta = {};
+                this.listEntries.forEach( listEntryInfo => {
+                    let childEntryMeta = listEntryInfo.elementObject.getMeta();
+                    let childKey = listEntryInfo.elementObject.getKey();
+                    if((childEntryMeta)&&(childKey)) {
+                        childMeta[childKey] = childEntryMeta;
+                    }
+                })
+                fullMeta.childMeta = childMeta;
+            }
+            else {
+                let listEntryInfo = this.listEntries[0];
+                let childEntryMeta = listEntryInfo.elementObject.getMeta();
+                if(childEntryMeta) {
+                    fullMeta.entryMeta = childEntryMeta;
+                }
+            }
+
+            return fullMeta;
+        }
+        else {
+            return null;
         }
     }
     
