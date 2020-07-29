@@ -44,7 +44,7 @@ export default class CheckboxElement extends ConfigurableElement {
         this.checkbox.checked = (value === true);
         
         //needed for selection children
-        this.checkChildSelection(value);
+        //this.checkChildSelection(value);
     }
     
     /** This should be extended in elements to handle on change listeners. */

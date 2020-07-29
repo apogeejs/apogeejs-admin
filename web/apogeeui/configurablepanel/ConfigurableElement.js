@@ -36,9 +36,6 @@ export default class ConfigurableElement {
     /** This hides or shows the given element within the panel. */
     setState(state) {
         this.state = state;
-
-console.log("Settings state: " + state + "; element key: " + this.key);
-         
         switch(state) {
             case ConfigurablePanelConstants.STATE_NORMAL:
                 this._setVisible(true);
@@ -75,62 +72,28 @@ console.log("Settings state: " + state + "; element key: " + this.key);
     getForm() {
         return this.form;
     }
-    
-    /** This allows this element to control visibility of the given child.
-     * When the value of the element is set, the child will be made visible depending
-     * if its childs target valud matches the current element value. */
-    addSelectionChild(childElement,value,keepActiveOnHide) {
-        if(!this.childSelectionElements) {
-            this._initAsParent();
-        }
-        var childData = {};
-        childData.element = childElement;
-        childData.value = value;
-        childData.keepActiveOnHide = keepActiveOnHide;
-        this.childSelectionElements.push(childData);
-        
-        this.setChildState(childData,this.getValue());
-    }
-    
-    checkChildSelection(value) {
-        if((this.childSelectionElements)&&(this.setChildState)) {
-            this.childSelectionElements.forEach( childData => this.setChildState(childData,value));
-        } 
-    }
-    
-//    /* Implement this if the element can selector children */
-//    setChildState(childData,value) {
-//        
-//    }
 
-    //---------------------------------
-    //set child state implementations
-    //---------------------------------
-    
-    /** This is a function that can be used to set values when the parent element has a single value. */
-    static setChildStateSingleValue(childData,value) {
-console.log("Setting child state single. Child Data Value: " + childData.value + ". Parent value: " + value);
-        if(childData.value == value) {
-            childData.element.setState(ConfigurablePanelConstants.STATE_NORMAL);
-        }
-        else {
-            var state = childData.keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE;
-            childData.element.setState(state);
-        }
-    }
-    
-    /** This is a function that can be used to set values when the parent element has an array value. */
-    static setChildStateArrayValue(childData,value) {
-console.log("Setting child state array.");
-        if(value.indexOf(childData.value) >= 0) {
-            childData.element.setState(ConfigurablePanelConstants.STATE_NORMAL);
-        }
-        else {
-            var state = childData.keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE;
-            childData.element.setState(state);
+    //==================================
+    //protecxted methods
+    //==================================
+
+    /** This method returns the onValueChange handler to make the dependent element
+     * visible when the parent element (as the element depended on) has the given value. */
+    getDependentSelectHandler(dependentElement,value,keepActiveOnHide) {
+        return parentValue => {
+            let state;
+            if(parentValue == value) {
+                state = ConfigurablePanelConstants.STATE_NORMAL;
+            }
+            else {
+                state = (keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE);
+            }
+
+            if(dependentElement.getState() != state) {
+                dependentElement.setState(state);
+            }
         }
     }
-    
     
     //===================================
     // internal Methods
@@ -153,15 +116,25 @@ console.log("Setting child state array.");
             this.addOnChange(elementInitData.onChange);
         }
         
-        //accont for parent elements
+        //dependent element logic
         if(elementInitData.selector) {
-            if(!elementInitData.selector.parentKey) throw new Error("Parent key is required for a selectable child element:" + elementInitData.key);
-            if(elementInitData.selector.parentValue === undefined) throw new Error("A child selectable element must contain a value: " + elementInitData.key)
-            var parentElement = this.form.getEntry(elementInitData.selector.parentKey);
-            if(!parentElement) throw new Error("Parent element " + elementInitData.selector.parentKey + " not found for selectable child element " + elementInitData.key);
-            if(!parentElement.setChildState) throw new Error("Parent element " + elementInitData.selector.parentKey + " does not support selection of a child element - in element = " + elementInitData.key);
-            
-            parentElement.addSelectionChild(this,elementInitData.selector.parentValue,elementInitData.selector.keepActiveOnHide);
+            this._addSelector(elementInitData.selector);
+        }
+        if(elementInitData.inherit) {
+            if(Array.isArray(elementInitData.inherit)) {
+                elementInitData.inherit.forEach(inheritConfig => this._addInherit(inheritConfig));
+            }
+            else {
+                throw new Error("Inherit config should be an array: " + elementInitData.key);
+            }
+        }
+        if(elementInitData.react) {
+            if(Array.isArray(elementInitData.react)) {
+                elementInitData.react.forEach(reactConfig => this._addReact(reactConfig));
+            }
+            else {
+                throw new Error("React config should be an array: " + elementInitData.key);
+            }
         }
     }
     
@@ -175,12 +148,80 @@ console.log("Setting child state array.");
             this.domElement.style.display = "none";
         }
     }
-    
-    _initAsParent() {
-        this.childSelectionElements = [];
-        this.parentOnChangeHandler = (value,form) => this.childSelectionElements.forEach( childElement => this.setChildState(childElement,value));
-        this.addOnChange(this.parentOnChangeHandler);
+
+    /** This processes a selector entry from the init data */
+    _addSelector(selectorConfig) {
+        let parentKey = selectorConfig.parentKey;
+        let parentValue = selectorConfig.parentValue;
+        let keepActiveOnHide =  selectorConfig.keepActiveOnHide;
+
+        if(!parentKey) throw new Error("Parent key is required for a selectable child element:" + elementInitData.key);
+        if(parentValue === undefined) throw new Error("A child selectable element must contain a value: " + elementInitData.key)
+        let parentElement = this.form.getEntry(parentKey);
+        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for selectable child element " + elementInitData.key);
+        
+        let onValueChange = parentElement.getDependentSelectHandler(this,parentValue,keepActiveOnHide);
+        if(onValueChange) {
+            parentElement._addDependentCallback(onValueChange);
+        }
     }
+
+    /** This processes a inherit entry from the init data */
+    _addInherit(inheritConfig) {
+        let parentKey = inheritConfig.parentKey;
+        let childKey = inheritConfig.childKey;
+
+        if(!parentKey) throw new Error("A parent key is required for a inherit child element:" + elementInitData.key);
+        if(!childKey) throw new Error("A child key is required for an inherit child element: " + elementInitData.key)
+        let parentElement = this.form.getEntry(parentKey);
+        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for inherit child element " + elementInitData.key);
+        if(!this.inherit) throw new Error("The element " + elementInitData.key + " does not support inherit");
+        
+        let onValueChange = (parentValue) => {
+            this.inherit(childKey,parentValue);
+        }
+        parentElement._addDependentCallback(onValueChange);
+    }
+
+    /** This processes a react entry from the init data */
+    _addReact(reactConfig) {
+        let parentKey = reactConfig.parentKey;
+        let onValueChangeGenerator = reactConfig.generator;
+
+        if(!parentKey) throw new Error("A parent key is required for a react child element:" + elementInitData.key);
+        if(!onValueChangeGenerator) throw new Error("A callback generator is required for an react child element: " + elementInitData.key)
+        let parentElement = this.form.getEntry(parentKey);
+        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for react child element " + elementInitData.key);
+        
+        let onValueChange = onValueChangeGenerator(this);
+        if(onValueChange) {
+            parentElement._addDependentCallback(onValueChange);
+        }
+    }
+
+    /** This function adds a callback that came from config element initialization */
+    _addDependentCallback(onValueChange) {
+        if(!this.dependentCallbacks) {
+            this._initForDependents();
+        }
+        this.dependentCallbacks.push(onValueChange);
+
+        //call now to initialize state
+        onValueChange(this.getValue());
+    }
+
+    /** This function calls all the onValueChange callbacks for dependent elements. */
+    _callDependentCallbacks(value) {
+        if(this.dependentCallbacks) {
+            this.dependentCallbacks.forEach( onValueChange => onValueChange(value) );
+        }
+    }
+
+    _initForDependents() {
+        this.dependentCallbacks = [];
+        this.addOnChange( (value,form) => this._callDependentCallbacks(value) );
+    }
+            
 }
 
 ConfigurableElement.CONTAINER_CLASS_STANDARD = "apogee_configurablePanelLine_standard";

@@ -74,7 +74,7 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         this.checkboxList.forEach(checkbox => checkbox.checked = (valueList.indexOf(checkbox.value) >= 0));
         
         //needed for selection children
-        this.checkChildSelection(valueList);
+        //this.checkChildSelection(valueList);
     }
     
     /** This should be extended in elements to handle on change listeners. */
@@ -84,7 +84,29 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         }
         this.checkboxList.forEach(checkbox => checkbox.addEventListener("change",onChangeImpl));
     }
-    
+
+    //==================================
+    // protected methods
+    //==================================
+    /** This method returns the onValueChange handler. It overrides the default 
+     * implementation to make the dependent element visible if the parent element, this checkbox group
+     * CONTAINS the given value, rather than is equal to the given value. */
+    getDependentSelectHandler(dependentElement,value,keepActiveOnHide) {
+        return parentValue => {
+            let state;
+            if(parentValue == value) {
+                state = ConfigurablePanelConstants.STATE_NORMAL;
+            }
+            else {
+                state = (keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE);
+            }
+
+            if(dependentElement.getState() != state) {
+                dependentElement.setState(state);
+            }
+        }
+    }
+
     //===================================
     // internal Methods
     //==================================

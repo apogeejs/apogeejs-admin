@@ -56,6 +56,18 @@ export default class PanelElement extends ConfigurableElement {
         //add this to each element in the panel
         this.panel.getChildEntries().forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(onChange);} );
     }
+
+    //===================================
+    // protected Methods
+    //==================================
+
+    /** This function is used to inherit a child value from a parent value */
+    inherit(childKey,parentValue) {
+        let childElement = this.panel.getEntry(childKey);
+        if((childElement)&&(childElement.getValue() != parentValue)) {
+            childElement.setValue(parentValue);
+        }    
+    }
     
     //===================================
     // internal Methods

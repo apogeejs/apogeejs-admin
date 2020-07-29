@@ -50,7 +50,8 @@ export default class ConfigurablePanel {
             }
         }
         catch(error) {
-            var errorMsg = "Error in panel: " + error.message;
+            var errorMsg = "Error in panel: " + error.toString();
+            if(error.stack) console.error(error.stack);
             
             //display an error layout
             //but only try this once. If the error layout throws an error jsut continue

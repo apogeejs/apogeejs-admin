@@ -63,7 +63,7 @@ export default class DropdownElement extends ConfigurableElement {
         this.select.value = value;
         
         //needed for selection children
-        this.checkChildSelection(value);
+        //this.checkChildSelection(value);
     }
     
     /** This should be extended in elements to handle on change listeners. */

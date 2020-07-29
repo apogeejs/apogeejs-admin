@@ -42,6 +42,8 @@ export default class ListElement extends ConfigurableElement {
         this.elementContainer = null;
         this.listElement = this._createListContainer(); 
         containerElement.appendChild(this.listElement); 
+
+        this.inheritValueMap = {};
         
         this._postInstantiateInit(elementInitData);
     }
@@ -157,6 +159,25 @@ export default class ListElement extends ConfigurableElement {
     }
     
     //===================================
+    // protected Methods
+    //==================================
+
+    /** This function is used to inherit a child value from a parent value.
+     * It passes all values to any contained list element that has an inherit method. */
+    inherit(childKey,parentValue) {
+        //pass to any child entries applicable
+        this.listEntries.forEach( listEntry => {
+            let childElement = listEntry.elementObject;
+            if(childElement.inherit) {
+                childElement.inherit(childKey,parentValue);
+            }
+        }); 
+
+        //store the inherit value for when other entries created
+        this.inheritValueMap[childKey] = parentValue;
+    }
+
+    //===================================
     // internal Methods
     //==================================
 
@@ -210,9 +231,17 @@ export default class ListElement extends ConfigurableElement {
         this.listEntries.push(listEntryData);
         this.elementContainer.appendChild(listEntryData.element);
 
-        //set value if applicable
+        //set value if set in config
         if(optionalValue !== undefined) {
             listEntryData.elementObject.setValue(optionalValue);
+        }
+
+        //set value if set from inherit
+        for(let key in this.inheritValueMap) {
+            let childElement = listEntryData.elementObject;
+            if(childElement.inherit) {
+                childElement.inherit(key,this.inheritValueMap[key]);
+            }
         }
 
         //add the change listener for this element

@@ -83,7 +83,7 @@ export default class RadioGroupElement extends ConfigurableElement {
         }
         
         //needed for selection children
-        this.checkChildSelection(value);
+        //this.checkChildSelection(value);
     }
     
     /** This should be extended in elements to handle on change listeners. */

@@ -10,6 +10,8 @@ export default class InvisibleElement extends ConfigurableElement {
         //and show it, in which case they will get an empty element with margins.
         //maybe we should have a way to not create the element in the first place.
         super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_INVISIBLE);
+
+        this.onChangeListeners = [];
         
         this._postInstantiateInit(elementInitData);
     }
@@ -24,6 +26,13 @@ export default class InvisibleElement extends ConfigurableElement {
      * to see if this method is applicable. */
     setValue(value) {
         this.value = value;
+
+        this.onChangeListeners.forEach(listener => listener(value,this.getForm()));
+    }
+
+    /** This should be extended in elements to handle on change listeners. */
+    addOnChange(onChange) {
+        this.onChangeListeners.push(onChange);
     }
 }
 
