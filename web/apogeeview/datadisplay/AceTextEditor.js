@@ -98,7 +98,7 @@ export default class AceTextEditor extends DataDisplay {
         }
 
         //check data is valid
-        if(apogeeutil.getObjectType(text) != "String") {
+        if(!apogeeutil.isString(text)) {
             var errorMsg = "ERROR: Data value is not text";
             //this.setError(errorMsg);
             text = errorMsg;

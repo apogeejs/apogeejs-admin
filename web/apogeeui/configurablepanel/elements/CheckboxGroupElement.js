@@ -27,7 +27,8 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         
         //check boxes
         this.checkboxList = [];
-        var addCheckbox = checkboxInfo => {
+        this.valueMap = {};
+        var addCheckbox = (checkboxInfo,index) => {
             var buttonContainer = uiutil.createElement("div");
             buttonContainer.style.display = elementInitData.horizontal ? "inline-block" : "block";
             containerElement.appendChild(buttonContainer);
@@ -37,7 +38,7 @@ export default class CheckboxGroupElement extends ConfigurableElement {
             
             var label;
             var value;
-            if(apogeeutil.getObjectType(checkboxInfo) == "Array") {
+            if(Array.isArray(checkboxInfo)) {
                 label = checkboxInfo[0]
                 value = checkboxInfo[1];     
             }
@@ -45,7 +46,12 @@ export default class CheckboxGroupElement extends ConfigurableElement {
                 label = checkboxInfo;
                 value = checkboxInfo; 
             }
-            checkbox.value = value;
+
+            //checkbox only holds string values. We will store the user set value externally
+            let standinValue = String(index);
+            this.valueMap[standinValue] = value;
+            checkbox.value = standinValue;
+
             this.checkboxList.push(checkbox);
             buttonContainer.appendChild(checkbox);
             buttonContainer.appendChild(document.createTextNode(label));
@@ -66,15 +72,17 @@ export default class CheckboxGroupElement extends ConfigurableElement {
     /** This method returns value for this given element, if applicable. If not applicable
      * this method returns undefined. */
     getValue() {
-        return this.checkboxList.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
+        //return the check value mapped back to the proper (potentially non-string) value for the checkbox
+        return this.checkboxList.filter(checkbox => checkbox.checked).map(checkbox => this.valueMap[checkbox.value]); 
     }   
 
     /** This method updates the list of checked entries. */
     setValue(valueList) {
-        this.checkboxList.forEach(checkbox => checkbox.checked = (valueList.indexOf(checkbox.value) >= 0));
-        
-        //needed for selection children
-        //this.checkChildSelection(valueList);
+        this.checkboxList.forEach(checkbox => {
+            let standinValue = checkbox.value;
+            let properValue = this.valueMap[standinValue];
+            checkbox.checked = (valueList.indexOf(properValue) >= 0);
+        });
     }
     
     /** This should be extended in elements to handle on change listeners. */

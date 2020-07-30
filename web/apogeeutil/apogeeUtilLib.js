@@ -129,6 +129,11 @@ apogeeutil.getObjectType = function(object) {
     return "Unknown";
 }
 
+/** This returns true if the object is a string. */
+apogeeutil.isString = function(object) {
+    return (typeof object == "string");
+}
+
 /** This method creates a deep copy of an object, array or value. Note that
  * undefined is not a valid value in JSON. 
  * 

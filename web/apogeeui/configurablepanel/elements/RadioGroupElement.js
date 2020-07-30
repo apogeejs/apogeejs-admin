@@ -27,9 +27,10 @@ export default class RadioGroupElement extends ConfigurableElement {
         
         //radio buttons
         this.buttonList = [];
+        this.valueMap = {};
         var groupName = elementInitData.groupName;
         if(!groupName) groupName = getRandomString();
-        var addButton = buttonInfo => {
+        var addButton = (buttonInfo,index) => {
             var buttonContainer = uiutil.createElement("div");
             buttonContainer.style.display = elementInitData.horizontal ? "inline-block" : "block";
             containerElement.appendChild(buttonContainer);
@@ -40,7 +41,7 @@ export default class RadioGroupElement extends ConfigurableElement {
             
             var label;
             var value;
-            if(apogeeutil.getObjectType(buttonInfo) == "Array") {
+            if(Array.isArray(buttonInfo)) {
                 label = buttonInfo[0]
                 value = buttonInfo[1];     
             }
@@ -48,7 +49,12 @@ export default class RadioGroupElement extends ConfigurableElement {
                 label = buttonInfo;
                 value = buttonInfo; 
             }
-            radio.value = value;
+
+            //radiobutton only holds string values. We will store the user set value externally
+            let standinValue = String(index);
+            this.valueMap[standinValue] = value;
+            radio.value = standinValue;
+
             this.buttonList.push(radio);
             buttonContainer.appendChild(radio);
             buttonContainer.appendChild(document.createTextNode(label));
@@ -68,7 +74,7 @@ export default class RadioGroupElement extends ConfigurableElement {
     getValue() {
         var checkedRadio = this.buttonList.find(radio => radio.checked);
         if(checkedRadio) {
-            return checkedRadio.value;
+            return this.valueMap[checkedRadio.value];
         }
         else {
             return undefined;
@@ -77,13 +83,15 @@ export default class RadioGroupElement extends ConfigurableElement {
 
     /** This method updates the list of checked entries. */
     setValue(value) {
-        var checkedButton = this.buttonList.find(radioButton => (radioButton.value == value));
+        var checkedButton = this.buttonList.find(radioButton => {
+            let standinValue = radioButton.value;
+            let properButtonValue = this.valueMap[standinValue];
+            return (properButtonValue === value);
+        });
+
         if(checkedButton) {
             checkedButton.checked = true;
         }
-        
-        //needed for selection children
-        //this.checkChildSelection(value);
     }
     
     /** This should be extended in elements to handle on change listeners. */

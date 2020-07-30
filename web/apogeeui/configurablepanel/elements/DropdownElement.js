@@ -23,11 +23,12 @@ export default class DropdownElement extends ConfigurableElement {
             this.labelElement = null;
         }
         
+        this.valueMap = {};
         this.select = uiutil.createElement("select");
-        var addEntry = entryInfo => {
+        var addEntry = (entryInfo,index) => {
             var label;
             var value;
-            if(apogeeutil.getObjectType(entryInfo) == "Array") {
+            if(Array.isArray(entryInfo)) {
                 label = entryInfo[0]
                 value = entryInfo[1];
             }
@@ -35,9 +36,13 @@ export default class DropdownElement extends ConfigurableElement {
                 label = entryInfo;
                 value = entryInfo;   
             }
+
+            let standinValue = String(index);
+            this.valueMap[standinValue] = value
+
             var entry = document.createElement("option");
             entry.text = label;
-            entry.value = value;
+            entry.value = standinValue;
             this.select.appendChild(entry);
         }
         if(elementInitData.entries) {
@@ -54,16 +59,19 @@ export default class DropdownElement extends ConfigurableElement {
     /** This method returns value for this given element, if applicable. If not applicable
      * this method returns undefined. */
     getValue() {
-        return this.select.value;
+        return this.valueMap[this.select.value];
     }   
 
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
     setValue(value) {
-        this.select.value = value;
-        
-        //needed for selection children
-        //this.checkChildSelection(value);
+        let standinValue;
+        for(let key in this.valueMap) {
+            if(this.valueMap[key] === value) standinValue = key;
+        }
+        if(standinValue !== undefined) {
+            this.select.value = standinValue;
+        }
     }
     
     /** This should be extended in elements to handle on change listeners. */

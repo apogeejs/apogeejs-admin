@@ -121,7 +121,7 @@ let lineFunctions = {
         for(var i = 0; i < lineDef.entries.length; i++) {
             var entry = lineDef.entries[i];
             let label, value;
-            if(apogeeutil.getObjectType(entry) == "Array") {
+            if(Array.isArray(entry)) {
                 value = entry[0]
                 label = entry[1];
             }
