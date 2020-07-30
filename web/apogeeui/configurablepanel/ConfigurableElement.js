@@ -6,11 +6,11 @@ import uiutil from "/apogeeui/uiutil.js";
  * @class 
  */
 export default class ConfigurableElement {
-    constructor(form,elementInitData,optionalContainerClassName = ConfigurableElement.CONTAINER_CLASS_STANDARD) {
+    constructor(form,elementInitData) {
         this.form = form;
         this.key = elementInitData.key;
         this.meta = elementInitData.meta;
-        this.domElement = uiutil.createElement("div",{"className":optionalContainerClassName});
+        this.domElement = uiutil.createElement("div",{"className":ConfigurableElement.CONTAINER_CLASS_STANDARD});
     }
     
     /** This method returns the key for this ConfigurableElement within this panel. */

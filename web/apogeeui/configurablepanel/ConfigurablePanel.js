@@ -7,9 +7,9 @@ import uiutil from "/apogeeui/uiutil.js";
  */
 export default class ConfigurablePanel {
     
-    constructor(optionalContainerClassName = ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED) {
+    constructor() {
         this.elementObjects = [];
-        this.panelElement = this.createPanelElement(optionalContainerClassName); 
+        this.panelElement = this.createPanelElement(ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED); 
     }
     
     configureForm(formInitData) {
@@ -213,6 +213,7 @@ ConfigurablePanel.elementMap = {};
 
 ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
 ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED = "apogee_configurablePanelBody_selfSized";
+ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED_NO_MARGIN = "apogee_configurablePanelBody_selfSized_noMargin";
 
 //This is displayed if there is an invalid layout passed in
 ConfigurablePanel.INVALID_INIT_DATA = {

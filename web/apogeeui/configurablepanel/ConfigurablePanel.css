@@ -1,3 +1,12 @@
+.apogee_configurablePanelBody_selfSized { 
+    position: relative;
+    overflow: auto;
+}
+.apogee_configurablePanelBody_selfSized_noMargin { 
+    position: relative;
+    overflow: auto;
+    margin: 0px;
+}
 .apogee_configurablePanelBody_fillParent { 
     position: absolute;
     top: 0px;
@@ -5,16 +14,12 @@
     bottom: 0px;
     right: 0px;
 }
-.apogee_configurablePanelBody_selfSized { 
-    position: relative;
-    overflow: auto;
-}
 .apogee_configurablePanelLine_standard {
     position: relative;
     padding:5px;
     margin:0px;
 }
-.apogee_configurablePanelPanelLine_noMaring {
+.apogee_configurablePanelPanelLine_noMargin {
     position: relative;
     padding:0px;
     margin:0px;
@@ -23,7 +28,28 @@
     position: relative;
     display: none;
 }
-.apogee_configurablePanelHeading {
+.apogee_configurablePanelHeading_1 {
+    font-size: 2em;
+    font-weight: bold;
+}
+.apogee_configurablePanelHeading_2 {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.apogee_configurablePanelHeading_3 {
+    font-size: 1.17em;
+    font-weight: bold;
+}
+.apogee_configurablePanelHeading_4 {
+    font-weight: bold;
+}
+.apogee_configurablePanelHeading_5 {
+    font-size: .83em;
+    font-weight: bold;
+}
+.apogee_configurablePanelHeading_6 {
+    font-size: .67em;
+    font-weight: bold;
 }
 .apogee_configurablePanelLabel {
     font-weight: bold;

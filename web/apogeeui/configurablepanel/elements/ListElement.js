@@ -9,7 +9,7 @@ import uiutil from "/apogeeui/uiutil.js";
  */
 export default class ListElement extends ConfigurableElement {
     constructor(form,elementInitData) {
-        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_STANDARD);
+        super(form,elementInitData);
 
         var containerElement = this.getElement();
 

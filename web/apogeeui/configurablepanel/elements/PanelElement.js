@@ -7,17 +7,18 @@ import ConfigurablePanel from "/apogeeui/configurablepanel/ConfigurablePanel.js"
  */
 export default class PanelElement extends ConfigurableElement {
     constructor(form,elementInitData) {
-        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_NO_MARGIN);
+        super(form,elementInitData);
         
         var containerElement = this.getElement();
-        //update the container class
-        containerElement.className = "apogee_configurablePanelPanelLine";
+        //update the container class so there is no margin
+        containerElement.className = ConfigurableElement.CONTAINER_CLASS_NO_MARGIN;
         
         var formInitData = elementInitData.formData;
         this.panel = new ConfigurablePanel();
         this.panel.configureForm(formInitData);
         var panelElement = this.panel.getElement();
-        panelElement.className = "apogee_configurablePanelPanelLine";
+        //update the class to the no margin option
+        panelElement.className = ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED_NO_MARGIN;
         containerElement.appendChild(panelElement);
         
         this._postInstantiateInit(elementInitData);
