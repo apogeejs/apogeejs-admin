@@ -1,11 +1,6 @@
-.apogee_configurablePanelBody_selfSized { 
+.apogee_configurablePanelBody { 
     position: relative;
     overflow: auto;
-}
-.apogee_configurablePanelBody_selfSized_noMargin { 
-    position: relative;
-    overflow: auto;
-    margin: 0px;
 }
 .apogee_configurablePanelBody_fillParent { 
     position: absolute;
@@ -14,19 +9,8 @@
     bottom: 0px;
     right: 0px;
 }
-.apogee_configurablePanelLine_standard {
+.apogee_configurablePanelLine {
     position: relative;
-    padding:5px;
-    margin:0px;
-}
-.apogee_configurablePanelPanelLine_noMargin {
-    position: relative;
-    padding:0px;
-    margin:0px;
-}
-.apogee_configurablePanelPanelLine_hidden {
-    position: relative;
-    display: none;
 }
 .apogee_configurablePanelHeading_1 {
     font-size: 2em;

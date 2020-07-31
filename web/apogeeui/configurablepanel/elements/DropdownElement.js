@@ -72,6 +72,11 @@ export default class DropdownElement extends ConfigurableElement {
         if(standinValue !== undefined) {
             this.select.value = standinValue;
         }
+
+///////////////////////////////////////////////////
+        //needed for selection children
+        this._callDependentCallbacks(value);
+///////////////////////////////////////////////////
     }
     
     /** This should be extended in elements to handle on change listeners. */

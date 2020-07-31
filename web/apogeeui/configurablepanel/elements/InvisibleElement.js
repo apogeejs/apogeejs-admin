@@ -12,8 +12,7 @@ export default class InvisibleElement extends ConfigurableElement {
         super(form,elementInitData);
 
         //update the class to be invisible
-        let element = this.getElement();
-        element.className = ConfigurableElement.CONTAINER_CLASS_INVISIBLE;
+        this.setVisibleDisplayStyle(ConfigurableElement.ELEMENT_DISPLAY_INVISIBLE);
 
         this.onChangeListeners = [];
         

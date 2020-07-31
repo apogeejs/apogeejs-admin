@@ -9,7 +9,7 @@ export default class ConfigurablePanel {
     
     constructor() {
         this.elementObjects = [];
-        this.panelElement = this.createPanelElement(ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED); 
+        this.panelElement = this.createPanelElement(ConfigurablePanel.PANEL_CLASS); 
     }
     
     configureForm(formInitData) {
@@ -178,42 +178,61 @@ export default class ConfigurablePanel {
     createPanelElement(containerClassName) {
         var panelElement = document.createElement("div");
         panelElement.className = containerClassName;
+        //explicitly remove margin and padding
+        panelElement.style.margin = "0px";
+        panelElement.style.padding = "0px";
         return panelElement;
     }
     
     /** this is called internally to add an element to the panel. */
     addToPanel(elementInitData) {
+
+        var elementObject = ConfigurablePanel.instantiateConfigurableType(this,elementInitData);
+
+        if(elementObject.elementType == "ConfigurableLayoutContainer") {
+            //add all child elements from this container to the child element list
+            this.elementObjects.push(...elementObject.getChildElementObjects());
+            //add the dome element for the container
+            var domElement = elementObject.getElement();
+            if(domElement) {
+                this.panelElement.appendChild(domElement);
+            }
+        }
+        else if(elementObject.elementType == "ConfigurableElement") {
+            //add this element to the child element list
+            this.elementObjects.push(elementObject);
+            //add the dom element for the child element
+            var domElement = elementObject.getElement();
+            if(domElement) {
+                this.panelElement.appendChild(domElement);
+            }
+        }
+        
+        else {
+            throw new Error("Unknown form element class: " + typeof elementObject);
+        }
+    }
+
+    static instantiateConfigurableType(form,elementInitData) {
         var type = elementInitData.type;
         if(!type) {
             throw new Error("Type not found for configurable form entry!");
         }
         
-        var constructor = ConfigurablePanel.getTypeConstructor(type);
+        var constructor = ConfigurablePanel.elementMap[type];
         if(!constructor) {
             throw new Error("Type not found for configurable element: " + type);
         }
 
-        var elementObject = new constructor(this,elementInitData);
-
-        
-        this.elementObjects.push(elementObject);
-        var domElement = elementObject.getElement();
-        if(domElement) {
-            this.panelElement.appendChild(domElement);
-        }
-    }
-    
-    static getTypeConstructor(type) {
-        return ConfigurablePanel.elementMap[type];
+        return new constructor(form,elementInitData);
     }
 }
 
 //static fields
 ConfigurablePanel.elementMap = {};
 
-ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
-ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED = "apogee_configurablePanelBody_selfSized";
-ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED_NO_MARGIN = "apogee_configurablePanelBody_selfSized_noMargin";
+ConfigurablePanel.PANEL_CLASS = "apogee_configurablePanelBody";
+ConfigurablePanel.PANEL_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
 
 //This is displayed if there is an invalid layout passed in
 ConfigurablePanel.INVALID_INIT_DATA = {

@@ -258,25 +258,21 @@ export default class ListElement extends ConfigurableElement {
         let listEntry = {};
 
         //create element object
-        let layout = entryTypeJson.layout;
-        if(!layout) {
+
+        let elementInitData = entryTypeJson.layout;
+        if(!elementInitData) {
             throw new Error("Layout not found for list entry!");
         }
 
-        var type = layout.type;
-        if(!type) {
-            throw new Error("Type not found for list entry!");
-        }
-        
-        var constructor = ConfigurablePanel.getTypeConstructor(type);
-        if(!constructor) {
-            throw new Error("Type not found for list element: " + type);
-        }
+        var elementObject = ConfigurablePanel.instantiateConfigurableType(this.getForm(),elementInitData);
 
-        var elementObject = new constructor(this.getForm(),layout);
-
-        listEntry.elementObject = elementObject;
-        listEntry.element = this._createListDomElement(listEntry);
+        if(elementObject instanceof ConfigurableElement) {
+            listEntry.elementObject = elementObject;
+            listEntry.element = this._createListDomElement(listEntry);
+        }
+        else {
+            throw new Error("Only configurable elements cah be set as entry types for a list.");
+        }
 
         return listEntry;
     }

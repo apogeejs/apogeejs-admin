@@ -10,7 +10,13 @@ export default class ConfigurableElement {
         this.form = form;
         this.key = elementInitData.key;
         this.meta = elementInitData.meta;
-        this.domElement = uiutil.createElement("div",{"className":ConfigurableElement.CONTAINER_CLASS_STANDARD});
+        this.domElement = uiutil.createElement("div",{"className":ConfigurableElement.CONTAINER_CLASS});
+        //explicitly set the margin and padding
+        this.domElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_STANDARD;
+        this.domElement.style.padding = ConfigurableElement.ELEMENT_PADDING_STANDARD;
+        this.domElement.style.display = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE;
+
+        this.visibleDisplayStyle = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE
     }
     
     /** This method returns the key for this ConfigurableElement within this panel. */
@@ -73,9 +79,23 @@ export default class ConfigurableElement {
         return this.form;
     }
 
+    /** This is used to determine what type of child element this is for a panel. */
+    get elementType() {
+        return "ConfigurableElement";
+    }
+
     //==================================
     //protecxted methods
     //==================================
+
+    /** This function should be used to set the display state for the element, since that variable
+     * is also used to control visibility. */
+    setVisibleDisplayStyle(visibleDisplayStyle) {
+        this.visibleDisplayStyle = visibleDisplayStyle;
+        if(this.domElement.style.display != "none") {
+            this.domElement.style.display = this.visibleDisplayStyle;
+        }
+    }
 
     /** This method returns the onValueChange handler to make the dependent element
      * visible when the parent element (as the element depended on) has the given value. */
@@ -142,7 +162,7 @@ export default class ConfigurableElement {
     
     _setVisible(isVisible) {
         if(isVisible) {
-            this.domElement.style.display = "";
+            this.domElement.style.display = this.visibleDisplayStyle;
         }
         else {
             this.domElement.style.display = "none";
@@ -224,8 +244,14 @@ export default class ConfigurableElement {
             
 }
 
-ConfigurableElement.CONTAINER_CLASS_STANDARD = "apogee_configurablePanelLine_standard";
-ConfigurableElement.CONTAINER_CLASS_NO_MARGIN = "apogee_configurablePanelPanelLine_noMargin";
-ConfigurableElement.CONTAINER_CLASS_INVISIBLE = "apogee_configurablePanelPanelLine_hidden";
+ConfigurableElement.CONTAINER_CLASS = "apogee_configurablePanelLine";
+
+ConfigurableElement.ELEMENT_MARGIN_STANDARD = "0px";
+ConfigurableElement.ELEMENT_MARGIN_NONE = "0px";
+ConfigurableElement.ELEMENT_PADDING_STANDARD = "4px";
+ConfigurableElement.ELEMENT_PADDING_NONE = "0px";
+ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE = "block";
+ConfigurableElement.ELEMENT_DISPLAY_PARTIAL_LINE = "inline-block";
+ConfigurableElement.ELEMENT_DISPLAY_INVISIBLE = "none";
 
 

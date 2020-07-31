@@ -92,6 +92,11 @@ export default class RadioGroupElement extends ConfigurableElement {
         if(checkedButton) {
             checkedButton.checked = true;
         }
+
+///////////////////////////////////////////////////
+        //needed for selection children
+        this._callDependentCallbacks(value);
+///////////////////////////////////////////////////
     }
     
     /** This should be extended in elements to handle on change listeners. */

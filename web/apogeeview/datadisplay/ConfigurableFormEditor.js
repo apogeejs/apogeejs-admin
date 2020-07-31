@@ -24,6 +24,8 @@ export default class ConfigurableFormEditor extends DataDisplay {
         if(dataSource.getDisplayData) {
             this.panel.configureForm(dataSource.getDisplayData());
         }
+
+        this.panel.addOnChange( formValue => this.onFormChange(formValue));
     }
 
     /** This method will return undefined until showData is called. */
@@ -50,24 +52,26 @@ export default class ConfigurableFormEditor extends DataDisplay {
             data = {};
         }
 
-        this.changeReferenceValue = data;
+        this.changeReferenceFormValue = data;
 
         //input data is the layout and the value
         this.panel.setValue(data);
-        
+    }
+
+    onFormChange(formValue) {
         //set change to enable save bar is form value differs from initial data
         let dataSource = this.getDataSource();
-        if((dataSource.getEditOk)&&(dataSource.getEditOk())) {
-            var onChange = (currentFormValue,form) => {
-                if(apogeeutil.jsonEquals(currentFormValue,this.changeReferenceValue)) {
-                    this.endEditMode()
-                }
-                else {
-                    this.startEditMode();
-                }
+        let editOk = (dataSource.getEditOk)&&(dataSource.getEditOk()); 
+        if(editOk) {
+            if(!apogeeutil.jsonEquals(formValue,this.changeReferenceFormValue)) {
+                
+                this.startEditMode();
             }
-            this.panel.addOnChange(onChange);
-        }     
+            else {
+                //I think I like it better without clearing the edit state if we revert to the original value
+                //this.endEditMode()
+            }
+        }
     }
 
     //===========================

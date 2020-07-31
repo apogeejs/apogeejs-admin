@@ -10,15 +10,14 @@ export default class PanelElement extends ConfigurableElement {
         super(form,elementInitData);
         
         var containerElement = this.getElement();
-        //update the container class so there is no margin
-        containerElement.className = ConfigurableElement.CONTAINER_CLASS_NO_MARGIN;
+        //udpate padding and margin to 0
+        containerElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_NONE;
+        containerElement.style.padding = ConfigurableElement.ELEMENT_PADDING_NONE;
         
         var formInitData = elementInitData.formData;
         this.panel = new ConfigurablePanel();
         this.panel.configureForm(formInitData);
         var panelElement = this.panel.getElement();
-        //update the class to the no margin option
-        panelElement.className = ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED_NO_MARGIN;
         containerElement.appendChild(panelElement);
         
         this._postInstantiateInit(elementInitData);

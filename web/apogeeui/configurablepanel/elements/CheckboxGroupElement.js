@@ -83,6 +83,11 @@ export default class CheckboxGroupElement extends ConfigurableElement {
             let properValue = this.valueMap[standinValue];
             checkbox.checked = (valueList.indexOf(properValue) >= 0);
         });
+
+///////////////////////////////////////////////////
+        //needed for selection children
+        this._callDependentCallbacks(value);
+///////////////////////////////////////////////////
     }
     
     /** This should be extended in elements to handle on change listeners. */

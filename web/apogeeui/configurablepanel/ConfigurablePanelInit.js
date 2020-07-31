@@ -14,6 +14,8 @@ import SubmitElement from "/apogeeui/configurablepanel/elements/SubmitElement.js
 import TextareaElement from "/apogeeui/configurablepanel/elements/TextareaElement.js";
 import TextFieldElement from "/apogeeui/configurablepanel/elements/TextFieldElement.js";
 
+import HorizontalLayout from "/apogeeui/configurablepanel/elements/HorizontalLayout.js";
+
 ConfigurablePanel.addConfigurableElement(CheckboxElement);
 ConfigurablePanel.addConfigurableElement(CheckboxGroupElement);
 ConfigurablePanel.addConfigurableElement(CustomElement);
@@ -28,3 +30,5 @@ ConfigurablePanel.addConfigurableElement(SpacerElement);
 ConfigurablePanel.addConfigurableElement(SubmitElement);
 ConfigurablePanel.addConfigurableElement(TextareaElement);
 ConfigurablePanel.addConfigurableElement(TextFieldElement);
+
+ConfigurablePanel.addConfigurableElement(HorizontalLayout);
