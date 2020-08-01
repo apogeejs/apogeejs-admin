@@ -10,13 +10,17 @@ export default class ConfigurableElement {
         this.form = form;
         this.key = elementInitData.key;
         this.meta = elementInitData.meta;
+
+        this.onChangeListeners = [];
+        this.onInputListeners = [];
+
         this.domElement = uiutil.createElement("div",{"className":ConfigurableElement.CONTAINER_CLASS});
         //explicitly set the margin and padding
         this.domElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_STANDARD;
         this.domElement.style.padding = ConfigurableElement.ELEMENT_PADDING_STANDARD;
         this.domElement.style.display = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE;
 
-        this.visibleDisplayStyle = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE
+        this.visibleDisplayStyle = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE;
     }
     
     /** This method returns the key for this ConfigurableElement within this panel. */
@@ -34,6 +38,13 @@ export default class ConfigurableElement {
     getValue() {
         return undefined;
     }  
+
+    /** This method updates the value for a given element. See the specific element
+     * to see if this method is applicable. */
+    setValue(value) {
+        this.setValueImpl(value);
+        this.valueChanged(true);
+    }
     
     getState() {
         return this.state;
@@ -64,11 +75,6 @@ export default class ConfigurableElement {
         
     }
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
-    }
-
     /** This method returns the DOM element for this configurable element. */
     getElement() {
         return this.domElement;
@@ -79,14 +85,45 @@ export default class ConfigurableElement {
         return this.form;
     }
 
+    addOnChange(onChange) {
+        this.onChangeListeners.push(onChange);
+    }
+
+    addOnInput(onInput) {
+        this.onInputListeners.push(onInput);
+    }
+
     /** This is used to determine what type of child element this is for a panel. */
     get elementType() {
         return "ConfigurableElement";
     }
 
     //==================================
-    //protecxted methods
+    //protected methods
     //==================================
+
+    /** This method should be implemented by extending to set the value for the element. The method 
+     * "valueChanged" does not need to be called. It is called automatically. */
+    setValueImpl(value) {}
+
+    /** This method should be called when the value changes. Here value changed refers to a completed
+     * input. For example typing a character a text field should not trigger this event, only the update 
+     * of the value of a given field. */
+    valueChanged() {
+        if(this.onChangeListeners.length > 0) {
+            let value =this.getValue();
+            this.onChangeListeners.forEach( listener => listener(value,this.form));
+        }
+    }
+
+    /** This method should be called input is done at the user interface. Thiw is should be called when typing
+     * characters in a text field or when changing an element such as a checkbox. */
+    inputDone() {
+        if(this.onInputListeners.length > 0) {
+            let value =this.getValue();
+            this.onInputListeners.forEach( listener => listener(value,this.form));
+        }
+    }
 
     /** This function should be used to set the display state for the element, since that variable
      * is also used to control visibility. */
@@ -134,6 +171,9 @@ export default class ConfigurableElement {
         //standard events
         if(elementInitData.onChange) {
             this.addOnChange(elementInitData.onChange);
+        }
+        if(elementInitData.onInput) {
+            this.addOnInput(elementInitData.onInput);
         }
         
         //dependent element logic

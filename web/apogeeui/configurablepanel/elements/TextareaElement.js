@@ -31,11 +31,10 @@ export default class TextareaElement extends ConfigurableElement {
             this.inputElement.cols = elementInitData.cols;
         }
         containerElement.appendChild(this.inputElement); 
-        
-        //non standard events
-        if(elementInitData.onChangeCompleted) {
-            this.addOnChangeCompleted(elementInitData.onChangeCompleted);
-        }
+
+        //add dom listeners
+        this.inputElement.addEventListener("input",() => this.onInput());
+        this.inputElement.addEventListener("change",() => this.onChange());
         
         this._postInstantiateInit(elementInitData);
     }
@@ -46,26 +45,13 @@ export default class TextareaElement extends ConfigurableElement {
         return this.inputElement.value.trim();
     }   
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
+    //==================================
+    // protected methods
+    //==================================
+
+    /** This method updates the UI value for a given element. */
+    setValueImpl(value) {
         this.inputElement.value = value;
-    }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        }
-        this.inputElement.addEventListener("input",onChangeImpl);
-    }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChangeCompleted(onChangeCompleted) {
-        var onChangeCompletedImpl = () => {
-            onChangeCompleted(this.getValue(),this.getForm());
-        }
-        this.inputElement.addEventListener("change",onChangeCompletedImpl);
     }
     
     //===================================

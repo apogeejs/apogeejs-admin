@@ -139,11 +139,19 @@ export default class ConfigurablePanel {
     
     //takes a handler onChange(formValue,form)
     addOnChange(onChange) {
-        var childOnChange = (childValue,form) => {
+        let onChildChange = (childValue,form) => {
             var formValue = this.getValue();
             onChange(formValue,form);
         }
-        this.elementObjects.forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(childOnChange);} );
+        this.elementObjects.forEach( elementObject => elementObject.addOnChange(onChildChange));
+    }
+
+    addOnInput(onInput) {
+        let onChildInput = (childValue,form) => {
+            var formValue = this.getValue();
+            onInput(formValue,form);
+        }
+        this.elementObjects.forEach( elementObject => elementObject.addOnInput(onChildInput));
     }
     
     setDisabled(isDisabled) {

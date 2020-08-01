@@ -24,7 +24,13 @@ export default class CheckboxElement extends ConfigurableElement {
         
         //checkbox field
         this.checkbox = uiutil.createElement("input",{"type":"checkbox"});
-        containerElement.appendChild(this.checkbox);  
+        containerElement.appendChild(this.checkbox); 
+        
+        //add dom listeners for events
+        this.checkbox.addEventListener("change",() => {
+            this.inputDone();
+            this.valueChanged();
+        });
         
         this._postInstantiateInit(elementInitData);
         
@@ -36,25 +42,15 @@ export default class CheckboxElement extends ConfigurableElement {
      * this method returns undefined. */
     getValue() {
         return this.checkbox.checked;
-    }   
+    } 
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
+    //===================================
+    // protected Methods
+    //==================================
+
+    /** This method updates the UI value for a given element. */
+    setValueImpl(value) {
         this.checkbox.checked = (value === true);
-        
-///////////////////////////////////////////////////
-        //needed for selection children
-        this._callDependentCallbacks(value);
-///////////////////////////////////////////////////
-    }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        }
-        this.checkbox.addEventListener("change",onChangeImpl);
     }
     
     //===================================

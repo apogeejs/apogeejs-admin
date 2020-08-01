@@ -73,9 +73,44 @@ export default class ListElement extends ConfigurableElement {
         return listValue;
     }   
 
+    /** This overrides the get meta element to calculate it on the fly. Because of list elements,
+     * the meta value depends on the content. */
+    getMeta() {
+        if(this.meta) {
+            let fullMeta = apogeeutil.jsonCopy(this.meta);
+            if(this.isMultiTypeList) {
+                let childMeta = {};
+                this.listEntries.forEach( listEntryInfo => {
+                    let childEntryMeta = listEntryInfo.elementObject.getMeta();
+                    let childKey = listEntryInfo.elementObject.getKey();
+                    if((childEntryMeta)&&(childKey)) {
+                        childMeta[childKey] = childEntryMeta;
+                    }
+                })
+                fullMeta.childMeta = childMeta;
+            }
+            else {
+                let listEntryInfo = this.listEntries[0];
+                let childEntryMeta = listEntryInfo.elementObject.getMeta();
+                if(childEntryMeta) {
+                    fullMeta.entryMeta = childEntryMeta;
+                }
+            }
+
+            return fullMeta;
+        }
+        else {
+            return null;
+        }
+    }
+    
+    //===================================
+    // protected Methods
+    //==================================
+
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
-    setValue(listValue) {
+    setValueImpl(listValue) {
         if(Array.isArray(listValue)) {
             let currentValue = this.getValue();
             //update values if the list changes
@@ -114,53 +149,11 @@ export default class ListElement extends ConfigurableElement {
                     }
                 });
             }
-
-            this._listValueChanged();
         }
         else {
             console.log("Value being set for list is not an array!");
         }
     }
-
-    /** This overrides the get meta element to calculate it on the fly. Because of list elements,
-     * the meta value depends on the content. */
-    getMeta() {
-        if(this.meta) {
-            let fullMeta = apogeeutil.jsonCopy(this.meta);
-            if(this.isMultiTypeList) {
-                let childMeta = {};
-                this.listEntries.forEach( listEntryInfo => {
-                    let childEntryMeta = listEntryInfo.elementObject.getMeta();
-                    let childKey = listEntryInfo.elementObject.getKey();
-                    if((childEntryMeta)&&(childKey)) {
-                        childMeta[childKey] = childEntryMeta;
-                    }
-                })
-                fullMeta.childMeta = childMeta;
-            }
-            else {
-                let listEntryInfo = this.listEntries[0];
-                let childEntryMeta = listEntryInfo.elementObject.getMeta();
-                if(childEntryMeta) {
-                    fullMeta.entryMeta = childEntryMeta;
-                }
-            }
-
-            return fullMeta;
-        }
-        else {
-            return null;
-        }
-    }
-    
-    /** This will call the handler is this panel changes value. */
-    addOnChange(onChange) {
-        this.changeListener = onChange;
-    }
-    
-    //===================================
-    // protected Methods
-    //==================================
 
     /** This function is used to inherit a child value from a parent value.
      * It passes all values to any contained list element that has an inherit method. */
@@ -184,12 +177,6 @@ export default class ListElement extends ConfigurableElement {
     /** This looks up the entry type for a given key, based on the layout key. */
     _lookupEntryTypeJson(key) {
         return this.entryTypes.find( entryTypeJson => entryTypeJson.layout.key == key);
-    }
-
-    _listValueChanged() {
-        if(this.changeListener) {
-            this.changeListener(this.getValue(),this.getForm());
-        }
     }
     
     //---------------------
@@ -245,12 +232,11 @@ export default class ListElement extends ConfigurableElement {
         }
 
         //add the change listener for this element
-        if(listEntryData.elementObject.addOnChange) {
-            listEntryData.elementObject.addOnChange( () => this._listValueChanged())
-        }
-
-        //nofity change
-        this._listValueChanged();
+        listEntryData.elementObject.addOnChange( () => this.valueChanged());
+        listEntryData.elementObject.addOnInput( () => this.inputDone());
+        
+        //nofityof value change
+        this.valueChanged();
     }
 
     _createListEntryData(entryTypeJson) {
@@ -343,7 +329,7 @@ export default class ListElement extends ConfigurableElement {
             //listEntries.forEach( childEntry => this.elementContainer.appendChild(childEntry.element));
 
             //nofity change
-            this._listValueChanged();
+            this.valueChanged();
         }
     }
 
@@ -357,7 +343,7 @@ export default class ListElement extends ConfigurableElement {
             this.elementContainer.insertBefore(entry.element.nextSibling,entry.element);
 
             //nofity change
-            this._listValueChanged();
+            this.valueChanged();
         }
     }
 
@@ -369,7 +355,7 @@ export default class ListElement extends ConfigurableElement {
         this.elementContainer.removeChild(entry.element);
 
         //nofity change
-        this._listValueChanged();
+        this.valueChanged();
     }
 }
 

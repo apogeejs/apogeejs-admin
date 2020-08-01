@@ -19,6 +19,10 @@ export default class PanelElement extends ConfigurableElement {
         this.panel.configureForm(formInitData);
         var panelElement = this.panel.getElement();
         containerElement.appendChild(panelElement);
+
+        //add event listeners
+        this.panel.addOnInput( () => this.inputDone() );
+        this.panel.addOnChange( () => this.valueChanged() );
         
         this._postInstantiateInit(elementInitData);
     }
@@ -28,12 +32,6 @@ export default class PanelElement extends ConfigurableElement {
     getValue() {
         return this.panel.getValue();
     }   
-
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
-        this.panel.setValue(value);
-    }
 
     /** This overrides the get meta element to calculate it on the fly. Because of list elements,
      * the meta value depends on the content. */
@@ -47,19 +45,16 @@ export default class PanelElement extends ConfigurableElement {
             return null;
         }
     }
-    
-    /** This will call the handler is this panel changes value. */
-    addOnChange(onChange) {
-        var childOnChange = (value,childForm) => {
-            onChange(this.getValue(),this.getForm());
-        }
-        //add this to each element in the panel
-        this.panel.getChildEntries().forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(onChange);} );
-    }
 
     //===================================
     // protected Methods
     //==================================
+
+    /** This method updates the value for a given element. See the specific element
+     * to see if this method is applicable. */
+    setValueImpl(value) {
+        this.panel.setValue(value);
+    }
 
     /** This function is used to inherit a child value from a parent value */
     inherit(childKey,parentValue) {

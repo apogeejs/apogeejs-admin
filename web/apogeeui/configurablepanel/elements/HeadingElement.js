@@ -24,12 +24,6 @@ export default class HeadingElement extends ConfigurableElement {
         this.headingElement = uiutil.createElement("span",{"className":headingClass,"innerHTML":elementInitData.text});
         containerElement.appendChild(this.headingElement);
     }
-
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action;
-    }
 }
 
 

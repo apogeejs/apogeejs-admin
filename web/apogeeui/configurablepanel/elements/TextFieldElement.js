@@ -30,43 +30,27 @@ export default class TextFieldElement extends ConfigurableElement {
         if(elementInitData.size !== undefined) {
             this.inputElement.size = elementInitData.size;
         }
-        
-        //non-standard events
-        if(elementInitData.onChangeCompleted) {
-            this.addOnChangeCompleted(elementInitData.onChangeCompleted);
-        }
+
+        //add dom listeners for events
+        this.inputElement.addEventListener("input",() => this.inputDone());
+        this.inputElement.addEventListener("change",() => this.valueChanged());
         
         this._postInstantiateInit(elementInitData);
     }
-    
-    /** This method returns value for this given element, if applicable. If not applicable
-     * this method returns undefined. */
+
     getValue() {
         return this.inputElement.value.trim();
-    }   
+    }  
+    
+    //===================================
+    // protected Methods
+    //==================================
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
+    /** This method updates the UI value for a given element. */
+    setValueImpl(value) {
         this.inputElement.value = value;
     }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        }
-        this.inputElement.addEventListener("input",onChangeImpl);
-    }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChangeCompleted(onChangeCompleted) {
-        var onChangeCompletedImpl = () => {
-            onChangeCompleted(this.getValue(),this.getForm());
-        }
-        this.inputElement.addEventListener("change",onChangeCompletedImpl);
-    }
-    
+
     //===================================
     // internal Methods
     //==================================

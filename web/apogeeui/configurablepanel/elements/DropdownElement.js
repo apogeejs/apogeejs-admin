@@ -49,6 +49,12 @@ export default class DropdownElement extends ConfigurableElement {
             elementInitData.entries.forEach(addEntry);
         }
         containerElement.appendChild(this.select); 
+
+        //add dom listeners
+        this.select.addEventListener("change",() => {
+            this.inputDone();
+            this.valueChanged();
+        });
         
         this._postInstantiateInit(elementInitData);
         
@@ -60,11 +66,14 @@ export default class DropdownElement extends ConfigurableElement {
      * this method returns undefined. */
     getValue() {
         return this.valueMap[this.select.value];
-    }   
+    }  
+    
+    //===================================
+    // protected Methods
+    //==================================
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
+    /** This method updates the UI value for a given element. */
+    setValueImpl(value) {
         let standinValue;
         for(let key in this.valueMap) {
             if(this.valueMap[key] === value) standinValue = key;
@@ -72,23 +81,7 @@ export default class DropdownElement extends ConfigurableElement {
         if(standinValue !== undefined) {
             this.select.value = standinValue;
         }
-
-///////////////////////////////////////////////////
-        //needed for selection children
-        this._callDependentCallbacks(value);
-///////////////////////////////////////////////////
     }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        }
-        this.select.addEventListener("change",onChangeImpl);
-    }
-    
-    
-  
     
     //===================================
     // internal Methods

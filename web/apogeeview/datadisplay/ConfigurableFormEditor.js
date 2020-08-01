@@ -25,7 +25,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
             this.panel.configureForm(dataSource.getDisplayData());
         }
 
-        this.panel.addOnChange( formValue => this.onFormChange(formValue));
+        this.panel.addOnInput( formValue => this.onFormInput(formValue));
     }
 
     /** This method will return undefined until showData is called. */
@@ -58,7 +58,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
         this.panel.setValue(data);
     }
 
-    onFormChange(formValue) {
+    onFormInput(formValue) {
         //set change to enable save bar is form value differs from initial data
         let dataSource = this.getDataSource();
         let editOk = (dataSource.getEditOk)&&(dataSource.getEditOk()); 

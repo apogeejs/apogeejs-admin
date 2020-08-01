@@ -60,6 +60,12 @@ export default class RadioGroupElement extends ConfigurableElement {
             buttonContainer.appendChild(document.createTextNode(label));
             
             if(elementInitData.horizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
+
+            //add dom listeners
+            radio.addEventListener("change",() => {
+                this.inputDone();
+                this.valueChanged();
+            });
         };
         elementInitData.entries.forEach(addButton);
         
@@ -79,10 +85,14 @@ export default class RadioGroupElement extends ConfigurableElement {
         else {
             return undefined;
         }
-    }   
+    }  
+    
+    //===================================
+    // protectd Methods
+    //==================================
 
     /** This method updates the list of checked entries. */
-    setValue(value) {
+    setValueImpl(value) {
         var checkedButton = this.buttonList.find(radioButton => {
             let standinValue = radioButton.value;
             let properButtonValue = this.valueMap[standinValue];
@@ -92,21 +102,8 @@ export default class RadioGroupElement extends ConfigurableElement {
         if(checkedButton) {
             checkedButton.checked = true;
         }
+    }
 
-///////////////////////////////////////////////////
-        //needed for selection children
-        this._callDependentCallbacks(value);
-///////////////////////////////////////////////////
-    }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        }
-        this.buttonList.forEach(radioButton => radioButton.addEventListener("change",onChangeImpl));
-    }
-    
     //===================================
     // internal Methods
     //==================================

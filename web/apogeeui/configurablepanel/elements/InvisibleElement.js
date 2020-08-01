@@ -13,8 +13,6 @@ export default class InvisibleElement extends ConfigurableElement {
 
         //update the class to be invisible
         this.setVisibleDisplayStyle(ConfigurableElement.ELEMENT_DISPLAY_INVISIBLE);
-
-        this.onChangeListeners = [];
         
         this._postInstantiateInit(elementInitData);
     }
@@ -25,17 +23,15 @@ export default class InvisibleElement extends ConfigurableElement {
         return this.value;
     }   
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
+    //===================================
+    // protected Methods
+    //==================================
+
+    /** This method updates the UI value for a given element. */
+    setValueImpl(value) {
         this.value = value;
 
         this.onChangeListeners.forEach(listener => listener(value,this.getForm()));
-    }
-
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        this.onChangeListeners.push(onChange);
     }
 }
 

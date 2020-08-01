@@ -57,11 +57,18 @@ export default class CheckboxGroupElement extends ConfigurableElement {
             buttonContainer.appendChild(document.createTextNode(label));
 
             if(elementInitData.horizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
-
             
             if(elementInitData.disabled) checkbox.disabled = true;
+
+            //add the dom listener
+            checkbox.addEventListener("change",() => {
+                this.inputDone();
+                this.valueChanged();
+            });
         };
-        elementInitData.entries.forEach(addCheckbox);   
+        elementInitData.entries.forEach(addCheckbox);  
+        
+        this.checkboxList.forEach(checkbox => checkbox.addEventListener("change",onChangeImpl));
         
         this._postInstantiateInit(elementInitData);
         
@@ -76,31 +83,19 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         return this.checkboxList.filter(checkbox => checkbox.checked).map(checkbox => this.valueMap[checkbox.value]); 
     }   
 
-    /** This method updates the list of checked entries. */
-    setValue(valueList) {
+    //==================================
+    // protected methods
+    //==================================
+
+    /** This method updates the UI value for a given element. */
+    setValueImpl(valueList) {
         this.checkboxList.forEach(checkbox => {
             let standinValue = checkbox.value;
             let properValue = this.valueMap[standinValue];
             checkbox.checked = (valueList.indexOf(properValue) >= 0);
         });
-
-///////////////////////////////////////////////////
-        //needed for selection children
-        this._callDependentCallbacks(value);
-///////////////////////////////////////////////////
-    }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        }
-        this.checkboxList.forEach(checkbox => checkbox.addEventListener("change",onChangeImpl));
     }
 
-    //==================================
-    // protected methods
-    //==================================
     /** This method returns the onValueChange handler. It overrides the default 
      * implementation to make the dependent element visible if the parent element, this checkbox group
      * CONTAINS the given value, rather than is equal to the given value. */

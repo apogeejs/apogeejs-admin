@@ -14,11 +14,6 @@ export default class HTMLDisplayElement extends ConfigurableElement {
         containerElement.innerHTML = elementInitData.html
     }
 
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action;
-    }
 }
 
 HTMLDisplayElement.TYPE_NAME = "htmlDisplay";
