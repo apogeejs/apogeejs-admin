@@ -197,28 +197,26 @@ export default class ConfigurablePanel {
 
         var elementObject = ConfigurablePanel.instantiateConfigurableType(this,elementInitData);
 
-        if(elementObject.elementType == "ConfigurableLayoutContainer") {
+        //add the dome element for the container
+        var domElement = elementObject.getElement();
+        if(domElement) {
+            this.panelElement.appendChild(domElement);
+        }
+
+        if(elementObject.elementType == "ConfigurableElement") {
             //add all child elements from this container to the child element list
-            this.elementObjects.push(...elementObject.getChildElementObjects());
-            //add the dome element for the container
-            var domElement = elementObject.getElement();
-            if(domElement) {
-                this.panelElement.appendChild(domElement);
-            }
+            this.elementObjects.push(elementObject);  
         }
-        else if(elementObject.elementType == "ConfigurableElement") {
-            //add this element to the child element list
-            this.elementObjects.push(elementObject);
-            //add the dom element for the child element
-            var domElement = elementObject.getElement();
-            if(domElement) {
-                this.panelElement.appendChild(domElement);
-            }
-        }
-        
-        else {
-            throw new Error("Unknown form element class: " + typeof elementObject);
-        }
+        // else if(elementObject.elementType == "ConfigurableLayoutContainer") {
+        // }
+        // else {
+        //     throw new Error("Unknown form element class: " + typeof elementObject);
+        // }
+    }
+
+    /** This method is called by a child layout container to pass children element objects to the form.  */
+    insertChildElement(configurableElement) {
+        this.elementObjects.push(configurableElement);
     }
 
     static instantiateConfigurableType(form,elementInitData) {

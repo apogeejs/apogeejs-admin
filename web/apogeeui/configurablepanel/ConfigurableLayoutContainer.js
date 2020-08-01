@@ -12,7 +12,6 @@ import uiutil from "/apogeeui/uiutil.js";
 export default class ConfigurableLayoutContainer {
     constructor(form) {
         this.form = form;
-        this.childConfigurableElements = [];
         this.domElement = uiutil.createElement("div",{"className":ConfigurableElement.CONTAINER_CLASS});
         //udpate padding and margin to 0
         this.domElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_NONE;
@@ -27,11 +26,6 @@ export default class ConfigurableLayoutContainer {
     /** This method returns the parent form for this configurable element. */
     getForm() {
         return this.form;
-    }
-
-    /** This returns a list of ConfigurableElements inside this layout container.  */
-    getChildElementObjects() {
-        return this.childConfigurableElements;
     }
 
     /** This is used to determine what type of child element this is for a panel. */
@@ -51,23 +45,21 @@ export default class ConfigurableLayoutContainer {
 
     /** this is called internally to add an element to the panel. */
     addToContainer(elementInitData) {
-        var elementObject = ConfigurablePanel.instantiateConfigurableType(this.getForm(),elementInitData);
+        var elementObject = ConfigurablePanel.instantiateConfigurableType(this.form,elementInitData);
 
         //add the dom element for the child element
         this.insertElement(elementObject,elementInitData);
 
         //add the child configurable elements to the list
         if(elementObject instanceof ConfigurableElement) {
-            //add this element to the child element list
-            this.childConfigurableElements.push(elementObject);
+            //pass the element object to the form
+            this.form.insertChildElement(elementObject);
         }
-        else if(elementObject instanceof ConfigurableLayoutContainer) {
-            //add all child elements from this container to the child element list
-            this.childConfigurableElements.push(...elementObject.getChildElementObjects());
-        }
-        else {
-            throw new Error("Unknown form item class: " + typeof elementObject);
-        } 
+        // else if(elementObject instanceof ConfigurableLayoutContainer) {
+        // }
+        // else {
+        //     throw new Error("Unknown form item class: " + typeof elementObject);
+        // } 
     }
       
 }

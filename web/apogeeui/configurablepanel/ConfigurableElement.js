@@ -215,10 +215,10 @@ export default class ConfigurableElement {
         let parentValue = selectorConfig.parentValue;
         let keepActiveOnHide =  selectorConfig.keepActiveOnHide;
 
-        if(!parentKey) throw new Error("Parent key is required for a selectable child element:" + elementInitData.key);
-        if(parentValue === undefined) throw new Error("A child selectable element must contain a value: " + elementInitData.key)
+        if(!parentKey) throw new Error("Parent key is required for a selectable child element:" + selectorConfig.key);
+        if(parentValue === undefined) throw new Error("A child selectable element must contain a value: " + selectorConfig.key)
         let parentElement = this.form.getEntry(parentKey);
-        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for selectable child element " + elementInitData.key);
+        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for selectable child element " + selectorConfig.key);
         
         let onValueChange = parentElement.getDependentSelectHandler(this,parentValue,keepActiveOnHide);
         if(onValueChange) {
@@ -231,11 +231,11 @@ export default class ConfigurableElement {
         let parentKey = inheritConfig.parentKey;
         let childKey = inheritConfig.childKey;
 
-        if(!parentKey) throw new Error("A parent key is required for a inherit child element:" + elementInitData.key);
-        if(!childKey) throw new Error("A child key is required for an inherit child element: " + elementInitData.key)
+        if(!parentKey) throw new Error("A parent key is required for a inherit child element:" + inheritConfig.key);
+        if(!childKey) throw new Error("A child key is required for an inherit child element: " + inheritConfig.key)
         let parentElement = this.form.getEntry(parentKey);
-        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for inherit child element " + elementInitData.key);
-        if(!this.inherit) throw new Error("The element " + elementInitData.key + " does not support inherit");
+        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for inherit child element " + inheritConfig.key);
+        if(!this.inherit) throw new Error("The element " + inheritConfig.key + " does not support inherit");
         
         let onValueChange = (parentValue) => {
             this.inherit(childKey,parentValue);
@@ -248,10 +248,10 @@ export default class ConfigurableElement {
         let parentKey = reactConfig.parentKey;
         let onValueChangeGenerator = reactConfig.generator;
 
-        if(!parentKey) throw new Error("A parent key is required for a react child element:" + elementInitData.key);
-        if(!onValueChangeGenerator) throw new Error("A callback generator is required for an react child element: " + elementInitData.key)
+        if(!parentKey) throw new Error("A parent key is required for a react child element:" + reactConfig.key);
+        if(!onValueChangeGenerator) throw new Error("A callback generator is required for an react child element: " + reactConfig.key)
         let parentElement = this.form.getEntry(parentKey);
-        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for react child element " + elementInitData.key);
+        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for react child element " + reactConfig.key);
         
         let onValueChange = onValueChangeGenerator(this);
         if(onValueChange) {
