@@ -23,6 +23,8 @@ export default class HeadingElement extends ConfigurableElement {
         
         this.headingElement = uiutil.createElement("span",{"className":headingClass,"innerHTML":elementInitData.text});
         containerElement.appendChild(this.headingElement);
+
+        this._postInstantiateInit(elementInitData);
     }
 }
 

@@ -412,14 +412,18 @@ export default class PageDisplayContainer {
     * data display is up to date. */
     componentUpdated(component) {
         //update the data display
-        if((this.dataDisplay)&&(!this.inEditMode)) {
+        if(this.dataDisplay) {
             let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
             if(reloadDataDisplay) {
+                //this will also reload data
                 this.reloadDisplay();
             }
             else if(reloadData) {
-                this.dataDisplay.showData();
-                this.updateViewSizeButtons();
+                //don't reload data if we are in edit mode. It will reload after completion, whether through cancel or save.
+                if(!this.inEditMode) {
+                    this.dataDisplay.showData();
+                    this.updateViewSizeButtons();
+                }
             }
         }
     }

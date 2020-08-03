@@ -9,6 +9,9 @@ import uiutil from "/apogeeui/uiutil.js";
 export default class CheckboxGroupElement extends ConfigurableElement {
     constructor(form,elementInitData) {
         super(form,elementInitData);
+
+        //this element returns a list of selections
+        this.setIsMultiselect(true)
         
         var containerElement = this.getElement();
         
@@ -68,12 +71,13 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         };
         elementInitData.entries.forEach(addCheckbox);  
         
-        this.checkboxList.forEach(checkbox => checkbox.addEventListener("change",onChangeImpl));
+        //add dom listeners
+        this.checkboxList.forEach(checkbox => checkbox.addEventListener("change",() => {
+            this.inputDone();
+            this.valueChanged();
+        }));
         
         this._postInstantiateInit(elementInitData);
-        
-        //add suport for selection children
-        this.setChildState = ConfigurableElement.setChildStateArrayValue;
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -94,25 +98,6 @@ export default class CheckboxGroupElement extends ConfigurableElement {
             let properValue = this.valueMap[standinValue];
             checkbox.checked = (valueList.indexOf(properValue) >= 0);
         });
-    }
-
-    /** This method returns the onValueChange handler. It overrides the default 
-     * implementation to make the dependent element visible if the parent element, this checkbox group
-     * CONTAINS the given value, rather than is equal to the given value. */
-    getDependentSelectHandler(dependentElement,value,keepActiveOnHide) {
-        return parentValue => {
-            let state;
-            if(parentValue == value) {
-                state = ConfigurablePanelConstants.STATE_NORMAL;
-            }
-            else {
-                state = (keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE);
-            }
-
-            if(dependentElement.getState() != state) {
-                dependentElement.setState(state);
-            }
-        }
     }
 
     //===================================

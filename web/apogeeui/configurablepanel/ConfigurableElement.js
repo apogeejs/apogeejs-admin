@@ -10,6 +10,7 @@ export default class ConfigurableElement {
         this.form = form;
         this.key = elementInitData.key;
         this.meta = elementInitData.meta;
+        this.isMultiselect = false;
 
         this.onChangeListeners = [];
         this.onInputListeners = [];
@@ -102,6 +103,12 @@ export default class ConfigurableElement {
     //protected methods
     //==================================
 
+    /** If the element returns multiple selected values, such as a checkbox group, then isMultiselect
+     * should be set to true. The default is false. */
+    setIsMultiselect(isMultiselect) {
+        this.isMultiselect = isMultiselect;
+    }
+
     /** This method should be implemented by extending to set the value for the element. The method 
      * "valueChanged" does not need to be called. It is called automatically. */
     setValueImpl(value) {}
@@ -131,24 +138,6 @@ export default class ConfigurableElement {
         this.visibleDisplayStyle = visibleDisplayStyle;
         if(this.domElement.style.display != "none") {
             this.domElement.style.display = this.visibleDisplayStyle;
-        }
-    }
-
-    /** This method returns the onValueChange handler to make the dependent element
-     * visible when the parent element (as the element depended on) has the given value. */
-    getDependentSelectHandler(dependentElement,value,keepActiveOnHide) {
-        return parentValue => {
-            let state;
-            if(parentValue == value) {
-                state = ConfigurablePanelConstants.STATE_NORMAL;
-            }
-            else {
-                state = (keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE);
-            }
-
-            if(dependentElement.getState() != state) {
-                dependentElement.setState(state);
-            }
         }
     }
     
@@ -211,16 +200,33 @@ export default class ConfigurableElement {
 
     /** This processes a selector entry from the init data */
     _addSelector(selectorConfig) {
+        //parent element
         let parentKey = selectorConfig.parentKey;
-        let parentValue = selectorConfig.parentValue;
+        if(!parentKey) throw new Error("Parent key is required for a selectable child element:" + selectorConfig.key); 
+
+        //get the target values. This can bve a single value of a list of values
+        let target, targetIsMultichoice;
+        if(selectorConfig.parentValue !== undefined) {
+            target = selectorConfig.parentValue;
+            targetIsMultichoice = false;
+        }
+        else if(selectorConfig.parentValues !== undefined) {
+            target = selectorConfig.parentValues;
+            targetIsMultichoice = true;
+        }
+        else {
+            throw new Error("A child selectable element must contain a value or list of values: " + selectorConfig.key)
+        }
+
+        //optional value
         let keepActiveOnHide =  selectorConfig.keepActiveOnHide;
 
-        if(!parentKey) throw new Error("Parent key is required for a selectable child element:" + selectorConfig.key);
-        if(parentValue === undefined) throw new Error("A child selectable element must contain a value: " + selectorConfig.key)
+        
         let parentElement = this.form.getEntry(parentKey);
         if(!parentElement) throw new Error("Parent element " + parentKey + " not found for selectable child element " + selectorConfig.key);
         
-        let onValueChange = parentElement.getDependentSelectHandler(this,parentValue,keepActiveOnHide);
+        let onValueChange = parentElement._getDependentSelectHandler(this,target,targetIsMultichoice,keepActiveOnHide)
+        
         if(onValueChange) {
             parentElement._addDependentCallback(onValueChange);
         }
@@ -259,6 +265,45 @@ export default class ConfigurableElement {
         }
     }
 
+    
+    /** This method returns the onValueChange handler to make the dependent element
+     * visible when the parent element (as the element depended on) has the/a proper value. */
+    _getDependentSelectHandler(dependentElement,target,targetIsMultichoice,keepActiveOnHide) {
+        //handle cases of potential multiple target values and multiple select parents
+        let valueMatch;
+        if(this.isMultiselect) {
+            if(targetIsMultichoice) {
+                valueMatch = parentValue => containsCommonValue(target,parentValue);
+            }
+            else {
+                valueMatch = parentValue => (parentValue.indexOf(target) >= 0);
+            }
+        }
+        else {
+            if(targetIsMultichoice) {
+                valueMatch = parentValue => (target.indexOf(parentValue) >= 0);
+            }
+            else {
+                valueMatch = parentValue => (parentValue == target);
+            }
+        }
+        
+        //this is the function that will do the test at compare time
+        return parentValue => {
+            let state;
+            if(valueMatch(parentValue)) {
+                state = ConfigurablePanelConstants.STATE_NORMAL;
+            }
+            else {
+                state = (keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE);
+            }
+
+            if(dependentElement.getState() != state) {
+                dependentElement.setState(state);
+            }
+        }
+    }
+
     /** This function adds a callback that came from config element initialization */
     _addDependentCallback(onValueChange) {
         if(!this.dependentCallbacks) {
@@ -293,5 +338,14 @@ ConfigurableElement.ELEMENT_PADDING_NONE = "0px";
 ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE = "block";
 ConfigurableElement.ELEMENT_DISPLAY_PARTIAL_LINE = "inline-block";
 ConfigurableElement.ELEMENT_DISPLAY_INVISIBLE = "none";
+
+//================
+//Other functions
+//================
+
+/**This function checks if the two array share any common values. */
+function containsCommonValue(array1,array2) {
+    return array1.some( value => (array2.indexOf(value) >= 0) );
+}
 
 

@@ -205,17 +205,22 @@ export default class WebDisplayContainer {
     /** This method is called when the member is updated, to make sure the 
     * data display is up to date. */
    componentUpdated(component) {
-        //update the data display
-        if((this.dataDisplay)&&(!this.inEditMode)) {
-            let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
-            if(reloadDataDisplay) {
-                this.reloadDisplay();
-            }
-            else if(reloadData) {
+    //update the data display
+    if(this.dataDisplay) {
+        let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
+        if(reloadDataDisplay) {
+            //this will also reload data
+            this.reloadDisplay();
+        }
+        else if(reloadData) {
+            //don't reload data if we are in edit mode. It will reload after completion, whether through cancel or save.
+            if(!this.inEditMode) {
                 this.dataDisplay.showData();
+                this.updateViewSizeButtons();
             }
         }
     }
+}
         
     //------------------------------
     // Accessed by the Editor, if applicable
