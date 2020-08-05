@@ -70,9 +70,6 @@ export default class RadioGroupElement extends ConfigurableElement {
         elementInitData.entries.forEach(addButton);
         
         this._postInstantiateInit(elementInitData);
-        
-        //add suport for selection children
-        this.setChildState = ConfigurableElement.setChildStateSingleValue;
     }
     
     /** This method returns value for this given element, if applicable. If not applicable

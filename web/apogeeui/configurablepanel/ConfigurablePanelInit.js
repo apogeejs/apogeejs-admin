@@ -3,6 +3,7 @@ import CheckboxElement from "/apogeeui/configurablepanel/elements/CheckboxElemen
 import CheckboxGroupElement from "/apogeeui/configurablepanel/elements/CheckboxGroupElement.js";
 import CustomElement from "/apogeeui/configurablepanel/elements/CustomElement.js";
 import DropdownElement from "/apogeeui/configurablepanel/elements/DropdownElement.js";
+import ExtendedDropdownElement from "/apogeeui/configurablepanel/elements/ExtendedDropdownElement.js"
 import HeadingElement from "/apogeeui/configurablepanel/elements/HeadingElement.js";
 import HTMLDisplayElement from "/apogeeui/configurablepanel/elements/HTMLDisplayElement.js";
 import InvisibleElement from "/apogeeui/configurablepanel/elements/InvisibleElement.js";
@@ -22,6 +23,7 @@ ConfigurablePanel.addConfigurableElement(CheckboxElement);
 ConfigurablePanel.addConfigurableElement(CheckboxGroupElement);
 ConfigurablePanel.addConfigurableElement(CustomElement);
 ConfigurablePanel.addConfigurableElement(DropdownElement);
+ConfigurablePanel.addConfigurableElement(ExtendedDropdownElement);
 ConfigurablePanel.addConfigurableElement(HeadingElement);
 ConfigurablePanel.addConfigurableElement(HTMLDisplayElement);
 ConfigurablePanel.addConfigurableElement(InvisibleElement);

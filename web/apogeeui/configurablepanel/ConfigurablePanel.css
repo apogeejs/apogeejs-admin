@@ -55,3 +55,31 @@
     padding-right: 5px;
     padding-left: 5px;
 }
+.apogee_configurableExtendedDropdown {
+    position: relative;
+    display: inline-block;
+    height: 200px;
+}
+.apogee_configurableExtendedHeadLink {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+.apogee_configurableExtendedBodyContainer {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+.apogee_configurableExtendedBodyLink {
+    display: inline-block;
+    padding: 3px;
+    margin: 0px;
+}
+.apogee_configurableExtendedOpened {
+    display: block;
+}

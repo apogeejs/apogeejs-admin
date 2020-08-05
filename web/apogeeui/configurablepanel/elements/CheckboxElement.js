@@ -33,9 +33,7 @@ export default class CheckboxElement extends ConfigurableElement {
         });
         
         this._postInstantiateInit(elementInitData);
-        
-        //add suport for selection children
-        this.setChildState = ConfigurableElement.setChildStateSingleValue;
+
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
