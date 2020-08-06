@@ -58,28 +58,42 @@
 .apogee_configurableExtendedDropdown {
     position: relative;
     display: inline-block;
-    height: 200px;
+    overflow: visible;
 }
 .apogee_configurableExtendedHeadLink {
+    position: relative;
     background-color: #4CAF50;
     color: white;
     padding: 16px;
     font-size: 16px;
     border: none;
     cursor: pointer;
+    z-index: 5;
 }
 .apogee_configurableExtendedBodyContainer {
     display: none;
     position: absolute;
+    top: 100%;
+    left: 0;
     background-color: #f9f9f9;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
-.apogee_configurableExtendedBodyLink {
+.apogee_configurableExtendedBodyElement {
     display: inline-block;
     padding: 3px;
     margin: 0px;
+    z-index: 500;
 }
 .apogee_configurableExtendedOpened {
     display: block;
+}
+.apogee_configurableExtendedShield {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+    
 }

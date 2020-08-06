@@ -9,6 +9,8 @@ import uiutil from "/apogeeui/uiutil.js";
 export default class ExtendedDropdownElement extends ConfigurableElement {
     constructor(form,elementInitData) {
         super(form,elementInitData);
+
+        if(!ExtendedDropdownElement.initialized) ExtendedDropdownElement._initialize();
         
         this.elementData = [];
         this.value = null;
@@ -64,7 +66,6 @@ export default class ExtendedDropdownElement extends ConfigurableElement {
         }
         
         this._setSelection(initialIndex);
- 
 
         //-------------------------------------------------------------
         //define content here//////////////////////////////////////////
@@ -123,9 +124,7 @@ export default class ExtendedDropdownElement extends ConfigurableElement {
         headLink.className = "apogee_configurableExtendedHeadLink";
         headLink.href = "javascript:void(0);";
 
-        headLink.onmousedown = e => this._onHeadClick(e);
-        headLink.onfocus = e => this._onLinkFocus(e);
-        headLink.onblur = e => this._onLinkBlur(e);
+        headLink.onmousedown = e => ExtendedDropdownElement._onHeadMouseDown(e,this);
         headLink.onkeydown = e => this._onHeadKeyDown(e);
 
         return headLink;
@@ -142,50 +141,30 @@ export default class ExtendedDropdownElement extends ConfigurableElement {
         elementEntry.index = index;
         elementEntry.html = contentEntry[0];
         elementEntry.value = contentEntry[1];
-        elementEntry.bodyLink = this._createBodyLink(elementEntry.html,elementEntry.index);
+        elementEntry.bodyElement = this._createBodyElement(elementEntry.html,elementEntry.index);
 
         this.elementData.push(elementEntry);
 
-        this.bodyContainer.appendChild(elementEntry.bodyLink);
+        this.bodyContainer.appendChild(elementEntry.bodyElement);
         this.bodyContainer.appendChild(document.createElement("br"));
     }
 
     /** This generates a body link */
-    _createBodyLink(content,index) {
-        let bodyLink = document.createElement("div");
-        bodyLink.className = "apogee_configurableExtendedBodyLink";
-        bodyLink.innerHTML = content;
+    _createBodyElement(content,index) {
+        let bodyElement = document.createElement("div");
+        bodyElement.className = "apogee_configurableExtendedBodyElement";
+        bodyElement.innerHTML = content;
 
-        bodyLink.onclick = event => {
+        bodyElement.onclick = event => {
             this._onBodyClick(index);
-            event.stopPropagation();
-        }
-        bodyLink.onmousedown = event => {
-            event.stopPropagation();
         }
 
-        return bodyLink;
-    }
-
-    _closeBody() {
-        this.bodyContainer.classList.remove("apogee_configurableExtendedOpened");
-        console.log("closed: " + this.bodyContainer.classList);
-    }
-
-    _openBody() {
-        this.bodyContainer.classList.add("apogee_configurableExtendedOpened");
-        console.log("opened: " + this.bodyContainer.classList);
+        return bodyElement;
     }
 
     //---------------
     //event handlers
     //----------------
-    
-    //toggle the open state of the body
-    _onHeadClick(e) {
-        this.bodyContainer.classList.toggle("apogee_configurableExtendedOpened");
-        console.log("clicked:" + this.bodyContainer.classList);
-    }
 
     //char handling on head
     _onHeadKeyDown(e) {
@@ -199,7 +178,7 @@ export default class ExtendedDropdownElement extends ConfigurableElement {
         this.inputDone();
         this.valueChanged();
 
-        this._closeBody();
+        ExtendedDropdownElement._closeActiveDropdown();
     }
     
     //char handling on body link
@@ -207,30 +186,67 @@ export default class ExtendedDropdownElement extends ConfigurableElement {
 
     }
 
-    //body should be open if any link has focus
-    _onLinkFocus(e) {
-        this._openBody();
+    //==========================================
+    // Static
+    //==========================================
+
+
+
+    static _initialize() {
+        window.addEventListener("mousedown",ExtendedDropdownElement._globalMouseDownListener);
+        ExtendedDropdownElement._initialized = true;
     }
-    
-    //body should be open if any link has focus and closed is not
-    _onLinkBlur(e) {
-        if(this.elementData.some( elementEntry => elementEntry.bodyLink == e.target)) {
-            //no action if focus goes to internal entry
+
+    static _uninitialize() {
+        window.removeEventListener("mousedown",ExtendedDropdownElement._globalMouseDownListener);
+        ExtendedDropdownElement._initialized = false;
+    }
+
+    static _globalMouseDownListener(event) {
+        if(ExtendedDropdownElement.activeDropdown) {
+            if( (!event.target.classList.contains("apogee_configurableExtendedHeadLink")) &&
+                (!event.target.classList.contains("apogee_configurableExtendedBodyElement")) ) {
+                    ExtendedDropdownElement._closeActiveDropdown();
+            }
+        }
+    }
+
+    static _onHeadMouseDown(event,dropdown) {
+        if(dropdown != ExtendedDropdownElement.activeDropdown) {
+            //open the element
+            ExtendedDropdownElement._openDropdownElement(dropdown);
         }
         else {
-            this._closeBody();
+            //if we are activea and click the head, close the element
+            ExtendedDropdownElement._closeActiveDropdown();
         }
-    }   
+    }
 
-    // _aLinkHasFocus() {
-    //     let activeElement = document.activeElement;
+    static _openDropdownElement(dropdown) {
+        if(ExtendedDropdownElement.activeDropdown) ExtendedDropdownElement._closeActiveDropdown();
 
-    //     //check if head has focus
-    //     if(this.headLink === activeElement) return true;
-    //     else return false;
-    // }
-    
+        ExtendedDropdownElement._open(dropdown);
+        ExtendedDropdownElement.activeDropdown = dropdown;
+    } 
+
+    static _closeActiveDropdown() {
+        if(ExtendedDropdownElement.activeDropdown) {
+            ExtendedDropdownElement._close(ExtendedDropdownElement.activeDropdown);
+            ExtendedDropdownElement.activeDropdown = null;
+        }
+    }
+
+    static _open(dropdown) {
+        dropdown.bodyContainer.classList.add("apogee_configurableExtendedOpened");
+    }
+
+    static _close(dropdown) {
+        dropdown.bodyContainer.classList.remove("apogee_configurableExtendedOpened");
+    }
 
 }
 
 ExtendedDropdownElement.TYPE_NAME = "extendedDropdown";
+
+ExtendedDropdownElement.initialized = false;
+ExtendedDropdownElement.activeDropdown = null;

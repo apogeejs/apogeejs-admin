@@ -39,14 +39,13 @@
     padding:2px;
     margin:0px;
 }
-.visiui-menu-text:hover {
+.visiui-menu-label:hover {
     background-color:rgb(211,211,164);
+    outline: 3px solid rgb(211,211,164);
 }
-.visiui-menu-image:hover {
+.visiui-menu-label:active {
     background-color:rgb(211,211,164);
-}
-.visiui-menu-heading:active {
-    background-color:rgb(211,211,164);
+    outline: 3px solid rgb(211,211,164);
 }
 
 

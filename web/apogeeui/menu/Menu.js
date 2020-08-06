@@ -23,9 +23,9 @@ Menu.createMenu = function(text) {
         Menu.initialize();
     }
 
-    var element = uiutil.createElementWithClass("div", "visiui-menu-heading visiui-menu-text");
-    element.innerHTML = text;
-    return new MenuHeader(element);
+    var labelElement = uiutil.createElementWithClass("div", "visiui-menu-label");
+    labelElement.innerHTML = text;
+    return new MenuHeader(labelElement);
 }
 
 /** This method creates a static menu from the given img url. */
@@ -36,11 +36,9 @@ Menu.createMenuFromImage = function(imageUrl) {
         Menu.initialize();
     }
 
-    var imageElement = document.createElement("img");
+    var imageElement = uiutil.createElementWithClass("img", "visiui-menu-label");
     imageElement.src = imageUrl;
-    var element = uiutil.createElementWithClass("div", "visiui-menu-heading visiui-menu-image");
-    element.appendChild(imageElement);
-    return new MenuHeader(element);
+    return new MenuHeader(imageElement);
 }
 
 /** This method creates a context menu object. */
@@ -75,11 +73,21 @@ Menu.menuHeaderPressed = function(menuHeader) {
 	}
 }
 
-Menu.nonMenuPressed = function() {
-	//if the mouse is pressed outside the menu, close any active menu
-	if(Menu.activeMenu) {
-		Menu.hideActiveMenu();
-	}
+Menu.globalPress = function(event) {
+    if(event.target.classList.contains("visiui-menu-item")) {
+        //menu item click - handled in menu item
+        return;
+    }
+    else if(event.target.classList.contains("visiui-menu-label")) {
+        //menu header clicked - handled in menu header
+        return;
+    }
+    else {
+        //if the mouse is pressed outside the menu, close any active menu
+        if(Menu.activeMenu) {
+            Menu.hideActiveMenu();
+        }
+    }
 }
 
 //================================
@@ -126,13 +134,13 @@ Menu.hideActiveMenu = function() {
 Menu.nonMenuMouseHandler = null;
 
 Menu.initialize = function() {
-	window.addEventListener("mousedown",Menu.nonMenuPressed);
+	window.addEventListener("mousedown",Menu.globalPress);
 	Menu.initialized = true;
 }
 
 /** This method allows you to undo the initialization actions. I am not sure you would ever need to do it. */
 Menu.deinitialize = function() {
-	window.removeEventListener("mousedown",Menu.nonMenuPressed);
+	window.removeEventListener("mousedown",Menu.globalPress);
 	Menu.initialized = false;
 }
 
@@ -211,13 +219,13 @@ class MenuBody {
     setPosition(x, y, parentElement) {
         this.parentElement = parentElement;
     
-    //we need to calculate the size, so I add and remove it - there is probably another way
-    parentElement.appendChild(this.menuDiv);
+        //we need to calculate the size, so I add and remove it - there is probably another way
+        parentElement.appendChild(this.menuDiv);
         var parentWidth = parentElement.offsetWidth;
         var parentHeight = parentElement.offsetHeight;
         var menuWidth = this.menuDiv.clientWidth;
         var menuHeight = this.menuDiv.clientHeight;
-    parentElement.appendChild(this.menuDiv);
+        parentElement.appendChild(this.menuDiv);
 
         //position
         if((x + menuWidth > parentWidth)&&(x > parentWidth/2)) {
@@ -271,20 +279,9 @@ class MenuBody {
             childMenuDiv.style.left = "100%";
             childMenuDiv.style.top = "0%";
             itemInfo.element.appendChild(childMenuDiv);
-            
-            //prevent normal action on a click
-            itemInfo.element.onmousedown = (event) => {
-                event.stopPropagation();
-            }
-            itemInfo.element.onclick = (event) => {
-                event.stopPropagation();
-            }
         }
         else {
             //create a norman (clickable) menu item
-            itemInfo.element.onmousedown = (event) => {
-                event.stopPropagation();
-            }
             itemInfo.element.onclick = (event) => {
                 //close menu
                 Menu.hideActiveMenu();
@@ -298,7 +295,6 @@ class MenuBody {
                     //use the callback
                     itemInfo.callback();
                 }
-                event.stopPropagation();
             }
         }
         
@@ -371,15 +367,19 @@ class MenuBody {
  */
 class MenuHeader {
 
-    constructor(domElement) {
+    constructor(labelElement) {
         
         //variables
-        this.domElement = domElement;
+        this.labelElement = labelElement;
+        this.domElement = uiutil.createElementWithClass("div", "visiui-menu-heading");
+        this.domElement.appendChild(this.labelElement);
         this.menuBody = new MenuBody();
-        
+
         //construct the menu
-        this.initHeadingElement();
-        
+        this.labelElement.onmousedown = (e) => {
+            Menu.menuHeaderPressed(this);
+        }
+   
         //attach menu to heading
         this.menuBody.attachToMenuHeader(this);
     }
@@ -439,19 +439,8 @@ class MenuHeader {
     setAsOnTheFlyMenu(getMenuItemsCallback) {
         this.menuBody.setAsOnTheFlyMenu(getMenuItemsCallback);
     }
-    //================================
-    // Init
-    //================================
-
-    /** this adds a menu item that dispatchs the given event when clicked. */
-    initHeadingElement() {	
-        this.domElement.onmousedown = (e) => {
-            Menu.menuHeaderPressed(this);
-            e.stopPropagation();
-        }	
-    }
 
 }
-
+	
 
 	
