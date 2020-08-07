@@ -45,7 +45,6 @@ export default class AceTextEditor extends DataDisplay {
         this.editorOptions.minLines = DEFAULT_MIN_LINES;
 
         //set variables for internal display view sizing
-        this.setSupressContainerHorizontalScroll(true);
         this.setUseContainerHeightUi(true)
     }
     

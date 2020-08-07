@@ -18,6 +18,12 @@ export default class ConfigurableFormEditor extends DataDisplay {
      */
     constructor(displayContainer,dataSource) {
         super(displayContainer,dataSource);
+
+        //TEMP - to raise the z index
+        let domElement = this.displayContainer.getDisplayElement();
+        if(domElement) {
+            domElement.style.zIndex = 2;
+        }
         
         //construct the display
         this.panel = new ConfigurablePanel();

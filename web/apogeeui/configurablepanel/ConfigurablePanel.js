@@ -9,7 +9,7 @@ export default class ConfigurablePanel {
     
     constructor() {
         this.elementObjects = [];
-        this.panelElement = this.createPanelElement(ConfigurablePanel.PANEL_CLASS); 
+        this.panelElement = this.createPanelElement(ConfigurablePanel.PANEL_CLASS_NORMAL); 
     }
     
     configureForm(formInitData) {

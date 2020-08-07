@@ -436,6 +436,9 @@ class ChartJSDisplay extends DataDisplay {
         this.prevOptions = this.config.options;
         
         //populate the UI element
+        this.wrapperElement = document.createElement("div");
+        this.wrapperElement.style = "position: relative; width: 100%; height: 100%; overflow: auto;";
+
         this.contentElement = document.createElement("div");
         this.contentElement.style = "position: relative; width: 800px; overflow: none;"
         
@@ -443,13 +446,14 @@ class ChartJSDisplay extends DataDisplay {
         this.canvasElement.style = "position: relative;";
 
         this.contentElement.appendChild(this.canvasElement);
+        this.wrapperElement.appendChild(this.contentElement);
 
         //this.chart = new Chart(this.canvasElement,this.config);
     }
     
     /** This method returns the content element for the data display REQUIRED */
     getContent() {
-        return this.contentElement;
+        return this.wrapperElement;
     }
     
     /** This sets the data into the editor display. REQUIRED */

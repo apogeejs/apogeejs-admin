@@ -131,7 +131,10 @@ export default class ApogeeView {
                 SplitPane.SCROLLING_PANE,
                 SplitPane.FIXED_PANE
             );
-        mainContainer.getBody().appendChild(this.splitPane.getOuterElement());
+        let contentOutsideMenuBar = this.splitPane.getOuterElement();
+        //adding this class puts the content at lower z-index than menu bar.
+        contentOutsideMenuBar.classList.add("content_outside_menu_bar");
+        mainContainer.getBody().appendChild(contentOutsideMenuBar);
 
         //---------------------
         //load the tree pane

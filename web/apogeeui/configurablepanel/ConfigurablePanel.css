@@ -1,6 +1,11 @@
 .apogee_configurablePanelBody { 
     position: relative;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: visible;
+}
+.apogee_configurablePanelBody_scroll { 
+    position: relative;
+    overflow: auto; /** note!!! - browsers do not do x auto/scroll and y visible */
 }
 .apogee_configurablePanelBody_fillParent { 
     position: absolute;

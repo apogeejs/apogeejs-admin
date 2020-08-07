@@ -24,7 +24,6 @@ export default class DataDisplay {
         this.editOk = false;
 
         //defaults for container sizing logic
-        this.supressContainerHorizontalScroll = false;
         this.useContainerHeightUi = false;
     }
 
@@ -114,17 +113,6 @@ export default class DataDisplay {
     // The display has controls for the user to resize the display. These use the 
     // following API to interact with the display
     //----------------------------
-
-    /** This function is called to see if the container should provide horizontal scroll bars for the display view content. */
-    getSupressContainerHorizontalScroll() {
-        return this.supressContainerHorizontalScroll;
-    }
-
-    /** This sets the variable that determines if the container will provide a horizontal scroll bars for the display view
-     * content. The default value is false. */
-    setSupressContainerHorizontalScroll(supressContainerHorizontalScroll) {
-        this.supressContainerHorizontalScroll = supressContainerHorizontalScroll;
-    }
 
     /** This function is called to see if the container should provide a view height UI, if the container supports it. */
     getUseContainerHeightUi() {

@@ -14,13 +14,6 @@ uiutil.getResourcePath = function(relativePath) {
 
 //I put some utilities in here. I shoudl figure out a better place to put this.
 
-//=====================================
-// ZIndex Constants
-//=====================================
-uiutil.MENU_ZINDEX = 100;
-uiutil.WINDOW_FRAME_ZINIDEX = 10;
-uiutil.DIALOG_ZINDEX = 200;
-
 //======================================
 // ID Generator
 //======================================

@@ -191,9 +191,7 @@ export default class PageDisplayContainer {
         this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
         
         //add the view container
-        let viewContainerClass = this.dataDisplay.getSupressContainerHorizontalScroll() ? 
-            "visiui_displayContainer_viewContainerClass_noHScroll" : "visiui_displayContainer_viewContainerClass";
-        this.viewContainer = uiutil.createElementWithClass("div",viewContainerClass,this.mainElement);
+        this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
 
         this.uiCompleted = true;
     }

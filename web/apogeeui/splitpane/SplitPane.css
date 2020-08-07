@@ -29,19 +29,22 @@
 .visiui-sp-left {
     width:20%;
     height: 100%;
-    overflow: hidden;
+    overflow: visible;
+    z-index: 1;
 }
 .visiui-sp-divider {
     width:5px;
     height:100%;
     background-color: rgb(220,220,240);
     cursor: ew-resize;
+    z-index: 0;
 }
 .visiui-sp-right {
     height:100%;
-    overflow: hidden;
+    overflow: visible;
     margin: 0px;
     padding: 0px;
+    z-index: 1;
 }
 .visiui-sp-inner {
     position: relative;

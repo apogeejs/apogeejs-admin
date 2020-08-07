@@ -53,7 +53,6 @@ export default class HandsonGridEditor extends DataDisplay {
         }
 
         //set variables for internal display view sizing
-        this.setSupressContainerHorizontalScroll(true);
         this.setUseContainerHeightUi(true)
 
         //we will use a listener to see when the page is resized
