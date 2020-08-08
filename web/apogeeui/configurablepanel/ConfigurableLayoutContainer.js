@@ -33,6 +33,15 @@ export default class ConfigurableLayoutContainer {
         return "ConfigurableLayoutContainer";
     }
 
+    /** This function should be used to set the display state for the element, since that variable
+     * is also used to control visibility. */
+    setVisibleDisplayStyle(visibleDisplayStyle) {
+        this.visibleDisplayStyle = visibleDisplayStyle;
+        if(this.domElement.style.display != "none") {
+            this.domElement.style.display = this.visibleDisplayStyle;
+        }
+    }
+
     //==================================
     //protected methods
     //==================================

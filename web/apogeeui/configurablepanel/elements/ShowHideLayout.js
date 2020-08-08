@@ -45,19 +45,25 @@ export default class ShowHideLayout extends ConfigurableLayoutContainer {
         
         //heading
         this.headingElement = document.createElement("div");
+        this.headingElement.className = "apogee_configurableShowHideHeadingLine";
         mainElement.appendChild(this.headingElement);
-        this.control = document.createElement("img");
-        this.control.className = "apogee_configurableShowHideControl";
-        this.headingElement.appendChild(this.control);
         if(containerInitData.heading !== undefined) {
             this.titleElement = document.createElement("span");
             this.titleElement.innerHTML = containerInitData.heading;
+            let level;
             if(containerInitData.level !== undefined) {
-                let titleCssClass = "apogee_configurablePanelHeading_" + containerInitData.level;
-                this.titleElement.className = titleCssClass;
+                level = containerInitData.level;
             }
+            else {
+                level = 4; //this is should be the level that is the same size as a label
+            }
+            let titleCssClass = "apogee_configurablePanelHeading_" + level;
+            this.titleElement.className = titleCssClass;
             this.headingElement.appendChild(this.titleElement);
         }
+        this.control = document.createElement("img");
+        this.control.className = "apogee_configurableShowHideControl";
+        this.headingElement.appendChild(this.control);
         this.headingElement.onclick = () => this._toggleState();
 
         //body

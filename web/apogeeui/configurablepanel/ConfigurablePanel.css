@@ -52,7 +52,13 @@
     margin-top: 0;
     margin-bottom: 0;
     margin-right: 0;
-    margin-left: 15px;
+    margin-left: 20px;
+}
+.apogee_configurableShowHideHeadingLine {
+    position: relative;
+    display: block;
+    padding: 4px;
+    margin: 0;
 }
 .apogee_configurableShowHideControl {
     padding-top: 0;
