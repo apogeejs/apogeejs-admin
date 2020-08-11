@@ -77,6 +77,9 @@ export default class ListElement extends ConfigurableElement {
      * the meta value depends on the content. */
     getMeta() {
         if(this.meta) {
+            //handle an empty list
+            if(this.listEntries.length === 0) return null;
+
             let fullMeta = apogeeutil.jsonCopy(this.meta);
             if(this.isMultiTypeList) {
                 let childMeta = {};
