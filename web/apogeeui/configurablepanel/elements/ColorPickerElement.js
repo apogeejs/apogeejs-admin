@@ -6,7 +6,7 @@ import uiutil from "/apogeeui/uiutil.js";
  * 
  * @class 
  */
-export default class SliderElement extends ConfigurableElement {
+export default class ColorPickerElement extends ConfigurableElement {
     constructor(form,elementInitData) {
         super(form,elementInitData);
         
@@ -24,23 +24,13 @@ export default class SliderElement extends ConfigurableElement {
         }
         
         //slider
-        this.sliderElement = uiutil.createElement("input",{"type":"range"});
-        containerElement.appendChild(this.sliderElement); 
+        this.colorPickerElement = uiutil.createElement("input",{"type":"color"});
+        containerElement.appendChild(this.colorPickerElement); 
 
-        this.sliderElement.addEventListener("change",() => {
+        this.colorPickerElement.addEventListener("change",() => {
             this.inputDone();
             this.valueChanged();
         });
-
-        if(elementInitData.min !== undefined) {
-            this.sliderElement.min = elementInitData.min;
-        }
-        if(elementInitData.max !== undefined) {
-            this.sliderElement.max = elementInitData.max;
-        }
-        if(elementInitData.step !== undefined) {
-            this.sliderElement.step = elementInitData.step;
-        }
 
         this._postInstantiateInit(elementInitData);
     }
@@ -48,8 +38,7 @@ export default class SliderElement extends ConfigurableElement {
     /** This method returns value for this given element, if applicable. If not applicable
      * this method returns undefined. */
     getValue() {
-        let stringValue = this.sliderElement.value;
-        return parseFloat(stringValue);
+        return this.colorPickerElement.value;
     }  
     
     //===================================
@@ -58,7 +47,7 @@ export default class SliderElement extends ConfigurableElement {
 
     /** This method updates the list of checked entries. */
     setValueImpl(value) {
-        this.sliderElement.value = value;
+        this.colorPickerElement.value = value;
     }
 
     //===================================
@@ -66,9 +55,9 @@ export default class SliderElement extends ConfigurableElement {
     //==================================
     
     _setDisabled(isDisabled) { 
-        this.sliderElement.disabled = isDisabled;
+        this.colorPickerElement.disabled = isDisabled;
     }
 }
 
-SliderElement.TYPE_NAME = "slider";
+ColorPickerElement.TYPE_NAME = "colorPicker";
 
