@@ -1,5 +1,6 @@
 import ConfigurablePanelConstants from "/apogeeui/configurablepanel/ConfigurablePanelConstants.js";
 import uiutil from "/apogeeui/uiutil.js";
+import ErrorElement from "/apogeeui/configurablepanel/elements/ErrorElement.js";
 
 /** This is a panel with forma elements that can be configured using a javascript object.
  * 
@@ -194,8 +195,15 @@ export default class ConfigurablePanel {
     
     /** this is called internally to add an element to the panel. */
     addToPanel(elementInitData) {
+        let elementObject;
 
-        var elementObject = ConfigurablePanel.instantiateConfigurableType(this,elementInitData);
+        try {
+            elementObject = ConfigurablePanel.instantiateConfigurableType(this,elementInitData);
+        }
+        catch(error) {
+            //create an error element if there is an error
+            elementObject = new ErrorElement(this,elementInitData,error);
+        }
 
         //add the dome element for the container
         var domElement = elementObject.getElement();
@@ -207,11 +215,6 @@ export default class ConfigurablePanel {
             //add all child elements from this container to the child element list
             this.elementObjects.push(elementObject);  
         }
-        // else if(elementObject.elementType == "ConfigurableLayoutContainer") {
-        // }
-        // else {
-        //     throw new Error("Unknown form element class: " + typeof elementObject);
-        // }
     }
 
     /** This method is called by a child layout container to pass children element objects to the form.  */

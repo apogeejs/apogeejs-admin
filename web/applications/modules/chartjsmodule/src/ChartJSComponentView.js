@@ -59,7 +59,7 @@ export default class ChartJSComponentView extends ComponentView {
                 //NOTE - we only want to update the data from the form and its generated function
                 //we should prevent someone else from updating it.
                 let reloadData = this.getComponent().isMemberDataUpdated("member");
-                let reloadDataDisplay = false;
+                let reloadDataDisplay = this.getComponent().isFieldUpdated("chartType");
                 return {reloadData,reloadDataDisplay};
             },
 
@@ -95,13 +95,18 @@ export default class ChartJSComponentView extends ComponentView {
                 //NOTE - we only want to update the data from the form and its generated function
                 //we should prevent someone else from updating it.
                 let reloadData = this.getComponent().isMemberDataUpdated("member");
-                let reloadDataDisplay = false;
+                let reloadDataDisplay = this.getComponent().isFieldUpdated("debugOutputType");
                 return {reloadData,reloadDataDisplay};
             },
 
             getData: () => {
-                //return JSON.stringify(this._getChartConfig(),null,"\t");
-                return JSON.stringify(this.getComponent().getMember().getData(),null,"\t");
+                let debugChartConfig = this.getComponent().getField("debugOutputType")
+                if(debugChartConfig == "Chart Config") {
+                    return JSON.stringify(this._getChartConfig(),null,"\t")
+                }
+                else {
+                    return JSON.stringify(this.getComponent().getMember().getData(),null,"\t");
+                }
             },
         }
     }
@@ -117,7 +122,7 @@ export default class ChartJSComponentView extends ComponentView {
             return memberData.storedFormValue;
         }
         else {
-            return DEFAULT_FORM_DATA_EXPORT;
+            return {};
         }
     }
 
@@ -148,7 +153,10 @@ export default class ChartJSComponentView extends ComponentView {
         }
         catch(error) {
             if(error.stack) console.error(error.stack);
-            return {};
+            let chartConfig = {
+                errorMsg: error.toString()
+            }
+            return chartConfig;
         }
     }
     
@@ -190,29 +198,6 @@ export default class ChartJSComponentView extends ComponentView {
     }       
 
 }
-
-let DEFAULT_FORM_DATA_EXPORT = {
-    "chartType": "line"
-}
-
-let DEFAULT_FORM_DATA_VALUES = {
-    "inputType": "form",
-    "formPanel": {
-        "chartType": "line",
-        "xValuesType": "common",
-        "xValues": [],
-        "dataSeries": [],
-        "chartOptions": {}
-    }
-}
-
-let DEFAULT_CHART_DATA_INFO = {
-    "chartType": "line",
-    "dataSeries": []
-}
-
-let CHART_TYPE_VALUES = ["bar","line"];
-let X_TYPE_VALUES = ["common","paired"];
 
 function _getFormLayout(chartType) {
     return [
@@ -290,6 +275,12 @@ ChartJSComponentView.propertyDialogLines = [
         "heading":"Chart Types: ",
         "entries":["line","bar","scatter"],
         "resultKey":"chartType"
+    },
+    {
+        "type":"dropdown",
+        "heading":"Debug Output Type: ",
+        "entries":["JSON","Chart Config"],
+        "resultKey":"debugOutputType"
     }
 ];
 
@@ -333,11 +324,15 @@ class ChartJSDisplay extends DataDisplay {
 
         this.contentElement = document.createElement("div");
         this.contentElement.style = "position: relative; width: 800px; overflow: none;"
+
+        this.errorElement = document.createElement("div");
+        this.errorElement.style = "position: relative; color: red;"
         
         this.canvasElement = document.createElement("canvas");
         this.canvasElement.style = "position: relative;";
 
         this.contentElement.appendChild(this.canvasElement);
+        this.contentElement.appendChild(this.errorElement);
         this.wrapperElement.appendChild(this.contentElement);
 
         //this.chart = new Chart(this.canvasElement,this.config);
@@ -354,37 +349,58 @@ class ChartJSDisplay extends DataDisplay {
         if((!config)||(config === apogeeutil.INVALID_VALUE)) {
             config = DEFAULT_CHART_CONFIG;
         }
-
-        //make a new chart if there is no chart or if the options change (I am not sure about this criteria exactly)
-        if((!this.chart)||(!apogeeutil.jsonEquals(this.prevOptions,config.options))) {
-            if(this.chart) this.chart.destroy();
-            this.config = config;
-            try {
-                this.chart = new Chart(this.canvasElement,this.config);
-            }
-            catch(error) {
-                console.log("Error loading chart: " + error.toString());
-                if(error.stack) console.error(error.stack);
-            }
+        else if(config.errorMsg) {
+            this.showChartErrorMessage(config.errorMsg);
         }
         else {
-            //we need to copy our new data into the existing config object
-            this.config.type = config.type;
-            this.config.options = config.options;
-            //the chart modifies the data so we will make a copy
-            this.config.data = apogeeutil.jsonCopy(config.data);
+            //make sure proper elements are showing
+            if(this.canvasElement.style.display == "none") this.canvasElement.style.display = "";
+            if(this.errorElement.style.display != "none") this.errorElement.style.display = "none";
 
-            try {
-                this.chart.update();
+            //make a new chart if there is no chart or if the options change (I am not sure about this criteria exactly)
+            if((!this.chart)||(!apogeeutil.jsonEquals(this.prevOptions,config.options))) {
+                if(this.chart) this.chart.destroy();
+                this.config = config;
+                try {
+                    this.chart = new Chart(this.canvasElement,this.config);
+                }
+                catch(error) {
+                    let msg = "Error loading chart: " + error.toString();
+                    console.log(msg);
+                    if(error.stack) console.error(error.stack);
+                    this.showChartErrorMessage(msg);
+                }
             }
-            catch(error) {
-                console.log("Error loading chart: " + error.toString());
-                if(error.stack) console.error(error.stack);
+            else {
+                //we need to copy our new data into the existing config object
+                this.config.type = config.type;
+                this.config.options = config.options;
+                //the chart modifies the data so we will make a copy
+                this.config.data = apogeeutil.jsonCopy(config.data);
+
+                try {
+                    this.chart.update();
+                }
+                catch(error) {
+                    let msg = "Error loading chart: " + error.toString();
+                    console.log(msg);
+                    if(error.stack) console.error(error.stack);
+                    this.showChartErrorMessage(msg);
+                }
             }
         }
 
         //save the options for next time
         this.prevOption = config.options;
+    }
+
+    showChartErrorMessage(errorMsg) {
+        //make sure proper elements are showing
+        if(this.canvasElement.style.display != "none") this.canvasElement.style.display = "none";
+        if(this.errorElement.style.display == "none") this.errorElement.style.display = "";
+
+        //show the error message
+        this.errorElement.innerHTML = "<b>Chart Error: </b>"  + errorMsg;
     }
 
     /** This method is called on loading the display. OPTIONAL */

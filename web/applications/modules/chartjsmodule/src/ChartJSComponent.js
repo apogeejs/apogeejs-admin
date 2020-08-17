@@ -20,17 +20,34 @@ export default class ChartJSComponent extends Component {
         }
     }
 
+    getDebugOutputType() {
+        let debugOutputType = this.getField("debugOutputType");
+        if(!debugOutputType) debugOutputType = ChartJSComponent.DEFAULT_DEBUG_OUTPUT_TYPE;
+        return debugOutputType;
+    }
+
+    setDebugOutputType(debugOutputType) {
+        let oldDebugOutputType = this.getField("debugOutputType");
+        if(oldDebugOutputType != debugOutputType) {
+            this.setField("debugOutputType",debugOutputType);
+        }
+    }
+
     //==============================
     // serialization
     //==============================
 
     writeToJson(json,modelManager) {
         json.chartType = this.getChartType();
+        json.debugOutputType = this.getDebugOutputType();
     }
 
     readPropsFromJson(json) {
         if(json.chartType !== undefined) {
             this.setChartType(json.chartType);
+        }
+        if(json.debugOutputType !== undefined) {
+            this.setDebugOutputType(json.debugOutputType);
         }
     }
 
@@ -42,6 +59,7 @@ export default class ChartJSComponent extends Component {
      * proeprties dialog. */
     readExtendedProperties(values) {
         values.chartType = this.getChartType();
+        values.debugOutputType = this.getDebugOutputType();
     }
 
     //======================================
@@ -53,6 +71,9 @@ export default class ChartJSComponent extends Component {
     static transferComponentProperties(inputValues,propertyJson) {
         if(inputValues.chartType !== undefined) {
             propertyJson.chartType = inputValues.chartType;
+        }
+        if(inputValues.debugOutputType !== undefined) {
+            propertyJson.debugOutputType = inputValues.debugOutputType;
         }
     }
 }
@@ -69,3 +90,4 @@ ChartJSComponent.DEFAULT_MEMBER_JSON = {
 };
 
 ChartJSComponent.DEFAULT_CHART_TYPE = "line";
+ChartJSComponent.DEFAULT_DEBUG_OUTPUT_TYPE = "JSON"; //other choice "Chart Config"
