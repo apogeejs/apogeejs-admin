@@ -1088,8 +1088,8 @@ const lineConfigElement = {
                             type: "slider",
                             key: "tension",
                             min: 0,
-                            max: 1,
-                            step: .1,
+                            max: .5,
+                            step: .05,
                             value: 0,
                             selector: {
                                 parentKey: "doLineTension",
