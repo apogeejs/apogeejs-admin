@@ -22042,18 +22042,27 @@ class ChartJSComponentView extends ComponentView {
             let chartConfig;
             let chartType = this.getComponent().getChartType();
 
-            if(memberData.inputType == "rawConfig") {
-                //raw chart config entered
-                //for chart js, this must be a editable, so we will make a copy
-                chartConfig = apogeeutil.jsonCopy(memberData.configData);
+            if(memberData) {
+                if(memberData.inputType == "rawConfig") {
+                    //raw chart config entered
+                    //for chart js, this must be a editable, so we will make a copy
+                    chartConfig = apogeeutil.jsonCopy(memberData.configData);
+                }
+                else if(memberData.inputType == "json") {
+                    let chartJson = memberData.jsonData;
+                    chartConfig = createChartConfig(chartJson,chartType);
+                }
+                else if(memberData.inputType == "form") {
+                    let chartJson = memberData.formData;
+                    chartConfig = createChartConfig(chartJson,chartType);
+                }
+                else {
+                    throw new Error("Input error: a valid input type is not given.")
+                }
             }
-            else if(memberData.inputType == "json") {
-                let chartJson = memberData.jsonData;
-                chartConfig = createChartConfig(chartJson,chartType);
-            }
-            else if(memberData.inputType == "form") {
-                let chartJson = memberData.formData;
-                chartConfig = createChartConfig(chartJson,chartType);
+            else {
+                //provide empty chart config data
+                chartConfig = DEFAULT_CHART_CONFIG_DATA[chartType];
             }
 
             return chartConfig;
@@ -22155,6 +22164,12 @@ function _getFormLayout(chartType) {
     ];
 }
 
+const DEFAULT_CHART_CONFIG_DATA = {
+    line: {"categoryDataSeries": [] },
+    bar: {"categoryDataSeries": [] },
+    scatter: {"numericDataSeries": [] }
+};
+
 //======================================
 // Static properties
 //======================================
@@ -22185,7 +22200,7 @@ ChartJSComponentView.propertyDialogLines = [
     },
     {
         "type":"dropdown",
-        "heading":"Debug Output Type: ",
+        "heading":"Config Output: ",
         "entries":["JSON","Chart Config"],
         "resultKey":"debugOutputType"
     }
