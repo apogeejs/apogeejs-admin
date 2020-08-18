@@ -337,7 +337,7 @@ export default class LiteratePageComponentDisplay {
     /** This is used to select the end of the document if the page is clicked below the document end. */
     onClickContentElement(event) {
         if(event.target == this.contentElement) {
-            //this.componentView.giveEditorFocusIfShowing();
+            this.componentView.giveEditorFocusIfShowing();
             let command = this.componentView.getSelectEndOfDocumentCommand();
             let app = this.componentView.getModelView().getApp();
             app.executeCommand(command);
