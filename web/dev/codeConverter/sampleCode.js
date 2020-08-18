@@ -1033,7 +1033,7 @@ return data;}
 function getXCategoryChartData(sourceData,chartInfo,generalChartOptions) {
 let data = {};
 
-if(!sourceData.categoryDataSeries) throw new Error("Unkonwn error: Category data series array missing for category data chart.");
+if(!sourceData.categoryDataSeries) throw new Error("Unknown error: Category data series array missing for category data chart.");
 
 //read the category data
 let xCategories;
@@ -1096,16 +1096,22 @@ if(chartInfo.usePoint) {
     targetOptions.elements.point = processOptions(sourceOptions.point,"point","chart");
 }
 
-if(chartInfo.usePoint) {
+if(chartInfo.useLine) {
     targetOptions.elements.line = processOptions(sourceOptions.line,"line","chart");
+    
+    //merge a currently hard coded pacity into the background color, if it exists and is not "auto"
+    if((targetOptions.elements.line)&&(targetOptions.elements.line.backgroundColor)&&(targetOptions.elements.line.backgroundColor != "auto")) {
+        let opacity = .2;
+        targetOptions.elements.line.backgroundColor = mergeOpacity(targetOptions.elements.line.backgroundColor,opacity);
+    }
 }
 
 if(chartInfo.useRectangle) {
-    targetOptions.elements.rectangle = processOptions(targetOptions.elements.rectangle,"rectangle","chart");
+    targetOptions.elements.rectangle = processOptions(sourceOptions.rectangle,"rectangle","chart");
 }
 
 if(chartInfo.useArc) {
-    targetOptions.elements.arc = processOptions(targetOptions.elements.arc,"arc","chart");
+    targetOptions.elements.arc = processOptions(sourceOptions.arc,"arc","chart");
 }
 
 targetOptions.title = processOptions(sourceOptions.title,"title","chart");
@@ -1130,69 +1136,144 @@ return targetOptions;}
 /** This function loads the data series options into the target options object from the apogee format input json. */
 function loadSeriesOptions(targetOptions,sourceOptions,chartInfo,chartOptions,index) {
 if(sourceOptions.label !== undefined) targetOptions.label = sourceOptions.label;
+else {
+    targetOptions.label = "Series " + (index + 1);
+}
 
 if(chartInfo.usePoint) {
-    let options = processOptions(sourceOptions.point,"point","series");
+    let seriesPointOptions = processOptions(sourceOptions.point,"point","series");
     
-    //check for "auto" in chart options
-    if((chartOptions)&&(chartOptions.elements)&&(chartOptions.elements.point)&&(chartOptions.elements.point.borderColor == "auto")&&(options.borderColor === undefined)) {
-        options.borderColor = _getColorForIndex(index);
+    //------------
+    //special rules
+    //------------
+    let chartPointOptions;
+    if((chartOptions)&&(chartOptions.elements)&&(chartOptions.elements.point)) chartPointOptions = chartOptions.elements.point;
+    else chartPointOptions = {};
+    
+    //check for "auto" border color in chart options
+    if(seriesPointOptions.borderColor === undefined) {
+        if(chartPointOptions.borderColor == "auto") {
+            seriesPointOptions.borderColor = _getColorForIndex(index);
+        }
+        else if(chartPointOptions.borderColor !== undefined) {
+            seriesPointOptions.borderColor = chartPointOptions.borderColor;
+        }
     }
     
     //implement for "show points" from chart options or series options - set radius to 0
-    if( (options.showPoints === false) ||
-        ((chartOptions)&&(chartOptions.elements)&&(chartOptions.elements.point)&&(chartOptions.elements.point.showPoints === false)&&(options.showPoints !== true)) ) {
-        options.radius = 0;        
+    if( (seriesPointOptions.showPoints === false) ||
+        ((chartPointOptions.showPoints === false)&&(seriesPointOptions.showPoints !== true)) ) {
+        seriesPointOptions.radius = 0;        
     }
     
     //if we are also using line we need to remap some keys
     if(chartInfo.useLine) {
-        _remap(options,LINE_POINT_KEY_MAPPING);
+        _remap(seriesPointOptions,LINE_POINT_KEY_MAPPING);
     } 
     
     //map these back to our series options
-    Object.assign(targetOptions,options);
+    Object.assign(targetOptions,seriesPointOptions);
 }
 
 if(chartInfo.useLine) {
-    let options = processOptions(sourceOptions.line,"line","series");
+    let seriesLineOptions = processOptions(sourceOptions.line,"line","series");
+    
+    //------------
+    //special rules
+    //------------
+    let chartLineOptions;
+    if((chartOptions)&&(chartOptions.elements)&&(chartOptions.elements.line)) chartLineOptions = chartOptions.elements.line;
+    else chartLineOptions = {};
 
-    //check for "auto" in chart options
-    if((chartOptions)&&(chartOptions.elements)&&(chartOptions.elements.line)&&(chartOptions.elements.line.borderColor == "auto")&&(options.borderColor === undefined)) {
-        options.borderColor = _getColorForIndex(index);
+    //explictily set line color since we added the "auto" option
+    if (seriesLineOptions.borderColor === undefined) {
+        if(chartLineOptions.borderColor == "auto") {
+            seriesLineOptions.borderColor = _getColorForIndex(index);
+        }
+        else if(chartLineOptions.borderColor !== undefined) {
+            seriesLineOptions.borderColor = chartLineOptions.borderColor;
+        }
     }
     
-    //there is some remapping
-    if(chartInfo.useLine) {
-        _remap(options,LINE_KEY_MAPPING);
+    //explictily set the point color
+    //we are using results of target options set above.
+    if(targetOptions.pointBorderColor === undefined) {
+        seriesLineOptions.pointBorderColor = seriesLineOptions.borderColor;
     }
+    
+    //explictily set the area color since we added the "auto" option
+    if(seriesLineOptions.backgroundColor === undefined) {
+        if(chartLineOptions.backgroundColor == "auto") {
+            seriesLineOptions.backgroundColor = _getColorForIndex(index);
+        }
+        else if(chartLineOptions.backgroundColor !== undefined) {
+            seriesLineOptions.backgroundColor = chartLineOptions.backgroundColor;
+        }
+        else {
+            //default to line color
+            seriesLineOptions.backgroundColor = seriesLineOptions.borderColor;
+        }
+    }
+    
+    //merge a currently hard coded pacity into the background color, if it exists.
+    if(seriesLineOptions.backgroundColor) {
+        let opacity = .2;
+        seriesLineOptions.backgroundColor = mergeOpacity(seriesLineOptions.backgroundColor,opacity);
+    }
+    
+    //there is some remapping for the series
+    _remap(seriesLineOptions,LINE_KEY_MAPPING);
     
     //map these back to our series options
-    Object.assign(targetOptions,options);
+    Object.assign(targetOptions,seriesLineOptions);
 }
 
 if(chartInfo.useRectangle) {
-    let options = processOptions(sourceOptions.rectangle,"rectangle","series");
+    let seriesRectOptions = processOptions(sourceOptions.rectangle,"rectangle","series");
+    
+    //------------
+    //special rules
+    //------------
+    let chartRectOptions;
+    if((chartOptions)&&(chartOptions.elements)&&(chartOptions.elements.rectangle)) chartRectOptions = chartOptions.elements.rectangle;
+    else chartRectOptions = {};
     
     //check for "auto" in chart options
-    if((chartOptions)&&(chartOptions.elements)&&(chartOptions.elements.rectangle)&&(chartOptions.elements.rectangle.backgroundColor == "auto")&&(options.backgroundColor === undefined)) {
-        options.backgroundColor = _getColorForIndex(index);
+    if(seriesRectOptions.backgroundColor === undefined) {
+        if(chartRectOptions.backgroundColor == "auto") {
+            seriesRectOptions.backgroundColor = _getColorForIndex(index);
+        }
+        else if(chartRectOptions.backgroundColor == "auto") {
+            seriesRectOptions.backgroundColor = chartRectOptions.backgroundColor;
+        }
     }
     
     //map these back to our series options
-    Object.assign(targetOptions,options);
+    Object.assign(targetOptions,seriesRectOptions);
 }
 
 if(chartInfo.useArc) {
-    let options = processOptions(sourceOptions.arc,"arc","series");
+    let seriesArcOptions = processOptions(sourceOptions.arc,"arc","series");
+    
+    //------------
+    //special rules
+    //------------
+    let chartArcOptions;
+    if((chartOptions)&&(chartOptions.elements)&&(chartOptions.elements.arc)) chartArcOptions = chartOptions.elements.arc;
+    else chartArcOptions = {};
     
     //check for "auto" in chart options
-    if((chartOptions)&&(chartOptions.elements)&&(chartOptions.elements.arc)&&(chartOptions.elements.rectangle.arc == "auto")&&(options.backgroundColor === undefined)) {
-        options.backgroundColor = _getColorForIndex(index);
+    if(seriesArcOptions.backgroundColor === undefined) {
+        if(chartArcOptions.backgroundColor == "auto") {
+            seriesArcOptions.backgroundColor = _getColorForIndex(index);
+        }
+        else if(chartArcOptions.backgroundColor == "auto") {
+            seriesArcOptions.backgroundColor = chartArcOptions.backgroundColor;
+        }
     }
     
     //map these back to our series options
-    Object.assign(targetOptions,options);
+    Object.assign(targetOptions,seriesArcOptions);
 }
 }
 
@@ -1232,7 +1313,6 @@ const OPTION_MODIFIER = {
         line: {
             borderColor: "auto",
             fill: false,
-            
         },
         rectangle: {
             backgroundColor: "auto"
@@ -1247,9 +1327,9 @@ const OPTION_MODIFIER = {
     },
     associations: {
         point: {
-            pointHoverRadius: {
+            hoverRadius: {
                 source: "radius",
-                target: "hoverPointRadius",
+                target: "hoverRadius",
                 modifier: "addOne"
             },
             hoverBorderWidth: {
@@ -1274,7 +1354,7 @@ const OPTION_MODIFIER = {
 }
 
 /** These are the list of colors for "auto" color assignment. (We might want to let the users set these globally since the palette will be very important in many cases.)  */
-const COLOR_LIST = ["blue","red","green","navy","maroon","black","teal","purple","olive","gray","fuchsia","yellow","aqua"]
+const COLOR_LIST = ["#0000ff","#ff0000","#008000","#000080","#800000","#000000","#008080","#800080","#808000","#808080","#ff00ff","#ffff00","#00ffff"]
 
 /** The following does standard mapping of options from the input json config to create the raw config. In some cases, additional processing may be needed, which will be done externally. */
 function processOptions(inJsonObject,optionsType,optionsOrigin) {
@@ -1290,7 +1370,7 @@ if(optionsOrigin == "chart") {
     }
 }
 
-//add any associations
+//add any associations - this is when one value should equal (or be a function of) ONE other field.
 let associationsMap = OPTION_MODIFIER.associations[optionsType];
 if(associationsMap) {
     _addAssociations(outOptions,associationsMap);
@@ -1317,8 +1397,8 @@ function _addAssociations(optionsObject,associationsMap) {
         let modifierString = association.modifier;
         
         //allow for lookup of modifier function
-        if(modifierString !== undefined) {
-            if((optionsObject[sourceField] !== undefined)&&(optionsObject[targetField] === undefined)) {
+        if((optionsObject[sourceField] !== undefined)&&(optionsObject[targetField] === undefined)) {
+            if(modifierString !== undefined) {
                 //right now we have a lookup function for modifier functions. But we only have one modifier.
                 let modifierFunction;
                 switch(modifierString) {
@@ -1335,10 +1415,10 @@ function _addAssociations(optionsObject,associationsMap) {
                     optionsObject[targetField] = modifierFunction(optionsObject[targetField], optionsObject[sourceField]);
                 }
             }
-        }
-        else {
-            //if there is no modifier function listed, just set the target value equal the source value
-            optionsObject[targetField] = optionsObject[sourceField];
+            else {
+                //if there is no modifier function listed, just set the target value equal the source value
+                optionsObject[targetField] = optionsObject[sourceField];
+            }
         }
     }
 }
@@ -1362,3 +1442,86 @@ function _doShowHidePoint(initialTarget,initialSource) {
     }
 }
 //-- processOptions private code end ---
+
+function mergeOpacity(color,opacity) {
+let colorStruct = _parseColorString(color);
+if(colorStruct) {
+    let rgbaVector = colorStruct.rgba;
+    rgbaVector[3] = opacity;
+    let colorArgs = rgbaVector.join(",");
+    return `rgba(${colorArgs})`;
+}
+else {
+    //we could not parse this for now
+    return color;
+}
+}
+
+//-- mergeOpacity private code start ---
+/** This parses just rgb, rgba and hex colors. Otherwise it returns false. 
+* This is from the code from jscolor.js */
+function _parseColorString(str) {
+	var ret = {
+		rgba: null,
+		format: null // 'hex' | 'rgb' | 'rgba'
+	};
+
+	var m;
+	if (m = str.match(/^\W*([0-9A-F]{3}([0-9A-F]{3})?)\W*$/i)) {
+		// HEX notation
+
+		ret.format = 'hex';
+
+		if (m[1].length === 6) {
+			// 6-char notation
+			ret.rgba = [
+				parseInt(m[1].substr(0,2),16),
+				parseInt(m[1].substr(2,2),16),
+				parseInt(m[1].substr(4,2),16),
+				null
+			];
+		} else {
+			// 3-char notation
+			ret.rgba = [
+				parseInt(m[1].charAt(0) + m[1].charAt(0),16),
+				parseInt(m[1].charAt(1) + m[1].charAt(1),16),
+				parseInt(m[1].charAt(2) + m[1].charAt(2),16),
+				null
+			];
+		}
+		return ret;
+
+	} else if (m = str.match(/^\W*rgba?\(([^)]*)\)\W*$/i)) {
+		// rgb(...) or rgba(...) notation
+
+		var params = m[1].split(',');
+		var re = /^\s*(\d+|\d*\.\d+|\d+\.\d*)\s*$/;
+		var mR, mG, mB, mA;
+		if (
+			params.length >= 3 &&
+			(mR = params[0].match(re)) &&
+			(mG = params[1].match(re)) &&
+			(mB = params[2].match(re))
+		) {
+			ret.format = 'rgb';
+			ret.rgba = [
+				parseFloat(mR[1]) || 0,
+				parseFloat(mG[1]) || 0,
+				parseFloat(mB[1]) || 0,
+				null
+			];
+
+			if (
+				params.length >= 4 &&
+				(mA = params[3].match(re))
+			) {
+				ret.format = 'rgba';
+				ret.rgba[3] = parseFloat(mA[1]) || 0;
+			}
+			return ret;
+		}
+	}
+
+	return false;
+}
+//-- mergeOpacity private code end ---
