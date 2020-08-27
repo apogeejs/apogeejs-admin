@@ -3,7 +3,7 @@ import {validateTableName} from "/apogee/apogeeCoreLib.js";
 
 import {getPropertiesDialogLayout} from "/apogeeview/commandseq/updatecomponentseq.js";
 import {Component,componentInfo} from "/apogeeapp/apogeeAppLib.js";
-import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
+import {showLegacyConfigurableDialog} from "/apogeeview/dialogs/LegacyConfigurableDialog.js";
 import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog.js";
 import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
@@ -162,7 +162,7 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
         let onCancelFunction = () => null; /*parentComponentView.giveEditorFocusIfShowing() - oops no parent component*/;
         
         //show dialog
-        showConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
+        showLegacyConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
 }
 
 

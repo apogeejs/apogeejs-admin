@@ -1,5 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
+import {showLegacyConfigurableDialog} from "/apogeeview/dialogs/LegacyConfigurableDialog.js";
 import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 const DIALOG_LAYOUT_URL_LINE = {
@@ -64,7 +64,7 @@ export function addLink(app,displayInfo) {
     }
 
     //show dialog
-    showConfigurableDialog(dialogLayout,onSubmitFunction);
+    showLegacyConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 /** This method updates a link in the workspace. */
@@ -125,7 +125,7 @@ export function updateLink(app,referenceEntry,displayInfo) {
     }
 
     //show dialog
-    showConfigurableDialog(dialogLayout,onSubmitFunction);
+    showLegacyConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 

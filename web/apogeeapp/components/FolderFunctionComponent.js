@@ -91,7 +91,7 @@ export default class FolderFunctionComponent extends ParentComponent {
 // This is the component generator, to register the component
 //======================================
 
-FolderFunctionComponent.displayName = "Page Function";
+FolderFunctionComponent.displayName = "Multi-Cell Function";
 FolderFunctionComponent.uniqueName = "apogeeapp.PageFunctionComponent";
 FolderFunctionComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.FolderFunction",

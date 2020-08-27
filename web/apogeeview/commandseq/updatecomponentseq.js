@@ -1,7 +1,7 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
 
-import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
+import {showLegacyConfigurableDialog} from "/apogeeview/dialogs/LegacyConfigurableDialog.js";
 import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 //=====================================
@@ -228,7 +228,7 @@ export function updateComponent(componentView) {
     let onCancelFunction = () => returnToEditor(componentView);
 
     //show dialog
-    showConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
+    showLegacyConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
 }
 
 function returnToEditor(componentView) {
@@ -264,21 +264,21 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
     }
     lines.push(titleLine);
 
-    if(folderNames) {
-        var parentLine = {};
-        parentLine.type = "dropdown";
-        parentLine.heading = "Folder: ";
-        parentLine.entries = folderNames;
-        parentLine.resultKey = "parentId"; 
-        lines.push(parentLine);
-    }
-
     var nameLine = {};
     nameLine.type = "inputElement";
     nameLine.heading = "Name: ";
     nameLine.resultKey = "name";
     nameLine.focus = true;
     lines.push(nameLine);
+
+    if(folderNames) {
+        var parentLine = {};
+        parentLine.type = "dropdown";
+        parentLine.heading = "Parent Page: ";
+        parentLine.entries = folderNames;
+        parentLine.resultKey = "parentId"; 
+        lines.push(parentLine);
+    }
     
     //add additioanl lines, if applicable
     if(additionalLines) {

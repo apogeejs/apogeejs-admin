@@ -1,4 +1,4 @@
-import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
+import {showLegacyConfigurableDialog} from "/apogeeview/dialogs/LegacyConfigurableDialog.js";
 
 //=====================================
 // UI Entry Point
@@ -48,7 +48,7 @@ export function exportWorkspace(app,fileAccessObject) {
     }
 
     //show dialog
-    showConfigurableDialog(dialogLayout,onSubmitFunction);
+    showLegacyConfigurableDialog(dialogLayout,onSubmitFunction);
 }
     
 

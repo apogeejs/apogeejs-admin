@@ -40,7 +40,8 @@ input[type=text] focus {
 .menu_bar {
     background-color: rgb(220,220,240);
     position:relative;
-    z-index: 1
+    z-index: 1;
+    padding: 2px;
 }
 .menu_bar_left {
     /* fixed */
@@ -51,6 +52,10 @@ input[type=text] focus {
     /* fixed */
     float:right;
     display:inline;
+}
+.menu_bar_icon {
+    height: 16px;
+    vertical-align: middle;
 }
 .content_outside_menu_bar {
     z-index: 0;

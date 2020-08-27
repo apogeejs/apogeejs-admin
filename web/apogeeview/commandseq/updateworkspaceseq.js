@@ -1,5 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
+import {showLegacyConfigurableDialog} from "/apogeeview/dialogs/LegacyConfigurableDialog.js";
 
 const DIALOG_LAYOUT_TITLE_LINE = {
     "type": "title",
@@ -75,7 +75,7 @@ export function updateWorkspaceProperties(workspaceManager) {
     }
 
     //show dialog
-    showConfigurableDialog(dialogLayout,onSubmitFunction);
+    showLegacyConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 

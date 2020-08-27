@@ -14,7 +14,7 @@
 .visiui-menu-item {
     cursor:default;
     font-weight:normal;
-    padding:2px;
+    padding: 2px;
     white-space: nowrap;
     display: block;
     position: relative;
@@ -22,8 +22,7 @@
 }
 .visiui-menu-item:hover {
     background-color:lightgray;
-    padding:2px;
-    
+
     overflow: visible;
 }
 
@@ -36,7 +35,10 @@
     white-space: nowrap;
 
     /* configurable */
-    padding:2px;
+    padding-left: 8px;
+    padding-right: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     margin:0px;
 }
 .visiui-menu-label:hover {

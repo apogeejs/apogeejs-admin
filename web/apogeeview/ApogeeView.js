@@ -257,8 +257,17 @@ export default class ApogeeView {
         var menuBarLeft = uiutil.createElementWithClass("div","menu_bar_left",menuBar);
         var menuBarRight = uiutil.createElementWithClass("div","menu_bar_right",menuBar);
 
+        //apogee icon
+        let apogeeIcon = document.createElement("img");
+        apogeeIcon.src = uiutil.getResourcePath("/shortlogo16.png");
+        apogeeIcon.className = "menu_bar_icon";
+        menuBarLeft.appendChild(apogeeIcon);
+        // apogeeIcon.onclick = () => {
+        //     this.minimizeContent();
+        // }
+
         //Workspace menu
-        name = "Workspace";
+        name = "File";
         this.workspaceMenu = Menu.createMenu(name);
         menuBarLeft.appendChild(this.workspaceMenu.getElement());
         menus[name] = this.workspaceMenu;
@@ -276,6 +285,16 @@ export default class ApogeeView {
         //populate the workspace menu on the fly - depends on workspace state
         var getEditMenuCallback = () => this.getEditMenuItems();
         this.editMenu.setAsOnTheFlyMenu(getEditMenuCallback);
+
+        //Edit menu
+        name = "Help";
+        this.helpMenu = Menu.createMenu(name);
+        menuBarLeft.appendChild(this.helpMenu.getElement());
+        menus[name] = this.helpMenu;
+        
+        //populate the workspace menu on the fly - depends on workspace state
+        var getHelpMenuCallback = () => this.getHelpMenuItems();
+        this.helpMenu.setAsOnTheFlyMenu(getHelpMenuCallback);
         
         //FOR NOW REMOVE GLOBAL COMPONENT AND IMPORT MENUS
         // //Components Menu
@@ -417,6 +436,28 @@ export default class ApogeeView {
         return menuItems;
     }
 
+    getHelpMenuItems() {
+        var menuItems = [];
+        var menuItem;
+        
+        let helpCallback = () => true;
+        let aboutCallback = () => true;
+
+        //help entry
+        menuItem = {};
+        menuItem.title = "Apogee Help";
+        menuItem.callback = helpCallback;
+        menuItems.push(menuItem);
+        
+        //about entry
+        menuItem = {};
+        menuItem.title = "About";
+        menuItem.callback = aboutCallback;
+        menuItems.push(menuItem);
+        
+        return menuItems;
+    }
+    
     ///** This method should be implemented if custom menus or menu items are desired. */
     //addToMenuBar(menuBar,menus);
 
