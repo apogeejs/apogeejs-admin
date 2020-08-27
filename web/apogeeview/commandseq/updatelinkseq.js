@@ -1,25 +1,20 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {showLegacyConfigurableDialog} from "/apogeeview/dialogs/LegacyConfigurableDialog.js";
+import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 const DIALOG_LAYOUT_URL_LINE = {
-    "type": "inputElement",
-    "heading": "URL: ",
-    "resultKey": "url",
-    "initial": "",
+    "type": "textField",
+    "label": "URL: ",
+    "key": "url",
+    "value": "",
     "focus": true
 };
 const DIALOG_LAYOUT_NICKNAME_LINE = {
-    "type": "inputElement",
-    "heading": "Nickname (optional): ",
-    "resultKey": "nickname",
-    "initial": ""
+    "type": "textField",
+    "label": "Nickname (optional): ",
+    "key": "nickname",
+    "value": ""
 };
-const DIALOG_LAYOUT_SUBMIT_LINE = {
-    "type": "submit",
-    "submit": "Update",
-    "cancel": "Cancel"
-}
 
 //=====================================
 // UI Entry Point
@@ -30,15 +25,15 @@ export function addLink(app,displayInfo) {
         
     //create the dialog layout 
     var titleLine = {};
-    titleLine.type = "title";
-    titleLine.title = displayInfo.ADD_ENTRY_TEXT
+    titleLine.type = "heading";
+    titleLine.text = displayInfo.ADD_ENTRY_TEXT;
+    titleLine.level = 3;
 
     var dialogLayout = {};
-    dialogLayout.lines = [];
-    dialogLayout.lines.push(titleLine);
-    dialogLayout.lines.push(DIALOG_LAYOUT_URL_LINE);
-    dialogLayout.lines.push(DIALOG_LAYOUT_NICKNAME_LINE);
-    dialogLayout.lines.push(DIALOG_LAYOUT_SUBMIT_LINE);
+    dialogLayout.layout = [];
+    dialogLayout.layout.push(titleLine);
+    dialogLayout.layout.push(DIALOG_LAYOUT_URL_LINE);
+    dialogLayout.layout.push(DIALOG_LAYOUT_NICKNAME_LINE);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {
@@ -64,7 +59,7 @@ export function addLink(app,displayInfo) {
     }
 
     //show dialog
-    showLegacyConfigurableDialog(dialogLayout,onSubmitFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 /** This method updates a link in the workspace. */
@@ -77,20 +72,20 @@ export function updateLink(app,referenceEntry,displayInfo) {
 
     //create the dialog layout
     var titleLine = {};
-    titleLine.type = "title";
-    titleLine.title = displayInfo.UPDATE_ENTRY_TEXT;
+    titleLine.type = "heading";
+    titleLine.text = displayInfo.UPDATE_ENTRY_TEXT;
+    titleLine.level = 3;
 
     var urlLine = apogeeutil.jsonCopy(DIALOG_LAYOUT_URL_LINE);
-    urlLine.initial = initialValues.url;
+    urlLine.value = initialValues.url;
     var nicknameLine = apogeeutil.jsonCopy(DIALOG_LAYOUT_NICKNAME_LINE);
-    nicknameLine.initial = initialValues.nickname;
+    nicknameLine.value = initialValues.nickname;
 
     var dialogLayout = {};
-    dialogLayout.lines = [];
-    dialogLayout.lines.push(titleLine);
-    dialogLayout.lines.push(urlLine);
-    dialogLayout.lines.push(nicknameLine);
-    dialogLayout.lines.push(DIALOG_LAYOUT_SUBMIT_LINE);
+    dialogLayout.layout = [];
+    dialogLayout.layout.push(titleLine);
+    dialogLayout.layout.push(urlLine);
+    dialogLayout.layout.push(nicknameLine);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {
@@ -125,7 +120,7 @@ export function updateLink(app,referenceEntry,displayInfo) {
     }
 
     //show dialog
-    showLegacyConfigurableDialog(dialogLayout,onSubmitFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 

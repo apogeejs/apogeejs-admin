@@ -1,7 +1,7 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
 
-import {showLegacyConfigurableDialog} from "/apogeeview/dialogs/LegacyConfigurableDialog.js";
+import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 //=====================================
@@ -228,7 +228,7 @@ export function updateComponent(componentView) {
     let onCancelFunction = () => returnToEditor(componentView);
 
     //show dialog
-    showLegacyConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction,onCancelFunction);
 }
 
 function returnToEditor(componentView) {
@@ -252,33 +252,37 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};
     var lines = [];
-    dialogLayout.lines = lines;
+    dialogLayout.layout = lines;
 
     var titleLine = {};
-    titleLine.type = "title";
+    titleLine.type = "heading";
     if(doCreate) {
-        titleLine.title = "New " + displayName;
+        titleLine.text = "New " + displayName;
     }
     else {
-        titleLine.title = "Update " + displayName; 
+        titleLine.text = "Update " + displayName; 
     }
+    titleLine.level = 3;
     lines.push(titleLine);
-
-    var nameLine = {};
-    nameLine.type = "inputElement";
-    nameLine.heading = "Name: ";
-    nameLine.resultKey = "name";
-    nameLine.focus = true;
-    lines.push(nameLine);
 
     if(folderNames) {
         var parentLine = {};
         parentLine.type = "dropdown";
-        parentLine.heading = "Parent Page: ";
+        parentLine.label = "Parent Page: ";
         parentLine.entries = folderNames;
-        parentLine.resultKey = "parentId"; 
+        parentLine.key = "parentId"; 
+        if(doCreate) {
+            parentLine.state = "disabled";
+        }
         lines.push(parentLine);
     }
+
+    var nameLine = {};
+    nameLine.type = "textField";
+    nameLine.label = "Name: ";
+    nameLine.key = "name";
+    nameLine.focus = true;
+    lines.push(nameLine);
     
     //add additioanl lines, if applicable
     if(additionalLines) {
@@ -288,23 +292,23 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
     }
 
     //submit
-    var submitLine = {};
-    submitLine.type = "submit";
-    if(doCreate) {
-        submitLine.submit = "Create";
-    }
-    else {
-        submitLine.submit = "Update";
-    }
-    submitLine.cancel = "Cancel";
-    lines.push(submitLine);
+    // var submitLine = {};
+    // submitLine.type = "submit";
+    // if(doCreate) {
+    //     submitLine.submit = "Create";
+    // }
+    // else {
+    //     submitLine.submit = "Update";
+    // }
+    // submitLine.cancel = "Cancel";
+    // lines.push(submitLine);
     
     //set the initial values
     if(initialValues) {
         for(var i = 0; i < lines.length; i++) {
             var line = lines[i];
-            if(line.resultKey) {
-                line.initial = initialValues[line.resultKey];
+            if(line.key) {
+                line.value = initialValues[line.key];
             }
         }
     }

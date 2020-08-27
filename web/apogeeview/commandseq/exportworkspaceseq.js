@@ -1,4 +1,4 @@
-import {showLegacyConfigurableDialog} from "/apogeeview/dialogs/LegacyConfigurableDialog.js";
+import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 
 //=====================================
 // UI Entry Point
@@ -48,7 +48,7 @@ export function exportWorkspace(app,fileAccessObject) {
     }
 
     //show dialog
-    showLegacyConfigurableDialog(dialogLayout,onSubmitFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
     
 
@@ -74,29 +74,25 @@ function getExportDialogLayout(folderInfo) {
     //create the dialog layout - do on the fly because folder list changes
     var dialogLayout = {};
     var lines = [];
-    dialogLayout.lines = lines;
+    dialogLayout.layout = lines;
 
     var titleLine = {};
-    titleLine.type = "title";
-    titleLine.title = "Export Folder as Workspace"
+    titleLine.type = "heading";
+    titleLine.text = "Export Folder as Workspace";
+    titleLine.level = 3;
     lines.push(titleLine);
 
     if(folderNames) {
         var parentLine = {};
         parentLine.type = "dropdown";
-        parentLine.heading = "Folder: ";
-        parentLine.entries = folderInfo;
-        parentLine.resultKey = "parentId"; 
-        parentLine.focus = true;
+        parentLine.label = "Parent Page: ";
+        parentLine.entries = folderNames;
+        parentLine.key = "parentId"; 
+        if(doCreate) {
+            parentLine.state = "disabled";
+        }
         lines.push(parentLine);
     }
-    
-    //submit
-    var submitLine = {};
-    submitLine.type = "submit";
-    submitLine.submit = "OK";
-    submitLine.cancel = "Cancel";
-    lines.push(submitLine);
     
     return dialogLayout;
 }

@@ -51,13 +51,13 @@ FolderFunctionComponentView.TREE_ENTRY_SORT_ORDER = ParentComponentView.FOLDER_C
 
 FolderFunctionComponentView.propertyDialogLines = [
     {
-        "type":"inputElement",
-        "heading":"Arg List: ",
-        "resultKey":"argListString"
+        "type":"textField",
+        "label":"Arg List: ",
+        "key":"argListString"
     },
     {
-        "type":"inputElement",
-        "heading":"Return Val: ",
-        "resultKey":"returnValueString"
+        "type":"textField",
+        "label":"Return Val: ",
+        "key":"returnValueString"
     }
 ];

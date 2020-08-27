@@ -7,8 +7,8 @@ import {uiutil,dialogMgr,ConfigurablePanel} from "/apogeeui/apogeeUiLib.js";
 export function showConfigurableDialog(layout,onSubmitFunction,optionalOnCancelFunction) {
 
     var dialog = dialogMgr.createDialog({"movable":true});
-    this.panel = new ConfigurablePanel();
-    this.panel.configureForm(layout);
+    let panel = new ConfigurablePanel();
+    panel.configureForm(layout);
 
     let onCancel = function() {
         if(optionalOnCancelFunction) optionalOnCancelFunction();
@@ -23,10 +23,10 @@ export function showConfigurableDialog(layout,onSubmitFunction,optionalOnCancelF
         }
     }
 
-    this.panel.addSubmit(onSubmit,onCancel);
+    panel.addSubmit(onSubmit,onCancel);
     
     //show dialog
-    dialog.setContent(this.pangel.getElement(),uiutil.SIZE_WINDOW_TO_CONTENT);
+    dialog.setContent(panel.getElement(),uiutil.SIZE_WINDOW_TO_CONTENT);
     dialogMgr.showDialog(dialog);
     
     //size the dialog to the content

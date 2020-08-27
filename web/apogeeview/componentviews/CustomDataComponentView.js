@@ -207,8 +207,8 @@ CustomDataComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";
 CustomDataComponentView.propertyDialogLines = [
     {
         "type":"checkbox",
-        "heading":"Destroy on Hide: ",
-        "resultKey":"destroyOnInactive"
+        "label":"Destroy on Hide: ",
+        "key":"destroyOnInactive"
     }
 ];
 

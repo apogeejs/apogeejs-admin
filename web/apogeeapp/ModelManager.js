@@ -82,7 +82,7 @@ export default class ModelManager extends FieldObject {
         let folders = []
         //get the model parent entry
         if(includeRootFolder) {
-            folders.push([model.getId(),"Root Folder"]);
+            folders.push(["Root Folder",model.getId()]);
         }
         
         //get folder compontents
@@ -92,8 +92,8 @@ export default class ModelManager extends FieldObject {
                 let folderMember = component.getParentFolderForChildren();
                 if(folderMember.getChildrenWriteable()) { 
                     let folderEntry = [];
-                    folderEntry.push(folderMember.getId());
                     folderEntry.push(folderMember.getFullName(model));
+                    folderEntry.push(folderMember.getId());
                     folders.push(folderEntry);
                 }
             }

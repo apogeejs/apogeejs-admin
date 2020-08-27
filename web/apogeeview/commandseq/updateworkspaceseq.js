@@ -1,22 +1,18 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {showLegacyConfigurableDialog} from "/apogeeview/dialogs/LegacyConfigurableDialog.js";
+import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 
 const DIALOG_LAYOUT_TITLE_LINE = {
-    "type": "title",
-    "title": "Update Workspace"
+    "type": "heading",
+    "text": "Update Workspace",
+    "level": 3
 };
 const DIALOG_LAYOUT_NAME_LINE = {
-    "type": "inputElement",
-    "heading": "Name: ",
-    "resultKey": "name",
+    "type": "textField",
+    "label": "Name: ",
+    "key": "name",
     "initial": "",
     "focus": true
 };
-const DIALOG_LAYOUT_SUBMIT_LINE = {
-    "type": "submit",
-    "submit": "Update",
-    "cancel": "Cancel"
-}
 
 //=====================================
 // UI Entry Point
@@ -33,14 +29,13 @@ export function updateWorkspaceProperties(workspaceManager) {
 
     //create the dialog layout
     var nameLine = apogeeutil.jsonCopy(DIALOG_LAYOUT_NAME_LINE);
-    nameLine.initial = initialValues.name;
+    nameLine.value = initialValues.name;
 
     var dialogLayout = {};
-    dialogLayout.lines = [];
-    dialogLayout.lines.push(DIALOG_LAYOUT_TITLE_LINE);
-    dialogLayout.lines.push(nameLine);
+    dialogLayout.layout = [];
+    dialogLayout.layout.push(DIALOG_LAYOUT_TITLE_LINE);
+    dialogLayout.layout.push(nameLine);
     //(add any workspace ui lines here)
-    dialogLayout.lines.push(DIALOG_LAYOUT_SUBMIT_LINE);
 
     //create on submit callback
     var onSubmitFunction = function(newValues) {
@@ -75,7 +70,7 @@ export function updateWorkspaceProperties(workspaceManager) {
     }
 
     //show dialog
-    showLegacyConfigurableDialog(dialogLayout,onSubmitFunction);
+    showConfigurableDialog(dialogLayout,onSubmitFunction);
 }
 
 

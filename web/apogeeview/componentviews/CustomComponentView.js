@@ -211,8 +211,8 @@ CustomComponentView.ICON_RES_PATH = "/componentIcons/chartControl.png";
 CustomComponentView.propertyDialogLines = [
     {
         "type":"checkbox",
-        "heading":"Destroy on Hide: ",
-        "resultKey":"destroyOnInactive"
+        "label":"Destroy on Hide: ",
+        "key":"destroyOnInactive"
     }
 ];
 

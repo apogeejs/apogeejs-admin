@@ -73,9 +73,9 @@ FunctionComponentView.ICON_RES_PATH = "/componentIcons/functionTable.png";
 
 FunctionComponentView.propertyDialogLines = [
     {
-        "type":"inputElement",
-        "heading":"Arg List: ",
-        "resultKey":"argListString"
+        "type":"textField",
+        "label":"Arg List: ",
+        "key":"argListString"
     }
 ];
 

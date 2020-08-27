@@ -133,14 +133,13 @@ JsonTableComponentView.ICON_RES_PATH = "/componentIcons/dataTable.png";
 JsonTableComponentView.propertyDialogLines = [
     {
         "type":"dropdown",
-        "heading":"Data View: ",
+        "label":"Data Display Format: ",
         "entries":[
-            "Colorized",
-//            "Plain",
-            "Text Data",
+            "JSON",
+            "Plain Text",
             "Grid"
         ],
-        "resultKey":"dataView"
+        "key":"dataView"
     }
 ];
 
