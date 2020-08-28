@@ -107,7 +107,6 @@ JsonTableComponentView.TABLE_EDIT_SETTINGS = {
 JsonTableComponentView.COLORIZED_DATA_VEW = "Colorized";
 JsonTableComponentView.TEXT_DATA_VEW = "Text Data";
 JsonTableComponentView.GRID_DATA_VEW = "Grid";
-JsonTableComponentView.PLAIN_DATA_VEW = "Plain"; 
 
 JsonTableComponentView.DEFAULT_DATA_VIEW = JsonTableComponentView.COLORIZED_DATA_VEW;
 
@@ -135,9 +134,9 @@ JsonTableComponentView.propertyDialogLines = [
         "type":"dropdown",
         "label":"Data Display Format: ",
         "entries":[
-            "JSON",
-            "Plain Text",
-            "Grid"
+            ["JSON",JsonTableComponentView.COLORIZED_DATA_VEW],
+            ["Plain Text",JsonTableComponentView.TEXT_DATA_VEW],
+            ["Grid",JsonTableComponentView.GRID_DATA_VEW]
         ],
         "key":"dataView"
     }

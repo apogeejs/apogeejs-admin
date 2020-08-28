@@ -115,6 +115,15 @@ export default class ConfigurablePanel {
     getChildEntries() {
         return this.elementObjects;
     }
+
+    /** This element will give focus to the first element which can hold the focus. */
+    giveFocus() {   
+        for(let i = 0; i < this.elementObjects.length; i++) {
+            let element = this.elementObjects[i];
+            if(element.giveFocus()) return true;
+        }
+        return false;
+    }
     
     /** This is an alternate way to add a submit entry to the form. This is useful
      * if the layout has no other handlers in it and is a pure JSON object. This 

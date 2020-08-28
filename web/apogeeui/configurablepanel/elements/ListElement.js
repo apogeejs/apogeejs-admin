@@ -106,6 +106,15 @@ export default class ListElement extends ConfigurableElement {
             return null;
         }
     }
+
+    /** We override the standard giveFocus method to pass it on to a child element. */
+    giveFocus() {
+        for(let i = 0; i < this.listEntries.length; i++) {
+            let listEntry = this.listEntries[i];
+            if((listEntry.elementObject)&&(listEntry.elementObject.giveFocus())) return true;
+        }
+        return false;
+    }
     
     //===================================
     // protected Methods

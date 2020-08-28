@@ -26,6 +26,7 @@ export default class TextFieldElement extends ConfigurableElement {
         var type = (elementInitData.password === true) ? "password" : "text";
         this.inputElement = uiutil.createElement("input",{"type":type});
         containerElement.appendChild(this.inputElement); 
+        this.setFocusElement(this.inputElement);
         
         if(elementInitData.size !== undefined) {
             this.inputElement.size = elementInitData.size;

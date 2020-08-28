@@ -25,7 +25,9 @@ export default class ColorPickerElement extends ConfigurableElement {
         
         //slider
         this.colorPickerElement = uiutil.createElement("input",{"type":"color"});
-        containerElement.appendChild(this.colorPickerElement); 
+        containerElement.appendChild(this.colorPickerElement);
+        
+        this.setFocusElement(this.colorPickerElement);
 
         this.colorPickerElement.addEventListener("change",() => {
             this.inputDone();

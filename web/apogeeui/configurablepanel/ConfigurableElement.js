@@ -11,6 +11,7 @@ export default class ConfigurableElement {
         this.key = elementInitData.key;
         this.meta = elementInitData.meta;
         this.isMultiselect = false;
+        this.focusElement = null;
 
         this.onChangeListeners = [];
         this.onInputListeners = [];
@@ -76,6 +77,17 @@ export default class ConfigurableElement {
         
     }
 
+    /** This function attempts to give focus to the element. It will return true if element successfullly got focus. */
+    giveFocus() {
+        if((this.state == ConfigurablePanelConstants.STATE_NORMAL)&&(this.focusElement)) {
+            this.focusElement.focus();
+            return (document.activeElement == this.focusElement);
+        }
+        else {
+            return false;
+        }
+    }
+
     /** This method returns the DOM element for this configurable element. */
     getElement() {
         return this.domElement;
@@ -139,6 +151,11 @@ export default class ConfigurableElement {
         if(this.domElement.style.display != "none") {
             this.domElement.style.display = this.visibleDisplayStyle;
         }
+    }
+
+    /** This method should be called by extending methods to set the focus element, if there is one. */
+    setFocusElement(focusElement) {
+        this.focusElement = focusElement;
     }
     
     //===================================

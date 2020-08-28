@@ -50,6 +50,8 @@ export default class DropdownElement extends ConfigurableElement {
         }
         containerElement.appendChild(this.select); 
 
+        this.setFocusElement(this.select);
+
         //add dom listeners
         this.select.addEventListener("change",() => {
             this.inputDone();

@@ -32,6 +32,8 @@ export default class TextareaElement extends ConfigurableElement {
         }
         containerElement.appendChild(this.inputElement); 
 
+        this.setFocusElement(this.inputElement);
+
         //add dom listeners
         this.inputElement.addEventListener("input",() => this.onInput());
         this.inputElement.addEventListener("change",() => this.onChange());

@@ -25,6 +25,8 @@ export default class CheckboxElement extends ConfigurableElement {
         //checkbox field
         this.checkbox = uiutil.createElement("input",{"type":"checkbox"});
         containerElement.appendChild(this.checkbox); 
+
+        this.setFocusElement(this.checkbox);
         
         //add dom listeners for events
         this.checkbox.addEventListener("change",() => {

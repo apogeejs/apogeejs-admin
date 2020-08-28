@@ -46,6 +46,11 @@ export default class PanelElement extends ConfigurableElement {
         }
     }
 
+    /** We override the standard giveFocus method to pass it on to a child element. */
+    giveFocus() {
+        return this.panel.giveFocus();
+    }
+
     //===================================
     // protected Methods
     //==================================

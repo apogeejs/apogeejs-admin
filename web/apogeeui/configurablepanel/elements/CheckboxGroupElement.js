@@ -31,6 +31,7 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         //check boxes
         this.checkboxList = [];
         this.valueMap = {};
+        let focusElementSet = false;
         var addCheckbox = (checkboxInfo,index) => {
             var buttonContainer = uiutil.createElement("div");
             buttonContainer.style.display = elementInitData.horizontal ? "inline-block" : "block";
@@ -38,7 +39,12 @@ export default class CheckboxGroupElement extends ConfigurableElement {
 
             var checkbox = uiutil.createElement("input");
             checkbox.type = "checkbox";
-            
+
+            if(!focusElementSet) {
+                this.setFocusElement(checkbox);
+                focusElementSet = true;
+            }
+
             var label;
             var value;
             if(Array.isArray(checkboxInfo)) {

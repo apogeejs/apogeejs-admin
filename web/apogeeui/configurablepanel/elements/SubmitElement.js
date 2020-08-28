@@ -15,6 +15,8 @@ export default class SubmitElement extends ConfigurableElement {
 
         this.submitDisabled = elementInitData.submitDisabled;
         this.cancelDisabled = elementInitData.cancelDisabled;
+
+        let focusElementSet = false;
         
         //create the submit button
         if(elementInitData.onSubmit) {
@@ -34,6 +36,9 @@ export default class SubmitElement extends ConfigurableElement {
             
             this.submitButton = uiutil.createElement("button",{"className":"apogee_configurablePanelButton","innerHTML":submitLabel,"onclick":onSubmit});
             containerElement.appendChild(this.submitButton);
+
+            this.setFocusElement(this.submitButton);
+            focusElementSet = true;
         }
         else {
             this.submitButton = null;
@@ -56,6 +61,9 @@ export default class SubmitElement extends ConfigurableElement {
             
             this.cancelButton = uiutil.createElement("button",{"className":"apogee_configurablePanelButton","innerHTML":cancelLabel,"onclick":onCancel});
             containerElement.appendChild(this.cancelButton);
+
+            this.setFocusElement(this.cancelButton);
+            focusElementSet = true;
         }
         else {
             this.cancelButton = null;

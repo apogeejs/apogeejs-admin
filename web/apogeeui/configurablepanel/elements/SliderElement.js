@@ -27,6 +27,8 @@ export default class SliderElement extends ConfigurableElement {
         this.sliderElement = uiutil.createElement("input",{"type":"range"});
         containerElement.appendChild(this.sliderElement); 
 
+        this.setFocusElement(this.sliderElement);
+
         this.sliderElement.addEventListener("change",() => {
             this.inputDone();
             this.valueChanged();

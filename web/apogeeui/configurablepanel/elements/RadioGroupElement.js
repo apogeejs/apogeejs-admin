@@ -28,6 +28,7 @@ export default class RadioGroupElement extends ConfigurableElement {
         //radio buttons
         this.buttonList = [];
         this.valueMap = {};
+        let focusElementSet = false;
         var groupName = elementInitData.groupName;
         if(!groupName) groupName = getRandomString();
         var addButton = (buttonInfo,index) => {
@@ -38,6 +39,11 @@ export default class RadioGroupElement extends ConfigurableElement {
             var radio = uiutil.createElement("input");
             radio.type = "radio";
             radio.name = groupName;
+
+            if(!focusElementSet) {
+                this.setFocusElement(radio);
+                focusElementSet = true;
+            }
             
             var label;
             var value;
