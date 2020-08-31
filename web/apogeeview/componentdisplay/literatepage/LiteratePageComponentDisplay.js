@@ -168,13 +168,9 @@ export default class LiteratePageComponentDisplay {
         this.tab.addListener(uiutil.CLOSE_EVENT,() => this.tabClosed());
 
         //------------------
-        // set menu
+        // set icon
         //------------------
-        var menu = this.tab.createMenu(this.componentView.getIconUrl());
-        var createMenuItemsCallback = () => {
-            return this.componentView.getMenuItems();
-        }
-        menu.setAsOnTheFlyMenu(createMenuItemsCallback);
+        this.tab.setIconUrl(this.componentView.getIconUrl());
 
         //-----------------
         //set the tab title

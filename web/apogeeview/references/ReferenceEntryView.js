@@ -22,8 +22,10 @@ export default class ReferenceEntryView {
         if(referenceEntry.getId() != this.referenceEntry.getId()) return;
         
         this.referenceEntry = referenceEntry;
-        if(referenceEntry.getIsLabelUpdated()) {
-            this.treeEntry.setLabel(this.referenceEntry.getLabel());
+        if(referenceEntry.isFieldUpdated("nickname")) {
+            let nickname = this.referenceEntry.getNickname();
+            if(!nickname) nickname = "-unnamed entry-";
+            this.treeEntry.setLabel(nickname);
         }
 
         if(referenceEntry.isFieldUpdated("state")) {
@@ -37,7 +39,7 @@ export default class ReferenceEntryView {
 
     _createTreeEntry() {
         var iconUrl = uiutil.getResourcePath(this.displayInfo.ENTRY_ICON_PATH);
-        var label = this.referenceEntry.getLabel();
+        var label = this.referenceEntry.getNickname();
         var menuItemsCallback = () => this._getMenuItems();
 
         var treeEntry = new TreeEntry(label, iconUrl, null, menuItemsCallback, false);

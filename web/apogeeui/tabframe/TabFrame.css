@@ -72,16 +72,18 @@
     background-color:white;
     /*overflow:auto;*/
 }
-
-.visiui-tf_tab-menuDiv {
+.visiui-tf-tab-icon-container {
     /* fixed */
     display:inline-block;
     position: relative;
-    
+
     /* configurable */
-    margin-right:3px;
+    /*margin-right:3px;*/
 }
-.visiui_tf_icon_overlay {
+.visiui-tf-tab-icon {
+    display:inline-block;
+}
+.visiui_tf_tab_icon_overlay {
     position: absolute;
     top: 0px;
     left: 0px;

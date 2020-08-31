@@ -215,27 +215,54 @@ export default class PageChildComponentDisplay {
     addTitleBar() {
         
         this.titleBarContainer = uiutil.createElementWithClass("div","visiui_pageChild_titleBarClass",this.mainElement);
-        this.titleBarMenuElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarMenuClass",this.titleBarContainer);
-        this.titleBarNameElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarNameClass",this.titleBarContainer);
+
+        //icon/menu
+        var iconSrc = this.componentView.getIconUrl();
+        if(!iconSrc) {
+            iconSrc = uiutil.getResourcePath(uiutil.GENERIC_ICON);
+        }
+
+        this.iconContainerElement = uiutil.createElementWithClass("div", "visiui-pageChild-icon-container",this.titleBarContainer);
+        this.icon = uiutil.createElementWithClass("img", "visiui-pageChild-icon",this.iconContainerElement);
+        this.icon.src = iconSrc; 
+        this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_pageChild_icon_overlay",this.iconContainerElement);
+        
+        //label
+        this.titleBarNameElement = uiutil.createElementWithClass("div", "visiui_pageChild_titleBarNameClass",this.titleBarContainer);
+
+        //menu
+        let menuItemCallback = () => {
+            return this.componentView.getMenuItems();
+        }
+        let menuImageUrl = uiutil.getResourcePath(uiutil.DOT_MENU_IMAGE);
+        this.menu = Menu.createMenuFromImage(menuImageUrl);
+        this.menu.setAsOnTheFlyMenu(menuItemCallback);
+        this.titleBarContainer.appendChild(this.menu.getElement());
+
+        //views
         this.titleBarViewsElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
         
         //------------------
         // menu
         //------------------
         
-        var iconUrl = this.componentView.getIconUrl();
-        if(!iconUrl) iconUrl = uiutil.getResourcePath(uiutil.MENU_IMAGE);
+        // var iconUrl = this.componentView.getIconUrl();
+        // if(!iconUrl) iconUrl = uiutil.getResourcePath(uiutil.GENERIC_ICON);
         
-        this.menu = Menu.createMenuFromImage(iconUrl);
-        var menuItemCallback = () => {
-            return this.componentView.getMenuItems();
-        }
-        this.menu.setAsOnTheFlyMenu(menuItemCallback);
+        // //create the icon (menu) overlay
+        // this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_pageChild_icon_overlay_style",this.titleBarMenuElement);
+        
     
-        this.titleBarMenuElement.appendChild(this.menu.getElement());
+        // this.titleBarMenuElement.appendChild(this.menu.getElement());
         
-        //create the icon (menu) overlay
-        this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_pageChild_icon_overlay_style",this.titleBarMenuElement);
+        
+
+        // let iconUrl = uiutil.getResourcePath(uiutil.DOT_MENU_IMAGE);
+        // this.menu = Menu.createMenuFromImage(iconUrl);
+        // var menuItemCallback = () => {
+        //     return this.componentView.getMenuItems();
+        // }
+        // this.menu.setAsOnTheFlyMenu(menuItemCallback);
 
     }
 

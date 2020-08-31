@@ -23,32 +23,44 @@ export default class TreeEntry {
         
         this.element = uiutil.createElementWithClass("li", baseCssClass);
         this.control = uiutil.createElementWithClass("img", "visiui-tc-control",this.element);
-        
+
+        if(dblClickCallback) {
+            this.mainContent = uiutil.createElementWithClass("a", "visiui-tc-main-content-link",this.element);
+            this.mainContent.href = "#";
+            this.mainContent.onclick = () => {
+                dblClickCallback();
+                return false;
+            }
+        }
+        else {
+            this.mainContent = uiutil.createElementWithClass("div", "visiui-tc-main-content-div",this.element);
+        }
 
         //icon/menu
-        if(iconSrc) {
-            this.iconContainerElement = uiutil.createElementWithClass("div", "visiui-tc-icon-container",this.element);
-            if(menuItemCallback) {
-                //icon as menu
-                this.menu = Menu.createMenuFromImage(iconSrc);
-                this.menu.setAsOnTheFlyMenu(menuItemCallback);
-                this.iconContainerElement.appendChild(this.menu.getElement());
-            }
-            else {
-                //plain icon
-                this.icon = uiutil.createElementWithClass("img", "visiui-tc-icon",this.iconContainerElement);
-                this.icon.src = iconSrc; 
-            }
-            this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_tc_icon_overlay",this.iconContainerElement);
+        if(!iconSrc) {
+            iconSrc = uiutil.getResourcePath(uiutil.GENERIC_ICON);
         }
-        
-        
+
+        this.iconContainerElement = uiutil.createElementWithClass("div", "visiui-tc-icon-container",this.mainContent);
+        this.icon = uiutil.createElementWithClass("img", "visiui-tc-icon",this.iconContainerElement);
+        this.icon.src = iconSrc; 
+        this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_tc_icon_overlay",this.iconContainerElement);
         
         //label
-        this.label = uiutil.createElementWithClass("div", "visiui-tc-label",this.element);
+        this.label = uiutil.createElementWithClass("div", "visiui-tc-label",this.mainContent);
         if(labelText) {
             this.setLabel(labelText);
         }
+
+        //menu
+        if(menuItemCallback) {
+            //icon as menu
+            let menuImageUrl = uiutil.getResourcePath(uiutil.DOT_MENU_IMAGE);
+            this.menu = Menu.createMenuFromImage(menuImageUrl);
+            this.menu.setAsOnTheFlyMenu(menuItemCallback);
+            this.element.appendChild(this.menu.getElement());
+        }
+
         
         this.childContainer = null;
         this.childEntries = [];
@@ -60,20 +72,6 @@ export default class TreeEntry {
         //but for now it will be empty
         this.nonEmptyState = TreeEntry.DEFAULT_STATE;
         this.setState(TreeEntry.NO_CONTROL);
-        
-        //context menu and double click
-        var contextMenuCallback = (event) => {
-            var contextMenu = Menu.createContextMenu();
-            var menuItems = menuItemCallback();
-            contextMenu.setMenuItems(menuItems);
-            Menu.showContextMenu(contextMenu,event);
-        }
-        this.label.oncontextmenu = contextMenuCallback;
-        
-        //double click action
-        if(dblClickCallback) {
-            this.label.ondblclick = dblClickCallback;
-        }
     }
 
     /** The outer DOM element */

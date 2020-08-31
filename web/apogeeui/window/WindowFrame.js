@@ -105,7 +105,7 @@ export default class WindowFrame {
 
     /** This method shows the window. */
     createMenu(iconUrl) {
-        if(!iconUrl) iconUrl = uiutil.getResourcePath(uiutil.MENU_IMAGE);
+        if(!iconUrl) iconUrl = uiutil.getResourcePath(uiutil.HAMBURGER_MENU_IMAGE);
         this.menu = Menu.createMenuFromImage(iconUrl);
         this.titleBarMenuElement.appendChild(this.menu.getElement());
         //create the icon (menu) overlay

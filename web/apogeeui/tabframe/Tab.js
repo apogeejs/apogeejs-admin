@@ -1,6 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
-import Menu from "/apogeeui/menu/Menu.js";
 import DisplayAndHeader from "/apogeeui/displayandheader/DisplayAndHeader.js";
 import uiutil from "/apogeeui/uiutil.js";
 
@@ -14,7 +13,10 @@ export default class Tab {
         this.id = id;
         this.tabLabelElement = uiutil.createElementWithClass("div","visiui-tf-tab-base visiui-tf-tab-inactive");
         
-        this.menuContainer = uiutil.createElementWithClass("div","visiui-tf_tab-menuDiv",this.tabLabelElement);
+        this.iconContainerElement = uiutil.createElementWithClass("div", "visiui-tf-tab-icon-container",this.tabLabelElement);
+        this.icon = uiutil.createElementWithClass("img", "visiui-tf-tab-icon",this.iconContainerElement);
+        this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_tf_tab_icon_overlay",this.iconContainerElement);
+        
         this.titleElement = uiutil.createElementWithClass("div","visiui_tf_tab_title",this.tabLabelElement);
         
         this.closeButton = uiutil.createElementWithClass("img","visiui_tf_tab_cmd_button",this.tabLabelElement);
@@ -92,6 +94,15 @@ export default class Tab {
         this.title = title;
     }
 
+    /** This method shows the window. */
+    setIconUrl(iconUrl) {
+        if(!iconUrl) {
+            iconUrl = uiutil.getResourcePath(uiutil.GENERIC_ICON);
+        }
+
+        this.icon.src = iconUrl; 
+    }
+
     /** This sets the content for the window. If null (or otherwise false) is passed
      * the content will be set to empty.*/
     setHeaderContent(contentElement) {
@@ -119,21 +130,6 @@ export default class Tab {
     /** This method must be implemented in inheriting objects. */
     getTitle() {
         return this.title;
-    }
-
-    /** This method shows the window. */
-    createMenu(iconUrl) {
-        if(!iconUrl) iconUrl = uiutil.getResourcePath(uiutil.MENU_IMAGE);
-        this.menu = Menu.createMenuFromImage(iconUrl);
-        this.menuContainer.appendChild(this.menu.domElement);
-        //add the icon overlay element
-        this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_tf_icon_overlay",this.menuContainer);
-        return this.menu;
-    }
-
-    /** This method shows the window. */
-    getMenu() {
-        return this.menu;
     }
 
     /** This sets the given element as the icon overlay. If null or other [false} is passed

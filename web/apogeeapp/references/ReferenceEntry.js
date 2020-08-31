@@ -28,7 +28,7 @@ export default class ReferenceEntry extends FieldObject {
             this.setField("state",apogeeutil.STATE_PENDING);
 
             let nickname = referenceData.nickname;
-            if(!nickname) nickname = NO_NICKNAME_EMPTY_STRING; 
+            if(!nickname) nickname = this.createNickname(referenceData.url); 
             this.setField("nickname",nickname);
         }
 
@@ -57,16 +57,6 @@ export default class ReferenceEntry extends FieldObject {
 
     getNickname() {
         return this.getField("nickname");
-    }
-
-    getLabel() {
-        let nickname = this.getNickname();
-        return nickname ? nickname : this.getUrl();
-    }
-
-    getIsLabelUpdated() {
-        //this will return true sometimes where there is no update to the label
-        return this.areAnyFieldsUpdated(["url","nickname"]);
     }
 
     setViewStateCallback(viewStateCallback) {
@@ -198,11 +188,28 @@ export default class ReferenceEntry extends FieldObject {
         }
     }
 
+    createNickname(url) {
+        let lastSeperatorIndex = url.lastIndexOf("/");
+        if(lastSeperatorIndex == 0) return url.substr(0,MAX_AUTO_NICKNAME_LENGTH);
+
+        let fileName = url.substr(lastSeperatorIndex+1);
+        let queryStart = fileName.indexOf("?");
+        if(queryStart > 0) {
+            fileName = fileName.substring(0,queryStart);
+        }
+        if(fileName.length > MAX_AUTO_NICKNAME_LENGTH) {
+            fileName = fileName.substring(0,MAX_AUTO_NICKNAME_LENGTH);
+        }
+        return fileName;
+    }
+
 }
 
 //====================================
 // Static Fields
 //====================================
+
+let MAX_AUTO_NICKNAME_LENGTH = 24;
 
 
 ReferenceEntry.ELEMENT_ID_BASE = "__apogee_link_element_";

@@ -85,21 +85,34 @@
 .visiui_pageChild_titleBarClass {
     position: relative;
 }
-.visiui_pageChild_titleBarMenuClass {
-    position: relative;
+.visiui_pageChild_titleBarNameClass {
     display: inline;
-    padding-left: 1px;
+    padding-left: 2px;
+    padding-right:10px;
+    font-weight:bold;
+    font-size: larger;
+    color:darkblue;
+}
+.visiui-pageChild-icon-container {
+    /* fixed */
+    display:inline-block;
+    position: relative;
+
+    /* configurable */
+    /*margin-right:3px;*/
+}
+.visiui-pageChild-icon {
+    display:inline-block;
+}
+.visiui_pageChild_icon_overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
 .visiui_pageChild_titleBarViewsClass {
     display: inline;
     /* padding-left: 15px; */
 }
-.visiui_pageChild_icon_overlay_style {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-}
-
 .visiui_displayContainer_mainClass {
     position: relative;
 }
@@ -122,14 +135,6 @@
 .visiui_displayContainer_viewActiveElementClass {
     display: inline;
     padding-left: 1px;
-}
-.visiui_pageChild_titleBarNameClass {
-    display: inline;
-    padding-left: 2px;
-    padding-right:10px;
-    font-weight:bold;
-    font-size: larger;
-    color:darkblue;
 }
 .visiui_displayContainer_viewSelectorClass {
     display: inline;

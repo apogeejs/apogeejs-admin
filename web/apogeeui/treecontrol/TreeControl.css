@@ -6,12 +6,13 @@
 }
 .visiui-tc-label {
     display:inline-block;
-    cursor:default;
+    /*cursor:default;*/
     color: #369;
     padding-left: 5px;
     vertical-align: top;
     padding-top: 2px;
     padding-bottom: 2px;
+    text-decoration: inherit;
 }
 .visiui-tc-control {
     display:inline-block;
@@ -23,6 +24,9 @@
     padding-bottom: 2px;
     /*left:-5px;*/
 }
+.visiui-tc-control:hover {
+    background-color: rgb(211,211,164);
+}
 .visiui-tc-icon-container {
     /* fixed */
     display:inline-block;
@@ -30,6 +34,16 @@
 
     /* configurable */
     /*margin-right:3px;*/
+}
+.visiui-tc-main-content-link {
+    display: inline-block; 
+    text-decoration:none;
+}
+.visiui-tc-main-content-link:hover { 
+    background-color: rgb(211,211,164);
+}
+.visiui-tc-main-content-div {
+    display: inline-block;
 }
 .visiui-tc-icon {
     display:inline-block;
