@@ -121,5 +121,5 @@ DynamicFormView.TABLE_EDIT_SETTINGS = {
 DynamicFormView.componentName = "apogeeapp.ActionFormCell";
 DynamicFormView.hasTabEntry = false;
 DynamicFormView.hasChildEntry = true;
-DynamicFormView.ICON_RES_PATH = "/componentIcons/formControl.png";
+DynamicFormView.ICON_RES_PATH = "/icons3/formCellIcon.png";
 

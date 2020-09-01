@@ -312,7 +312,7 @@ ChartJSComponentView.hasTabEntry = false;
 ChartJSComponentView.hasChildEntry = true;
 
 /** This is the icon url for the component. */
-ChartJSComponentView.ICON_RES_PATH = "/componentIcons/chartControl.png";
+ChartJSComponentView.ICON_RES_PATH = "/icons3/chartCellIcon.png";
 
 
 //================================

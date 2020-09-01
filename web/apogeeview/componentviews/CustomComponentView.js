@@ -207,7 +207,7 @@ CustomComponentView.GENERATOR_FUNCTION_FORMAT_TEXT = [
 CustomComponentView.componentName = "apogeeapp.CustomCell";
 CustomComponentView.hasTabEntry = false;
 CustomComponentView.hasChildEntry = true;
-CustomComponentView.ICON_RES_PATH = "/componentIcons/chartControl.png";
+CustomComponentView.ICON_RES_PATH = "/icons3/genericCellIcon.png";
 CustomComponentView.propertyDialogLines = [
     {
         "type":"checkbox",

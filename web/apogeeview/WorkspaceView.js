@@ -145,4 +145,4 @@ export default class WorkspaceView {
 
 let Workspace_OPENING_NAME = "opening...";
 
-WorkspaceView.ICON_RES_PATH = "/componentIcons/workspace.png";   
+WorkspaceView.ICON_RES_PATH = "/icons3/workspaceIcon.png";   

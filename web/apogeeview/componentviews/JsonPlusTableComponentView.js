@@ -175,7 +175,7 @@ JsonPlusTableComponentView.hasTabEntry = false;
 /** If true, this indicates the component has an entry appearing on the parent tab */
 JsonPlusTableComponentView.hasChildEntry = true;
 /** This is the icon url for the component. */
-JsonPlusTableComponentView.ICON_RES_PATH = "/componentIcons/dataTable.png";
+JsonPlusTableComponentView.ICON_RES_PATH = "/icons3/jsonCellIcon.png";
 /** This field gives the default value for the JSON taht should be deserialized to
  * create the member for this object. The field "name" can be omitted. This will 
  * be added when the member is created. */

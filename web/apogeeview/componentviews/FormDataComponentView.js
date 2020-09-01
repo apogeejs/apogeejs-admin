@@ -191,4 +191,4 @@ FormDataComponentView.TABLE_EDIT_SETTINGS = {
 FormDataComponentView.componentName = "apogeeapp.DataFormCell";
 FormDataComponentView.hasTabEntry = false;
 FormDataComponentView.hasChildEntry = true;
-FormDataComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";
+FormDataComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";

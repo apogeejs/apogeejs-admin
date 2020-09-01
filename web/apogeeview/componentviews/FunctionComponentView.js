@@ -69,7 +69,7 @@ FunctionComponentView.TABLE_EDIT_SETTINGS = {
 FunctionComponentView.componentName = "apogeeapp.FunctionCell";
 FunctionComponentView.hasTabEntry = false;
 FunctionComponentView.hasChildEntry = true;
-FunctionComponentView.ICON_RES_PATH = "/componentIcons/functionTable.png";
+FunctionComponentView.ICON_RES_PATH = "/icons3/functionCellIcon.png";
 
 FunctionComponentView.propertyDialogLines = [
     {
