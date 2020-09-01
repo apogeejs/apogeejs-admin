@@ -58,7 +58,8 @@
 }
 .visiui-tc-label {
     display:inline-block;
-    color: #369;
+    /*color: #369;*/
+    color: darkblue;
     margin: 3px;
     padding: 0px;
     vertical-align: middle;

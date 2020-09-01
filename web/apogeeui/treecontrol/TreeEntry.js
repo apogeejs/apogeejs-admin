@@ -6,10 +6,14 @@ export default class TreeEntry {
 
     constructor(labelText,iconSrc,clickCallback,menuItemCallback,isRoot) {
         
-        this.contractUrl = uiutil.getResourcePath("/opened_bluish.png");
-        this.expandUrl = uiutil.getResourcePath("/closed_bluish.png");
-        this.noControlUrl = uiutil.getResourcePath("/circle_bluish.png");
-        this.emptyControlUrl = uiutil.getResourcePath("/circle_bluish.png");
+        // this.contractUrl = uiutil.getResourcePath("/opened_bluish.png");
+        // this.expandUrl = uiutil.getResourcePath("/closed_bluish.png");
+        // this.noControlUrl = uiutil.getResourcePath("/circle_bluish.png");
+        // this.emptyControlUrl = uiutil.getResourcePath("/circle_bluish.png");
+        this.contractUrl = uiutil.getResourcePath("/opened_darkgray.png");
+        this.expandUrl = uiutil.getResourcePath("/closed_darkgray.png");
+        this.noControlUrl = uiutil.getResourcePath("/circle_darkgray.png");
+        this.emptyControlUrl = uiutil.getResourcePath("/circle_darkgray.png");
         
         this.isRoot = isRoot;
         
