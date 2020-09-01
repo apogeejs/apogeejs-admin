@@ -132,23 +132,36 @@
     padding-right: 20px;
     font-size: smaller;
     color:rgb(0,0,0);
+    font-weight: bold;
 }
 
 
 .visiui_displayContainer_viewSelectorContainerClass {
     display: inline;
-    padding-left: 8px;
+    margin-left: 10px;
+}
+.visiui_displayContainer_viewSelectorContainerClass:hover {
+    background-color: rgba(128,128,144,.35);
+}
+.visiui_displayContainer_viewSelectorLinkClass {
+    text-decoration:none;
 }
 .visiui_displayContainer_viewActiveElementClass {
     display: inline;
-    padding-left: 1px;
+    padding: 0px;
+    margin: 0px;
+    vertical-align: middle;
 }
 .visiui_displayContainer_viewSelectorClass {
     display: inline;
-    padding-left: 1px;
     font-size: smaller;
     color:rgb(0,0,0);
     cursor: pointer;
+    vertical-align: middle;
+    font-weight: bold;
+}
+.visiui_displayContainer_expandContractClass {
+    vertical-align: middle;
 }
 .visiui_displayContainer_headerContainerClass {
     position: relative;

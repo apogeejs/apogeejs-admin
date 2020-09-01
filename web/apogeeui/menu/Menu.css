@@ -36,16 +36,16 @@
     margin: 0px;
 }
 .visiui-menu-heading-active {
-    background-color:rgb(211,211,164);
-    outline: 3px solid rgb(211,211,164);
+    background-color:rgba(128,128,144,.35);
+    outline: 3px solid rgba(128,128,144,.35);
 }
 .visiui-menu-label:hover {
-    background-color:rgb(211,211,164);
-    outline: 3px solid rgb(211,211,164);
+    background-color:rgba(128,128,144,.35);
+    outline: 3px solid rgba(128,128,144,.35);
 }
 .visiui-menu-label:active {
-    background-color:rgb(211,211,164);
-    outline: 3px solid rgb(211,211,164);
+    background-color:rgba(128,128,144,.35);
+    outline: 3px solid rgba(128,128,144,.35);
 }
 
 

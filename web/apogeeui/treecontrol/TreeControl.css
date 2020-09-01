@@ -4,15 +4,12 @@
     white-space: nowrap;
     display:inline-block;
 }
-.visiui-tc-control:hover {
-    background-color: rgb(211,211,164);
-}
 .visiui-tc-main-content-link {
     display: inline-block; 
     text-decoration:none;
 }
 .visiui-tc-main-content-link:hover { 
-    background-color: rgb(211,211,164);
+    background-color: rgba(128,128,144,.35);
 }
 .visiui-tc-main-content-div {
     display: inline-block;
@@ -25,7 +22,15 @@
     
     position:relative;
     padding: 0px;
-    margin: 3px;
+    margin: 0px;
+}
+.visiui-tc-control_interactive {
+}
+.visiui-tc-control_interactive:hover {
+    background-color: rgba(128,128,144,.35);
+}
+.visiui-tc-control_interactive:active {
+    background-color: rgba(128,128,144,.35);
 }
 .visiui-tc-icon-container {
     display:inline-block;

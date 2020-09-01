@@ -154,19 +154,20 @@ export default class PageDisplayContainer {
 
         //make the selector for the view, in the component title bar
         this.viewSelectorContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
+        this.viewSelectorLink = uiutil.createElementWithClass("a","visiui_displayContainer_viewSelectorLinkClass",this.viewSelectorContainer);
 
-        this.viewActiveElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewActiveElementClass",this.viewSelectorContainer);
-        this.viewNameElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorClass",this.viewSelectorContainer);
+        this.expandImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewSelectorLink);
+        this.expandImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_CLOSED_IMAGE_PATH);
+    
+        this.contractImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewSelectorLink);
+        this.contractImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_OPENED_IMAGE_PATH);
+
+        this.viewNameElement = uiutil.createElementWithClass("span","visiui_displayContainer_viewSelectorClass",this.viewSelectorLink);
         
         this.viewNameElement.innerHTML = this.viewType;
 
-        this.expandImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
-        this.expandImage.src = uiutil.getResourcePath(PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
-    
-        this.contractImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
-        this.contractImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
-
-        this.viewSelectorContainer.onclick = () => this.setIsViewActive(!this.isViewActive);
+        this.viewSelectorLink.href = "javascript:void(0)";
+        this.viewSelectorLink.onclick = () => this.setIsViewActive(!this.isViewActive);
         
         this.updateViewSelectorState();
     }
@@ -511,8 +512,8 @@ export default class PageDisplayContainer {
 }
 
 /** This method returns the main dom element for the window frame. */
-PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH = "/closed_gray.png";
-PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH = "/opened_gray.png";
+PageDisplayContainer.VIEW_CLOSED_IMAGE_PATH = "/closed_black.png";
+PageDisplayContainer.VIEW_OPENED_IMAGE_PATH = "/opened_black.png";
 
 
 

@@ -154,6 +154,7 @@ export default class TreeEntry {
             else {
                 this.control.src = this.noControlUrl;
             }
+            this.control.classList.remove("visiui-tc-control_interactive");
         }
         else if(this.state == TreeEntry.EXPANDED) {
             this.control.src = this.contractUrl;
@@ -166,6 +167,7 @@ export default class TreeEntry {
             
             this.control.onclick = this.collapse
             this.childContainer.style.display = "";
+            this.control.classList.add("visiui-tc-control_interactive");
         }
         else if(this.state == TreeEntry.COLLAPSED) {
             this.control.src = this.expandUrl;
@@ -178,6 +180,7 @@ export default class TreeEntry {
             
             this.control.onclick = this.expand;
             this.childContainer.style.display = "none";
+            this.control.classList.add("visiui-tc-control_interactive");
         }
     }
 
