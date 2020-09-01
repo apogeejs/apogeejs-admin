@@ -4,7 +4,7 @@ import {getIconOverlay} from "/apogeeui/banner/banner.js";
 
 export default class TreeEntry {
 
-    constructor(labelText,iconSrc,dblClickCallback,menuItemCallback,isRoot) {
+    constructor(labelText,iconSrc,clickCallback,menuItemCallback,isRoot) {
         
         this.contractUrl = uiutil.getResourcePath("/opened_bluish.png");
         this.expandUrl = uiutil.getResourcePath("/closed_bluish.png");
@@ -24,11 +24,11 @@ export default class TreeEntry {
         this.element = uiutil.createElementWithClass("li", baseCssClass);
         this.control = uiutil.createElementWithClass("img", "visiui-tc-control",this.element);
 
-        if(dblClickCallback) {
+        if(clickCallback) {
             this.mainContent = uiutil.createElementWithClass("a", "visiui-tc-main-content-link",this.element);
             this.mainContent.href = "#";
             this.mainContent.onclick = () => {
-                dblClickCallback();
+                clickCallback();
                 return false;
             }
         }
@@ -38,7 +38,7 @@ export default class TreeEntry {
 
         //icon/menu
         if(!iconSrc) {
-            iconSrc = uiutil.getResourcePath(uiutil.GENERIC_ICON);
+            iconSrc = uiutil.getResourcePath(uiutil.GENERIC_CELL_ICON);
         }
 
         this.iconContainerElement = uiutil.createElementWithClass("div", "visiui-tc-icon-container",this.mainContent);
@@ -54,13 +54,14 @@ export default class TreeEntry {
 
         //menu
         if(menuItemCallback) {
-            //icon as menu
-            let menuImageUrl = uiutil.getResourcePath(uiutil.DOT_MENU_IMAGE);
-            this.menu = Menu.createMenuFromImage(menuImageUrl);
+            let menuImage = uiutil.getResourcePath(uiutil.DOT_MENU_IMAGE);
+            this.menu = Menu.createMenuFromImage(menuImage);
             this.menu.setAsOnTheFlyMenu(menuItemCallback);
-            this.element.appendChild(this.menu.getElement());
+            let menuElement = this.menu.getElement();
+            //update the style of the menu element
+            menuElement.style.verticalAlign = "middle";
+            this.element.appendChild(menuElement);
         }
-
         
         this.childContainer = null;
         this.childEntries = [];

@@ -49,7 +49,7 @@
     cursor: default;
     
     /*configurable*/
-    padding:0px;
+    padding: 2px;
     margin:0px;
 }
 .visiui-tf-tab-inactive {
@@ -73,15 +73,23 @@
     /*overflow:auto;*/
 }
 .visiui-tf-tab-icon-container {
-    /* fixed */
     display:inline-block;
     position: relative;
-
-    /* configurable */
-    /*margin-right:3px;*/
+    padding: 0px;
+    margin: 0px;
+    vertical-align: middle;
+    height: 16px;
+    width: 16px;
 }
 .visiui-tf-tab-icon {
     display:inline-block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 0px;
+    margin: 0px;
+    height: 16px;
+    width: 16px;
 }
 .visiui_tf_tab_icon_overlay {
     position: absolute;
@@ -93,21 +101,15 @@
     display:inline-block;
     cursor:default;
     color:darkblue;
-    padding: 2px 0px;
-    vertical-align: top;
-    
-    /* configurable */
-    margin-right:5px;
+    padding: 0px;
+    margin: 2px;
+    vertical-align: middle;
 }
 .visiui_tf_tab_cmd_button {
-    /* fixed */
     display:inline-block;
-
-    /* configurable */
+    vertical-align: middle;
     margin:0px;
     padding:0px;
-    /* configurable */
-    margin-right:5px;
 }
 
 .visiui_tf_tab_container {

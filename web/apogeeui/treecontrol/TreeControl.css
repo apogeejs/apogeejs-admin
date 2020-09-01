@@ -4,36 +4,8 @@
     white-space: nowrap;
     display:inline-block;
 }
-.visiui-tc-label {
-    display:inline-block;
-    /*cursor:default;*/
-    color: #369;
-    padding-left: 5px;
-    vertical-align: top;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    text-decoration: inherit;
-}
-.visiui-tc-control {
-    display:inline-block;
-    cursor:default;
-    font-family: monospace;
-    
-    position:relative;
-    padding-right: 4px;
-    padding-bottom: 2px;
-    /*left:-5px;*/
-}
 .visiui-tc-control:hover {
     background-color: rgb(211,211,164);
-}
-.visiui-tc-icon-container {
-    /* fixed */
-    display:inline-block;
-    position: relative;
-
-    /* configurable */
-    /*margin-right:3px;*/
 }
 .visiui-tc-main-content-link {
     display: inline-block; 
@@ -45,13 +17,55 @@
 .visiui-tc-main-content-div {
     display: inline-block;
 }
+.visiui-tc-control {
+    display:inline-block;
+    cursor:default;
+    font-family: monospace;
+    vertical-align: middle;
+    
+    position:relative;
+    padding: 0px;
+    margin: 3px;
+}
+.visiui-tc-icon-container {
+    display:inline-block;
+    position: relative;
+    padding: 0px;
+    margin: 0px;
+    vertical-align: middle;
+    height: 16px;
+    width: 16px;
+}
 .visiui-tc-icon {
     display:inline-block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 0px;
+    margin: 0px;
+    height: 16px;
+    width: 16px;
 }
 .visiui_tc_icon_overlay {
     position: absolute;
     top: 0px;
     left: 0px;
+}
+.visiui-tc-label {
+    display:inline-block;
+    color: #369;
+    margin: 3px;
+    padding: 0px;
+    vertical-align: middle;
+    text-decoration: inherit;
+}
+.visiui-tc-menu {
+    display:inline-block;
+    position:relative;
+    cursor: default;
+    overflow:visible;
+    padding: 0px;
+    margin: 2px;
 }
 .visiui-tc-child-list {
     list-style: none;

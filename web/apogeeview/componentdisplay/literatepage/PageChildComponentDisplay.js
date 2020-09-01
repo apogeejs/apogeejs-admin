@@ -219,7 +219,7 @@ export default class PageChildComponentDisplay {
         //icon/menu
         var iconSrc = this.componentView.getIconUrl();
         if(!iconSrc) {
-            iconSrc = uiutil.getResourcePath(uiutil.GENERIC_ICON);
+            iconSrc = uiutil.getResourcePath(uiutil.GENERIC_CELL_ICON);
         }
 
         this.iconContainerElement = uiutil.createElementWithClass("div", "visiui-pageChild-icon-container",this.titleBarContainer);
@@ -234,35 +234,16 @@ export default class PageChildComponentDisplay {
         let menuItemCallback = () => {
             return this.componentView.getMenuItems();
         }
-        let menuImageUrl = uiutil.getResourcePath(uiutil.DOT_MENU_IMAGE);
-        this.menu = Menu.createMenuFromImage(menuImageUrl);
+        let menuImage = uiutil.getResourcePath(uiutil.DOT_MENU_IMAGE);
+        this.menu = Menu.createMenuFromImage(menuImage);
         this.menu.setAsOnTheFlyMenu(menuItemCallback);
-        this.titleBarContainer.appendChild(this.menu.getElement());
+        let menuElement = this.menu.getElement();
+        //update the style of the menu element
+        menuElement.style.verticalAlign = "middle";
+        this.titleBarContainer.appendChild(menuElement);
 
         //views
         this.titleBarViewsElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
-        
-        //------------------
-        // menu
-        //------------------
-        
-        // var iconUrl = this.componentView.getIconUrl();
-        // if(!iconUrl) iconUrl = uiutil.getResourcePath(uiutil.GENERIC_ICON);
-        
-        // //create the icon (menu) overlay
-        // this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_pageChild_icon_overlay_style",this.titleBarMenuElement);
-        
-    
-        // this.titleBarMenuElement.appendChild(this.menu.getElement());
-        
-        
-
-        // let iconUrl = uiutil.getResourcePath(uiutil.DOT_MENU_IMAGE);
-        // this.menu = Menu.createMenuFromImage(iconUrl);
-        // var menuItemCallback = () => {
-        //     return this.componentView.getMenuItems();
-        // }
-        // this.menu.setAsOnTheFlyMenu(menuItemCallback);
 
     }
 

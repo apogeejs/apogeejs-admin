@@ -62,16 +62,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.87607325"
-     inkscape:cx="-443.49696"
-     inkscape:cy="-754.35511"
+     inkscape:zoom="0.24501716"
+     inkscape:cx="-339.44313"
+     inkscape:cy="-327.64226"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:snap-grids="true"
      inkscape:snap-to-guides="false"
      inkscape:snap-nodes="true"
-     inkscape:snap-global="false"
+     inkscape:snap-global="true"
      inkscape:object-paths="true"
      inkscape:object-nodes="true"
      inkscape:snap-smooth-nodes="true"
@@ -99,6 +99,18 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:25;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="M 1438.47,-44.271149 1565.4172,-170.45232"
+       id="path4456"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:25;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 1438.47,-170.45232 126.9472,126.181171"
+       id="path4458"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot3464"
@@ -267,7 +279,7 @@
              height="152.64215"
              width="248.19862"
              id="rect4677-9" /></flowRegion><flowPara
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#e00000;fill-opacity:1;"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#008000;fill-opacity:1"
            id="flowPara4679-6">JS</flowPara></flowRoot>      <rect
          y="356.18964"
          x="-226.99756"
@@ -740,7 +752,10 @@
          x="699.9566"
          y="2488.8745">Grid Cell</tspan></text>
     <g
-       id="g6316">
+       id="g6316"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\icons3\javasciptLinkIcon.png"
+       inkscape:export-xdpi="7.2642584"
+       inkscape:export-ydpi="7.2642584">
       <g
          inkscape:export-ydpi="7.2642584"
          inkscape:export-xdpi="7.2642584"
@@ -760,7 +775,7 @@
                y="2566.3738"
                style="fill:#e00000;fill-opacity:1" /></flowRegion><flowPara
              id="flowPara4679-6-6-6"
-             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#e00000;fill-opacity:1">JS</flowPara></flowRoot>        <rect
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#008000;fill-opacity:1">JS</flowPara></flowRoot>        <rect
            style="opacity:0.753;fill:none;fill-opacity:0.25287356;stroke:#000000;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            id="rect4357-0-2-0-4-5-5"
            width="199"
@@ -802,7 +817,7 @@
         <flowRoot
            xml:space="preserve"
            id="flowRoot4673-94-5-6-0"
-           style="font-style:normal;font-weight:normal;font-size:90px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#e00000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           style="font-style:normal;font-weight:normal;font-size:90px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#008000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
            transform="matrix(1.5824344,0,0,1.9121716,1092.9261,-4586.691)"><flowRegion
              id="flowRegion4675-6-2-9-5"><rect
                id="rect4677-9-7-3-7"
@@ -810,9 +825,9 @@
                height="152.64215"
                x="-830.22443"
                y="2566.3738"
-               style="fill:#e00000;fill-opacity:1" /></flowRegion><flowPara
+               style="fill:#008000;fill-opacity:1;" /></flowRegion><flowPara
              id="flowPara4679-6-6-6-7"
-             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#e00000;fill-opacity:1">ES</flowPara></flowRoot>        <rect
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#008000;fill-opacity:1;">ES</flowPara></flowRoot>        <rect
            style="opacity:0.753;fill:none;fill-opacity:0.25287356;stroke:#000000;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            id="rect4357-0-2-0-4-5-5-2"
            width="199"
@@ -854,7 +869,7 @@
         <flowRoot
            xml:space="preserve"
            id="flowRoot4673-94-5-6-1"
-           style="font-style:normal;font-weight:normal;font-size:90px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#e00000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           style="font-style:normal;font-weight:normal;font-size:90px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#008000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
            transform="matrix(0.92018188,0,0,1.9709427,542.45895,-4742.8306)"><flowRegion
              id="flowRegion4675-6-2-9-0"><rect
                id="rect4677-9-7-3-79"
@@ -862,9 +877,9 @@
                height="152.64215"
                x="-830.22443"
                y="2566.3738"
-               style="fill:#e00000;fill-opacity:1" /></flowRegion><flowPara
+               style="fill:#008000;fill-opacity:1;" /></flowRegion><flowPara
              id="flowPara4679-6-6-6-9"
-             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#e00000;fill-opacity:1">NPM</flowPara></flowRoot>        <rect
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#008000;fill-opacity:1;">NPM</flowPara></flowRoot>        <rect
            style="opacity:0.753;fill:none;fill-opacity:0.25287356;stroke:#000000;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            id="rect4357-0-2-0-4-5-5-0"
            width="199"
@@ -947,7 +962,10 @@
          sodipodi:nodetypes="cccccc" />
     </g>
     <g
-       id="g6366">
+       id="g6366"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\icons3\g6366.png"
+       inkscape:export-xdpi="7.2325449"
+       inkscape:export-ydpi="7.2325449">
       <g
          inkscape:export-ydpi="7.2325449"
          inkscape:export-xdpi="7.2325449"
@@ -956,7 +974,7 @@
         <flowRoot
            xml:space="preserve"
            id="flowRoot4673-94-5-6-04"
-           style="font-style:normal;font-weight:normal;font-size:90px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#e00000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           style="font-style:normal;font-weight:normal;font-size:90px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#008000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
            transform="matrix(0.88411006,0,0,1.9611476,-183.28611,-2791.7858)"><flowRegion
              id="flowRegion4675-6-2-9-7"><rect
                id="rect4677-9-7-3-8"
@@ -964,9 +982,9 @@
                height="152.64215"
                x="-830.22443"
                y="2566.3738"
-               style="fill:#e00000;fill-opacity:1" /></flowRegion><flowPara
+               style="fill:#008000;fill-opacity:1;" /></flowRegion><flowPara
              id="flowPara4679-6-6-6-2"
-             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#e00000;fill-opacity:1">AMD</flowPara></flowRoot>        <rect
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#008000;fill-opacity:1;">AMD</flowPara></flowRoot>        <rect
            style="opacity:0.753;fill:none;fill-opacity:0.25287356;stroke:#000000;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            id="rect4357-0-2-0-4-5-5-09"
            width="199"
@@ -1197,7 +1215,10 @@
       </g>
     </g>
     <g
-       id="g7004">
+       id="g7004"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\icons3\functionCellIcon.png"
+       inkscape:export-xdpi="7.2325463"
+       inkscape:export-ydpi="7.2325463">
       <g
          inkscape:export-ydpi="7.2642584"
          inkscape:export-xdpi="7.2642584"
@@ -1214,7 +1235,7 @@
              style="font-style:normal;font-weight:normal;font-size:165.55166626px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#e00000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
              xml:space="preserve"
              transform="scale(1.1198785,0.89295405)"><tspan
-               style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#e00000;fill-opacity:1"
+               style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#008000;fill-opacity:1"
                y="1265.077"
                x="866.83832"
                id="tspan4731-4"
@@ -1498,7 +1519,7 @@
            inkscape:connector-curvature="0"
            id="path4301-5-6-8"
            d="m -16.331374,1369.732 c -5.4946,-1.0016 -32.6268,51.8133 -27.9495,56.2271 4.6773,4.4137 54.873,-5.8585 55.8989,-12.9505 1.026,-7.0921 -22.4548,-42.275 -27.9494,-43.2766 z"
-           style="fill:#008000;fill-opacity:1;stroke:#000000;stroke-width:0.61461937px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+           style="fill:#800080;fill-opacity:1;stroke:#000000;stroke-width:0.61461937px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
       </g>
       <g
          id="g6595-03"
@@ -1526,7 +1547,10 @@
       </g>
     </g>
     <g
-       id="g7056">
+       id="g7056"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\icons3\pageFunctionIcon.png"
+       inkscape:export-xdpi="7.2325463"
+       inkscape:export-ydpi="7.2325463">
       <g
          inkscape:export-ydpi="7.2642584"
          inkscape:export-xdpi="7.2642584"
@@ -1569,7 +1593,7 @@
              style="font-style:normal;font-weight:normal;font-size:165.55166626px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#e00000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
              xml:space="preserve"
              transform="scale(1.1198785,0.89295405)"><tspan
-               style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#e00000;fill-opacity:1"
+               style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT Bold';fill:#008000;fill-opacity:1"
                y="1265.077"
                x="866.83832"
                id="tspan4731-4-2"
@@ -1632,5 +1656,105 @@
          d="m 1405.6994,1972.9256 36.8034,26.2881 28.1999,-52.5763"
          style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:15;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
+    <g
+       transform="translate(490.82888,-419.11557)"
+       id="g6595-43"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\icons3\errorCellIcon.png"
+       inkscape:export-xdpi="7.2325463"
+       inkscape:export-ydpi="7.2325463">
+      <g
+         inkscape:export-ydpi="7.2325463"
+         inkscape:export-xdpi="7.2325463"
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\icons3\jsonCellIcon.png"
+         transform="translate(1537.4052,-1524.4635)"
+         id="g4854-05-52">
+        <rect
+           style="opacity:0.753;fill:none;fill-opacity:0.25287356;stroke:#000000;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="rect4357-0-2-0-5-52"
+           width="199"
+           height="199"
+           x="-626.46851"
+           y="1737.3997" />
+      </g>
+      <circle
+         r="89.5"
+         cy="312.43616"
+         cx="1010.4366"
+         id="path6528-3-4"
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:30px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="1228.4854"
+       y="-111.84201"
+       id="text4462"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4464"
+         x="1228.4854"
+         y="-111.84201">error cell</tspan></text>
+    <g
+       transform="translate(-56.65894,331.09255)"
+       id="g7056-9"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\icons3\errorPageIcon.png"
+       inkscape:export-xdpi="7.2325463"
+       inkscape:export-ydpi="7.2325463">
+      <g
+         inkscape:export-ydpi="7.2642584"
+         inkscape:export-xdpi="7.2642584"
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\icons3\pageFunctionIcon.png"
+         transform="translate(1.2883521,660.4037)"
+         id="g6458-6-4">
+        <g
+           id="g4854-1-5-7-8"
+           transform="translate(987.41277,-1989.2841)">
+          <rect
+             y="1737.3997"
+             x="-626.46851"
+             height="199"
+             width="199"
+             id="rect4357-0-2-0-20-4-2-8"
+             style="opacity:0.753;fill:none;fill-opacity:0.25287356;stroke:#000000;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+          <rect
+             y="1747.3997"
+             x="-616.46851"
+             height="179"
+             width="179"
+             id="rect4357-0-2-0-5-8-6-8-5"
+             style="opacity:1;fill:none;fill-opacity:0.25287356;stroke:#000000;stroke-width:5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+        </g>
+      </g>
+    </g>
+    <g
+       id="g4538"
+       transform="translate(-136.72512,129.58276)">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path4458-7"
+         d="M 478.32519,646.43846 605.2724,772.61963"
+         style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <g
+         id="g4535">
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 478.32519,772.61963 605.27239,646.43846"
+           id="path4456-9"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc" />
+      </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:30px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="113.25738"
+       y="851.35583"
+       id="text4543"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4545"
+         x="113.25738"
+         y="851.35583">error page</tspan></text>
   </g>
 </svg>

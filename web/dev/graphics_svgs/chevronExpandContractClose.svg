@@ -38,11 +38,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="6.8744447"
-     inkscape:cx="119.47377"
-     inkscape:cy="591.58074"
+     inkscape:zoom="2.4304832"
+     inkscape:cx="109.54386"
+     inkscape:cy="696.4529"
      inkscape:document-units="px"
-     inkscape:current-layer="g4311"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:snap-object-midpoints="true"
      inkscape:window-width="1920"
@@ -603,7 +603,10 @@
        inkscape:export-ydpi="27"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\down_black.png" />
     <g
-       id="g4311">
+       id="g4328"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_gray.png"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587">
       <rect
          inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_gray.png"
          inkscape:export-ydpi="44.696587"
@@ -613,7 +616,7 @@
          height="32.117168"
          width="32.117168"
          id="rect4448-7-3-8-8-8-3-72"
-         style="opacity:1;fill:none;fill-opacity:1;stroke:none;stroke-width:0.10000002;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
       <ellipse
          inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots9_gray.png"
          inkscape:export-ydpi="48.160595"
@@ -631,7 +634,7 @@
          cy="459.77081"
          cx="133.5396"
          id="path4265-7-9-1"
-         style="opacity:1;fill:#737373;fill-opacity:1;stroke:#b200bb;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         style="opacity:1;fill:#737373;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          rx="3.3086174"
          ry="3.3086197" />
       <ellipse
@@ -644,17 +647,155 @@
          style="opacity:1;fill:#737373;fill-opacity:1;stroke:#b200bb;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          rx="3.3086174"
          ry="3.3086197" />
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-weight:normal;font-size:15px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         x="39.84943"
+    </g>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4317"
+       y="268.65674"
+       x="39.84943"
+       style="font-style:normal;font-weight:normal;font-size:15px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
          y="268.65674"
-         id="text4317"
-         sodipodi:linespacing="125%"><tspan
-           sodipodi:role="line"
-           id="tspan4319"
-           x="39.84943"
-           y="268.65674">- export menu dots @16px</tspan></text>
+         x="39.84943"
+         id="tspan4319"
+         sodipodi:role="line">- export menu dots @16px</tspan></text>
+    <g
+       id="g4322"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_blue.png"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587">
+      <rect
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_gray.png"
+         inkscape:export-ydpi="44.696587"
+         inkscape:export-xdpi="44.696587"
+         y="444.65173"
+         x="170.73555"
+         height="32.117168"
+         width="32.117168"
+         id="rect4448-7-3-8-8-8-3-72-4"
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <ellipse
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots9_gray.png"
+         inkscape:export-ydpi="48.160595"
+         inkscape:export-xdpi="48.160595"
+         cy="460.71033"
+         cx="186.79413"
+         id="path4265-7-9-8"
+         style="opacity:1;fill:#406297;fill-opacity:1;stroke:#406297;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="3.3086174"
+         ry="3.3086197" />
+      <ellipse
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots9_gray.png"
+         inkscape:export-ydpi="48.160595"
+         inkscape:export-xdpi="48.160595"
+         cy="460.71033"
+         cx="196.79413"
+         id="path4265-7-9-1-3"
+         style="opacity:1;fill:#406297;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="3.3086174"
+         ry="3.3086197" />
+      <ellipse
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots9_gray.png"
+         inkscape:export-ydpi="48.160595"
+         inkscape:export-xdpi="48.160595"
+         cy="460.71033"
+         cx="176.79413"
+         id="path4265-7-9-9-3"
+         style="opacity:1;fill:#406297;fill-opacity:1;stroke:#406297;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="3.3086174"
+         ry="3.3086197" />
+    </g>
+    <g
+       id="g4316"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_black.png"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587">
+      <rect
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_gray.png"
+         inkscape:export-ydpi="44.696587"
+         inkscape:export-xdpi="44.696587"
+         y="439.71445"
+         x="223.39996"
+         height="32.117168"
+         width="32.117168"
+         id="rect4448-7-3-8-8-8-3-72-3"
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <ellipse
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots9_gray.png"
+         inkscape:export-ydpi="48.160595"
+         inkscape:export-xdpi="48.160595"
+         cy="455.77304"
+         cx="239.45854"
+         id="path4265-7-9-94"
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:#b200bb;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="3.3086174"
+         ry="3.3086197" />
+      <ellipse
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots9_gray.png"
+         inkscape:export-ydpi="48.160595"
+         inkscape:export-xdpi="48.160595"
+         cy="455.77304"
+         cx="249.45854"
+         id="path4265-7-9-1-4"
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:#b200bb;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="3.3086174"
+         ry="3.3086197" />
+      <ellipse
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots9_gray.png"
+         inkscape:export-ydpi="48.160595"
+         inkscape:export-xdpi="48.160595"
+         cy="455.77304"
+         cx="229.45854"
+         id="path4265-7-9-9-32"
+         style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="3.3086174"
+         ry="3.3086197" />
+    </g>
+    <g
+       id="g4310"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_darkgray.png"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587">
+      <rect
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_gray.png"
+         inkscape:export-ydpi="44.696587"
+         inkscape:export-xdpi="44.696587"
+         y="455.34918"
+         x="295.4021"
+         height="32.117168"
+         width="32.117168"
+         id="rect4448-7-3-8-8-8-3-72-8"
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <ellipse
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots9_gray.png"
+         inkscape:export-ydpi="48.160595"
+         inkscape:export-xdpi="48.160595"
+         cy="471.40778"
+         cx="311.46069"
+         id="path4265-7-9-98"
+         style="opacity:1;fill:#606060;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="3.3086174"
+         ry="3.3086197" />
+      <ellipse
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots9_gray.png"
+         inkscape:export-ydpi="48.160595"
+         inkscape:export-xdpi="48.160595"
+         cy="471.40778"
+         cx="321.46069"
+         id="path4265-7-9-1-0"
+         style="opacity:1;fill:#606060;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="3.3086174"
+         ry="3.3086197" />
+      <ellipse
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots9_gray.png"
+         inkscape:export-ydpi="48.160595"
+         inkscape:export-xdpi="48.160595"
+         cy="471.40778"
+         cx="301.46069"
+         id="path4265-7-9-9-2"
+         style="opacity:1;fill:#505050;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="3.3086174"
+         ry="3.3086197" />
     </g>
   </g>
 </svg>

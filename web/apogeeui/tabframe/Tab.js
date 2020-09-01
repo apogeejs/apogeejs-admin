@@ -97,7 +97,7 @@ export default class Tab {
     /** This method shows the window. */
     setIconUrl(iconUrl) {
         if(!iconUrl) {
-            iconUrl = uiutil.getResourcePath(uiutil.GENERIC_ICON);
+            iconUrl = uiutil.getResourcePath(uiutil.GENERIC_CELL_ICON);
         }
 
         this.icon.src = iconUrl; 

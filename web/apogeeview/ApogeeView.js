@@ -269,7 +269,13 @@ export default class ApogeeView {
         //Workspace menu
         name = "File";
         this.workspaceMenu = Menu.createMenu(name);
-        menuBarLeft.appendChild(this.workspaceMenu.getElement());
+        //add custom spacing
+        let workspaceMenuElement = this.workspaceMenu.getElement();
+        workspaceMenuElement.style.marginLeft = "8px";
+        workspaceMenuElement.style.marginRight = "2px";
+        workspaceMenuElement.style.marginTop = "2px";
+        workspaceMenuElement.style.marginBottom = "2px";
+        menuBarLeft.appendChild(workspaceMenuElement);
         menus[name] = this.workspaceMenu;
         
         //populate the workspace menu on the fly - depends on workspace state
@@ -279,7 +285,13 @@ export default class ApogeeView {
         //Edit menu
         name = "Edit";
         this.editMenu = Menu.createMenu(name);
-        menuBarLeft.appendChild(this.editMenu.getElement());
+        //add custom spacing
+        let editMenuElement = this.editMenu.getElement();
+        editMenuElement.style.marginLeft = "8px";
+        editMenuElement.style.marginRight = "2px";
+        editMenuElement.style.marginTop = "2px";
+        editMenuElement.style.marginBottom = "2px";
+        menuBarLeft.appendChild(editMenuElement);
         menus[name] = this.editMenu;
         
         //populate the workspace menu on the fly - depends on workspace state
@@ -289,7 +301,13 @@ export default class ApogeeView {
         //Edit menu
         name = "Help";
         this.helpMenu = Menu.createMenu(name);
-        menuBarLeft.appendChild(this.helpMenu.getElement());
+        //add custom spacing
+        let helpMenuElement = this.helpMenu.getElement();
+        helpMenuElement.style.marginLeft = "8px";
+        helpMenuElement.style.marginRight = "2px";
+        helpMenuElement.style.marginTop = "2px";
+        helpMenuElement.style.marginBottom = "2px";
+        menuBarLeft.appendChild(helpMenuElement);
         menus[name] = this.helpMenu;
         
         //populate the workspace menu on the fly - depends on workspace state

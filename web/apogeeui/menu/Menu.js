@@ -106,8 +106,8 @@ Menu.show = function(menuBody) {
         Menu.activeMenu = menuBody;
         //set the header to active
         var menuHeader = menuBody.getMenuHeader();
-        if(menuHeader) {
-            menuHeader.className = "visiui-menu-heading visiui-menu-heading-active";
+        if((menuHeader)&&(menuHeader.domElement)) {
+            menuHeader.domElement.className = "visiui-menu-heading visiui-menu-heading-active";
         }
     }
 }
@@ -117,8 +117,8 @@ Menu.hideActiveMenu = function() {
         var activeMenu = Menu.activeMenu;
         //set the header to normal (not active)
         var menuHeader = activeMenu.getMenuHeader();
-        if(menuHeader) {
-            menuHeader.className = "visiui-menu-heading";
+        if((menuHeader)&&(menuHeader.domElement)) {
+            menuHeader.domElement.className = "visiui-menu-heading";
         }
         
         var parentElement = activeMenu.getParentElement();

@@ -87,22 +87,29 @@
 }
 .visiui_pageChild_titleBarNameClass {
     display: inline;
-    padding-left: 2px;
-    padding-right:10px;
+    padding: 2px;
     font-weight:bold;
     font-size: larger;
     color:darkblue;
 }
 .visiui-pageChild-icon-container {
-    /* fixed */
     display:inline-block;
     position: relative;
-
-    /* configurable */
-    /*margin-right:3px;*/
+    padding: 0px;
+    margin: 0px;
+    vertical-align: middle;
+    height: 16px;
+    width: 16px;
 }
 .visiui-pageChild-icon {
     display:inline-block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 0px;
+    margin: 0px;
+    height: 16px;
+    width: 16px;
 }
 .visiui_pageChild_icon_overlay {
     position: absolute;
@@ -111,7 +118,7 @@
 }
 .visiui_pageChild_titleBarViewsClass {
     display: inline;
-    /* padding-left: 15px; */
+    padding-left: 15px;
 }
 .visiui_displayContainer_mainClass {
     position: relative;

@@ -27,19 +27,17 @@
 }
 
 .visiui-menu-heading {
-    /* fixed */
     display:inline-block;
     position:relative;
     cursor: default;
 	overflow:visible;
     white-space: nowrap;
-
-    /* configurable */
-    padding-left: 8px;
-    padding-right: 2px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    margin:0px;
+    padding: 0px;
+    margin: 0px;
+}
+.visiui-menu-heading-active {
+    background-color:rgb(211,211,164);
+    outline: 3px solid rgb(211,211,164);
 }
 .visiui-menu-label:hover {
     background-color:rgb(211,211,164);

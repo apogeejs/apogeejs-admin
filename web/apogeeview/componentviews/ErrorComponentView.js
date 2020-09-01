@@ -50,5 +50,5 @@ ErrorComponentView.TABLE_EDIT_SETTINGS = {
 ErrorComponentView.componentName = "apogeeapp.ErrorCell";
 ErrorComponentView.hasTabEntry = false;
 ErrorComponentView.hasChildEntry = true;
-ErrorComponentView.ICON_RES_PATH = "/icons3/generiCellIcon.png";
+ErrorComponentView.ICON_RES_PATH = "/icons3/errorCellIcon.png";
 
