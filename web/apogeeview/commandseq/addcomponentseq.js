@@ -146,7 +146,7 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
                         parentComponentView.giveEditorFocusIfShowing();
                     }
                 };
-                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
+                showSimpleActionDialog(deleteMsg,null,["OK","Cancel"],[doAction,cancelAction]);
             }
             else {
                 //otherwise just take the action

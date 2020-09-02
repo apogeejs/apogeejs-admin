@@ -137,7 +137,7 @@ export function removeLink(app,referenceEntry,displayInfo) {
     let cancelAction = () => true;
 
     //verify the delete
-    showSimpleActionDialog("Are you sure you want to delete this link?",["Delete","Cancel"],[doAction,cancelAction]);
+    showSimpleActionDialog("Are you sure you want to delete this link?",null,["Delete","Cancel"],[doAction,cancelAction]);
 }
 
 

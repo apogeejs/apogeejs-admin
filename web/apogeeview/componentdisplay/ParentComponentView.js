@@ -347,7 +347,7 @@ export default class ParentComponentView extends ComponentView {
                 let cancelAction = () => {
                     this.giveEditorFocusIfShowing();
                 };
-                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[okAction,cancelAction]);
+                showSimpleActionDialog(deleteMsg,null,["OK","Cancel"],[okAction,cancelAction]);
             }
             else {
                 //otherwise just take the action

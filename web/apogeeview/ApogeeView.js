@@ -5,6 +5,7 @@ import {importWorkspace} from "/apogeeview/commandseq/importworkspaceseq.js";
 import {exportWorkspace} from "/apogeeview/commandseq/exportworkspaceseq.js";
 import {openWorkspace} from "/apogeeview/commandseq/openworkspaceseq.js";
 import {saveWorkspace} from "/apogeeview/commandseq/saveworkspaceseq.js";
+import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 import WorkspaceView from "/apogeeview/WorkspaceView.js";
 
@@ -457,9 +458,6 @@ export default class ApogeeView {
     getHelpMenuItems() {
         var menuItems = [];
         var menuItem;
-        
-        let helpCallback = () => true;
-        let aboutCallback = () => true;
 
         //help entry
         menuItem = {};
@@ -525,3 +523,22 @@ export default class ApogeeView {
 let componentClassMap = {};
 
 const RESIZE_TIMER_PERIOD_MS = 500;
+
+function helpCallback() {
+    let title = "Apogee Help";
+    let message;
+    //if we are in a browser, allow the user to open the link. Otherwise just print it.
+    if(__browser__) {
+        message = 'For help, please go to the website: <a href="https://www.apogeejs.com" target="_blank">https://www.apogeejs.com</a>'
+    }
+    else {
+        message = 'For help, please go to the website: <b>https://www.apogeejs.com</b>'
+    }
+    showSimpleActionDialog(title,message,["OK"]);
+}
+
+function aboutCallback() {
+    let title = "Apogee Programming Environment";
+    let message = "Version: " + __apogee_version__;
+    showSimpleActionDialog(title,message,["OK"]);
+}

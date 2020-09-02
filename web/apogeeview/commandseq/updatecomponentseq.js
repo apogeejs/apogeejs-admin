@@ -213,7 +213,7 @@ export function updateComponent(componentView) {
             let cancelAction = () => {
                 returnToEditor(componentView,submittedValues.name);
             };
-            showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
+            showSimpleActionDialog(deleteMsg,null,["OK","Cancel"],[doAction,cancelAction]);
         }
         else {
             //otherwise just take the action
