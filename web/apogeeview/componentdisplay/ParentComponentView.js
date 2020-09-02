@@ -688,16 +688,35 @@ export default class ParentComponentView extends ComponentView {
             let { empty } = state.selection;
             if(!empty) {
 
-                setupTransaction = state.tr.deleteSelection(); 
+                //BELOW I HAVE TWO MODELS FOR INSERTING A NEW NODE - OVER THE CURRENT SELECTION
+                //OR AFTER THE CURRENT SELECTION 
 
-                //see if we need to delete any apogee nodes
-                var deletedComponentShortNames = this.getDeletedApogeeComponentShortNames(setupTransaction);
-                commandInfo.deletedComponentShortNames = deletedComponentShortNames
+                //-----------------------------------------------
+                // START insert the node over the current selection
+                // It is commented out because some users got confused when a node got deleted when they added a new one,
+                // which happened in the case a node is selected.
+                
+                // setupTransaction = state.tr.deleteSelection(); 
 
-                if(deletedComponentShortNames.length > 0) {
-                    //create delete commands
-                    commandInfo.deletedComponentCommands = this.createDeleteComponentCommands(deletedComponentShortNames); 
-                }
+                // //see if we need to delete any apogee nodes
+                // var deletedComponentShortNames = this.getDeletedApogeeComponentShortNames(setupTransaction);
+                // commandInfo.deletedComponentShortNames = deletedComponentShortNames
+
+                // if(deletedComponentShortNames.length > 0) {
+                //     //create delete commands
+                //     commandInfo.deletedComponentCommands = this.createDeleteComponentCommands(deletedComponentShortNames); 
+                // }
+
+                //END insert over current selection
+                //------------------------------------------------
+
+                //-----------------------------------------------
+                // START insert the node at the end of the current selection
+                let $endPos = state.selection.$to;
+                let selection = new TextSelection($endPos,$endPos);
+                setupTransaction = state.tr.setSelection(selection);
+                // END insert the node at the end of the current selection
+                //------------------------------------------------
             }
         }
         else {
