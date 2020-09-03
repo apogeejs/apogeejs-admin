@@ -26,7 +26,9 @@ export default class AceTextEditor extends DataDisplay {
 
         this.aceMode = aceMode;
 
-        this.storedData = null;
+        this.inputData = null;
+        this.cachedDisplayData = null;
+        this.dataError = false;
 
         //configure the options
         if(!options) options = {};
@@ -69,8 +71,8 @@ export default class AceTextEditor extends DataDisplay {
         
         this.editor = editor;
         
-        if(this.storedData) {
-            this.setData(this.storedData);
+        if(this.cachedDisplayData) {
+            this.setData(this.cachedDisplayData);
         }
         
         //enter edit mode on change to the data
@@ -81,34 +83,47 @@ export default class AceTextEditor extends DataDisplay {
         return this.editorDiv;
     }
 
+    /** We override the save function to clear any error if there was one and the
+     * user saves - meaning we want to keep the editor data. */
+    save() {
+        //clear error flag since the user wants to save what is displayed
+        if(this.dataError) this.dataError = false;
+
+        super.save();
+    }
+
     getData() {
-        if(this.editor) {
-            this.storedData = this.editor.getSession().getValue();
+        if((this.editor)&&(!this.dataError)) {
+            this.cachedDisplayData = this.editor.getSession().getValue();
+            this.inputData = this.cachedDisplayData;
         }
-        return this.storedData; 
+        return this.inputData; 
     }
     
     setData(text) {
+
+        this.inputData = text;
+        this.cachedDisplayData = text;
+        this.dataError = false;
+
         //The data source should give a text value "" if the data in invalid rather than sending
         //in a json, but we will do this check anyway.
         if(text == apogeeutil.INVALID_VALUE) {
             var errorMsg = "ERROR: Data value is not valid"
-            text = "";
+            this.cachedDisplayData = "";
+            this.dataError = true;
         }
 
         //check data is valid
         if(!apogeeutil.isString(text)) {
             var errorMsg = "ERROR: Data value is not text";
-            //this.setError(errorMsg);
-            text = errorMsg;
+            this.cachedDisplayData = errorMsg;
+            this.dataError = true;
         }
-            
-        //store the data
-        this.storedData = text;
         
         //place ineditor, if it is present
         if(this.editor) {
-            this.editor.getSession().setValue(text);
+            this.editor.getSession().setValue(this.cachedDisplayData);
 
             //set the edit mode and background color
             if(this.editOk) {
@@ -139,7 +154,7 @@ export default class AceTextEditor extends DataDisplay {
     checkStartEditMode() {
         if((!this.displayContainer.isInEditMode())&&(this.editor)) {
             var activeData = this.editor.getSession().getValue();
-            if(activeData != this.storedData) {
+            if(activeData != this.cachedDisplayData) {
                 this.onTriggerEditMode();
             }
         }
