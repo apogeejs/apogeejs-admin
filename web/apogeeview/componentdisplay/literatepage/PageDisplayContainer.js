@@ -14,10 +14,11 @@ export default class PageDisplayContainer {
         this.isMainView = isMainView;
         
         this.mainElement = null;
-        this.viewLabelHeaderElement = null;
+        this.viewToolbarElement = null;
         this.viewLabelElement = null;
         this.headerContainer = null;
         this.viewContainer = null;
+        this.viewDisplayElement = null;
 
         this.viewSelectorContainer = null;
         this.viewActiveElement = null;
@@ -131,6 +132,11 @@ export default class PageDisplayContainer {
         return this.mainElement;
     }
 
+    /** This method returns the display bar. It is a status and control bar for the data display to manage. */
+    getDisplayBarElement() {
+        return this.viewDisplayElement;
+    }
+
     //====================================
     // Private Methods
     //====================================
@@ -152,7 +158,24 @@ export default class PageDisplayContainer {
         //make the container
         this.mainElement = uiutil.createElementWithClass("div","visiui_displayContainer_mainClass",null);
 
-        //make the selector for the view, in the component title bar
+        //create the view header
+        this.viewToolbarElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.mainElement);
+
+        this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewToolbarElement);
+        this.viewLabelElement.innerHTML = this.viewType;
+
+        this.sizingElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewSizingElementClass",this.viewToolbarElement);
+
+        //create the view display
+        this.viewDisplayElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplayBarClass",this.viewToolbarElement);
+        
+        //add the header elment (for the save bar)
+        this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
+
+        //add the view container
+        this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
+
+        //make the selector for the view, displayed in the component title bar
         this.viewSelectorContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
         this.viewSelectorLink = uiutil.createElementWithClass("a","visiui_displayContainer_viewSelectorLinkClass",this.viewSelectorContainer);
 
@@ -163,43 +186,32 @@ export default class PageDisplayContainer {
         this.contractImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_OPENED_IMAGE_PATH);
 
         this.viewNameElement = uiutil.createElementWithClass("span","visiui_displayContainer_viewSelectorClass",this.viewSelectorLink);
-        
         this.viewNameElement.innerHTML = this.viewType;
 
         this.viewSelectorLink.href = "javascript:void(0)";
         this.viewSelectorLink.onclick = () => this.setIsViewActive(!this.isViewActive);
-        
+
         this.updateViewSelectorState();
     }
 
     /** This completes the UI. It should only be called when the data display has been created. */
     completeUI() {
-
         if(!this.dataDisplay) return;
-        
-        //make the label for the view
-        this.viewLabelHeaderElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelHeaderClass",this.mainElement);
-
-        this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
-        this.viewLabelElement.innerHTML = this.viewType;
-
-        this.viewToolbarElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.viewLabelHeaderElement);
 
         //add the view toolbar controls
-        this.populateViewToolbar();
-        
-        //add the header elment (for the save bar)
-        this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
-        
-        //add the view container
-        this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
+        this.populateSizingElement();
+
+        //populating the display element is initiated by the data display itself
 
         this.uiCompleted = true;
     }
 
-    /** This undoes the data display specific parts of the container ui */
+    /** This clears the data display specific parts of the container ui, so a new data display may be added. */
     uncompleteUI() {
-        uiutil.removeAllChildren(this.mainElement);
+        uiutil.removeAllChildren(this.sizingElement);
+        uiutil.removeAllChildren(this.viewDisplayElement);
+        uiutil.removeAllChildren(this.viewContainer);
+
         this.heightUiActive = false;
         this.uiCompleted = false;
     }
@@ -219,19 +231,23 @@ export default class PageDisplayContainer {
     }
 
     /** This method configures the toolbar for the view display. */
-    populateViewToolbar() {
+    populateSizingElement() {
+        //show the height controls
         if(this.dataDisplay.getUseContainerHeightUi()) {
-            this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
             this.showLessButton.innerHTML = "less";
             this.showLessButton.onclick = () => this.showLess();
-            this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
             this.showMoreButton.innerHTML = "more";
             this.showMoreButton.onclick = () => this.showMore();
-            this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
             this.showMaxButton.innerHTML = "max";
             this.showMaxButton.onclick = () => this.showMax();
             this.heightUiActive = true;
             this.updateViewSizeButtons()
+        }
+        else {
+            this.sizingElement.style.display = "none";
         }
     }
 

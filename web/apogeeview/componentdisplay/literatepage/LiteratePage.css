@@ -123,13 +123,16 @@
 .visiui_displayContainer_mainClass {
     position: relative;
 }
-.visiui_displayContainer_viewLabelHeaderClass {
+.visiui_displayContainer_viewToolbarClass {
     position: relative;
 }
 .visiui_displayContainer_viewLabelClass {
     display: inline;
-    padding-left: 1px;
-    padding-right: 20px;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0px;
     font-size: smaller;
     color:rgb(0,0,0);
     font-weight: bold;
@@ -166,16 +169,34 @@
 .visiui_displayContainer_headerContainerClass {
     position: relative;
 }
-.visiui_displayContainer_viewToolbarClass {
-    position: relative;
-    display: inline;
+.visiui_displayContainer_viewSizingElementClass {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.visiui_displayContainer_viewDisplayBarClass {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 .visiui_displayContainer_viewDisplaySizeButtonClass {
     display: inline;
-    padding-right: 5px;
+    margin-right: 5px;
     font-size: smaller;
     color:rgb(128,128,128);
     cursor: pointer;
+}
+.visiui_displayContainer_viewDisplaySizeButtonClass:hover {
+    background-color: rgba(128,128,144,.35);
+}
+.visiui_displayContainer_viewDisplaySizeButtonClass:active {
+    background-color: rgba(128,128,144,.35);
 }
 .visiui_displayContainer_viewContainerClass {
     position: relative;

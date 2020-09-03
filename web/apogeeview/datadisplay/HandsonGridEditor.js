@@ -20,37 +20,38 @@ export default class HandsonGridEditor extends DataDisplay {
         });
 
         this.inputData = null;
-        this.activeEditOk = undefined;
+        this.cachedDisplayData = null;
         this.dataCached = false;
+        this.dataError = false;
+
+        this.updatesPaused = false;
+
+        this.activeEditOk = undefined;
 
        //we have to make sure the element is loaded before initailizing for handsontable to work properly
        this.loaded = false;
 
-        //grid edited function
-        this.gridEdited = (args) => {
-            //I am doing this because it tries to save on the initial creation
-            //I am sure there is some other way to prevent this.
-            if(!this.gridControl) return;
-            
-            this.save(arguments);
-        }
+        // //on a paste, the event is fired for each row created. We delay it here to haev fewer updates of the rest of the sheet
+        // this.timerInProcess = false;
+        // var REFRESH_DELAY = 50;
 
-        //on a paste, the event is fired for each row created. We delay it here to haev fewer updates of the rest of the sheet
-        this.timerInProcess = false;
-        var REFRESH_DELAY = 50;
+        // this.delayGridEdited = (args) => {
 
-        this.delayGridEdited = (args) => {
+        //     if(this.updatesPaused) return;
 
-            //if there is no timer waiting, start a timer
-            if(!this.timerInProcess) {
-                this.timerInProcess = true;
-                var callEditEvent = (args) => {
-                    this.timerInProcess = false;
-                    this.gridEdited(arguments);
-                }
-                setTimeout(callEditEvent,REFRESH_DELAY);
-            }
-        }
+        //     console.log("grid edited called");
+
+        //     //if there is no timer waiting, start a timer
+        //     if(!this.timerInProcess) {
+        //         this.timerInProcess = true;
+        //         var callEditEvent = (args) => {
+        //             this.timerInProcess = false;
+        //             this.gridEdited(arguments);
+        //             console.log("grid edited processed");
+        //         }
+        //         setTimeout(callEditEvent,REFRESH_DELAY);
+        //     }
+        // }
 
         //set variables for internal display view sizing
         this.setUseContainerHeightUi(true)
@@ -71,29 +72,40 @@ export default class HandsonGridEditor extends DataDisplay {
     }
     
     getData() {
+        if(this.dataError) return this.inputData;
+
         //update "input" data before calling update
-        if(this.gridControl) this.inputData = apogeeutil.jsonCopy(this.gridControl.getData());
+        if(this.gridControl) {
+            this.inputData = apogeeutil.jsonCopy(this.gridControl.getData());
+            //data should not be cached, but if it is update the value.
+            if(this.dataCached) {
+                this.cachedDisplayData = this.inputData;
+            }
+        }
         return this.inputData;
     }
     
     setData(json) {
-        if(json == apogeeutil.INVALID_VALUE) {
-            var errorMsg = "ERROR: Data value is not valid"
-            json = [[errorMsg]];
-        }
 
         if((this.inputData === json)&&(this.editOk)) return;
+
+        this.inputData = json;
+        this.cachedDisplayData = json;
+        this.dataCached = true;
+        this.dataError = false;
+
+        if(json == apogeeutil.INVALID_VALUE) {
+            var errorMsg = "ERROR: Data value is not valid"
+            this.cachedDisplayData = [[errorMsg]];
+            this.dataError = true;
+        }
         
         //verify data is the proper format
         if(!this.dataIsValidFormat(json)) {
             var errorMsg = "ERROR: Data value is not an array of arrays"
-            json = [[errorMsg]];
+            this.cachedDisplayData = [[errorMsg]];
+            this.dataError = true;
         }
-//figure out how to handle this error
-//I should detect an error if the first array is not as long as all other arrays - handsontable issue
-	
-        this.inputData = json;
-        this.dataCached = true;
 
         if(this.loaded) {
             this.displayData();
@@ -266,51 +278,70 @@ export default class HandsonGridEditor extends DataDisplay {
             this.gridControl = null;
         }
 
-        var gridOptions; 
-        if(this.editOk) {
-            gridOptions = {
-                data: initialData,
-                rowHeaders: true,
-                colHeaders: true,
-                contextMenu: true,
-                //edit callbacks - I am using a delay on the grid edited because the table fires too many updates - one for 
-                //each row (soemthing like that I forget) on a big paste
-                afterChange:this.delayGridEdited,
-                afterCreateCol:this.delayGridEdited,
-                afterCreateRow:this.delayGridEdited,
-                afterRemoveCol:this.delayGridEdited,
-                afterRemoveRow:this.delayGridEdited,
-                width:"100%",
-                height: this.savedPixelHeight + "px"
-
-            }
-            this.gridEditable = true;
-        }
-        else {
-            gridOptions = {
-                data: initialData,
-                readOnly: true,
-                rowHeaders: true,
-                colHeaders: true,
-                width:"100%",
-                height: this.savedPixelHeight + "px"
-            }
-            this.gridEditable = false;
+        var gridOptions = {
+            data: initialData,
+            readOnly: !this.editOk,
+            contextMenu: this.editOk,
+            rowHeaders: true,
+            colHeaders: true,
+            width:"100%",
+            height: this.savedPixelHeight + "px"
         }
 
         this.gridControl = new Handsontable(this.gridDiv,gridOptions); 
 
+        if(this.editOk) {
+        //edit callbacks - I am using a delay on the grid edited because the table fires too many updates - one for 
+            //each row (soemthing like that I forget) on a big paste
+            Handsontable.hooks.add("afterChange",() => this.gridEdited(),this.gridControl);
+            Handsontable.hooks.add("beforePaste",() => this.pauseUpdates(),this.gridControl);
+            Handsontable.hooks.add("afterPaste",() => this.unpauseUpdates(true),this.gridControl);
+            Handsontable.hooks.add("afterCreateCol",() => this.gridEdited(),this.gridControl);
+            Handsontable.hooks.add("afterCreateRow",() => this.gridEdited(),this.gridControl);
+            Handsontable.hooks.add("afterRemoveCol",() => this.gridEdited(),this.gridControl);
+            Handsontable.hooks.add("afterRemoveRow",() => this.gridEdited(),this.gridControl);
+        }
+
         this.updateWidth();
     }
+
+    //grid edited function
+    gridEdited() {
+        if(!this.gridControl) return;
+        
+        //if the grid was edited, clear any data error so we can take the new data.
+        this.dataError = false;
+
+        this.save();
+    }
+
+    afterChange() {
+        console.log("after change called");
+        this.delayGridEdited();
+    }
+
+    pauseUpdates() {
+        this.updatesPaused = true;
+    }
+
+    unpauseUpdates(doUpdate) {
+        this.updatesPaused = false;
+        if(doUpdate) {
+            this.delayGridEdited();
+        }
+    } 
     
     
     //we must be loaded before creating objects
     displayData() {
 
+        //pause change updates
+        this.pauseUpdates();
+
         //clear the cached data flag, if it is present
         this.dataCached = false;
 
-        var editData = apogeeutil.jsonCopy(this.inputData);
+        var editData = apogeeutil.jsonCopy(this.cachedDisplayData);
         if(!editData) {
             editData = [[]];
         }
@@ -330,6 +361,9 @@ export default class HandsonGridEditor extends DataDisplay {
         else {
             this.gridDiv.style.backgroundColor = DATA_DISPLAY_CONSTANTS.NO_EDIT_BACKGROUND_COLOR;
         }
+
+        //restart change updates
+        this.unpauseUpdates(false);
     }
     
     //this merifies the data is an array of arrays

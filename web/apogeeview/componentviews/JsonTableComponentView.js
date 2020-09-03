@@ -32,6 +32,8 @@ export default class JsonTableComponentView extends ComponentView {
             case JsonTableComponentView.VIEW_DATA:
                 var component = this.getComponent();
                 let dataView = component.getField("dataView");
+                //update the display container state bar
+                this._setDisplayContainerStatus(displayContainer,dataView);
                 switch(dataView) {
                     case JsonTableComponentView.COLORIZED_DATA_VEW:
                     default:
@@ -78,6 +80,18 @@ export default class JsonTableComponentView extends ComponentView {
         }
         return dataDisplaySource;
     }
+
+    _setDisplayContainerStatus(displayContainer,dataView) {
+        let displayBarElement = displayContainer.getDisplayBarElement();
+        if(displayBarElement) {
+            let statusElement = document.createElement("span");
+            statusElement.innerHTML = "Display Format: " + VIEW_DISPLAY_NAMES[dataView];
+            statusElement.style.fontSize = "smaller";
+            statusElement.style.color = "gray";
+            statusElement.style.marginLeft = "20px";
+            displayBarElement.appendChild(statusElement);
+        }
+    }
 }
 
 /** This is used as the default data value if we clear the code. It really should be a function of the data view,
@@ -110,6 +124,11 @@ JsonTableComponentView.GRID_DATA_VEW = "Grid";
 
 JsonTableComponentView.DEFAULT_DATA_VIEW = JsonTableComponentView.COLORIZED_DATA_VEW;
 
+let VIEW_DISPLAY_NAMES = {};
+VIEW_DISPLAY_NAMES[JsonTableComponentView.COLORIZED_DATA_VEW] = "JSON";
+VIEW_DISPLAY_NAMES[JsonTableComponentView.TEXT_DATA_VEW] = "Plain Text";
+VIEW_DISPLAY_NAMES[JsonTableComponentView.GRID_DATA_VEW] = "Grid";
+
 //===============================
 // External Settings
 //===============================
@@ -134,9 +153,9 @@ JsonTableComponentView.propertyDialogLines = [
         "type":"dropdown",
         "label":"Data Display Format: ",
         "entries":[
-            ["JSON",JsonTableComponentView.COLORIZED_DATA_VEW],
-            ["Plain Text",JsonTableComponentView.TEXT_DATA_VEW],
-            ["Grid",JsonTableComponentView.GRID_DATA_VEW]
+            [ VIEW_DISPLAY_NAMES[JsonTableComponentView.COLORIZED_DATA_VEW] , JsonTableComponentView.COLORIZED_DATA_VEW ],
+            [ VIEW_DISPLAY_NAMES[JsonTableComponentView.TEXT_DATA_VEW] , JsonTableComponentView.TEXT_DATA_VEW ],
+            [ VIEW_DISPLAY_NAMES[JsonTableComponentView.GRID_DATA_VEW] , JsonTableComponentView.GRID_DATA_VEW ]
         ],
         "key":"dataView"
     }
