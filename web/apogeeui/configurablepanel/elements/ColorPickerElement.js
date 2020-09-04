@@ -13,14 +13,9 @@ export default class ColorPickerElement extends ConfigurableElement {
         var containerElement = this.getElement();
         
         //label
-        if(elementInitData.label) {
-            this.labelElement = document.createElement("span");
-            this.labelElement.className = "apogee_configurablePanelLabel";
-            this.labelElement.innerHTML = elementInitData.label;
-            containerElement.appendChild(this.labelElement);
-        }
-        else {
-            this.labelElement = null;
+        let labelElement = this.getLabelElement(elementInitData);
+        if(labelElement) {
+            containerElement.appendChild(labelElement);
         }
         
         //slider
@@ -29,10 +24,17 @@ export default class ColorPickerElement extends ConfigurableElement {
         
         this.setFocusElement(this.colorPickerElement);
 
-        this.colorPickerElement.addEventListener("change",() => {
+        this.changeListener = () => {
             this.inputDone();
             this.valueChanged();
-        });
+        }
+        this.colorPickerElement.addEventListener("change",this.changeListener);
+
+        //hint
+        let hintElement = this.getHintElement(elementInitData);
+        if(hintElement) {
+            containerElement.appendChild(hintElement);
+        }
 
         this._postInstantiateInit(elementInitData);
     }
@@ -50,6 +52,12 @@ export default class ColorPickerElement extends ConfigurableElement {
     /** This method updates the list of checked entries. */
     setValueImpl(value) {
         this.colorPickerElement.value = value;
+    }
+
+    destroy() {
+        super.destroy();
+        this.colorPickerElement.removeEventListener("change",this.changeListener);
+        this.colorPickerElement = null;
     }
 
     //===================================

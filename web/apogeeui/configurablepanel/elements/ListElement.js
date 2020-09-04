@@ -18,14 +18,9 @@ export default class ListElement extends ConfigurableElement {
         this.closeUrl = uiutil.getResourcePath("/close_black.png");
         
         //label
-        if(elementInitData.label) {
-            this.labelElement = document.createElement("span");
-            this.labelElement.className = "apogee_configurablePanelLabel";
-            this.labelElement.innerHTML = elementInitData.label;
-            containerElement.appendChild(this.labelElement);
-        }
-        else {
-            this.labelElement = null;
+        let labelElement = this.getLabelElement(elementInitData);
+        if(labelElement) {
+            containerElement.appendChild(labelElement);
         }
         
         //initialize the list
@@ -180,6 +175,16 @@ export default class ListElement extends ConfigurableElement {
 
         //store the inherit value for when other entries created
         this.inheritValueMap[childKey] = parentValue;
+    }
+
+    destroy() {
+        super.destroy();
+
+        this.entryTypes = [];
+        this.listEntries.forEach( listEntry => {
+            listEntry.elementObject.destroy();
+        })
+        listEntries = [];
     }
 
     //===================================

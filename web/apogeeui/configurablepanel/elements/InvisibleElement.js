@@ -30,8 +30,6 @@ export default class InvisibleElement extends ConfigurableElement {
     /** This method updates the UI value for a given element. */
     setValueImpl(value) {
         this.value = value;
-
-        this.onChangeListeners.forEach(listener => listener(value,this.getForm()));
     }
 }
 

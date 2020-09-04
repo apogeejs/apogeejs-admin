@@ -18,6 +18,8 @@ export default class ShowHideLayout extends ConfigurableLayoutContainer {
         this.control = null;
         this.headingElement = null;
 
+        this.initialized = false;
+
         this.openedUrl = uiutil.getResourcePath("/opened_bluish.png");
         this.closedUrl = uiutil.getResourcePath("/closed_bluish.png");
 
@@ -33,6 +35,17 @@ export default class ShowHideLayout extends ConfigurableLayoutContainer {
     insertElement(elementObject,elementInitData) {
         //add the dom element
         this.bodyElement.appendChild(elementObject.getElement());
+    }
+
+    destroy() {
+        super.destroy();
+        
+        this.titleElement = null;
+        this.bodyElement = null;
+        this.control = null;
+        this.headingElement = null;
+
+        this.initialized = false;
     }
     
     //===================================
@@ -80,13 +93,19 @@ export default class ShowHideLayout extends ConfigurableLayoutContainer {
             throw new Error("Improper format for Horizontal layout config. It should have a array named 'formData'");
         }
         containerInitData.formData.forEach(elementInitData => this.addToContainer(elementInitData));
+
+        this.initialized = true;
     }
 
     _toggleState() {
+        if(!this.initialized) return;
+
         this._setState(!this.isClosed);
     }
 
     _setState(isClosed) {
+        if(this.initialized) return;
+
         this.isClosed = isClosed;
         if(this.isClosed) {
             this.bodyElement.style.display = "none";

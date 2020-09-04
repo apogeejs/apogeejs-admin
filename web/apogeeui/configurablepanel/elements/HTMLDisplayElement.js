@@ -12,6 +12,8 @@ export default class HTMLDisplayElement extends ConfigurableElement {
         var containerElement = this.getElement();
         
         containerElement.innerHTML = elementInitData.html
+
+        this._postInstantiateInit(elementInitData);
     }
 
 }

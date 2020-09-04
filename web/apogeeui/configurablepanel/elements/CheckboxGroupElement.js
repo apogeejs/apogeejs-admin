@@ -16,16 +16,24 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         var containerElement = this.getElement();
         
         //label
-        if(elementInitData.label) {
-            this.labelElement = document.createElement("span");
-            this.labelElement.className = "apogee_configurablePanelLabel";
-            this.labelElement.innerHTML = elementInitData.label;
-            containerElement.appendChild(this.labelElement);
-            
-            if(!elementInitData.horizontal) containerElement.appendChild(document.createElement("br"));
+        let labelElement = this.getLabelElement(elementInitData);
+        if(labelElement) {
+            containerElement.appendChild(labelElement);
         }
-        else {
-            this.labelElement = null;
+
+        //hint
+        //if not horizontal, put the hint after the label
+        if(!elementInitData.horizontal) {
+            let hintElement = this.getHintElement(elementInitData);
+            if(hintElement) {
+                containerElement.appendChild(hintElement);
+            }
+        }
+
+        //add dom listeners for events
+        this.changeListener = () => {
+            this.inputDone();
+            this.valueChanged();
         }
         
         //check boxes
@@ -70,18 +78,18 @@ export default class CheckboxGroupElement extends ConfigurableElement {
             if(elementInitData.disabled) checkbox.disabled = true;
 
             //add the dom listener
-            checkbox.addEventListener("change",() => {
-                this.inputDone();
-                this.valueChanged();
-            });
+            checkbox.addEventListener("change",this.changeListener);
         };
         elementInitData.entries.forEach(addCheckbox);  
-        
-        //add dom listeners
-        this.checkboxList.forEach(checkbox => checkbox.addEventListener("change",() => {
-            this.inputDone();
-            this.valueChanged();
-        }));
+
+        //hint
+        //if  horizontal, put the hint at the end
+        if(elementInitData.horizontal) {
+            let hintElement = this.getHintElement(elementInitData);
+            if(hintElement) {
+                containerElement.appendChild(hintElement);
+            }
+        }
         
         this._postInstantiateInit(elementInitData);
     }
@@ -104,6 +112,16 @@ export default class CheckboxGroupElement extends ConfigurableElement {
             let properValue = this.valueMap[standinValue];
             checkbox.checked = (valueList.indexOf(properValue) >= 0);
         });
+    }
+
+    destroy() {
+        super.destroy();
+        
+        this.checkboxList.forEach(checkbox => {
+            checkbox.removeEventListener("change",this.changeListener);
+        })
+        this.checkboxList = [];
+        this.changeListener = null;
     }
 
     //===================================

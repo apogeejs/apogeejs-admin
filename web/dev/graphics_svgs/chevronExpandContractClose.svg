@@ -39,8 +39,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.4304832"
-     inkscape:cx="233.59957"
-     inkscape:cy="696.4529"
+     inkscape:cx="225.16503"
+     inkscape:cy="729.36817"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -72,8 +72,8 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot3347"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;opacity:1;"
-       transform="translate(99.289265,-7.2192392)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.8,0,0,0.6,112.37091,113.26462)"
        inkscape:export-xdpi="27.391304"
        inkscape:export-ydpi="27.391304"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_black.png"><flowRegion
@@ -83,9 +83,9 @@
            height="47.67857"
            x="53.57143"
            y="270.75507"
-           style="stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;" /></flowRegion><flowPara
+           style="stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
          id="flowPara3353"
-         style="-inkscape-font-specification:'sans-serif, Normal';font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:40px;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;stroke:none;stroke-opacity:0;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;fill:#000000;fill-opacity:1;">v</flowPara></flowRoot>    <circle
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0">v</flowPara></flowRoot>    <circle
        style="opacity:1;fill:#000000;fill-opacity:1;stroke:#b200bb;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path4265"
        cx="130.23204"
@@ -185,7 +185,7 @@
          sodipodi:role="line"
          x="39.979649"
          y="230.07516"
-         id="tspan4576">- export expanded/contracted square @ 16px</tspan><tspan
+         id="tspan4576">- export expanded/contracted square @ 16px height</tspan><tspan
          sodipodi:role="line"
          x="39.979649"
          y="248.82516"
@@ -227,8 +227,8 @@
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0">v</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3347-1"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;opacity:1;"
-       transform="matrix(0,-1,1,0,-86.398219,360.13874)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0,-0.8,0.6,0,34.085641,347.0571)"
        inkscape:export-xdpi="27.391304"
        inkscape:export-ydpi="27.391304"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_black.png"><flowRegion
@@ -238,13 +238,13 @@
            height="47.67857"
            x="53.57143"
            y="270.75507"
-           style="stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;" /></flowRegion><flowPara
+           style="stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
          id="flowPara3353-34"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;">v</flowPara></flowRoot>    <flowRoot
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0">v</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3347-3"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#406297;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;opacity:1;"
-       transform="translate(106.79516,44.686576)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#406297;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.8,0,0,0.6,119.8768,165.17044)"
        inkscape:export-xdpi="27.391304"
        inkscape:export-ydpi="27.391304"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_bluish.png"><flowRegion
@@ -254,13 +254,13 @@
            height="47.67857"
            x="53.57143"
            y="270.75507"
-           style="stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;fill:#406297;fill-opacity:1;" /></flowRegion><flowPara
+           style="fill:#406297;fill-opacity:1;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
          id="flowPara3353-30"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#406297;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;">v</flowPara></flowRoot>    <flowRoot
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#406297;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0">v</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3347-12"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#406297;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;opacity:1;"
-       transform="matrix(0,-1,1,0,-85.374835,415.02537)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#406297;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0,-0.8,0.6,0,35.109025,401.94373)"
        inkscape:export-xdpi="27.391304"
        inkscape:export-ydpi="27.391304"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_bluish.png"><flowRegion
@@ -270,13 +270,13 @@
            height="47.67857"
            x="53.57143"
            y="270.75507"
-           style="fill:#406297;fill-opacity:1;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;" /></flowRegion><flowPara
+           style="fill:#406297;fill-opacity:1;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
          id="flowPara3353-1"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#406297;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;">v</flowPara></flowRoot>    <flowRoot
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#406297;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0">v</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3347-7"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#737373;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;"
-       transform="translate(83.521311,96.902849)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#737373;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.8,0,0,0.6,96.602952,217.38671)"
        inkscape:export-xdpi="27.391304"
        inkscape:export-ydpi="27.391304"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_gray.png"><flowRegion
@@ -286,9 +286,9 @@
            height="47.67857"
            x="53.57143"
            y="270.75507"
-           style="stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;fill:#737373;fill-opacity:1;" /></flowRegion><flowPara
+           style="fill:#737373;fill-opacity:1;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
          id="flowPara3353-18"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#737373;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;">v</flowPara></flowRoot>    <circle
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#737373;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0">v</flowPara></flowRoot>    <circle
        style="opacity:1;fill:#737373;fill-opacity:1;stroke:#b200bb;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path4265-7"
        cx="114.46409"
@@ -300,8 +300,8 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot3347-1-7"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#737373;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;"
-       transform="matrix(0,-1,1,0,-102.16617,464.26083)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#737373;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0,-0.8,0.6,0,18.31769,451.17919)"
        inkscape:export-xdpi="27.391304"
        inkscape:export-ydpi="27.391304"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_gray.png"><flowRegion
@@ -311,9 +311,9 @@
            height="47.67857"
            x="53.57143"
            y="270.75507"
-           style="stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;fill:#737373;fill-opacity:1;" /></flowRegion><flowPara
+           style="fill:#737373;fill-opacity:1;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
          id="flowPara3353-34-3"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#737373;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;">v</flowPara></flowRoot>    <flowRoot
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#737373;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0">v</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot3347-7-8"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#737373;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -612,101 +612,11 @@
          rx="3.3086174"
          ry="3.3086197" />
     </g>
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7"
-       width="32.117168"
-       height="32.117168"
-       x="198.78268"
-       y="277.94635"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_black.png" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-9"
-       width="32.117168"
-       height="32.117168"
-       x="98.405518"
-       y="382.22116"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\circle_gray.png" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-92"
-       width="32.117168"
-       height="32.117168"
-       x="133.65286"
-       y="382.08377"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_gray.png" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-7"
-       width="32.117168"
-       height="32.117168"
-       x="183.01474"
-       y="382.06845"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_gray.png" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-91"
-       width="32.117168"
-       height="32.117168"
-       x="117.50867"
-       y="336.38586"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\circle_bluish.png" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-2"
-       width="32.117168"
-       height="32.117168"
-       x="156.87038"
-       y="329.86749"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_bluish.png" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-6"
-       width="32.117168"
-       height="32.117168"
-       x="199.83127"
-       y="332.80722"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_bluish.png" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-4"
-       width="32.117168"
-       height="32.117168"
-       x="149.42082"
-       y="277.96167"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_black.png" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-8"
-       width="32.117168"
-       height="32.117168"
-       x="114.17346"
-       y="278.09906"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\circle_black.png" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot3347-7-5"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#505050;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;"
-       transform="translate(233.68744,86.996193)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#505050;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.8,0,0,0.6,246.76908,207.48005)"
        inkscape:export-xdpi="27.391304"
        inkscape:export-ydpi="27.391304"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_gray.png"><flowRegion
@@ -716,9 +626,9 @@
            height="47.67857"
            x="53.57143"
            y="270.75507"
-           style="fill:#505050;fill-opacity:1;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;" /></flowRegion><flowPara
+           style="fill:#505050;fill-opacity:1;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
          id="flowPara3353-18-4"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#505050;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;">v</flowPara></flowRoot>    <circle
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#505050;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0">v</flowPara></flowRoot>    <circle
        style="opacity:1;fill:#505050;fill-opacity:1;stroke:#b200bb;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path4265-7-1"
        cx="264.63022"
@@ -730,8 +640,8 @@
     <flowRoot
        xml:space="preserve"
        id="flowRoot3347-1-7-7"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#505050;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;"
-       transform="matrix(0,-1,1,0,47.99996,454.35417)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;opacity:1;fill:#505050;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0,-0.8,0.6,0,168.48382,441.27253)"
        inkscape:export-xdpi="27.391304"
        inkscape:export-ydpi="27.391304"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_gray.png"><flowRegion
@@ -741,39 +651,9 @@
            height="47.67857"
            x="53.57143"
            y="270.75507"
-           style="fill:#505050;fill-opacity:1;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;" /></flowRegion><flowPara
+           style="fill:#505050;fill-opacity:1;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
          id="flowPara3353-34-3-2"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#505050;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;">v</flowPara></flowRoot>    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-9-8"
-       width="32.117168"
-       height="32.117168"
-       x="248.57166"
-       y="372.31451"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\circle_darkgray.png" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-92-3"
-       width="32.117168"
-       height="32.117168"
-       x="283.819"
-       y="372.17712"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_darkgray.png" />
-    <rect
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4448-7-3-8-8-8-3-72-3-7-7-6"
-       width="32.117168"
-       height="32.117168"
-       x="333.18088"
-       y="372.1618"
-       inkscape:export-xdpi="44.696587"
-       inkscape:export-ydpi="44.696587"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_darkgray.png" />
-    <g
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#505050;fill-opacity:1;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0">v</flowPara></flowRoot>    <g
        id="g4301-3-6"
        transform="translate(60.611368,50.631802)"
        style="opacity:1;fill:#505050;fill-opacity:1;stroke:#737373;stroke-opacity:1"
@@ -853,5 +733,125 @@
        inkscape:export-xdpi="27"
        inkscape:export-ydpi="27"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\down_darkgray.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5"
+       width="24.117001"
+       height="32.117168"
+       x="118.17354"
+       y="278.09906"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\circle_black.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-3"
+       width="24.117001"
+       height="32.117168"
+       x="153.4209"
+       y="277.96167"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_black.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-32"
+       width="24.117001"
+       height="32.117168"
+       x="202.78278"
+       y="277.94635"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_black.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-1"
+       width="24.117001"
+       height="32.117168"
+       x="121.50874"
+       y="336.38586"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\circle_bluish.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-6"
+       width="24.117001"
+       height="32.117168"
+       x="160.87045"
+       y="329.86749"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_bluish.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-9"
+       width="24.117001"
+       height="32.117168"
+       x="203.83136"
+       y="332.80722"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_bluish.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-96"
+       width="24.117001"
+       height="32.117168"
+       x="102.4056"
+       y="382.22116"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\circle_gray.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-2"
+       width="24.117001"
+       height="32.117168"
+       x="137.65295"
+       y="382.08377"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_gray.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-33"
+       width="24.117001"
+       height="32.117168"
+       x="187.01483"
+       y="382.06845"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_gray.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-5"
+       width="24.117001"
+       height="32.117168"
+       x="252.57173"
+       y="372.31451"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\circle_darkgray.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-91"
+       width="24.117001"
+       height="32.117168"
+       x="287.81909"
+       y="372.17712"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\opened_darkgray.png" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.09999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4448-7-3-8-8-8-3-72-3-7-8-5-52"
+       width="24.117001"
+       height="32.117168"
+       x="337.18097"
+       y="372.1618"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_darkgray.png" />
   </g>
 </svg>

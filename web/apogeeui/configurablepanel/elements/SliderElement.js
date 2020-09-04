@@ -13,14 +13,9 @@ export default class SliderElement extends ConfigurableElement {
         var containerElement = this.getElement();
         
         //label
-        if(elementInitData.label) {
-            this.labelElement = document.createElement("span");
-            this.labelElement.className = "apogee_configurablePanelLabel";
-            this.labelElement.innerHTML = elementInitData.label;
-            containerElement.appendChild(this.labelElement);
-        }
-        else {
-            this.labelElement = null;
+        let labelElement = this.getLabelElement(elementInitData);
+        if(labelElement) {
+            containerElement.appendChild(labelElement);
         }
         
         //slider
@@ -29,10 +24,12 @@ export default class SliderElement extends ConfigurableElement {
 
         this.setFocusElement(this.sliderElement);
 
-        this.sliderElement.addEventListener("change",() => {
+        this.changeListener = () => {
             this.inputDone();
             this.valueChanged();
-        });
+        }
+
+        this.sliderElement.addEventListener("change",this.changeListener);
 
         if(elementInitData.min !== undefined) {
             this.sliderElement.min = elementInitData.min;
@@ -42,6 +39,12 @@ export default class SliderElement extends ConfigurableElement {
         }
         if(elementInitData.step !== undefined) {
             this.sliderElement.step = elementInitData.step;
+        }
+
+        //hint
+        let hintElement = this.getHintElement(elementInitData);
+        if(hintElement) {
+            containerElement.appendChild(hintElement);
         }
 
         this._postInstantiateInit(elementInitData);
@@ -61,6 +64,14 @@ export default class SliderElement extends ConfigurableElement {
     /** This method updates the list of checked entries. */
     setValueImpl(value) {
         this.sliderElement.value = value;
+    }
+
+    destroy() {
+        super.destroy();
+        
+        this.sliderElement.removeEventListener("change",this.changeListener);
+        this.changeListener = null;
+        this.sliderElement = null;
     }
 
     //===================================

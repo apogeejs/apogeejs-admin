@@ -10,7 +10,8 @@ export default class ConfigurablePanel {
     
     constructor() {
         this.elementObjects = [];
-        this.panelElement = this.createPanelElement(ConfigurablePanel.PANEL_CLASS_NORMAL); 
+        this.layouts = [];
+        this.panelDomElement = this.createPanelDomElement(ConfigurablePanel.PANEL_CLASS_NORMAL); 
     }
     
     configureForm(formInitData) {
@@ -27,7 +28,7 @@ export default class ConfigurablePanel {
         }
         
         //clear data
-        uiutil.removeAllChildren(this.panelElement);
+        uiutil.removeAllChildren(this.panelDomElement);
         this.elementObjects = [];
         
         try {
@@ -109,7 +110,7 @@ export default class ConfigurablePanel {
     }
     
     getElement() {
-        return this.panelElement;
+        return this.panelDomElement;
     }
     
     getChildEntries() {
@@ -171,6 +172,18 @@ export default class ConfigurablePanel {
             }
         });
     }
+
+    destroy() {
+        this.elementObjects.forEach( elementObject => {
+            elementObject.destroy();
+        });
+        this.elementObjects = [];
+        this.layouts.forEach( layout => {
+            layout.destroy();
+        });
+        this.layouts = [];
+        this.panelDomElement = null; 
+    }
     
     /** This method is used to register configurable elements with the panel */
     static addConfigurableElement(constructorFunction) {
@@ -193,13 +206,13 @@ export default class ConfigurablePanel {
     //=================================
     
     /** This creates the container element for the panel. */
-    createPanelElement(containerClassName) {
-        var panelElement = document.createElement("div");
-        panelElement.className = containerClassName;
+    createPanelDomElement(containerClassName) {
+        var panelDomElement = document.createElement("div");
+        panelDomElement.className = containerClassName;
         //explicitly remove margin and padding
-        panelElement.style.margin = "0px";
-        panelElement.style.padding = "0px";
-        return panelElement;
+        panelDomElement.style.margin = "0px";
+        panelDomElement.style.padding = "0px";
+        return panelDomElement;
     }
     
     /** this is called internally to add an element to the panel. */
@@ -217,12 +230,15 @@ export default class ConfigurablePanel {
         //add the dome element for the container
         var domElement = elementObject.getElement();
         if(domElement) {
-            this.panelElement.appendChild(domElement);
+            this.panelDomElement.appendChild(domElement);
         }
 
         if(elementObject.elementType == "ConfigurableElement") {
             //add all child elements from this container to the child element list
             this.elementObjects.push(elementObject);  
+        }
+        else if(elementObject.elementType == "ConfigurableLayoutContainer") {
+            this.layouts.push(elementObject);
         }
     }
 

@@ -8,6 +8,7 @@ import uiutil from "/apogeeui/uiutil.js";
 export default class ConfigurableElement {
     constructor(form,elementInitData) {
         this.form = form;
+        this.state = ConfigurablePanelConstants.STATE_NORMAL;
         this.key = elementInitData.key;
         this.meta = elementInitData.meta;
         this.isMultiselect = false;
@@ -148,7 +149,7 @@ export default class ConfigurableElement {
      * is also used to control visibility. */
     setVisibleDisplayStyle(visibleDisplayStyle) {
         this.visibleDisplayStyle = visibleDisplayStyle;
-        if(this.domElement.style.display != "none") {
+        if((this.domElement)&&(this.domElement.style.display != "none")) {
             this.domElement.style.display = this.visibleDisplayStyle;
         }
     }
@@ -156,6 +157,43 @@ export default class ConfigurableElement {
     /** This method should be called by extending methods to set the focus element, if there is one. */
     setFocusElement(focusElement) {
         this.focusElement = focusElement;
+    }
+
+    /** This cleans up the element. It should be extended to do any additional cleanup in an extending class. */
+    destroy() {
+        this.form = null;
+        this.onChangeListeners = [];
+        this.onInputListeners = [];
+        this.domElement = null;
+        this.focusElement  = null;
+    }
+
+    /** This function creates a label element and returns it if the element init data defines a label.
+     * Otherwise it returns null. */
+    getLabelElement(elementInitData) {
+        if(elementInitData.label) {
+            let labelElement = document.createElement("span");
+            labelElement.className = "apogee_configurablePanelLabel";
+            labelElement.innerHTML = elementInitData.label;
+            return labelElement;
+        }
+        else {
+            return null;
+        }
+    }
+
+    /** This function creates a label element and returns it if the element init data defines a label.
+     * Otherwise it returns null. */
+    getHintElement(elementInitData) {
+        if(elementInitData.hint) {
+            let hintElement = document.createElement("span");
+            hintElement.className = "apogee_configurablePanelHint";
+            hintElement.innerHTML = elementInitData.hint;
+            return hintElement;
+        }
+        else {
+            return null;
+        }
     }
     
     //===================================
@@ -207,6 +245,8 @@ export default class ConfigurableElement {
     _setDisabled(isDisabled) {};
     
     _setVisible(isVisible) {
+        if(!this.domElement) return;
+
         if(isVisible) {
             this.domElement.style.display = this.visibleDisplayStyle;
         }
@@ -237,7 +277,6 @@ export default class ConfigurableElement {
 
         //optional value
         let keepActiveOnHide =  selectorConfig.keepActiveOnHide;
-
         
         let parentElement = this.form.getEntry(parentKey);
         if(!parentElement) throw new Error("Parent element " + parentKey + " not found for selectable child element " + selectorConfig.key);

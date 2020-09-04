@@ -21,8 +21,8 @@ export default class HeadingElement extends ConfigurableElement {
         }
         var headingClass = "apogee_configurablePanelHeading_" + headingLevel;
         
-        this.headingElement = uiutil.createElement("span",{"className":headingClass,"innerHTML":elementInitData.text});
-        containerElement.appendChild(this.headingElement);
+        let headingElement = uiutil.createElement("span",{"className":headingClass,"innerHTML":elementInitData.text});
+        containerElement.appendChild(headingElement);
 
         this._postInstantiateInit(elementInitData);
     }

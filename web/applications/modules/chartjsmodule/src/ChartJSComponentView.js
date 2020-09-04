@@ -350,7 +350,7 @@ class ChartJSDisplay extends DataDisplay {
         this.contentElement.appendChild(this.errorElement);
         this.wrapperElement.appendChild(this.contentElement);
 
-        //this.chart = new Chart(this.canvasElement,this.config);
+        this.initialized = true;
     }
     
     /** This method returns the content element for the data display REQUIRED */
@@ -360,6 +360,7 @@ class ChartJSDisplay extends DataDisplay {
     
     /** This sets the data into the editor display. REQUIRED */
     setData(config) {
+        if(!this.initialized) return;
 
         if((!config)||(config === apogeeutil.INVALID_VALUE)) {
             config = DEFAULT_CHART_CONFIG;
@@ -410,6 +411,8 @@ class ChartJSDisplay extends DataDisplay {
     }
 
     showChartErrorMessage(errorMsg) {
+        if(!this.initialized) return;
+
         //make sure proper elements are showing
         if(this.canvasElement.style.display != "none") this.canvasElement.style.display = "none";
         if(this.errorElement.style.display == "none") this.errorElement.style.display = "";
@@ -421,6 +424,20 @@ class ChartJSDisplay extends DataDisplay {
     /** This method is called on loading the display. OPTIONAL */
     // onLoad() {
     // }
+
+    destroy() {
+        if(this.chart) {
+            this.chart.destroy();
+            this.chart = null;
+        }
+        this.config = null;
+        this.wrapperElement = null;
+        this.contentElement = null;
+        this.errorElement = null;
+        this.canvasElement = null;
+        
+        this.initialized = false;
+    }
 }
 
 let DEFAULT_CHART_CONFIG = {

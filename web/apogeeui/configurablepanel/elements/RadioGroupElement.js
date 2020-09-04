@@ -13,16 +13,24 @@ export default class RadioGroupElement extends ConfigurableElement {
         var containerElement = this.getElement();
         
         //label
-        if(elementInitData.label) {
-            this.labelElement = document.createElement("span");
-            this.labelElement.className = "apogee_configurablePanelLabel";
-            this.labelElement.innerHTML = elementInitData.label;
-            containerElement.appendChild(this.labelElement);
-            
-            if(!elementInitData.horizontal) containerElement.appendChild(document.createElement("br"));
+        let labelElement = this.getLabelElement(elementInitData);
+        if(labelElement) {
+            containerElement.appendChild(labelElement);
         }
-        else {
-            this.labelElement = null;
+
+        //hint
+        //if not horizontal, put the hint after the label
+        if(!elementInitData.horizontal) {
+            let hintElement = this.getHintElement(elementInitData);
+            if(hintElement) {
+                containerElement.appendChild(hintElement);
+            }
+        }
+
+        //add dom listeners for events
+        this.changeListener = () => {
+            this.inputDone();
+            this.valueChanged();
         }
         
         //radio buttons
@@ -68,12 +76,19 @@ export default class RadioGroupElement extends ConfigurableElement {
             if(elementInitData.horizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
 
             //add dom listeners
-            radio.addEventListener("change",() => {
-                this.inputDone();
-                this.valueChanged();
-            });
+            radio.addEventListener("change",this.changeListener);
         };
         elementInitData.entries.forEach(addButton);
+
+        //hint
+        //if  horizontal, put the hint at the end
+        if(elementInitData.horizontal) {
+            let hintElement = this.getHintElement(elementInitData);
+            if(hintElement) {
+                containerElement.appendChild(hintElement);
+            }
+
+        }
         
         this._postInstantiateInit(elementInitData);
     }
@@ -105,6 +120,16 @@ export default class RadioGroupElement extends ConfigurableElement {
         if(checkedButton) {
             checkedButton.checked = true;
         }
+    }
+
+    destroy() {
+        super.destroy();
+        
+        this.buttonList.forEach(radioButton => {
+            radioButton.removeEventListener("change",this.changeListener);
+        })
+        this.buttonList = [];
+        this.changeListener = null;
     }
 
     //===================================

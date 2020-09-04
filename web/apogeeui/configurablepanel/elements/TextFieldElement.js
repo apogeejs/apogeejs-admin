@@ -12,14 +12,9 @@ export default class TextFieldElement extends ConfigurableElement {
         var containerElement = this.getElement();
         
         //label
-        if(elementInitData.label) {
-            this.labelElement = document.createElement("span");
-            this.labelElement.className = "apogee_configurablePanelLabel";
-            this.labelElement.innerHTML = elementInitData.label;
-            containerElement.appendChild(this.labelElement);
-        }
-        else {
-            this.labelElement = null;
+        let labelElement = this.getLabelElement(elementInitData);
+        if(labelElement) {
+            containerElement.appendChild(labelElement);
         }
         
         //text field (maight had password flag)
@@ -32,9 +27,17 @@ export default class TextFieldElement extends ConfigurableElement {
             this.inputElement.size = elementInitData.size;
         }
 
-        //add dom listeners for events
-        this.inputElement.addEventListener("input",() => this.inputDone());
-        this.inputElement.addEventListener("change",() => this.valueChanged());
+        //add dom listeners
+        this.inputListener = () => this.inputDone();
+        this.changeListener = () => this.valueChanged();
+        this.inputElement.addEventListener("input",this.inputListener);
+        this.inputElement.addEventListener("change",this.changeListener);
+
+        //hint
+        let hintElement = this.getHintElement(elementInitData);
+        if(hintElement) {
+            containerElement.appendChild(hintElement);
+        }
         
         this._postInstantiateInit(elementInitData);
     }
@@ -50,6 +53,15 @@ export default class TextFieldElement extends ConfigurableElement {
     /** This method updates the UI value for a given element. */
     setValueImpl(value) {
         this.inputElement.value = value;
+    }
+
+    destroy() {
+        super.destroy();
+        this.inputElement.removeEventListener("input",this.inputListener);
+        this.inputElement.removeEventListener("change",this.changeListener);
+        this.inputListener = null;
+        this.changeListener = null;
+        this.inputElement = null;
     }
 
     //===================================

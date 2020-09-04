@@ -62,14 +62,22 @@ export default class SubmitElement extends ConfigurableElement {
             this.cancelButton = uiutil.createElement("button",{"className":"apogee_configurablePanelButton","innerHTML":cancelLabel,"onclick":onCancel});
             containerElement.appendChild(this.cancelButton);
 
-            this.setFocusElement(this.cancelButton);
-            focusElementSet = true;
+            if(!focusElementSet) {
+                this.setFocusElement(this.cancelButton);
+                focusElementSet = true;
+            }
         }
         else {
             this.cancelButton = null;
         }  
 
-        this._setButtonState();    
+        this._setButtonState(); 
+        
+        //hint
+        let hintElement = this.getHintElement(elementInitData);
+        if(hintElement) {
+            containerElement.appendChild(hintElement);
+        }
         
         this._postInstantiateInit(elementInitData);
     }
@@ -82,6 +90,20 @@ export default class SubmitElement extends ConfigurableElement {
     cancelDisable(isDisabled) {
         this.cancelDisabled = isDisabled;
         this._setButtonState();
+    }
+
+    destroy() {
+        super.destroy();
+
+        if(this.submitButton) {
+            this.submitButton.onclick = null;
+            this.submitButton = null;
+        }
+
+        if(this.cancelButton) {
+            this.cancelButton.onclick = null;
+            this.cancelButton = null;
+        }
     }
 
     //===================================
