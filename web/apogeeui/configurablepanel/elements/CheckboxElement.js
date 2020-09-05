@@ -19,6 +19,7 @@ export default class CheckboxElement extends ConfigurableElement {
         
         //checkbox field
         this.checkbox = uiutil.createElement("input",{"type":"checkbox"}); 
+        containerElement.appendChild(this.checkbox);
 
         this.setFocusElement(this.checkbox);
         
@@ -29,25 +30,16 @@ export default class CheckboxElement extends ConfigurableElement {
         }
         this.checkbox.addEventListener("change",this.changeListener);
 
-        //add the tooltip
-        if(elementInitData.tooltip) {
-            let tooltipWrapper = document.createElement("div");
-            tooltipWrapper.className = "apogee_tooltip_element";
-            let tooltip = document.createElement("div");
-            tooltip.className = "apogee_tooltip_text";
-            tooltip.innerHTML = elementInitData.tooltip;
-            tooltipWrapper.appendChild(this.checkbox);
-            tooltipWrapper.appendChild(tooltip);
-            containerElement.appendChild(tooltipWrapper);
-        }
-        else {
-            containerElement.appendChild(this.checkbox);
-        }
-
         //hint
         let hintElement = this.getHintElement(elementInitData);
         if(hintElement) {
             containerElement.appendChild(hintElement);
+        }
+
+        //help element
+        let helpElement = this.getHelpElement(elementInitData);
+        if(helpElement) {
+            containerElement.appendChild(helpElement);
         }
         
         this._postInstantiateInit(elementInitData);

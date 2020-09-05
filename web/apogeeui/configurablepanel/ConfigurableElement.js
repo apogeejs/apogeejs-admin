@@ -1,5 +1,6 @@
 import ConfigurablePanelConstants from "/apogeeui/configurablepanel/ConfigurablePanelConstants.js";
 import uiutil from "/apogeeui/uiutil.js";
+import {getHelpElement} from "/apogeeui/tooltip/tooltip.js";
 
 /** This is an element that composes the content of a configurable panel.
  * 
@@ -176,6 +177,18 @@ export default class ConfigurableElement {
             labelElement.className = "apogee_configurablePanelLabel";
             labelElement.innerHTML = elementInitData.label;
             return labelElement;
+        }
+        else {
+            return null;
+        }
+    }
+
+    getHelpElement(elementInitData) {
+        if(elementInitData.help) {
+            //note - the funciton below is the imported one, not the class member function
+            let helpElements = getHelpElement(elementInitData.help);
+            helpElements.wrapperElement.classList.add("apogee_configurableElementHelpAddon");
+            return helpElements.wrapperElement;
         }
         else {
             return null;

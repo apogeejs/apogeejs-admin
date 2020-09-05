@@ -38,9 +38,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.4304832"
-     inkscape:cx="225.16503"
-     inkscape:cy="729.36817"
+     inkscape:zoom="4.206224"
+     inkscape:cx="252.58498"
+     inkscape:cy="516.63835"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -69,6 +69,74 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <g
+       transform="translate(109.44326,108.62036)"
+       id="g4322-1-3"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\help_icon_bluish.png"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587">
+      <rect
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_gray.png"
+         inkscape:export-ydpi="44.696587"
+         inkscape:export-xdpi="44.696587"
+         y="444.65173"
+         x="170.73555"
+         height="32.117168"
+         width="32.117168"
+         id="rect4448-7-3-8-8-8-3-72-4-3-47"
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       transform="translate(185.55981,83.522475)"
+       id="g4322-1-7"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\helpIcon_gray.png"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587">
+      <rect
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_gray.png"
+         inkscape:export-ydpi="44.696587"
+         inkscape:export-xdpi="44.696587"
+         y="444.65173"
+         x="170.73555"
+         height="32.117168"
+         width="32.117168"
+         id="rect4448-7-3-8-8-8-3-72-4-3-7"
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       transform="translate(93.808505,58.013144)"
+       id="g4322-1"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\helpIcon.png"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587">
+      <rect
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_gray.png"
+         inkscape:export-ydpi="44.696587"
+         inkscape:export-xdpi="44.696587"
+         y="444.65173"
+         x="170.73555"
+         height="32.117168"
+         width="32.117168"
+         id="rect4448-7-3-8-8-8-3-72-4-3"
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       transform="translate(142.74794,60.527981)"
+       id="g4322-1-1"
+       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\helpIcon_darkgray.png"
+       inkscape:export-xdpi="44.696587"
+       inkscape:export-ydpi="44.696587">
+      <rect
+         inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\menuDots16_gray.png"
+         inkscape:export-ydpi="44.696587"
+         inkscape:export-xdpi="44.696587"
+         y="444.65173"
+         x="170.73555"
+         height="32.117168"
+         width="32.117168"
+         id="rect4448-7-3-8-8-8-3-72-4-3-4"
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
     <flowRoot
        xml:space="preserve"
        id="flowRoot3347"
@@ -193,7 +261,7 @@
          sodipodi:role="line"
          x="39.979649"
          y="267.57516"
-         id="tspan4584">- export menu dots @16px</tspan></text>
+         id="tspan4584">- export menu dots, help @16px</tspan></text>
     <flowRoot
        xml:space="preserve"
        id="flowRoot3347-9-6"
@@ -853,5 +921,91 @@
        inkscape:export-xdpi="44.696587"
        inkscape:export-ydpi="44.696587"
        inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\closed_darkgray.png" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4264"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:sans-serif;font-style:normal;font-weight:normal;font-size:30px;line-height:125%;letter-spacing:0px;word-spacing:0px"><flowRegion
+         id="flowRegion4266"><rect
+           id="rect4268"
+           width="53.487305"
+           height="32.503826"
+           x="139.88988"
+           y="510.08319" /></flowRegion><flowPara
+         id="flowPara4270"></flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:27.67960548px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="252.06592"
+       y="572.91077"
+       id="text4272"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0838305,0.9226535)"><tspan
+         sodipodi:role="line"
+         id="tspan4274"
+         x="252.06592"
+         y="572.91077"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.67960548px;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT'">?</tspan></text>
+    <circle
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4278"
+       cx="280.60263"
+       cy="518.72345"
+       r="14.606148" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:27.67960548px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#737373;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
+       x="336.72058"
+       y="600.55853"
+       id="text4272-6"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0838305,0.9226535)"><tspan
+         sodipodi:role="line"
+         id="tspan4274-3"
+         x="336.72058"
+         y="600.55853"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.67960548px;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT';fill:#737373;fill-opacity:1;">?</tspan></text>
+    <circle
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#737373;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4278-2"
+       cx="372.35394"
+       cy="544.23279"
+       r="14.606148" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:27.67960548px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#606060;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
+       x="297.22006"
+       y="575.63641"
+       id="text4272-2"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0838305,0.9226535)"><tspan
+         sodipodi:role="line"
+         id="tspan4274-2"
+         x="297.22006"
+         y="575.63641"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.67960548px;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT';fill:#606060;fill-opacity:1;">?</tspan></text>
+    <circle
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#606060;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4278-25"
+       cx="329.54205"
+       cy="521.23828"
+       r="14.606148" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:27.67960548px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#406297;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
+       x="266.49136"
+       y="627.76044"
+       id="text4272-7"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0838305,0.9226535)"><tspan
+         sodipodi:role="line"
+         id="tspan4274-35"
+         x="266.49136"
+         y="627.76044"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.67960548px;font-family:'Swis721 BT';-inkscape-font-specification:'Swis721 BT';fill:#406297;fill-opacity:1;">?</tspan></text>
+    <circle
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#406297;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4278-4"
+       cx="296.2374"
+       cy="569.33069"
+       r="14.606148" />
   </g>
 </svg>
