@@ -184,7 +184,7 @@ export default class ListElement extends ConfigurableElement {
         this.listEntries.forEach( listEntry => {
             listEntry.elementObject.destroy();
         })
-        listEntries = [];
+        this.listEntries = [];
     }
 
     //===================================
