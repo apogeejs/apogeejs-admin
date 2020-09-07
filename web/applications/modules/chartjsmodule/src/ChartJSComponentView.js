@@ -36,10 +36,6 @@ export default class ChartJSComponentView extends ComponentView {
                 dataSource = this._getInputFormDataSource();
                 return new ConfigurableFormEditor(displayContainer,dataSource);
 
-            case ChartJSComponentView.VIEW_CONFIG_DATA:
-                dataSource = this._getConfigDebugDataSource();
-                return new AceTextEditor(displayContainer,dataSource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
-
             default:
                 alert("unrecognized view element!");
                 return null;
@@ -136,14 +132,16 @@ export default class ChartJSComponentView extends ComponentView {
             let chartType = this.getComponent().getChartType();
 
             if(memberData) {
-                if(memberData.inputType == "rawConfig") {
-                    //raw chart config entered
-                    //for chart js, this must be a editable, so we will make a copy
-                    chartConfig = apogeeutil.jsonCopy(memberData.configData);
-                }
-                else if(memberData.inputType == "json") {
-                    let chartJson = memberData.jsonData;
-                    chartConfig = createChartConfig(chartJson,chartType);
+                if(memberData.inputType == "config") {
+                    let configJson = memberData.configJson;
+                    if(memberData.configFormat == "apogee") {
+                        //"apogee format", matching form result
+                        chartConfig = createChartConfig(configJson,chartType);
+                    }
+                    else if(memberData.configFormat == "") {
+                        //raw chart js format
+                        chartConfig = apogeeutil.jsonCopy(configJson);
+                    }
                 }
                 else if(memberData.inputType == "form") {
                     let chartJson = memberData.formData;

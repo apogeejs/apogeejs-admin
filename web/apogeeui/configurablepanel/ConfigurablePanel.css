@@ -42,16 +42,20 @@
 }
 .apogee_configurablePanelLabel {
     font-weight: bold;
-    vertical-align: top; 
+    vertical-align: middle; 
 }
 .apogee_configurablePanelHint {
     font-style: italic;
+    font-size: smaller;
     color: gray;
-    vertical-align: top; 
+    vertical-align: middle; 
+    margin-right: 3px;
+    margin-left: 3px;
 }
 .apogee_configurablePanelButton {
     margin-left:20px;
     margin-right:20px;
+    vertical-align: middle;
 }
 .apogee_configurableShowHideBody {
     margin-top: 0;
@@ -70,11 +74,13 @@
     padding-bottom: 0;
     padding-right: 5px;
     padding-left: 5px;
+    vertical-align: middle;
 }
 .apogee_configurableExtendedDropdown {
     position: relative;
     display: inline-block;
     overflow: visible;
+    vertical-align: middle;
 }
 .apogee_configurableExtendedHeadLink {
     position: relative;
@@ -114,8 +120,8 @@
     
 }
 .apogee_configurableElementHelpWrapperAddon {
-    vertical-align: center;
     margin-left: 10px;
+    vertical-align: middle;
 }
 .apogee_configurableElementHelpTextAddon {
     text-align: left;
