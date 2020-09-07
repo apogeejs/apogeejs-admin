@@ -186,7 +186,14 @@ export default class ConfigurableElement {
     getHelpElement(elementInitData) {
         if(elementInitData.help) {
             //note - the funciton below is the imported one, not the class member function
-            let helpElements = getHelpElement(elementInitData.help);
+            let options = {
+                wrapperAddonClass: "apogee_configurableElementHelpWrapperAddon",
+                textAddonClass: "apogee_configurableElementHelpTextAddon"
+            };
+            if(elementInitData.help.length > 24) {
+                options.textWidth = "300px";
+            }
+            let helpElements = getHelpElement(elementInitData.help,options);
             helpElements.wrapperElement.classList.add("apogee_configurableElementHelpAddon");
             return helpElements.wrapperElement;
         }

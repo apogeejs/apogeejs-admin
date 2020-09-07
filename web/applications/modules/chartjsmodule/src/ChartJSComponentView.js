@@ -79,7 +79,7 @@ export default class ChartJSComponentView extends ComponentView {
                 let reloadDataDisplay = this.getComponent().isFieldUpdated("chartType");
                 return {reloadData,reloadDataDisplay};
             }, 
-            getDisplayData: () => _getFormLayout(this.getComponent().getChartType()),
+            getDisplayData: () => getFormLayout(this.getComponent().getChartType()),
             getData: () => this._getFormData(),
             getEditOk: () => true,
             saveData: (formData) => this._onSubmit(formData)

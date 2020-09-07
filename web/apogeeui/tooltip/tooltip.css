@@ -2,7 +2,7 @@
     position: relative;
     display: inline-block;
 }
-.apogee_tooltip_element .apogee_tooltip_text {
+.apogee_tooltip_text {
     visibility: hidden;
     position: absolute;
     top: 50%;
@@ -10,10 +10,9 @@
     padding: 3px;
     background-color: rgb(245,245,245);
     color: darkblue;
-    border: 1px solid black;
+    border: 1px solid darkblue;
     text-align: center;
     z-index: 100;
-    width: 300px;
 }
 .apogee_tooltip_element:hover .apogee_tooltip_text {
     visibility: visible;

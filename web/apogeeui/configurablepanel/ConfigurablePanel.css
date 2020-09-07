@@ -113,7 +113,10 @@
     z-index: 10;
     
 }
-.apogee_configurableElementHelpAddon {
+.apogee_configurableElementHelpWrapperAddon {
     vertical-align: center;
     margin-left: 10px;
+}
+.apogee_configurableElementHelpTextAddon {
+    text-align: left;
 }
