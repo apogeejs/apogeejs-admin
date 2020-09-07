@@ -22,11 +22,18 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         }
 
         //hint
-        //if not horizontal, put the hint after the label
+        //if not horizontal, put the hint and help after the label
         if(!elementInitData.horizontal) {
+            //hint element
             let hintElement = this.getHintElement(elementInitData);
             if(hintElement) {
                 containerElement.appendChild(hintElement);
+            }
+
+            //help element
+            let helpElement = this.getHelpElement(elementInitData);
+            if(helpElement) {
+                containerElement.appendChild(helpElement);
             }
         }
 
@@ -83,11 +90,17 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         elementInitData.entries.forEach(addCheckbox);  
 
         //hint
-        //if  horizontal, put the hint at the end
+        //if  horizontal, put the hint and help at the end
         if(elementInitData.horizontal) {
             let hintElement = this.getHintElement(elementInitData);
             if(hintElement) {
                 containerElement.appendChild(hintElement);
+            }
+
+            //help element
+            let helpElement = this.getHelpElement(elementInitData);
+            if(helpElement) {
+                containerElement.appendChild(helpElement);
             }
         }
         

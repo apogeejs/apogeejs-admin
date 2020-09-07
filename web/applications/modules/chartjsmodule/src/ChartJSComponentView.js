@@ -208,55 +208,6 @@ export default class ChartJSComponentView extends ComponentView {
 
 }
 
-function _getFormLayout(chartType) {
-    return [
-        {
-            type: "radioButtonGroup",
-            label: "Input Type: ",
-            entries: [["Form","form"],["JSON","json"],["Raw ChartJS Config","rawConfig"]],
-            horizontal: true,
-            value: "form", //initial default
-            key: "inputType"
-        },    
-        {
-            type: "textField",
-            label: "JSON Config: ",
-            key: "jsonData",
-            selector: {
-                parentKey: "inputType",
-                parentValue: "json"
-            },
-            meta: {
-                "expression": "simple"
-            }
-        },
-        {
-            type: "textField",
-            label: "ChartJS Config: ",
-            key: "configData",
-            selector: {
-                parentKey: "inputType",
-                parentValue: "rawConfig"
-            },
-            meta: {
-                "expression": "simple"
-            }
-        },
-        {
-            type: "panel",
-            selector: {
-                parentKey: "inputType",
-                parentValue: "form"
-            },
-            formData: getChartLayout(chartType),
-            key: "formData",
-            meta: {
-                "expression": "object"
-            }
-        }
-    ];
-}
-
 const DEFAULT_CHART_CONFIG_DATA = {
     line: {"categoryDataSeries": [] },
     bar: {"categoryDataSeries": [] },
@@ -474,8 +425,58 @@ const CHART_INFO_MAP = {
     }
 }
 
+
+function getFormLayout(chartType) {
+    return [
+        {
+            type: "radioButtonGroup",
+            label: "Input Type: ",
+            entries: [["Form","form"],["JSON","json"],["Raw ChartJS Config","rawConfig"]],
+            horizontal: true,
+            value: "form", //initial default
+            key: "inputType"
+        },    
+        {
+            type: "textField",
+            label: "JSON Config: ",
+            key: "jsonData",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "json"
+            },
+            meta: {
+                "expression": "simple"
+            }
+        },
+        {
+            type: "textField",
+            label: "ChartJS Config: ",
+            key: "configData",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "rawConfig"
+            },
+            meta: {
+                "expression": "simple"
+            }
+        },
+        {
+            type: "panel",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "form"
+            },
+            formData: getChartFormLayout(chartType),
+            key: "formData",
+            meta: {
+                "expression": "object"
+            }
+        }
+    ];
+}
+
 /** The constructs the chart form layout for a given chart type. */
-function getChartLayout(chartType) {
+function getChartFormLayout(chartType) {
     let chartInfo = CHART_INFO_MAP[chartType];
 
     if (!chartInfo) throw new Error("Unrecognized chart type: " + chartType);

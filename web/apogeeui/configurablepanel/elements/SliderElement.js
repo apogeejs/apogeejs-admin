@@ -47,6 +47,12 @@ export default class SliderElement extends ConfigurableElement {
             containerElement.appendChild(hintElement);
         }
 
+        //help element
+        let helpElement = this.getHelpElement(elementInitData);
+        if(helpElement) {
+            containerElement.appendChild(helpElement);
+        }
+
         this._postInstantiateInit(elementInitData);
     }
     

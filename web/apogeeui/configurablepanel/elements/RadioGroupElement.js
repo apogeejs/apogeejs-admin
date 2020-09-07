@@ -19,11 +19,17 @@ export default class RadioGroupElement extends ConfigurableElement {
         }
 
         //hint
-        //if not horizontal, put the hint after the label
+        //if not horizontal, put the hint and help after the label
         if(!elementInitData.horizontal) {
             let hintElement = this.getHintElement(elementInitData);
             if(hintElement) {
                 containerElement.appendChild(hintElement);
+            }
+
+            //help element
+            let helpElement = this.getHelpElement(elementInitData);
+            if(helpElement) {
+                containerElement.appendChild(helpElement);
             }
         }
 
@@ -81,11 +87,17 @@ export default class RadioGroupElement extends ConfigurableElement {
         elementInitData.entries.forEach(addButton);
 
         //hint
-        //if  horizontal, put the hint at the end
+        //if  horizontal, put the hint and help at the end
         if(elementInitData.horizontal) {
             let hintElement = this.getHintElement(elementInitData);
             if(hintElement) {
                 containerElement.appendChild(hintElement);
+            }
+
+            //help element
+            let helpElement = this.getHelpElement(elementInitData);
+            if(helpElement) {
+                containerElement.appendChild(helpElement);
             }
 
         }
