@@ -83,10 +83,26 @@ export default class CSVComponentView extends ComponentView {
                 type: "textField",
                 label: "Input Text Data: ",
                 key: "input",
+                hint: "expression",
+                help: INPUT_HELP_TEXT,
                 meta: {
                     expression: "simple",
                     excludeValue: ""
                 }
+            },
+            {
+                type: "checkbox",
+                label: "Dynamic Typing: ",
+                value: false,
+                key: "dynamicTyping",
+                help: DYNAMIC_TYPING_HELP_TEXT
+            },
+            {
+                type: "checkbox",
+                label: "Skip Empty Lines: ",
+                value: false,
+                key: "skipEmptyLines",
+                help: SKIP_EMPTY_HELP_TEXT
             }
         ]
     }
@@ -147,6 +163,10 @@ CSVComponentView.TABLE_EDIT_SETTINGS = {
     "defaultView": CSVComponentView.VIEW_GRID
 }
 
+const INPUT_HELP_TEXT = "This should be a javascript expression, such as the name of a cell, which gives the raw CSV text. It will be converted to JSON format." + 
+" To access this json value, use the expression <em>[cell name].csv_data</em>.";
+const DYNAMIC_TYPING_HELP_TEXT = "Check this box to automatically convert numbers and booleans. If this is not selected, all data will be strings.";
+const SKIP_EMPTY_HELP_TEXT = "Check this box to omit a row with no content, often the last row.";
 
 
 //===============================

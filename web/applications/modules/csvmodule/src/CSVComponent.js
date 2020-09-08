@@ -48,7 +48,10 @@ CSVComponent.DEFAULT_MEMBER_JSON = {
                 "argList": [],
                 "functionBody":`
     if(csv_input.input) {
-        let result = __papaparse.parse(csv_input.input);
+        let options = {};
+        options.dynamicTyping = csv_input.dynamicTyping;
+        options.skipEmptyLines = csv_input.skipEmptyLines;
+        let result = __papaparse.parse(csv_input.input,options);
         if(result.errors.length == 0) {
             return result.data;
         }

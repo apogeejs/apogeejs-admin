@@ -27,7 +27,7 @@ const configJsonHelp = "Enter the name of the cell containing the config json, o
 
 const xValuesTypeHelp = "The x values can be (1) categories, such as days of the week or other discrete values, or (2) numeric values. "
 
-const categoryElementHelp = "This is a javascript expression, such as the name of a cell, giving the array of category values."
+const categoryElementHelp = "This is a javascript expression, such as the name of a cell, giving the array of category values. If this is omitted, the categories will be integer values starting with 1."
 
 const numericDataFormatHelp = "Select the desired data format to enter the X and Y Values for the chart. "
 
@@ -1011,7 +1011,7 @@ const yAxisConfigElement = {
 const categoryElement = {
     type: "textField",
     label: "X Category Array: ",
-    hint: "expression",
+    hint: "expression, optional",
     help: categoryElementHelp,
     key: "xCategories",
     meta: {
