@@ -104,8 +104,6 @@ export default class ShowHideLayout extends ConfigurableLayoutContainer {
     }
 
     _setState(isClosed) {
-        if(this.initialized) return;
-
         this.isClosed = isClosed;
         if(this.isClosed) {
             this.bodyElement.style.display = "none";

@@ -19,8 +19,95 @@ const CHART_INFO_MAP = {
     }
 }
 
-/** The constructs the chart form layout for a given chart type. */
-function getChartLayout(chartType) {
+const inputTypeHelp = "Indicates the way you will enter data:\n- <b>Form</b> gives you several fields to guide input for the chart data and style.\n- <b>Config JSON</b> lets you specify a single config JSON to specify the form data and style. See documentation for the required format for the config JSON."
+
+const configFormatHelp = "Two config formats are available. See the documentation for more information on each.\n- <b>Apogee Format</b> is the format that mirrors that data entered with the form input type.\n- <b>ChartJS Format</b> is the format of ChartJS. Using this allows more flexibility. "
+
+const configJsonHelp = "Enter the name of the cell containing the config json, or any other javascript expression returning the desired config json value. "
+
+const xValuesTypeHelp = "The x values can be (1) categories, such as days of the week or other discrete values, or (2) numeric values. "
+
+const categoryElementHelp = "This is a javascript expression, such as the name of a cell, giving the array of category values."
+
+const numericDataFormatHelp = "Select the desired data format to enter the X and Y Values for the chart. "
+
+const numericXValuesHelp = "Enter a javascript expression, such as the name of a cell, giving the array of X values. "
+
+const numericYValuesHelp = "Enter a javascript expression, such as the name of a cell, giving the array of Y values.  "
+
+const numericXYPointsHelp = "Enter a javascript expression, such as the name of a cell, giving the array of values of objects containing the values x and y."
+
+const numericDataArrayHelp = "Enter a javascript expression, such as the name of a cell, giving the array of arbitrary objects. The X and Y values will be read from it using the function specified below."
+
+const numericXAccessorHelp = "Enter a javascript expression giving a function f to read the X value from the above data array: xValueArray = dataArray.map( f ); "
+
+const numericYAccessorHelp = "Enter a javascript expression giving a function f to read the Y value from the above data array: yValueArray = dataArray.map( f ); "
+
+const categoryDataFormatHelp = "Select the desired data format to enter the Y Values for the chart. "
+
+const categoryYValuesHelp = "Enter a javascript expression, such as the name of a cell, giving the array of Y values.  "
+
+const categoryDataArrayHelp = "Enter a javascript expression, such as the name of a cell, giving the array of arbitrary objects. The Y values will be read from it using the function specified below."
+
+const categoryYAccessorHelp = "Enter a javascript expression giving a function f to read the Y value from the above data array: yValueArray = dataArray.map( f ); "
+
+/** This function constructs the overall form layout for the chart input. */
+function getFormLayout(chartType) {
+    return [
+        {
+            type: "radioButtonGroup",
+            label: "Input Type: ",
+            entries: [["Form", "form"], ["Config JSON", "config"]],
+            horizontal: true,
+            help: inputTypeHelp,
+            value: "form", //initial default
+            key: "inputType"
+        },
+        {
+            type: "radioButtonGroup",
+            label: "Config Format: ",
+            entries: [["Apogee Format", "apogee"], ["ChartJS Format", "chartjs"]],
+            horizontal: true,
+            help: configFormatHelp,
+            value: "apogee", //initial default
+            key: "configFormat",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "config"
+            },
+        },
+        {
+            type: "textField",
+            label: "Config JSON: ",
+            hint: "expression",
+            help: configJsonHelp,
+            key: "configJson",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "config"
+            },
+            meta: {
+                "expression": "simple"
+            }
+        },
+        {
+            type: "panel",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "form"
+            },
+            formData: getChartFormLayout(chartType),
+            key: "formData",
+            meta: {
+                "expression": "object"
+            }
+        }
+    ];
+}
+
+
+/** The constructs the body of the layout for the "form" option of input. Or, in other words, this is the actual chart entry form.  */
+function getChartFormLayout(chartType) {
     let chartInfo = CHART_INFO_MAP[chartType];
 
     if (!chartInfo) throw new Error("Unrecognized chart type: " + chartType);
@@ -249,11 +336,14 @@ const baseNumericDataSeriesDataLayout = [
         label: "Data Format: ",
         entries: [["X Array and Y Array", "values"], ["XY Point Array", "points"], ["Data Array and X and Y Acccessors", "structs"]],
         value: "values", //default
+        help: numericDataFormatHelp,
         key: "dataFormat"
     },
     {
         type: "textField",
         label: "X Values: ",
+        hint: "expression",
+        help: numericXValuesHelp,
         key: "xValues",
         selector: {
             parentKey: "dataFormat",
@@ -267,6 +357,8 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Y Values: ",
+        hint: "expression",
+        help: numericYValuesHelp,
         key: "yValues",
         selector: {
             parentKey: "dataFormat",
@@ -280,6 +372,8 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "XY Point Array: ",
+        hint: "expression",
+        help: numericXYPointsHelp,
         key: "xyPoints",
         selector: {
             parentKey: "dataFormat",
@@ -293,6 +387,8 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Data Array: ",
+        hint: "expression",
+        help: numericDataArrayHelp,
         key: "dataArray",
         selector: {
             parentKey: "dataFormat",
@@ -306,6 +402,8 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "X Accessor: ",
+        hint: "expression",
+        help: numericXAccessorHelp,
         key: "xAccessor",
         selector: {
             parentKey: "dataFormat",
@@ -319,6 +417,8 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Y Accessor: ",
+        hint: "expression",
+        help: numericYAccessorHelp,
         key: "yAccessor",
         selector: {
             parentKey: "dataFormat",
@@ -335,14 +435,17 @@ const baseNumericDataSeriesDataLayout = [
 const baseCategoryDataSeriesDataLayout = [
     {
         type: "dropdown",
-        label: "Data Type: ",
+        label: "Data Format: ",
         entries: [["Y Array", "values"], ["Data Array and Y Acccessor", "structs"]],
         value: "values", //default
+        help: categoryDataFormatHelp,
         key: "dataType"
     },
     {
         type: "textField",
         label: "Y Values: ",
+        hint: "expression",
+        help: categoryYValuesHelp,
         key: "yValues",
         selector: {
             parentKey: "dataType",
@@ -356,6 +459,8 @@ const baseCategoryDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Data Array: ",
+        hint: "expression",
+        help: categoryDataArrayHelp,
         key: "dataArray",
         selector: {
             parentKey: "dataType",
@@ -369,6 +474,8 @@ const baseCategoryDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Y Accessor: ",
+        hint: "expression",
+        help: categoryYAccessorHelp,
         key: "yAccessor",
         selector: {
             parentKey: "dataType",
@@ -904,6 +1011,8 @@ const yAxisConfigElement = {
 const categoryElement = {
     type: "textField",
     label: "X Category Array: ",
+    hint: "expression",
+    help: categoryElementHelp,
     key: "xCategories",
     meta: {
         "expression": "simple"
@@ -928,6 +1037,7 @@ const xValuesTypeElement = {
     entries: [["Category", "category"], ["Numeric", "numeric"]],
     value: "category", //initial default
     horizontal: true,
+    help: xValuesTypeHelp,
     key: "xValuesType"
 }
 
