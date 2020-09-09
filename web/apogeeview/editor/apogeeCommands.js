@@ -475,6 +475,40 @@ function pathToModPath(path) {
     return modPath;
 }
 
+//===================================================================
+/** Special work around
+ * Using the standard document logic, if an apogee node is the first node (and it is not the only node) then
+ * when a user presses enter the new paragraph will be created _above_ the node. I don't want this.
+ *This logic will detect that single case and put the new paragraph after. */
+function insertParagraphAfterFirstApogeeNode(state,dispatch) {
+    let {$from, $to} = state.selection;
+    let schema = state.schema;
+    //only run this if we are at the start of the doc
+    if($from.pos !== 0) return;
+
+    //see if the selection is a single apogee node (we can probably use a general function for this)
+    //THIS MIGHT NEED TO BE UPDATED, for now you can only select a single apogee node
+    let apogeeNodeCount = 0;
+    let nonApogeeNodeCount = 0;
+    let checkNodes = (node, pos, parent, index) => {
+        (node.type == schema.nodes.apogeeComponent) ? apogeeNodeCount++ : nonApogeeNodeCount++;
+        return false;
+    }
+    state.doc.nodesBetween($from.pos,$to.pos,checkNodes);
+
+    if((apogeeNodeCount !== 1)&&(nonApogeeNodeCount !== 0)) return;
+
+    //create a paragraph after the node
+    if (dispatch) {;
+        let typeToCreate = schema.nodes.paragraph
+        let pos = $to.pos;
+        let tr = state.tr.insert(pos, typeToCreate.createAndFill());
+        tr.setSelection(TextSelection.create(tr.doc, pos + 1));
+        dispatch(tr.scrollIntoView());
+    }
+    return true
+}
+
 
 //========================================
  // Keymap
@@ -484,7 +518,7 @@ import { createParagraphNear, splitBlock, deleteSelection,
   joinBackward, joinForward, selectAll,
   chainCommands  }  from "/prosemirror/dist/prosemirror-commands.es.js";
 
-let enter = chainCommands(exitEmptyList, createParagraphNear, splitBlock);
+let enter = chainCommands(exitEmptyList, insertParagraphAfterFirstApogeeNode, createParagraphNear, splitBlock);
 let backspace = chainCommands(exitEmptyList,deleteSelection, joinBackward, exitFromStartOfList);
 let del = chainCommands(deleteSelection, joinForward, joinNextBlockToListFromEnd, joinNextBlockFromListFromEnd);
 
