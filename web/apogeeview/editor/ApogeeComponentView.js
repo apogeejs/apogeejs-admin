@@ -85,7 +85,12 @@ export default class ApogeeComponentView {
   }
 
   destroy() {
-    //    if (this.innerView) this.close()
+    this.node = null;
+    this.view = null;
+    this.getPos = null;
+    this.pageDisplay = null;
+    this.dom = null;
+    this.contentDiv = null;
   }
 
   stopEvent(event) {

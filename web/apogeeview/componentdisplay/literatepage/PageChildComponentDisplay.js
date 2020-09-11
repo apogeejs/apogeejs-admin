@@ -29,8 +29,10 @@ export default class PageChildComponentDisplay {
         
         //connect to parent
         this.setIsPageShowing(this.parentComponentDisplay.getIsShowing());
-        this.parentComponentDisplay.addListener(uiutil.SHOWN_EVENT,() => this.setIsPageShowing(true));
-        this.parentComponentDisplay.addListener(uiutil.HIDDEN_EVENT,() => this.setIsPageShowing(false));
+        this.onShow = () => this.setIsPageShowing(true);
+        this.onHide = () => this.setIsPageShowing(false);
+        this.parentComponentDisplay.addListener(uiutil.SHOWN_EVENT,this.onShow);
+        this.parentComponentDisplay.addListener(uiutil.HIDDEN_EVENT,this.onHide);
     }
 
     getElement() {
@@ -133,6 +135,21 @@ export default class PageChildComponentDisplay {
 
     /** This should be called by the component when it discards this display. */
     deleteDisplay() {
+        if(this.isDestroyed) return; 
+
+        //remove parent listeners
+        if(this.parentComponentDisplay) {
+            this.parentComponentDisplay.removeListener(uiutil.SHOWN_EVENT,this.onShow);
+            this.parentComponentDisplay.removeListener(uiutil.HIDDEN_EVENT,this.onHide);
+            this.parentComponentDisplay = null;
+        }
+        
+        //discard the menu
+        if(this.menu) {
+            this.menu.destroy();
+            this.menu = null;
+        }
+
         //dispose any view elements
         for(var viewType in this.displayContainerMap) {
             var displayContainer = this.displayContainerMap[viewType];
@@ -141,6 +158,21 @@ export default class PageChildComponentDisplay {
                 delete this.displayContainerMap[viewType];
             }
         }
+
+        //remove the dom elements
+        if(this.mainElement) {
+            this.mainElement.onclick = null;
+            this.mainElement.remove();
+        }
+        if(this.bannerContainer) this.bannerContainer.remove();
+        if(this.viewContainer) this.viewContainer.remove();
+        if(this.titleBarContainer) this.titleBarContainer.remove();
+        if(this.iconContainerElement) this.iconContainerElement.remove();
+        if(this.icon) this.icon.remove();
+        if(this.titleBarNameElement) this.titleBarNameElement.remove();
+        if(this.titleBarViewsElement) this.titleBarViewsElement.remove();
+
+        this.isDestroyed = true;
     }
 
     /** This function sets this child display to highlighted. It is intended for when this display is

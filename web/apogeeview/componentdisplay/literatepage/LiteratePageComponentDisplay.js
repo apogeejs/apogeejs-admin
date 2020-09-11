@@ -8,10 +8,6 @@ import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 
 import {uiutil,Tab,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
 
-import { TextSelection } from "/prosemirror/dist/prosemirror-state.es.js";
-
-
-
 /** This component represents a json table object. */
 export default class LiteratePageComponentDisplay {
     
@@ -24,9 +20,22 @@ export default class LiteratePageComponentDisplay {
         this.isShowing = false;
 
         this.editorManager = this.componentView.getEditorManager();
+        this.editorView = null;
+        this.editorToolbarView = null;
+
+        //elements
+        this.contentElement = null;
+        this.editorToolbarContainer = null;
+        this.componentToolbarContainer = null;
+        this.bannerContainer = null;
+        this.headerElement = null;
 
         //this is used if we have to prepopolate and child component displays
         this.standInChildComponentDisplays = {};
+
+        //for cleanup
+        this.elementsWithOnclick = [];
+        this.isDestroyed = false;
 
         this.loadTabEntry();
     };
@@ -163,9 +172,13 @@ export default class LiteratePageComponentDisplay {
         else {
             this.tabHidden()
         }
-        this.tab.addListener(uiutil.SHOWN_EVENT,() => this.tabShown());
-        this.tab.addListener(uiutil.HIDDEN_EVENT,() => this.tabHidden());
-        this.tab.addListener(uiutil.CLOSE_EVENT,() => this.tabClosed());
+
+        this.tabShownListener = () => this.tabShown();
+        this.tabHiddenListener = () => this.tabHidden();
+        this.tabClosedListener = () => this.tabClosed();
+        this.tab.addListener(uiutil.SHOWN_EVENT,this.tabShownListener);
+        this.tab.addListener(uiutil.HIDDEN_EVENT,this.tabHiddenListener);
+        this.tab.addListener(uiutil.CLOSE_EVENT,this.tabClosedListener);
 
         //------------------
         // set icon
@@ -181,15 +194,6 @@ export default class LiteratePageComponentDisplay {
         // apply the banner state
         //-----------------
         this._setBannerState();
-
-        //-----------------------------
-        //add the handlers for the tab
-        //-----------------------------
-        var onClose = () => {
-            this.componentView.closeTabDisplay();
-            this.destroy();
-        }
-        this.tab.addListener(uiutil.CLOSE_EVENT,onClose);
     }
 
     _setBannerState() {
@@ -292,6 +296,9 @@ export default class LiteratePageComponentDisplay {
 
                     addComponent(appView,app,componentClass,initialValues,null,null);
                 }
+
+                //for cleanup
+                this.elementsWithOnclick.push(buttonElement);
             }
         }
 
@@ -312,6 +319,9 @@ export default class LiteratePageComponentDisplay {
             //I tacked on a piggyback for testing!!!
             addAdditionalComponent(appView,app,initialValues,null,null);
         }
+        //for cleanup
+        this.elementsWithOnclick.push(buttonElement);
+
         this.componentToolbarContainer.appendChild(buttonElement);
     }
 
@@ -321,12 +331,27 @@ export default class LiteratePageComponentDisplay {
         //start with an empty component display
         var initialEditorState = this.componentView.getEditorState();
         
-        this.editorView = this.editorManager.createEditorView(this.contentElement,this,initialEditorState);
+        let { editorView, toolbarView, plugins } = this.editorManager.createEditorView(this.contentElement,this,initialEditorState);
+        this.editorView = editorView;
+        this.editorToolbarView = toolbarView;
 
-        this.contentElement.addEventListener("click",event => this.onClickContentElement(event));
+        this.contentElement.onclick = event => this.onClickContentElement(event);
+        this.elementsWithOnclick.push(this.contentElement);
 
         //add the editor toolbar
-        this.editorToolbarContainer.appendChild(this.editorManager.editorToolbarElement);
+        this.editorToolbarContainer.appendChild(this.editorToolbarView.getElement());
+
+        //we need to call a command to set the plugins on the editor state
+        let pageComponent = this.componentView.getComponent();
+        var modelView = this.componentView.getModelView();
+
+        //we need to initialize the components in the editor state for this component
+        let command = {};
+        command.type = "literatePagePlugins";
+        command.componentId = pageComponent.getId();
+        command.plugins = plugins;
+        let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
+        workspaceManager.runFutureCommand(command);
         
     }
 
@@ -374,13 +399,18 @@ export default class LiteratePageComponentDisplay {
      * page display.  
      * @protected */
     destroy() {
+        if(this.isDestroyed) return;
+
+        //close tab if it is still present
+        if(this.tab) this.closeTab();
+
+        //child components
         //we should probably have a less cumbesome way of doing this
         let pageComponent = this.componentView.getComponent();
         let folder = pageComponent.getParentFolderForChildren();
         var childIdMap = folder.getChildIdMap();
         var modelView = this.componentView.getModelView();
         var modelManager = modelView.getModelManager();
-
         for(var childName in childIdMap) {
             var childMemberId = childIdMap[childName];
             var childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
@@ -390,7 +420,39 @@ export default class LiteratePageComponentDisplay {
             }
         }
 
-        if(this.tab) this.closeTab();
+        //we need to initialize the components in the editor state for this component
+        let command = {};
+        command.type = "literatePagePlugins";
+        command.componentId = pageComponent.getId();
+        command.plugins = [];
+        let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
+        workspaceManager.runFutureCommand(command);
+        
+        //editor view
+        if(this.editorView) {
+            this.editorView.destroy();
+            this.editorView = null;
+        }
+
+        //editor toolbar
+        if(this.editorToolbarView) {
+            this.editorToolbarView.destroy();
+            this.editorToolbarView = null;
+        }
+
+        //handler cleanmup
+        this.elementsWithOnclick.forEach( element => {
+            element.onclick = null;
+        })
+
+        //remove elements
+        if(this.contentElement) this.contentElement.remove();
+        if(this.editorToolbarContainer) this.editorToolbarContainer.remove();
+        if(this.componentToolbarContainer) this.componentToolbarContainer.remove();
+        if(this.bannerContainer) this.bannerContainer.remove();
+        if(this.headerElement) this.headerElement.remove();
+
+        this.isDestroyed = true;
     }
 
     /** @protected */
@@ -415,6 +477,18 @@ export default class LiteratePageComponentDisplay {
 
     tabClosed() {
         //delete the page
+        if(this.tabShownListener) {
+            this.tab.removeListener(uiutil.SHOWN_EVENT,this.tabShownListener);
+            this.tabShownListener = null;
+        }
+        if(this.tabHiddenListener) {
+            this.tab.removeListener(uiutil.HIDDEN_EVENT,this.tabHiddenListener);
+            this.tabHiddenListener = null;
+        }
+        if(this.tabClosedListener) {
+            this.tab.removeListener(uiutil.CLOSE_EVENT,this.tabClosedListener);
+            this.tabClosedListener = null;
+        }
         this.componentView.closeTabDisplay();
         this.dispatchEvent(uiutil.CLOSE_EVENT,this);
     }

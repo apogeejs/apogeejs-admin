@@ -305,9 +305,8 @@ export default class ComponentView {
             //first store the window state
             this.childDisplayState = this.childComponentDisplay.getStateJson();
             
-            //delete the window
+            //delete the display
             this.childComponentDisplay.deleteDisplay();
-            
             this.childComponentDisplay = null;
         }
     }

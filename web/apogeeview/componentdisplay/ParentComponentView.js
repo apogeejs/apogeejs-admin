@@ -20,14 +20,6 @@ export default class ParentComponentView extends ComponentView {
 
         //ccreate the editor manager
         this.editorManager = createProseMirrorManager(modelView.getApp(),component.getSchema());
-
-        //we need to call a command to set the plugins on the editor state for the associated component
-        let command = {};
-        command.type = "literatePagePlugins";
-        command.componentId = component.getId();
-        command.plugins = this.editorManager.getPlugins();
-        let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
-        workspaceManager.runFutureCommand(command);
     }
 
     createTreeDisplay() {

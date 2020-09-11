@@ -37,6 +37,10 @@ export default class ApogeeToolbar {
     this.update();
   }
 
+  getElement() {
+    return this.dom;
+  }
+
 
   update() {
     var selectionInfo = this._getSelectionInfo();

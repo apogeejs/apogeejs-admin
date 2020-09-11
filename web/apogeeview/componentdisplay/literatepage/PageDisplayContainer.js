@@ -23,8 +23,6 @@ export default class PageDisplayContainer {
         this.viewSelectorContainer = null;
         this.viewActiveElement = null;
         this.viewNameElement = null;
-
-        this.uiCompleted = false;
         
         this.isComponentShowing = false;
         this.isViewActive = isMainView;
@@ -46,6 +44,9 @@ export default class PageDisplayContainer {
         this.showMaxButton = null;
 
         this.savedUiState = {};
+
+        this.uiCompleted = false;
+        this.uiDestroyed = false;
         
         //initialize
         this.initUI();
@@ -77,19 +78,19 @@ export default class PageDisplayContainer {
     /** This method closes the window. If the argument forceClose is not
      * set to true the "request_close" handler is called to check if
      * it is ok to close the window. */
-    close(forceClose) {
+    // close(forceClose) {
 
-        if(!forceClose) {
-            //make a close request
-            var requestResponse = this.callHandler(uiutil.REQUEST_CLOSE,this);
-            if(requestResponse == uiutil.DENY_CLOSE) {
-                //do not close the window
-                return;
-            }
-        }
+    //     if(!forceClose) {
+    //         //make a close request
+    //         var requestResponse = this.callHandler(uiutil.REQUEST_CLOSE,this);
+    //         if(requestResponse == uiutil.DENY_CLOSE) {
+    //             //do not close the window
+    //             return;
+    //         }
+    //     }
 
-        this.dispatchEvent(uiutil.CLOSE_EVENT,this);
-    }
+    //     this.dispatchEvent(uiutil.CLOSE_EVENT,this);
+    // }
 
     getStateJson() {
         //update the saved state json
@@ -194,9 +195,38 @@ export default class PageDisplayContainer {
         this.updateViewSelectorState();
     }
 
+    /** This tears down any elements created in UI initialization */
+    destroyUI() {
+        if(!this.uiDestrpoyed) {
+            this.uiDestroyed = true;
+
+            this.mainElement = null;
+            this.viewToolbarElement = null;
+            this.viewLabelElement = null;
+
+            this.sizingElement = null;
+
+            this.viewDisplayElement = null;
+            this.headerContainer = null;
+            this.viewContainer = null;
+            this.viewSelectorContainer = null;
+
+            if(this.viewSelectorLink) {
+                this.viewSelectorLink.onclick = null;
+                this.viewSelectorLink = null;
+            }
+
+            this.expandImage = null;
+            this.contractImage = null;
+
+            this.viewNameElement = null;
+        }
+    }
+
     /** This completes the UI. It should only be called when the data display has been created. */
     completeUI() {
         if(!this.dataDisplay) return;
+        if(this.uiDestroyed) return;
 
         //add the view toolbar controls
         this.populateSizingElement();
@@ -208,11 +238,17 @@ export default class PageDisplayContainer {
 
     /** This clears the data display specific parts of the container ui, so a new data display may be added. */
     uncompleteUI() {
+        if(this.uiDestroyed) return;
+
+        if(this.showLessButton) this.showLessButton.onclick = null;
+        if(this.showMoreButton) this.showMoreButton.onclick = null;
+        if(this.showMaxButton) this.showMaxButton.onclick = null;
         uiutil.removeAllChildren(this.sizingElement);
         uiutil.removeAllChildren(this.viewDisplayElement);
         uiutil.removeAllChildren(this.viewContainer);
 
         this.heightUiActive = false;
+
         this.uiCompleted = false;
     }
 
@@ -232,6 +268,7 @@ export default class PageDisplayContainer {
 
     /** This method configures the toolbar for the view display. */
     populateSizingElement() {
+
         //show the height controls
         if(this.dataDisplay.getUseContainerHeightUi()) {
             this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
@@ -387,7 +424,7 @@ export default class PageDisplayContainer {
         this.savedUiState = this.getStateJson();
 
         //this destrpys the data display, not the container - bad name
-        this.destroy();
+        this.destroyDataDisplay();
 
         //this gets rid of the data display specific parts of the ui
         this.uncompleteUI();
@@ -398,6 +435,12 @@ export default class PageDisplayContainer {
 
     /** This method destroys the data display. */
     destroy() {
+        this.uncompleteUI();
+        this.destroyUI();
+        this.deleteDataDisplay();
+    }
+
+    deleteDataDisplay() {
         if(this.dataDisplay) {
             if(this.dataDisplay.destroy) {
                 this.dataDisplay.destroy();
@@ -426,6 +469,8 @@ export default class PageDisplayContainer {
     /** This method is called when the member is updated, to make sure the 
     * data display is up to date. */
     componentUpdated(component) {
+        if(this.uiDestroyed) return;
+
         //update the data display
         if(this.dataDisplay) {
             let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
