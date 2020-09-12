@@ -46,7 +46,7 @@ export default class DynamicFormView extends ComponentView {
                 
             default:
     //temporary error handling...
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }

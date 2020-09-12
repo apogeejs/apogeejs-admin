@@ -151,7 +151,7 @@ export function updateComponent(componentView) {
                         if(newParentCommands.deletedComponentCommands) {
                             //flag a delete will be done
                             commandsDeleteComponent = true
-                            deleteMsg = "Are you sure you want to delete these apogee nodes: " + deletedComponentNames + "?";
+                            deleteMsg = "This action deletes cells on the new page. Are you sure you want to do that? Deleted cells: " + deletedComponentNames;
                             
                             //return if user rejects
                             if(!doDelete) return;

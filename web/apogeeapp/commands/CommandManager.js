@@ -57,9 +57,16 @@ export default class CommandManager {
         if(oldWorkspaceManager) {
             newWorkspaceManager = oldWorkspaceManager.getMutableWorkspaceManager();
         }
-        else {
+        else if(command.type == "openWorkspace") {
+            //only command to run with no active workspace
             //instantiate a new empty workspace manager
             newWorkspaceManager = this.app.createWorkspaceManager();
+        }
+        else {
+            //no workspace to run command on
+            this.commandInProgress = false;
+            console.log("No workspace for command: " + command.type);
+            return;
         }
 
         var commandObject = CommandManager.getCommandObject(command.type);

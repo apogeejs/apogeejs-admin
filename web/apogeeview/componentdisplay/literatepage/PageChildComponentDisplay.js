@@ -223,10 +223,20 @@ export default class PageChildComponentDisplay {
         if(viewTypes.length > 0) {
             for(var i = 0; i < viewTypes.length; i++) {
                 var viewType = viewTypes[i];
+                var viewTypeName;
+                var viewTypeLabel;
+                if((typeof(viewType) == "string")||(viewType instanceof String)) {
+                    viewTypeName = viewType;
+                    viewTypeLabel = viewType;
+                }
+                else {
+                    viewTypeName = viewType.name;
+                    viewTypeLabel = viewType.label;
+                }
                 
                 var isMainView = (i == 0);
 
-                var displayContainer = new PageDisplayContainer(this.componentView, viewType, isMainView);
+                var displayContainer = new PageDisplayContainer(this.componentView, viewTypeName, viewTypeLabel, isMainView);
                 
                 //add the view title element to the title bar
                 this.titleBarViewsElement.appendChild(displayContainer.getViewSelectorContainer());
@@ -235,7 +245,7 @@ export default class PageChildComponentDisplay {
                 this.viewContainer.appendChild(displayContainer.getDisplayElement());
                 
                 //store the display container object
-                this.displayContainerMap[viewType] = displayContainer;
+                this.displayContainerMap[viewTypeName] = displayContainer;
             }
         }
 

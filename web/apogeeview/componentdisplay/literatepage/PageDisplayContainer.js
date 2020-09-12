@@ -8,7 +8,7 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
  */
 export default class PageDisplayContainer {
 
-    constructor(componentView, viewType, isMainView) {
+    constructor(componentView, viewTypeName, viewTypeLabel, isMainView) {
         
         //variables
         this.isMainView = isMainView;
@@ -35,7 +35,8 @@ export default class PageDisplayContainer {
         this.content = null;
         
         this.componentView = componentView;
-        this.viewType = viewType;
+        this.viewTypeName = viewTypeName;
+        this.viewTypeLabel = viewTypeLabel;
         this.dataDisplay = null;
 
         this.heightUiActive = false;
@@ -163,7 +164,7 @@ export default class PageDisplayContainer {
         this.viewToolbarElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.mainElement);
 
         this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewToolbarElement);
-        this.viewLabelElement.innerHTML = this.viewType;
+        this.viewLabelElement.innerHTML = this.viewTypeLabel;
 
         this.sizingElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewSizingElementClass",this.viewToolbarElement);
 
@@ -187,7 +188,7 @@ export default class PageDisplayContainer {
         this.contractImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_OPENED_IMAGE_PATH);
 
         this.viewNameElement = uiutil.createElementWithClass("span","visiui_displayContainer_viewSelectorClass",this.viewSelectorLink);
-        this.viewNameElement.innerHTML = this.viewType;
+        this.viewNameElement.innerHTML = this.viewTypeLabel;
 
         this.viewSelectorLink.href = "javascript:void(0)";
         this.viewSelectorLink.onclick = () => this.setIsViewActive(!this.isViewActive);
@@ -368,14 +369,16 @@ export default class PageDisplayContainer {
             if(!this.dataDisplayLoaded) {
                 if(!this.dataDisplay) {
                     //the display should be created only when it is made visible
-                    this.dataDisplay =  this.componentView.getDataDisplay(this,this.viewType);
-                    this.dataDisplay.readUiStateData(this.savedUiState);
-                    if(!this.uiCompleted) this.completeUI();
-                    this.setContent(this.dataDisplay.getContent());
-                    this.dataDisplay.showData();
+                    this.dataDisplay =  this.componentView.getDataDisplay(this,this.viewTypeName);
+                    if(this.dataDisplay) {
+                        this.dataDisplay.readUiStateData(this.savedUiState);
+                        if(!this.uiCompleted) this.completeUI();
+                        this.setContent(this.dataDisplay.getContent());
+                        this.dataDisplay.showData();
+                    }
                 }
             
-                if(this.dataDisplay.onLoad) this.dataDisplay.onLoad();
+                if((this.dataDisplay)&&(this.dataDisplay.onLoad)) this.dataDisplay.onLoad();
                 this.dataDisplayLoaded = true;
             }
         }
@@ -424,7 +427,7 @@ export default class PageDisplayContainer {
         this.savedUiState = this.getStateJson();
 
         //this destrpys the data display, not the container - bad name
-        this.destroyDataDisplay();
+        this.deleteDataDisplay();
 
         //this gets rid of the data display specific parts of the ui
         this.uncompleteUI();

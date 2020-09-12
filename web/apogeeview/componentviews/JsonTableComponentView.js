@@ -64,7 +64,7 @@ export default class JsonTableComponentView extends ComponentView {
                 
             default:
     //temporary error handling...
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }
@@ -107,9 +107,9 @@ JsonTableComponentView.VIEW_CODE = "Formula";
 JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 JsonTableComponentView.VIEW_MODES = [
-    JsonTableComponentView.VIEW_DATA,
-    JsonTableComponentView.VIEW_CODE,
-    JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE
+    {name: JsonTableComponentView.VIEW_DATA, label: "Data"},
+    {name: JsonTableComponentView.VIEW_CODE, label: "Formula"},
+    {name: JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private"},
 ];
 
 JsonTableComponentView.TABLE_EDIT_SETTINGS = {

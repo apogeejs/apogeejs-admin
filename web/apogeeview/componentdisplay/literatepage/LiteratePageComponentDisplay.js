@@ -463,7 +463,10 @@ export default class LiteratePageComponentDisplay {
             if(this.editorView.state) {
                 let tr = this.editorView.state.tr;
                 tr.scrollIntoView();
-                setTimeout(() => this.editorView.dispatch(tr),0);
+                setTimeout(() => {
+                    //make sure editor view is still here
+                    if(this.editorView) this.editorView.dispatch(tr)
+                },0);
             }
         }
         this.dispatchEvent(uiutil.SHOWN_EVENT,this);

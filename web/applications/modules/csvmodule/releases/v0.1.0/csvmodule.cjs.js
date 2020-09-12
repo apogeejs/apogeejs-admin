@@ -136,7 +136,7 @@ class CSVComponentView extends ComponentView {
                 return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
 
             default:
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }

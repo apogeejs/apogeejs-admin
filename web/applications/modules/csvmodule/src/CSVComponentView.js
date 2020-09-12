@@ -36,7 +36,7 @@ export default class CSVComponentView extends ComponentView {
                 return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
 
             default:
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }
@@ -154,8 +154,8 @@ CSVComponentView.VIEW_GRID = "Grid";
 CSVComponentView.VIEW_INPUT = "Input";
 
 CSVComponentView.VIEW_MODES = [
-	CSVComponentView.VIEW_GRID,
-    CSVComponentView.VIEW_INPUT
+	{name: CSVComponentView.VIEW_GRID, label: "Grid"},
+    {name: CSVComponentView.VIEW_INPUT, label: "Configuration"}
 ];
 
 CSVComponentView.TABLE_EDIT_SETTINGS = {

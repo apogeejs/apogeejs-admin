@@ -134,7 +134,7 @@ export function createProseMirrorManager(app, schema) {
             nodeViews: nodeViews
         })
 
-        return { editorView, toolbarView };
+        return { editorView, toolbarView, plugins };
     }
 
 

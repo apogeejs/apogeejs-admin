@@ -304,7 +304,7 @@ export default class ParentComponentView extends ComponentView {
             if(allDeletedNames.length > 0) {
                 //flag a delete will be done
                 commandsDeleteComponent = true
-                deleteMsg = "Are you sure you want to delete these apogee nodes: " + allDeletedNames + "?";
+                deleteMsg = "This action will delete the selected cells. Are you sure you want to do that? Cells to delete: " + allDeletedNames;
             }
 
             //-------------------------
