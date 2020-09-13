@@ -8,7 +8,7 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
  */
 export default class PageDisplayContainer {
 
-    constructor(componentView, viewTypeName, viewTypeLabel, isMainView) {
+    constructor(componentDisplay, viewTypeName, viewTypeLabel, isMainView) {
         
         //variables
         this.isMainView = isMainView;
@@ -34,7 +34,8 @@ export default class PageDisplayContainer {
         
         this.content = null;
         
-        this.componentView = componentView;
+        this.componentDisplay = componentDisplay;
+        this.componentView = componentDisplay.getComponentView();
         this.viewTypeName = viewTypeName;
         this.viewTypeLabel = viewTypeLabel;
         this.dataDisplay = null;
@@ -57,6 +58,10 @@ export default class PageDisplayContainer {
         return this.componentView;
     }
 
+    getComponentDisplay() {
+        return this.componentDisplay;
+    }
+
     getDataDisplay() {
         return this.dataDisplay;
     }
@@ -75,23 +80,6 @@ export default class PageDisplayContainer {
     getIsComponentShowing() {
         return this.isComponentShowing;
     }
-
-    /** This method closes the window. If the argument forceClose is not
-     * set to true the "request_close" handler is called to check if
-     * it is ok to close the window. */
-    // close(forceClose) {
-
-    //     if(!forceClose) {
-    //         //make a close request
-    //         var requestResponse = this.callHandler(uiutil.REQUEST_CLOSE,this);
-    //         if(requestResponse == uiutil.DENY_CLOSE) {
-    //             //do not close the window
-    //             return;
-    //         }
-    //     }
-
-    //     this.dispatchEvent(uiutil.CLOSE_EVENT,this);
-    // }
 
     getStateJson() {
         //update the saved state json
@@ -507,6 +495,9 @@ export default class PageDisplayContainer {
             this.inEditMode = true;
             var saveBar = getSaveBar(onSave,onCancel);
             this.setHeaderContent(saveBar);
+            //take additional edit mode actions
+            this.mainElement.classList.add("visiui_displayContainer_editMode");
+            this.componentDisplay.notifyEditMode(true,this.viewTypeName);
         }
     }
 
@@ -515,18 +506,11 @@ export default class PageDisplayContainer {
         if(this.inEditMode) {
             this.inEditMode = false;
             this.setHeaderContent(null);
+            this.mainElement.classList.remove("visiui_displayContainer_editMode");
+            this.componentDisplay.notifyEditMode(false,this.viewTypeName);
         }
         //select the associated node in the document.
         let parentComponentView = this.componentView.getParentComponentView();
-
-        //OMIT THIS FOR NOW
-        // if(parentComponentView) {
-        //     let name = this.componentView.getComponent().getName();
-        //     let commandData = parentComponentView.getSelectApogeeNodeCommand(name);
-        //     if(commandData) {
-        //         ???
-        //     }
-        // }
 
         //give the editor focus
         parentComponentView.giveEditorFocusIfShowing();

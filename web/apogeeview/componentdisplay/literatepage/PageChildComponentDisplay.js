@@ -1,6 +1,7 @@
 import PageDisplayContainer from "/apogeeview/componentdisplay/literatepage/PageDisplayContainer.js";
 
 import {uiutil,Menu,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
+import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 /** This component represents a json table object. */
 export default class PageChildComponentDisplay {
@@ -8,6 +9,9 @@ export default class PageChildComponentDisplay {
     constructor(componentView, parentComponentDisplay) {
         this.componentView = componentView;
         this.parentComponentDisplay = parentComponentDisplay;
+
+        this.editModeViews = [];
+        this.inEditMode = false;
         
         //these are the header elements
         this.iconOverlayElement
@@ -63,10 +67,6 @@ export default class PageChildComponentDisplay {
         }
     }
 
-    // getMember() {
-    //     return this.member;
-    // }
-
     componentUpdated(component) {
 
         if(component.isDisplayNameUpdated()) {
@@ -121,6 +121,12 @@ export default class PageChildComponentDisplay {
                 }
             }
         }
+    }
+
+    isCloseOk() {
+        let msg = "There is unsaved data in the cell " + this.componentView.getName() + "! Please save or cancel it.";
+        showSimpleActionDialog(msg,null,["OK"]);
+        return false;
     }
 
     /** This will reload the given data display. */
@@ -179,8 +185,13 @@ export default class PageChildComponentDisplay {
      * inside the current text selection. */
     setHighlight(isHighlighted) {
         if(this.isHighlighted != isHighlighted) {
-            this.mainElement.className = isHighlighted ? "visiui_pageChild_mainClass_highlighted" : "visiui_pageChild_mainClass";
             this.isHighlighted = isHighlighted;
+            if(isHighlighted) {
+                this.mainElement.classList.add("visiui_pageChild_highlighted");
+            }
+            else {
+                this.mainElement.classList.remove("visiui_pageChild_highlighted");
+            }
         }  
     }
 
@@ -236,7 +247,7 @@ export default class PageChildComponentDisplay {
                 
                 var isMainView = (i == 0);
 
-                var displayContainer = new PageDisplayContainer(this.componentView, viewTypeName, viewTypeLabel, isMainView);
+                var displayContainer = new PageDisplayContainer(this, viewTypeName, viewTypeLabel, isMainView);
                 
                 //add the view title element to the title bar
                 this.titleBarViewsElement.appendChild(displayContainer.getViewSelectorContainer());
@@ -293,6 +304,40 @@ export default class PageChildComponentDisplay {
         if(this.isPageShowing != isPageShowing) {
             this.isPageShowing = isPageShowing;
             this.updateChildDisplayStates();
+        }
+    }
+
+    /** This method should be called when a given view type enters of exits edit mode */
+    notifyEditMode(viewInEditMode,viewTypeName) {
+        if(viewInEditMode) {
+            if(this.editModeViews.indexOf(viewTypeName) < 0) {
+                this.editModeViews.push(viewTypeName);
+            }
+        }
+        else {
+            let index = this.editModeViews.indexOf(viewTypeName);
+            if(index >= 0) {
+                this.editModeViews.splice(index,1);
+            }
+        }
+        let inEditMode = (this.editModeViews.length > 0);
+
+        if(inEditMode != this.inEditMode) this._setEditMode(inEditMode);
+    }
+
+    _setEditMode(inEditMode) {
+        //set component edit mode
+        this.inEditMode = inEditMode;
+        if(inEditMode) {
+            this.mainElement.classList.add("visiui_pageChild_editMode");
+        }
+        else {
+            this.mainElement.classList.remove("visiui_pageChild_editMode");
+        }
+            
+        //notify page
+        if(this.componentView) {
+            this.parentComponentDisplay.notifyEditMode(this.inEditMode,this.componentView.getComponent().getId());
         }
     }
 

@@ -42,7 +42,7 @@ export default class ApogeeComponentView {
     //we will not display data in this time.
     let childComponentDisplay
     if (name) {
-      childComponentDisplay = this.pageDisplay.getChildComponentDisplay(name);
+      childComponentDisplay = this.pageDisplay.getChildComponentDisplay(name,true);
 
     }
 

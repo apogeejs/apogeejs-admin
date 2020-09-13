@@ -17,6 +17,10 @@ export default class LiteratePageComponentDisplay {
 
         this.componentView = componentView;
 
+        this.childDisplayMap = {};
+        this.editModeComponents = [];
+        this.inEditMode = false;
+
         this.isShowing = false;
 
         this.editorManager = this.componentView.getEditorManager();
@@ -28,6 +32,7 @@ export default class LiteratePageComponentDisplay {
         this.editorToolbarContainer = null;
         this.componentToolbarContainer = null;
         this.bannerContainer = null;
+        this.editNoticeContainer = null;
         this.headerElement = null;
 
         //this is used if we have to prepopolate and child component displays
@@ -81,36 +86,30 @@ export default class LiteratePageComponentDisplay {
         }
     }
 
-    getChildComponentDisplay(name) {
+    getChildComponentDisplay(name,createIfMissing) {
+        //get id
         let folderComponent = this.componentView.getComponent();
         let folderMember = folderComponent.getParentFolderForChildren();
+        let memberId = folderMember.lookupChildId(name);
 
         //lookup component
-        var memberId = folderMember.lookupChildId(name);
         if (memberId) {
             var modelView = this.componentView.getModelView();
             var modelManager = modelView.getModelManager();
             var childComponentId = modelManager.getComponentIdByMemberId(memberId);
-            var childComponentView = modelView.getComponentViewByComponentId(childComponentId);
-            let childComponentDisplay;
-            if (childComponentView) {
-                childComponentDisplay = childComponentView.getComponentDisplay();
+            let childComponentDisplay = this.childDisplayMap[childComponentId];
+            if((!childComponentDisplay)&&(createIfMissing)) {
+                //we don't haven't added it yet, but we will pre-create it
+                childComponentDisplay = new PageChildComponentDisplay(null, this);
+                this.childDisplayMap[childComponentId] = childComponentDisplay;
             }
-            else {
-                //hold a standin if it is requested before we create it.
-                childComponentDisplay = this.standInChildComponentDisplays[name];
-                if(!childComponentDisplay) {
-                    childComponentDisplay = new PageChildComponentDisplay(null, this);
-                    this.standInChildComponentDisplays[name] = childComponentDisplay;
-                }
-            }
-
-            return childComponentDisplay
+            return childComponentDisplay;
         }
         else {
             return null;
         }
     }
+
 
     /** This creates and adds a display for the child component to the parent container. */
     addChild(childComponentView) {
@@ -119,29 +118,36 @@ export default class LiteratePageComponentDisplay {
         // Get component display
         //-----------------
         let childComponentDisplay;
+        let componentId = childComponentView.getComponent().getId();
 
         //create a new component display for this child
         if(childComponentView.constructor.hasChildEntry) {
-            //check if there is a component display already waiting
-            childComponentDisplay = this.standInChildComponentDisplays[childComponentView.getName()];
+            //check if there is a component display already waiting, pre-created
+            childComponentDisplay = this.childDisplayMap[componentId];
             if(childComponentDisplay) {
                 //set up the standin component display
                 childComponentDisplay.setComponentView(childComponentView);
-                delete this.standInChildComponentDisplays[childComponentView.getName()];
             }
             else {
                 childComponentDisplay = new PageChildComponentDisplay(childComponentView,this);
+                this.childDisplayMap[componentId] = childComponentDisplay;
             }
         }
 
-        //set this on the child
         if(childComponentDisplay) {
-            //set the component display
+            //set the child's component display
             childComponentView.setComponentDisplay(childComponentDisplay);
         }
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+    removeChild(childComponentView) {
+        let componentId = childComponentView.getComponent().getId();
+        delete this.childDisplayMap[componentId];
+
+        //make sure this isn't listed as being in edit mode
+        this.notifyEditMode(false,componentId)
+    }
+
 
     /** This is to record any state in the tab object. */
     getStateJson() {
@@ -150,6 +156,37 @@ export default class LiteratePageComponentDisplay {
 
     /** This is to restore any state in the tab object. */
     setStateJson(json) {
+    }
+
+    /** This should be called when a child display enters or leaves edit mode. */
+    notifyEditMode(viewInEditMode,componentId) {
+        if(viewInEditMode) {
+            if(this.editModeComponents.indexOf(componentId) < 0) {
+                this.editModeComponents.push(componentId);
+            }
+        }
+        else {
+            let index = this.editModeComponents.indexOf(componentId);
+            if(index >= 0) {
+                this.editModeComponents.splice(index,1);
+            }
+        }
+        let inEditMode = (this.editModeComponents.length > 0);
+
+        this._setEditMode(inEditMode);
+    }
+
+    _setEditMode(inEditMode) {
+        //set component edit mode
+        this.inEditMode = inEditMode;
+
+        if(inEditMode) {
+            this.editNoticeContainer.innerHTML = this.editModeComponents.join();
+        }
+        else {
+            this.editNoticeContainer.innerHTML = "";
+        }
+            
     }
 
     //===============================
@@ -176,9 +213,11 @@ export default class LiteratePageComponentDisplay {
         this.tabShownListener = () => this.tabShown();
         this.tabHiddenListener = () => this.tabHidden();
         this.tabClosedListener = () => this.tabClosed();
+        this.beforeTabCloseHandler = () => this.beforeTabClose();
         this.tab.addListener(uiutil.SHOWN_EVENT,this.tabShownListener);
         this.tab.addListener(uiutil.HIDDEN_EVENT,this.tabHiddenListener);
         this.tab.addListener(uiutil.CLOSE_EVENT,this.tabClosedListener);
+        this.tab.addHandler(uiutil.REQUEST_CLOSE,this.beforeTabCloseHandler);
 
         //------------------
         // set icon
@@ -232,7 +271,7 @@ export default class LiteratePageComponentDisplay {
         this.editorToolbarContainer = uiutil.createElementWithClass("div","visiui_litPage_editorToolbar",this.headerElement);
         this.componentToolbarContainer = uiutil.createElementWithClass("div","visiui_litPage_componentToolbar",this.headerElement);
         this.bannerContainer = uiutil.createElementWithClass("div","visiui_litPage_banner",this.headerElement);
-
+        this.editNoticeContainer = uiutil.createElementWithClass("div","visiui_litPage_editNotice",this.headerElement);
         this.initComponentToolbar();
 
         //-------------------
@@ -390,7 +429,7 @@ export default class LiteratePageComponentDisplay {
 
     /** This function sets the highlight state for the given node. */
     _setApogeeNodeHighlight(childName,inSelection) {
-        let childComponentDisplay = this.getChildComponentDisplay(childName);
+        let childComponentDisplay = this.getChildComponentDisplay(childName,false);
         if(childComponentDisplay) childComponentDisplay.setHighlight(inSelection); 
     }
     
@@ -419,6 +458,13 @@ export default class LiteratePageComponentDisplay {
                 childComponentView.closeComponentDisplay();
             }
         }
+
+        for(let memberId in this.childDisplayMap) {
+            let childDisplay = this.childDisplayMap[memberId];
+            let childComponentView = childDisplay.getComponentView();
+            childComponentView.closeComponentDisplay();
+        }
+        this.childDisplayMap = [];
 
         //we need to initialize the components in the editor state for this component
         let command = {};
@@ -494,6 +540,18 @@ export default class LiteratePageComponentDisplay {
         }
         this.componentView.closeTabDisplay();
         this.dispatchEvent(uiutil.CLOSE_EVENT,this);
+    }
+
+    beforeTabClose() {
+        for(let componentId in this.childDisplayMap) {
+            let childDisplay = this.childDisplayMap[componentId];
+            if(!childDisplay.isCloseOk()) {
+                //can not close - note message should be shown in child 
+                return uiutil.DENY_CLOSE;
+            }
+        }
+        //anything besides deny close is ok
+        return true;
     }
     
 }

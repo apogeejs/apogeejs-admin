@@ -50,18 +50,22 @@ export default class ParentComponentView extends ComponentView {
     //----------------------
 
     /** This function adds a fhile componeent to the displays for this parent component. */
-    removeChild(childComponent) {
+    removeChild(childComponentView) {
         //remove from tree entry
         var treeEntry = this.getTreeEntry();
         if(treeEntry) {
-            var childTreeEntry = childComponent.getTreeEntry();
+            var childTreeEntry = childComponentView.getTreeEntry();
             if(childTreeEntry) {
                 treeEntry.removeChild(childTreeEntry);
             }
         }
+
+        if(this.tabDisplay) {
+            this.tabDisplay.removeChild(childComponentView); 
+        }
         
         //remove child windows - just hide them. They will be deleted in the component
-        childComponent.closeComponentDisplay();
+        childComponentView.closeComponentDisplay();
     }
 
     /** This function adds a fhile componeent to the displays for this parent component. */

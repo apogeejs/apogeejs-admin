@@ -4,6 +4,9 @@
 .visiui_litPage_banner {
     
 }
+.visiui_litPage_editNotice {
+    background-color: yellow;
+}
 .visiui_litPage_editorToolbar {
     border: 1px solid #ccc;
     padding: 2px;
@@ -30,6 +33,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     z-index: 0;
+    padding-bottom: 300px;
 }
 .visiui_litPage_componentButton {
     position:relative;
@@ -63,18 +67,15 @@
 .visiui_pageChild_mainClass {
     position: relative;
     background-color: rgb(235,235,240);
-    padding:3px;
+    padding: 3px;
     border: .5px solid rgb(230,230,235);
     margin-top: 5px;
     margin-bottom: 5px;
 }
-.visiui_pageChild_mainClass_highlighted {
-    position: relative;
+.visiui_pageChild_highlighted {
     background-color: rgb(215, 222, 243);
-    padding:3px;
-    border: .5px solid rgb(230,230,235);
-    margin-top: 5px;
-    margin-bottom: 5px;
+}
+.visiui_pageChild_editMode {
 }
 .visiui_pageChild_bannerContainerClass {
     position: relative;
@@ -122,6 +123,10 @@
 }
 .visiui_displayContainer_mainClass {
     position: relative;
+}
+.visiui_displayContainer_editMode {
+    border: 2px solid yellow;
+    background-color: yellow;
 }
 .visiui_displayContainer_viewToolbarClass {
     position: relative;

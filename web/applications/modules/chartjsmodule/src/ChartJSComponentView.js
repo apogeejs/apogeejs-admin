@@ -212,7 +212,7 @@ ChartJSComponentView.TABLE_EDIT_SETTINGS = {
 ChartJSComponentView.propertyDialogLines = [
     {
         "type":"dropdown",
-        "heading":"Chart Types: ",
+        "label":"Chart Type: ",
         "entries":["line","bar","scatter"],
         "resultKey":"chartType"
     }
