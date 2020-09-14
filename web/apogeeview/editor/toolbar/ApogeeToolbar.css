@@ -18,6 +18,9 @@
 .atb_toggleOnClass {
     background-color: rgb(220,220,240);;
 }
+.atb_toggleButton:hover {
+    background-color: rgba(128,128,144,.35);
+}
 .atb_radioButton {
     display: inline-block;
     border-right: 1px solid rgba(0, 0, 0, 0.2);
@@ -44,6 +47,9 @@
     cursor: pointer;
     text-align: center;
     min-width: 1.4em;
+}
+.atb_actionButton:hover {
+    background-color: rgba(128,128,144,.35);
 }
 .atb_actionHighlightedClass {
     background-color: rgb(220,220,240);
