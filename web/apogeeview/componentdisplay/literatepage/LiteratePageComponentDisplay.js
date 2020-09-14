@@ -7,6 +7,7 @@ import PageChildComponentDisplay from "/apogeeview/componentdisplay/literatepage
 import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 
 import {uiutil,Tab,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
+import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 /** This component represents a json table object. */
 export default class LiteratePageComponentDisplay {
@@ -18,7 +19,7 @@ export default class LiteratePageComponentDisplay {
         this.componentView = componentView;
 
         this.childDisplayMap = {};
-        this.editModeComponents = [];
+        this.editModeComponentInfos = [];
         this.inEditMode = false;
 
         this.isShowing = false;
@@ -145,7 +146,7 @@ export default class LiteratePageComponentDisplay {
         delete this.childDisplayMap[componentId];
 
         //make sure this isn't listed as being in edit mode
-        this.notifyEditMode(false,componentId)
+        this.notifyEditMode(false,childComponentView);
     }
 
 
@@ -159,29 +160,42 @@ export default class LiteratePageComponentDisplay {
     }
 
     /** This should be called when a child display enters or leaves edit mode. */
-    notifyEditMode(viewInEditMode,componentId) {
+    notifyEditMode(viewInEditMode,componentView) {
+        let componentId = componentView.getComponent().getId();
+        let index = this.editModeComponentInfos.findIndex( editInfo => editInfo.id == componentId );
         if(viewInEditMode) {
-            if(this.editModeComponents.indexOf(componentId) < 0) {
-                this.editModeComponents.push(componentId);
+            if(index < 0) {
+                this.editModeComponentInfos.push(this._getEditInfo(componentView));
             }
         }
         else {
-            let index = this.editModeComponents.indexOf(componentId);
             if(index >= 0) {
-                this.editModeComponents.splice(index,1);
+                this.editModeComponentInfos.splice(index,1);
             }
         }
-        let inEditMode = (this.editModeComponents.length > 0);
+        let inEditMode = (this.editModeComponentInfos.length > 0);
 
         this._setEditMode(inEditMode);
     }
 
+    //===============================
+    // Private Functions
+    //===============================
+
+    /** This retrieves the format of data to store for tracking edit mode in cells. */
+    _getEditInfo(componentView) {
+        let component = componentView.getComponent();
+        return {id: component.getId(), name: component.getName()}
+    }
+
+    /** This sets edit mode in the display. */
     _setEditMode(inEditMode) {
         //set component edit mode
         this.inEditMode = inEditMode;
 
         if(inEditMode) {
-            this.editNoticeContainer.innerHTML = this.editModeComponents.join();
+            let msg = "Cells being edited: " + this._getNameListFromEditInfos();
+            this.editNoticeContainer.innerHTML = msg;
         }
         else {
             this.editNoticeContainer.innerHTML = "";
@@ -189,9 +203,11 @@ export default class LiteratePageComponentDisplay {
             
     }
 
-    //===============================
-    // Private Functions
-    //===============================
+    /** This constructs the name list for the current edito components. */
+    _getNameListFromEditInfos() {
+        return this.editModeComponentInfos.map(editInfo => editInfo.name).join(", ");
+    }
+
 
     /** @private */
     loadTabEntry() {
@@ -543,13 +559,12 @@ export default class LiteratePageComponentDisplay {
     }
 
     beforeTabClose() {
-        for(let componentId in this.childDisplayMap) {
-            let childDisplay = this.childDisplayMap[componentId];
-            if(!childDisplay.isCloseOk()) {
-                //can not close - note message should be shown in child 
-                return uiutil.DENY_CLOSE;
-            }
+        if(this.inEditMode) {
+            let msg = "Please save or cancel the following cells: " + this._getNameListFromEditInfos();
+            showSimpleActionDialog(msg,null,["OK"]);
+            return uiutil.DENY_CLOSE;
         }
+        
         //anything besides deny close is ok
         return true;
     }

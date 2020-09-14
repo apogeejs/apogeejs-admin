@@ -1,7 +1,6 @@
 import PageDisplayContainer from "/apogeeview/componentdisplay/literatepage/PageDisplayContainer.js";
 
 import {uiutil,Menu,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
-import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 /** This component represents a json table object. */
 export default class PageChildComponentDisplay {
@@ -121,12 +120,6 @@ export default class PageChildComponentDisplay {
                 }
             }
         }
-    }
-
-    isCloseOk() {
-        let msg = "There is unsaved data in the cell " + this.componentView.getName() + "! Please save or cancel it.";
-        showSimpleActionDialog(msg,null,["OK"]);
-        return false;
     }
 
     /** This will reload the given data display. */
@@ -337,7 +330,7 @@ export default class PageChildComponentDisplay {
             
         //notify page
         if(this.componentView) {
-            this.parentComponentDisplay.notifyEditMode(this.inEditMode,this.componentView.getComponent().getId());
+            this.parentComponentDisplay.notifyEditMode(this.inEditMode,this.componentView);
         }
     }
 

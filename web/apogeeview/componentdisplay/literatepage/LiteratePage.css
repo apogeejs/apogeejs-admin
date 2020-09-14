@@ -5,7 +5,7 @@
     
 }
 .visiui_litPage_editNotice {
-    background-color: yellow;
+    background-color: rgb(0,255,255);
 }
 .visiui_litPage_editorToolbar {
     border: 1px solid #ccc;
@@ -125,8 +125,8 @@
     position: relative;
 }
 .visiui_displayContainer_editMode {
-    border: 2px solid yellow;
-    background-color: yellow;
+    border: 2px solid rgb(0,255,255);
+    background-color: rgb(0,255,255);
 }
 .visiui_displayContainer_viewToolbarClass {
     position: relative;
@@ -147,6 +147,9 @@
 .visiui_displayContainer_viewSelectorContainerClass {
     display: inline;
     margin-left: 10px;
+}
+.visiui_displayContainer_viewSelectorContainerClass_editMode {
+    background-color: rgb(0,255,255);
 }
 .visiui_displayContainer_viewSelectorContainerClass:hover {
     background-color: rgba(128,128,144,.35);

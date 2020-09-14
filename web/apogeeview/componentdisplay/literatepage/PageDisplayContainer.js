@@ -497,6 +497,7 @@ export default class PageDisplayContainer {
             this.setHeaderContent(saveBar);
             //take additional edit mode actions
             this.mainElement.classList.add("visiui_displayContainer_editMode");
+            this.viewSelectorContainer.classList.add("visiui_displayContainer_viewSelectorContainerClass_editMode");
             this.componentDisplay.notifyEditMode(true,this.viewTypeName);
         }
     }
@@ -507,6 +508,7 @@ export default class PageDisplayContainer {
             this.inEditMode = false;
             this.setHeaderContent(null);
             this.mainElement.classList.remove("visiui_displayContainer_editMode");
+            this.viewSelectorContainer.classList.remove("visiui_displayContainer_viewSelectorContainerClass_editMode");
             this.componentDisplay.notifyEditMode(false,this.viewTypeName);
         }
         //select the associated node in the document.
