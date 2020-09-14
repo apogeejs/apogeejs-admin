@@ -111,7 +111,9 @@
     margin:0px;
     padding:0px;
 }
-
+.visiui_tf_tab_cmd_button:hover {
+    background-color: rgba(128,128,144,.35);
+}
 .visiui_tf_tab_container {
     position:absolute;
     top:0px;
