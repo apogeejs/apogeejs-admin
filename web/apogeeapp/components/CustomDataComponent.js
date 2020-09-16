@@ -27,12 +27,10 @@ export default class CustomDataComponent extends Component {
         if(!instanceToCopy) {
             //internal tables
             let dataMember = member.lookupChild(model,"data");
-            this.setField("member.data",dataMember);
-            modelManager.registerMember(dataMember.getId(),this,false);
+            this.registerMember(modelManager,dataMember,"member.data",false);
 
             let inputMember = member.lookupChild(model,"input");
-            this.setField("member.input",inputMember);
-            modelManager.registerMember(inputMember.getId(),this,false);
+            this.registerMember(modelManager,inputMember,"member.input",false);
 
             this.setField("destroyOnInactive",false); //default to keep alive
             this.setField("html","");

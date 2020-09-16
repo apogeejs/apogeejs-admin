@@ -16,8 +16,7 @@ export default class FolderFunctionComponent extends ParentComponent {
         if(!instanceToCopy) {
             //register this object as a parent container
             var internalFolder = member.getInternalFolder(modelManager.getModel());
-            this.setField("member.body",internalFolder);
-            modelManager.registerMember(internalFolder.getId(),this,false);
+            this.registerMember(modelManager,internalFolder,"member.body",false);
 
             //initialize the schema
             this.initializeSchema(modelManager);

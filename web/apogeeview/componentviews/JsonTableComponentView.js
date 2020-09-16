@@ -108,7 +108,7 @@ JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 JsonTableComponentView.VIEW_MODES = [
     {name: JsonTableComponentView.VIEW_DATA, label: "Data", isActive: true},
-    {name: JsonTableComponentView.VIEW_CODE, label: "Formula", isActive: true},
+    {name: JsonTableComponentView.VIEW_CODE, label: "Formula", isActive: false},
     {name: JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false},
 ];
 

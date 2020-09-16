@@ -19,17 +19,17 @@ export default class CSVComponent extends Component {
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
             //internal tables
-            let dataMember = member.lookupChild(model,"csv_data");
-            this.setField("member.csv_data",dataMember);
-            modelManager.registerMember(dataMember.getId(),this,false);
+            let dataFolder = member.lookupChild(model,"data");
+            this.registerMember(modelManager,dataFolder,"member.data",false);
 
-            let headerMember = member.lookupChild(model,"csv_header");
-            this.setField("member.csv_header",headerMember);
-            modelManager.registerMember(headerMember.getId(),this,false);
+            let bodyMember = dataFolder.lookupChild(model,"body");
+            this.registerMember(modelManager,bodyMember,"member.data.body",false);
 
-            let inputMember = member.lookupChild(model,"csv_input");
-            this.setField("member.csv_input",inputMember);
-            modelManager.registerMember(inputMember.getId(),this,false);
+            let headerMember = dataFolder.lookupChild(model,"header");
+            this.registerMember(modelManager,headerMember,"member.data.header",false);
+
+            let inputMember = member.lookupChild(model,"__input__");
+            this.registerMember(modelManager,inputMember,"member.input",false);
         }
     }
 }
@@ -40,66 +40,74 @@ CSVComponent.displayName = "CSV Cell";
 /** This is the univeral unique name for the component, used to deserialize the component. */
 CSVComponent.uniqueName = "apogeeapp.CSVCell";
 
-/** This is the json needed to create the necessary members for the  component */
+/** This is the json needed to create the necessary members for the  component 
+ * NOTE: we put the data tables inside a folder "data" so the formula in the input member, from the 
+ * form, does not collide with the internal tables. Well, unless you try to access data called data.body or data.header.
+*/
 CSVComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.Folder",
     "childrenNotWriteable": true,
     "children": {
-        "csv_data": {
-            "name": "csv_data",
+        "__input__": {
+            "name": "__input__",
             "type": "apogee.JsonMember",
             "updateData": {
-                "argList": [],
-                "functionBody":`
-    if(csv_input.input) {
-        let options = {};
-        options.dynamicTyping = csv_input.dynamicTyping;
-        options.skipEmptyLines = csv_input.skipEmptyLines;
-        let result = __papaparse.parse(csv_input.input,options);
-        if(result.errors.length == 0) {
-            let headers = [];
-            let body = [];
-            if((result.data)&&(result.data.length > 0)) {                
-                result.data.forEach( (row,index) => {
-                    if(index == 0) {
-                        headers.push(row);
-                    }
-                    else {
-                        body.push(row);
-                    }
-                });
-
-                
+                "data": "",
             }
+        },
+        "data": {
+            "name": "data",
+            "type": "apogee.Folder",
+            "childrenNotWriteable": true,
+            "children": {
+                "body": {
+                    "name": "body",
+                    "type": "apogee.JsonMember",
+                    "updateData": {
+                        "argList": [],
+                        "functionBody":`
+if(__input__.input) {
+    let options = {};
+    options.dynamicTyping = __input__.dynamicTyping;
+    options.skipEmptyLines = __input__.skipEmptyLines;
+    let result = __papaparse.parse(__input__.input,options);
+    if(result.errors.length == 0) {
+        let headerRow;
+        let body = [];
+        if((result.data)&&(result.data.length > 0)) {                
+            result.data.forEach( (row,index) => {
+                if(index == 0) {
+                    headerRow = row;
+                }
+                else {
+                    body.push(row);
+                }
+            });            
+        }
 
-            apogeeMessenger.dataUpdate("csv_header",headers);
-            return body;
-            
-        }
-        else {
-            let errorMsg = "Parsing Error: " + result.errors.join(";");
-            throw new Error(errorMsg);
-        }
+        if(!headerRow) headerRow = [];
+        apogeeMessenger.dataUpdate("header",headerRow);
+        return body;
     }
     else {
-        apogeeMessenger.dataUpdate("csv_header",[[]]);
-        return [[]];
+        let errorMsg = "Parsing Error: " + result.errors.join(";");
+        throw new Error(errorMsg);
     }
-`
-            }
-        },
-        "csv_header": {
-            "name": "csv_header",
-            "type": "apogee.JsonMember",
-            "updateData": {
-                "data": "",
-            }
-        },
-        "csv_input": {
-            "name": "csv_input",
-            "type": "apogee.JsonMember",
-            "updateData": {
-                "data": "",
+}
+else {
+    apogeeMessenger.dataUpdate("header",[]);
+    return [[]];
+}
+        `
+                    }
+                },
+                "header": {
+                    "name": "header",
+                    "type": "apogee.JsonMember",
+                    "updateData": {
+                        "data": [],
+                    }
+                },
             }
         }
     }

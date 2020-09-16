@@ -1,5 +1,5 @@
 //These are in lieue of the import statements
-let { ComponentView,ConfigurableFormEditor,dataDisplayHelper,HandsonGridEditor,AceTextEditor} = apogeeview;
+let { ComponentView,ConfigurableFormEditor,dataDisplayHelper,HandsonGridEditor} = apogeeview;
 let { getFormResultFunctionBody } = apogeeui;
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
@@ -28,21 +28,14 @@ export default class CSVComponentView extends ComponentView {
         switch(viewType) {
 
             case CSVComponentView.VIEW_HEADER:
-                dataDisplaySource = dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member.csv_header");
+                dataDisplaySource = this._getHeaderDataSource();
                 let editor = new HandsonGridEditor(displayContainer,dataDisplaySource);
                 editor.updateHeight(HEADER_GRID_PIXEL_HEIGHT);
                 return editor;
 
-                //dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,this,"member.csv_header");
-                //return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
-
             case CSVComponentView.VIEW_DATA:
-                //do this as read only. it would otherwise be editable since it does not have a formula
-                dataDisplaySource = dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member.csv_data",true);
+                dataDisplaySource = dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member.data.body");
                 return new HandsonGridEditor(displayContainer,dataDisplaySource);
-
-                //dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,this,"member.csv_data",true);
-                //return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
 
             case CSVComponentView.VIEW_INPUT:
                 dataDisplaySource = this._getInputFormDataSource();
@@ -63,7 +56,7 @@ export default class CSVComponentView extends ComponentView {
         return {
             doUpdate: () => {
                 //data updates should only be triggered by the form itself
-                let reloadData = this.getComponent().isMemberDataUpdated("member.csv_input");
+                let reloadData = this.getComponent().isMemberDataUpdated("member.input");
                 //form layout constant
                 let reloadDataDisplay = false;
                 return {reloadData,reloadDataDisplay};
@@ -75,13 +68,35 @@ export default class CSVComponentView extends ComponentView {
         }
     }
 
+    _getHeaderDataSource() {
+        return {
+            doUpdate: () => {
+                //return value is whether or not the data display needs to be udpated
+                let reloadData = this.getComponent().isMemberDataUpdated("member.data.header");
+                let reloadDataDisplay = false;
+                return {reloadData,reloadDataDisplay};
+            },
+    
+            getData: () => {
+                let headerRow = this.getComponent().getField("member.data.header").getData();
+                if(headerRow != apogeeutil.INVALID_VALUE) {
+                    //for display wrap header row into a matrix
+                    return [headerRow];
+                }
+                else {
+                    return apogeeutil.INVALID_VALUE;
+                }
+            }
+        }
+    }
+
     //=====================================
     // Private Methods
     //=====================================
 
     /** This method gets the form value data that will be passed to the input form. */
     _getFormData() {
-        let memberData = this.getComponent().getField("member.csv_input").getData();
+        let memberData = this.getComponent().getField("member.input").getData();
         if((memberData)&&(memberData.storedFormValue)) {
             return memberData.storedFormValue;
         }
@@ -142,7 +157,7 @@ export default class CSVComponentView extends ComponentView {
         let functionBody = getFormResultFunctionBody(formData,formMeta);
 
         //set the code
-        var member = this.getComponent().getField("member.csv_input");
+        var member = this.getComponent().getField("member.input");
 
         var commandData = {};
         commandData.type = "saveMemberCode";
@@ -180,11 +195,11 @@ CSVComponentView.TABLE_EDIT_SETTINGS = {
 }
 
 const INPUT_HELP_TEXT = "This should be a javascript expression, such as the name of a cell, which gives the raw CSV text. It will be converted to JSON format." + 
-" To access this json value, use the expression <em>[cell name].csv_data</em>.";
+" To access this json value, use the expression <em>[cell name].data</em> to access the data rows and <em>[cell name].header</em>  to access the header row.";
 const DYNAMIC_TYPING_HELP_TEXT = "Check this box to automatically convert numbers and booleans. If this is not selected, all data will be strings.";
 const SKIP_EMPTY_HELP_TEXT = "Check this box to omit a row with no content, often the last row.";
 
-const HEADER_GRID_PIXEL_HEIGHT = 55;
+const HEADER_GRID_PIXEL_HEIGHT = 75;
 
 
 //===============================
