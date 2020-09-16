@@ -5,7 +5,7 @@ const FORMAT_STRING = "\t";
 
 /** This function creates the data display data source  for the data of the given member. The
  * member field should be the field name used to access the data source from the associated component. */
-dataDisplayHelper.getMemberDataJsonDataSource = function(app,componentView,memberFieldName) {
+dataDisplayHelper.getMemberDataJsonDataSource = function(app,componentView,memberFieldName,doReadOnly) {
 
     //this is used internally to lookup the data member used here
     let _getDataMember = function() {
@@ -28,26 +28,29 @@ dataDisplayHelper.getMemberDataJsonDataSource = function(app,componentView,membe
             return _getDataMember().getData();
         },
 
-        getEditOk: function () {
-            return !_getDataMember().hasCode();
-        },
+        getEditOk: doReadOnly ? 
+            function () { return false; }  : 
+            function () {
+                return !_getDataMember().hasCode();
+            },
 
-        saveData: function(data) {
-            var commandData = {};
-            commandData.type = "saveMemberData";
-            commandData.memberId = _getDataMember().getId();
-            commandData.data = data;
-            
-            app.executeCommand(commandData);
-            return true;
-        }
+        saveData: doReadOnly ? undefined :
+            function(data) {
+                var commandData = {};
+                commandData.type = "saveMemberData";
+                commandData.memberId = _getDataMember().getId();
+                commandData.data = data;
+                
+                app.executeCommand(commandData);
+                return true;
+            }
     }
 }
 
 /** This function creates editor callbacks or member data where the editor takes text format. */
-dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,memberFieldName) {
+dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,memberFieldName,doReadOnly) {
 
-    let baseSource = dataDisplayHelper.getMemberDataJsonDataSource(app,componentView,memberFieldName);
+    let baseSource = dataDisplayHelper.getMemberDataJsonDataSource(app,componentView,memberFieldName,doReadOnly);
 
     return {
         doUpdate: baseSource.doUpdate,
@@ -75,26 +78,27 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
 
         getEditOk: baseSource.getEditOk,
 
-        saveData: function(text) {
-            var data;
-            if(text.length > 0) {
-                try {
-                    data = JSON.parse(text);
+        saveData: doReadOnly ? undefined :
+            function(text) {
+                var data;
+                if(text.length > 0) {
+                    try {
+                        data = JSON.parse(text);
+                    }
+                    catch(error) {
+                        if(error.stack) console.error(error.stack);
+                        
+                        //parsing error
+                        alert("There was an error parsing the JSON input: " +  error.message);
+                        return false;
+                    }
                 }
-                catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    
-                    //parsing error
-                    alert("There was an error parsing the JSON input: " +  error.message);
-                    return false;
+                else {
+                    data = "";
                 }
-            }
-            else {
-                data = "";
-            }
 
-            return baseSource.saveData(data);
-        }
+                return baseSource.saveData(data);
+            }
     }
 }
 

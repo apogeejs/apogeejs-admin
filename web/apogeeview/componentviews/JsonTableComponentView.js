@@ -107,9 +107,9 @@ JsonTableComponentView.VIEW_CODE = "Formula";
 JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 JsonTableComponentView.VIEW_MODES = [
-    {name: JsonTableComponentView.VIEW_DATA, label: "Data"},
-    {name: JsonTableComponentView.VIEW_CODE, label: "Formula"},
-    {name: JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private"},
+    {name: JsonTableComponentView.VIEW_DATA, label: "Data", isActive: true},
+    {name: JsonTableComponentView.VIEW_CODE, label: "Formula", isActive: true},
+    {name: JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false},
 ];
 
 JsonTableComponentView.TABLE_EDIT_SETTINGS = {

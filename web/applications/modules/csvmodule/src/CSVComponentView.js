@@ -1,5 +1,5 @@
 //These are in lieue of the import statements
-let { ComponentView,ConfigurableFormEditor,dataDisplayHelper,HandsonGridEditor} = apogeeview;
+let { ComponentView,ConfigurableFormEditor,dataDisplayHelper,HandsonGridEditor,AceTextEditor} = apogeeview;
 let { getFormResultFunctionBody } = apogeeui;
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
@@ -27,9 +27,22 @@ export default class CSVComponentView extends ComponentView {
         //create the new view element;
         switch(viewType) {
 
-            case CSVComponentView.VIEW_GRID:
-                dataDisplaySource = dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member.csv_data");
+            case CSVComponentView.VIEW_HEADER:
+                dataDisplaySource = dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member.csv_header");
+                let editor = new HandsonGridEditor(displayContainer,dataDisplaySource);
+                editor.updateHeight(HEADER_GRID_PIXEL_HEIGHT);
+                return editor;
+
+                //dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,this,"member.csv_header");
+                //return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
+
+            case CSVComponentView.VIEW_DATA:
+                //do this as read only. it would otherwise be editable since it does not have a formula
+                dataDisplaySource = dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member.csv_data",true);
                 return new HandsonGridEditor(displayContainer,dataDisplaySource);
+
+                //dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,this,"member.csv_data",true);
+                //return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
 
             case CSVComponentView.VIEW_INPUT:
                 dataDisplaySource = this._getInputFormDataSource();
@@ -150,23 +163,27 @@ export default class CSVComponentView extends ComponentView {
 // Static properties
 //======================================
 
-CSVComponentView.VIEW_GRID = "Grid";
+CSVComponentView.VIEW_HEADER = "Header";
+CSVComponentView.VIEW_DATA = "Data";
 CSVComponentView.VIEW_INPUT = "Input";
 
 CSVComponentView.VIEW_MODES = [
-	{name: CSVComponentView.VIEW_GRID, label: "Grid"},
-    {name: CSVComponentView.VIEW_INPUT, label: "Configuration"}
+    {name: CSVComponentView.VIEW_HEADER, label: "Header", isActive: false},
+	{name: CSVComponentView.VIEW_DATA, label: "Data", isActive: false},
+    {name: CSVComponentView.VIEW_INPUT, label: "Configuration", isActive: true}
 ];
 
 CSVComponentView.TABLE_EDIT_SETTINGS = {
     "viewModes": CSVComponentView.VIEW_MODES,
-    "defaultView": CSVComponentView.VIEW_GRID
+    "defaultView": CSVComponentView.VIEW_DATA
 }
 
 const INPUT_HELP_TEXT = "This should be a javascript expression, such as the name of a cell, which gives the raw CSV text. It will be converted to JSON format." + 
 " To access this json value, use the expression <em>[cell name].csv_data</em>.";
 const DYNAMIC_TYPING_HELP_TEXT = "Check this box to automatically convert numbers and booleans. If this is not selected, all data will be strings.";
 const SKIP_EMPTY_HELP_TEXT = "Check this box to omit a row with no content, often the last row.";
+
+const HEADER_GRID_PIXEL_HEIGHT = 55;
 
 
 //===============================

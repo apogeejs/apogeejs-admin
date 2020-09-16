@@ -198,8 +198,8 @@ ChartJSComponentView.VIEW_CHART = "Chart";
 ChartJSComponentView.VIEW_INPUT = "Input";
 
 ChartJSComponentView.VIEW_MODES = [
-	{name: ChartJSComponentView.VIEW_CHART, label: "Chart"},
-    {name: ChartJSComponentView.VIEW_INPUT, label: "Configuration"}
+	{name: ChartJSComponentView.VIEW_CHART, label: "Chart", isActive: false},
+    {name: ChartJSComponentView.VIEW_INPUT, label: "Configuration", isActive: true}
 ];
 
 ChartJSComponentView.TABLE_EDIT_SETTINGS = {

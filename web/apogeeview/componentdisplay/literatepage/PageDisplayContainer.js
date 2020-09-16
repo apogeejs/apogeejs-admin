@@ -8,10 +8,10 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
  */
 export default class PageDisplayContainer {
 
-    constructor(componentDisplay, viewTypeName, viewTypeLabel, isMainView) {
+    constructor(componentDisplay, viewModeInfo) {
         
         //variables
-        this.isMainView = isMainView;
+        this.viewModeInfo = viewModeInfo;
         
         this.mainElement = null;
         this.viewToolbarElement = null;
@@ -25,7 +25,7 @@ export default class PageDisplayContainer {
         this.viewNameElement = null;
         
         this.isComponentShowing = false;
-        this.isViewActive = isMainView;
+        this.isViewActive = viewModeInfo.isActive;
         this.isContentLoaded = false;
         
         this.destroyViewOnInactive = true;
@@ -36,8 +36,8 @@ export default class PageDisplayContainer {
         
         this.componentDisplay = componentDisplay;
         this.componentView = componentDisplay.getComponentView();
-        this.viewTypeName = viewTypeName;
-        this.viewTypeLabel = viewTypeLabel;
+        this.viewTypeName = viewModeInfo.name;
+        this.viewTypeLabel = viewModeInfo.label;
         this.dataDisplay = null;
 
         this.heightUiActive = false;

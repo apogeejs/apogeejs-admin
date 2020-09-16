@@ -23,6 +23,10 @@ export default class CSVComponent extends Component {
             this.setField("member.csv_data",dataMember);
             modelManager.registerMember(dataMember.getId(),this,false);
 
+            let headerMember = member.lookupChild(model,"csv_header");
+            this.setField("member.csv_header",headerMember);
+            modelManager.registerMember(headerMember.getId(),this,false);
+
             let inputMember = member.lookupChild(model,"csv_input");
             this.setField("member.csv_input",inputMember);
             modelManager.registerMember(inputMember.getId(),this,false);
@@ -53,7 +57,24 @@ CSVComponent.DEFAULT_MEMBER_JSON = {
         options.skipEmptyLines = csv_input.skipEmptyLines;
         let result = __papaparse.parse(csv_input.input,options);
         if(result.errors.length == 0) {
-            return result.data;
+            let headers = [];
+            let body = [];
+            if((result.data)&&(result.data.length > 0)) {                
+                result.data.forEach( (row,index) => {
+                    if(index == 0) {
+                        headers.push(row);
+                    }
+                    else {
+                        body.push(row);
+                    }
+                });
+
+                
+            }
+
+            apogeeMessenger.dataUpdate("csv_header",headers);
+            return body;
+            
         }
         else {
             let errorMsg = "Parsing Error: " + result.errors.join(";");
@@ -61,9 +82,17 @@ CSVComponent.DEFAULT_MEMBER_JSON = {
         }
     }
     else {
+        apogeeMessenger.dataUpdate("csv_header",[[]]);
         return [[]];
     }
 `
+            }
+        },
+        "csv_header": {
+            "name": "csv_header",
+            "type": "apogee.JsonMember",
+            "updateData": {
+                "data": "",
             }
         },
         "csv_input": {

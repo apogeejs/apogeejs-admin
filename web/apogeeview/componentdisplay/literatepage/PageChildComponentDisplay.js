@@ -221,26 +221,24 @@ export default class PageChildComponentDisplay {
         
         //add the view elements
         var settings = this.componentView.getTableEditSettings();
-        var viewTypes = settings.viewModes;
+        var viewModes = settings.viewModes;
         
         this.displayContainerMap = {};  
-        if(viewTypes.length > 0) {
-            for(var i = 0; i < viewTypes.length; i++) {
-                var viewType = viewTypes[i];
-                var viewTypeName;
-                var viewTypeLabel;
-                if((typeof(viewType) == "string")||(viewType instanceof String)) {
-                    viewTypeName = viewType;
-                    viewTypeLabel = viewType;
-                }
-                else {
-                    viewTypeName = viewType.name;
-                    viewTypeLabel = viewType.label;
+        if(viewModes.length > 0) {
+            for(var i = 0; i < viewModes.length; i++) {
+                var viewModeInfo = viewModes[i];
+                if((typeof(viewModeInfo) == "string")||(viewModeInfo instanceof String)) {
+                    //legacy - when only name was stored, not view info
+                    viewName = viewModeInfo;
+                    viewModeInfo = {};
+                    viewModeInfo.name = viewName;
+                    viewModeInfo.label = viewName;
+                    viewModeInfo.isActive = (i == 0); //default is active
                 }
                 
                 var isMainView = (i == 0);
 
-                var displayContainer = new PageDisplayContainer(this, viewTypeName, viewTypeLabel, isMainView);
+                var displayContainer = new PageDisplayContainer(this, viewModeInfo);
                 
                 //add the view title element to the title bar
                 this.titleBarViewsElement.appendChild(displayContainer.getViewSelectorContainer());
@@ -249,7 +247,7 @@ export default class PageChildComponentDisplay {
                 this.viewContainer.appendChild(displayContainer.getDisplayElement());
                 
                 //store the display container object
-                this.displayContainerMap[viewTypeName] = displayContainer;
+                this.displayContainerMap[viewModeInfo.name] = displayContainer;
             }
         }
 

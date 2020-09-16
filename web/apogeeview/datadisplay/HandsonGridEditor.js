@@ -31,28 +31,6 @@ export default class HandsonGridEditor extends DataDisplay {
        //we have to make sure the element is loaded before initailizing for handsontable to work properly
        this.loaded = false;
 
-        // //on a paste, the event is fired for each row created. We delay it here to haev fewer updates of the rest of the sheet
-        // this.timerInProcess = false;
-        // var REFRESH_DELAY = 50;
-
-        // this.delayGridEdited = (args) => {
-
-        //     if(this.updatesPaused) return;
-
-        //     console.log("grid edited called");
-
-        //     //if there is no timer waiting, start a timer
-        //     if(!this.timerInProcess) {
-        //         this.timerInProcess = true;
-        //         var callEditEvent = (args) => {
-        //             this.timerInProcess = false;
-        //             this.gridEdited(arguments);
-        //             console.log("grid edited processed");
-        //         }
-        //         setTimeout(callEditEvent,REFRESH_DELAY);
-        //     }
-        // }
-
         //set variables for internal display view sizing
         this.setUseContainerHeightUi(true)
 
@@ -150,6 +128,7 @@ export default class HandsonGridEditor extends DataDisplay {
 
     /** This updates the height to the specified pixel height. */
     updateHeight(pixelHeight) {
+        this.savedPixelHeight = pixelHeight;
         if(this.gridControl) {
             this.gridControl.updateSettings({height: pixelHeight});
         }
@@ -186,7 +165,6 @@ export default class HandsonGridEditor extends DataDisplay {
                 }
             }
 
-            this.savedPixelHeight = newPixelHeight;
             this.updateHeight(newPixelHeight);
         }
     }
@@ -250,7 +228,6 @@ export default class HandsonGridEditor extends DataDisplay {
                 return;
             }
             
-            this.savedPixelHeight = newPixelHeight;
             this.updateHeight(newPixelHeight);
         }
     }
@@ -308,6 +285,7 @@ export default class HandsonGridEditor extends DataDisplay {
     //grid edited function
     gridEdited() {
         if(!this.gridControl) return;
+        if(this.updatesPaused) return;
         
         //if the grid was edited, clear any data error so we can take the new data.
         this.dataError = false;
@@ -317,7 +295,7 @@ export default class HandsonGridEditor extends DataDisplay {
 
     afterChange() {
         console.log("after change called");
-        this.delayGridEdited();
+        this.gridEdited();
     }
 
     pauseUpdates() {
@@ -327,7 +305,7 @@ export default class HandsonGridEditor extends DataDisplay {
     unpauseUpdates(doUpdate) {
         this.updatesPaused = false;
         if(doUpdate) {
-            this.delayGridEdited();
+            this.gridEdited();
         }
     } 
     
