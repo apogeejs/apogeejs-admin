@@ -229,7 +229,7 @@ export default class PageChildComponentDisplay {
                 var viewModeInfo = viewModes[i];
                 if((typeof(viewModeInfo) == "string")||(viewModeInfo instanceof String)) {
                     //legacy - when only name was stored, not view info
-                    viewName = viewModeInfo;
+                    let viewName = viewModeInfo;
                     viewModeInfo = {};
                     viewModeInfo.name = viewName;
                     viewModeInfo.label = viewName;

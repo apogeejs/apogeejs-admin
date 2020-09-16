@@ -210,8 +210,6 @@
 .visiui_displayContainer_viewContainerClass {
     position: relative;
     margin: 3px;
-    overflow-y: visible;
-    overflow-x: hidden;
     z-index: 0;
     /*outline: .5px solid rgb(200,200,200);*/
 }

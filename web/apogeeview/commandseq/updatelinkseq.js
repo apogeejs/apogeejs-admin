@@ -5,6 +5,7 @@ import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js"
 const DIALOG_LAYOUT_URL_LINE = {
     "type": "textField",
     "label": "URL: ",
+    "size": 100,
     "key": "url",
     "value": "",
     "focus": true
@@ -12,6 +13,7 @@ const DIALOG_LAYOUT_URL_LINE = {
 const DIALOG_LAYOUT_NICKNAME_LINE = {
     "type": "textField",
     "label": "Nickname (optional): ",
+    "size": 40,
     "key": "nickname",
     "value": ""
 };

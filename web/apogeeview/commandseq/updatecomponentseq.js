@@ -280,6 +280,7 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
     var nameLine = {};
     nameLine.type = "textField";
     nameLine.label = "Name: ";
+    nameLine.size = 40,
     nameLine.key = "name";
     nameLine.focus = true;
     lines.push(nameLine);

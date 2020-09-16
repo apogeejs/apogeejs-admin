@@ -75,6 +75,7 @@ FunctionComponentView.propertyDialogLines = [
     {
         "type":"textField",
         "label":"Arg List: ",
+        "size": 80,
         "key":"argListString"
     }
 ];

@@ -371,6 +371,7 @@ let DEFAULT_CHART_CONFIG = {
 //code generated using dev chart workspace
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /** This struct gives the information needed to construct the forms for each chart type. */
 const CHART_INFO_MAP = {
     line: {
@@ -715,6 +716,7 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "X Values: ",
+        size: 60,
         hint: "expression",
         help: numericXValuesHelp,
         key: "xValues",
@@ -730,6 +732,7 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Y Values: ",
+        size: 60,
         hint: "expression",
         help: numericYValuesHelp,
         key: "yValues",
@@ -745,6 +748,7 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "XY Point Array: ",
+        size: 60,
         hint: "expression",
         help: numericXYPointsHelp,
         key: "xyPoints",
@@ -760,6 +764,7 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Data Array: ",
+        size: 60,
         hint: "expression",
         help: numericDataArrayHelp,
         key: "dataArray",
@@ -775,6 +780,7 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "X Accessor: ",
+        size: 60,
         hint: "expression",
         help: numericXAccessorHelp,
         key: "xAccessor",
@@ -790,6 +796,7 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Y Accessor: ",
+        size: 60,
         hint: "expression",
         help: numericYAccessorHelp,
         key: "yAccessor",
@@ -817,6 +824,7 @@ const baseCategoryDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Y Values: ",
+        size: 60,
         hint: "expression",
         help: categoryYValuesHelp,
         key: "yValues",
@@ -832,6 +840,7 @@ const baseCategoryDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Data Array: ",
+        size: 60,
         hint: "expression",
         help: categoryDataArrayHelp,
         key: "dataArray",
@@ -847,6 +856,7 @@ const baseCategoryDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Y Accessor: ",
+        size: 60,
         hint: "expression",
         help: categoryYAccessorHelp,
         key: "yAccessor",
@@ -879,6 +889,7 @@ const titleConfigElement = {
                 {
                     type: "textField",
                     label: "Text: ",
+                    size: 40,
                     key: "text",
                     meta: {
                         "excludeValue": ""
@@ -1384,6 +1395,7 @@ const yAxisConfigElement = {
 const categoryElement = {
     type: "textField",
     label: "X Category Array: ",
+    size: 60,
     hint: "expression, optional",
     help: categoryElementHelp,
     key: "xCategories",
@@ -1407,6 +1419,7 @@ const categoryElementWithSelector = (() => {
 const xValuesTypeElement = {
     type: "radioButtonGroup",
     label: "X Values Type: ",
+    size: 60,
     entries: [["Category", "category"], ["Numeric", "numeric"]],
     value: "category", //initial default
     horizontal: true,
@@ -1425,6 +1438,7 @@ const invisibleXValuesTypeElement = {
 const seriesLabelElement = {
     type: "textField",
     label: "Label: ",
+    size: 40,
     key: "label",
     meta: {
         "excludeValue": ""

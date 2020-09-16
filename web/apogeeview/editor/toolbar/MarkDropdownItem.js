@@ -11,7 +11,7 @@ import {setMark,clearMark} from "/apogeeview/editor/apogeeCommands.js";
 //This is a menu element for a mark with multiple attribute values, for a single attribute name
 //the default value should be the selection option for no mark present.
 export default class MarkDropdownItem {
-    constructor(markType, attrName, attrValueList, defaultValue) {
+    constructor(markType, attrName, attrValueList, defaultValue, tooltip) {
         this.markType = markType;
         this.attrValueList = attrValueList;
         this.defaultValue = defaultValue;
@@ -19,6 +19,7 @@ export default class MarkDropdownItem {
         this.selectionGenerator = createSelectionGenerator(markType, attrName);
 
         this.element = document.createElement("select");
+        this.element.title = tooltip;
         attrValueList.forEach(attrValueEntry => {
             let option = document.createElement("option");
             option.value = attrValueEntry[1];

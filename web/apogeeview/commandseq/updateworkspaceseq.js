@@ -9,6 +9,7 @@ const DIALOG_LAYOUT_TITLE_LINE = {
 const DIALOG_LAYOUT_NAME_LINE = {
     "type": "textField",
     "label": "Name: ",
+    "size": 40,
     "key": "name",
     "initial": "",
     "focus": true

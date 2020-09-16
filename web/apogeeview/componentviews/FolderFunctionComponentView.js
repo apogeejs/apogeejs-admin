@@ -53,11 +53,13 @@ FolderFunctionComponentView.propertyDialogLines = [
     {
         "type":"textField",
         "label":"Arg List: ",
+        "size": 80,
         "key":"argListString"
     },
     {
         "type":"textField",
         "label":"Return Val: ",
+        "size": 40,
         "key":"returnValueString"
     }
 ];

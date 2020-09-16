@@ -47,7 +47,7 @@ export function createProseMirrorManager(app, schema) {
     }
 
     let toolbarItems = [
-        new ActionButton(convertToParagraphCommand, getBlockIsHighlightedFunction(schema.nodes.paragraph), null, "Normal", "atb_normal_style", "Paragraph"),
+        new ActionButton(convertToParagraphCommand, getBlockIsHighlightedFunction(schema.nodes.paragraph), null, "Normal", "atb_normal_style", "Normal Paragraph Text"),
         new ActionButton(convertToH1Command, getBlockIsHighlightedFunction(schema.nodes.heading1), null, "H1", "atb_h1_style", "Heading 1"),
         new ActionButton(convertToH2Command, getBlockIsHighlightedFunction(schema.nodes.heading2), null, "H2", "atb_h2_style", "Heading 2"),
         new ActionButton(convertToH3Command, getBlockIsHighlightedFunction(schema.nodes.heading3), null, "H3", "atb_h3_style", "Heading 3"),
@@ -56,12 +56,12 @@ export function createProseMirrorManager(app, schema) {
         new ActionButton(convertToNumberedCommand, getBlockIsHighlightedFunction(schema.nodes.numberedList), null, "1.", "atb_ol_style", "Nubmered List"),
         new MarkToggleItem(schema.marks.bold, null, "B", "atb_bold_style", "Bold"),
         new MarkToggleItem(schema.marks.italic, null, "I", "atb_italic_style", "Italic"),
-        new MarkDropdownItem(schema.marks.fontfamily, "fontfamily", [["Sans-serif", "Sans-serif"], ["Serif", "Serif"], ["Monospace", "Monospace"]], "Sans-serif"),
-        new MarkDropdownItem(schema.marks.fontsize, "fontsize", [["75%", ".75em"], ["100%", "1em"], ["150%", "1.5em"], ["200%", "2em"]], "1em"),
+        new MarkDropdownItem(schema.marks.fontfamily, "fontfamily", [["Sans-serif", "Sans-serif"], ["Serif", "Serif"], ["Monospace", "Monospace"]], "Sans-serif", "Font"),
+        new MarkDropdownItem(schema.marks.fontsize, "fontsize", [["75%", ".75em"], ["100%", "1em"], ["150%", "1.5em"], ["200%", "2em"]], "1em", "Font Size"),
         new MarkDropdownItem(schema.marks.textcolor, "color", [["Black", "black"], ["Blue", "blue"], ["Red", "red"], ["Green", "green"], ["Yellow", "yellow"], ["Dark Gray", "#202020"],
-        ["Gray", "#505050"], ["light gray", "#808080"]], "black"),
+        ["Gray", "#505050"], ["light gray", "#808080"]], "black","Font Color"),
         new MarkDropdownItem(schema.marks.highlight, "color", [["None", "none"], ["Yellow", "yellow"], ["Cyan", "cyan"], ["Pink", "pink"], ["Green", "green"],
-        ['Orange', "orange"], ["Red", "red"], ["Gray", "#a0a0a0"]], "none"),
+        ['Orange', "orange"], ["Red", "red"], ["Gray", "#a0a0a0"]], "none","Highlight"),
 
     ];
 

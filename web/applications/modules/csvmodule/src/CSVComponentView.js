@@ -95,6 +95,7 @@ export default class CSVComponentView extends ComponentView {
             {
                 type: "textField",
                 label: "Input Text Data: ",
+                size: 60,
                 key: "input",
                 hint: "expression",
                 help: INPUT_HELP_TEXT,
@@ -199,5 +200,5 @@ CSVComponentView.hasTabEntry = false;
 CSVComponentView.hasChildEntry = true;
 
 /** This is the icon url for the component. */
-CSVComponentView.ICON_RES_PATH = "/componentIcons/gridTable.png";
+CSVComponentView.ICON_RES_PATH = "/icons3/gridCellIcon.png";
 

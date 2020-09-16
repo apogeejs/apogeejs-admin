@@ -340,6 +340,7 @@ export default class LiteratePageComponentDisplay {
                 //label
                 var textElement = uiutil.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
                 textElement.innerHTML = componentClass.displayName;
+                buttonElement.title = "Insert " + componentClass.displayName;
                 //add handler
                 buttonElement.onclick = () => {
 
@@ -361,6 +362,7 @@ export default class LiteratePageComponentDisplay {
         var buttonElement = uiutil.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
         var textElement = uiutil.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
         textElement.innerHTML = "Additional Components...";
+        buttonElement.title = "Additional Cells to Insert"
         buttonElement.onclick = () => {
 
             this.editorView.focus();

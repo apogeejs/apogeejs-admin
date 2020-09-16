@@ -263,12 +263,15 @@ export default class PageDisplayContainer {
             this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
             this.showLessButton.innerHTML = "less";
             this.showLessButton.onclick = () => this.showLess();
+            this.showLessButton.title = "Descrease View Size";
             this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
             this.showMoreButton.innerHTML = "more";
             this.showMoreButton.onclick = () => this.showMore();
+            this.showMoreButton.title = "Increase View Size";
             this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
             this.showMaxButton.innerHTML = "max";
             this.showMaxButton.onclick = () => this.showMax();
+            this.showMaxButton.title = "Show Max View Size";
             this.heightUiActive = true;
             this.updateViewSizeButtons()
         }
