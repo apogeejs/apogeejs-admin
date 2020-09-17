@@ -408,7 +408,7 @@ export default class LiteratePageComponentDisplay {
         command.componentId = pageComponent.getId();
         command.plugins = plugins;
         let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
-        workspaceManager.runFutureCommand(command);
+        workspaceManager.getApp().executeCommand(command);
         
     }
 
@@ -490,7 +490,7 @@ export default class LiteratePageComponentDisplay {
         command.componentId = pageComponent.getId();
         command.plugins = [];
         let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
-        workspaceManager.runFutureCommand(command);
+        workspaceManager.getApp().executeCommand(command);
         
         //editor view
         if(this.editorView) {

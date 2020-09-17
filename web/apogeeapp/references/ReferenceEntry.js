@@ -86,7 +86,7 @@ export default class ReferenceEntry extends FieldObject {
                     url: this.getUrl(),
                     success: true
                 };
-                workspaceManager.runFutureCommand(commandData);
+                workspaceManager.getApp().executeCommand(commandData);
                 //call resolve in any case
                 resolve();
             };
@@ -104,7 +104,7 @@ export default class ReferenceEntry extends FieldObject {
                     success: false,
                     error: error
                 };
-                workspaceManager.runFutureCommand(commandData);
+                workspaceManager.getApp().executeCommand(commandData);
                 //call resolve in any case
                 resolve();
             }

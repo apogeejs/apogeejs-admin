@@ -38,18 +38,31 @@ export default class CommandManager {
         this.commandQueue = [];
     }
     
-    /** This method executes the given command and, if applicable, adds it to the queue. 
-     * Supress history does not add this command to the history. It is used by the history for
-     * undo commands/redo commands.
-    */
-    executeCommand(command,suppressFromHistory) {
+    /** This method executes the given command, asynchronously */
+    executeCommand(command) {
+        setTimeout(() => this._executeSynchronous(command,false),0);
+    }
 
-        //make sure we only exectue one command at a time. For now just give up if this happens
-        if(this.commandInProgress) {
-            alert("Command ettempted while another in progress. Ignored");
-            return false;
-        }
-        this.commandInProgress = true;
+    /** This returns the command history. */
+    getCommandHistory() {
+        return this.commandHistory;
+    }
+
+    //=========================================
+    // Private Methods
+    //=========================================
+
+    
+    /** This method actually executes the command. It should only be called internally. To run a command,
+     * use executeCommand, which will put the command in the command queue and run it asynchronously.
+     * There is one exception to using this method directly - the command history runs command directly rather
+     * than doing it asynchronously. This is so the latest command executed is the one undone, and also because of
+     * how the command failure logic is currently implemented.
+     * 
+     * TBR - (1) what happens when the undo supercedes other commands
+     * that follow from the undone command. (2) Handling an infinite string of commands. We should implement a way
+     * to let the user stop a string of commands. */
+    _executeSynchronous(command,suppressFromHistory) {
 
         //get a mutable workspace manager instance
         let oldWorkspaceManager = this.app.getWorkspaceManager();
@@ -157,18 +170,8 @@ export default class CommandManager {
             commandDone = false;
         }
 
-        this.commandInProgress = false;
         return commandDone;
     }
-
-    /** This returns the command history. */
-    getCommandHistory() {
-        return this.commandHistory;
-    }
-
-    //=========================================
-    // Private Methods
-    //=========================================
 
     _changeMapToChangeList(changeMap) {
         let changeList = [];
