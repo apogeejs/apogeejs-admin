@@ -114,6 +114,16 @@ Parent.removeChild = function(model,child) {
 //This method should optionally be implemented for any additional actions when a Child is removed.
 //Parent.onRemoveChild(model,child);
 
+/** This method is called when a child valud changes. */
+Parent.dataUpdate = function(model,child) {
+    if(this.onChildDataUpdate) {
+        this.onChildDataUpdate(model,child);
+    }
+}
+
+//This method should optionally be implemented for any additional actions when a Child value is changed.
+//Parent.onChildDataUpdate(model,child);
+
 ///** This method is called when the model is closed. 
 //* It should do any needed cleanup for the object. */
 Parent.onClose = function(model) {
