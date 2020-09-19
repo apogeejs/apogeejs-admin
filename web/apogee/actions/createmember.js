@@ -67,7 +67,7 @@ export function createMember(model,parent,memberJson) {
     }
 
     if(generator) {
-        member = generator.createMember(parent.getId(),memberJson); 
+        member = generator.createMember(model,memberJson); 
 
         //this codde attempts to write  the member ID into the command that created the member.
         //We want this in our stored commands so we can use it for "redo" and have a member created
@@ -90,6 +90,7 @@ export function createMember(model,parent,memberJson) {
         }
 
         //pass this child to the parent
+        member.setParentId(parent.getId());
         parent.addChild(model,member);
 
         //register member with model

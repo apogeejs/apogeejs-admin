@@ -8,8 +8,8 @@ import Parent from "/apogee/datacomponents/Parent.js";
 /** This is a folder. */
 export default class Folder extends DependentMember {
 
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
 
         //mixin init where needed
         //This is not a root. Scope is inherited from the parent.
@@ -18,13 +18,6 @@ export default class Folder extends DependentMember {
 
         //for the folder we set data even if the folder has an error or other invalid data
         this.omitClearDataOnInvalid = true;
-
-        //initialize data value if this is a new folder
-        if(!instanceToCopy) {
-            let dataMap = {};
-            Object.freeze(dataMap);
-            this.setData(model,dataMap);
-        }
     }
 
     //------------------------------
@@ -56,13 +49,11 @@ export default class Folder extends DependentMember {
     /** In this implementation we update the data value for the folder. See notes on why this is
      * done here rather than in 'calculate' */
     onChildDataUpdate(model,child) {
-        if(!child.isDataHolder) return;
-    
         var childId = child.getId();
         let childIdMap = this.getChildIdMap();
         var name = child.getName();
         var data = child.getData();
-        if(childIdMap[childId] != name) {
+        if(childIdMap[name] != childId) {
             alert("Error - the table " + childId + " is not registered in the parent under the name "  + name);
             return;
         }
@@ -129,8 +120,12 @@ export default class Folder extends DependentMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(parentId,json) {
-        var folder = new Folder(json.name,parentId,null,null,json.specialIdValue);
+    static fromJson(model,json) {
+        var folder = new Folder(json.name,null,null,json.specialIdValue);
+
+        let dataMap = {};
+        Object.freeze(dataMap);
+        folder.setData(model,dataMap);
 
         if(json.childrenNotWriteable) {
             folder.setChildrenWriteable(false);
@@ -191,9 +186,10 @@ export default class Folder extends DependentMember {
 
     /** This does a partial update of the folder value, for a single child */
     _spliceDataMap(model,addOrRemoveName,addData) {
-        //copy old data
+        //shallow copy old data
         let oldDataMap = this.getData();
-        let newDataMap = apogeeutil.jsonCopy(oldDataMap);
+        let newDataMap = {};
+        Object.assign(newDataMap,oldDataMap);
 
         //add or update this child data
         if(addData !== undefined) {

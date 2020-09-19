@@ -290,7 +290,7 @@ export default class Model extends FieldObject {
         if(member) {
             if(member.getIsLocked()) {
                 //create a unlocked copy of the member
-                let newMember = new member.constructor(member.getName(),member.getParentId(),member);
+                let newMember = new member.constructor(member.getName(),member);
 
                 //update the saved copy of this member in the member map
                 this.registerMember(newMember);

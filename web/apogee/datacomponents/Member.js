@@ -17,7 +17,7 @@ import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
  * the hierarchy (maybe the model). */
 export default class Member extends FieldObject {
 
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
         super("member",instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
         
         //==============
@@ -26,7 +26,6 @@ export default class Member extends FieldObject {
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
             this.setField("name",name);
-            this.setField("parentId",parentId);
             //"data"
             //"pendingPromise"
             //"state"
@@ -327,6 +326,11 @@ export default class Member extends FieldObject {
         }
     }
 
+    /** This should only be used for intially setting the parent id. */
+    setParentId(parentId) {
+        this.setField("parentId",parentId);
+    }
+
     //========================================
     // "Protected" Methods
     //========================================
@@ -367,7 +371,7 @@ export default class Member extends FieldObject {
      * For any state other than NORMAL, the data will be set to INVALID, regardless of 
      * what argument is given for data.
      * For state ERROR, an error list should be set. */
-    _setState(state,errorList) {
+    _setState(model,state,errorList) {
         let newStateStruct = {};
         let oldStateStruct = this.getField("state");
 
@@ -415,8 +419,9 @@ export default class Member extends FieldObject {
     _setDataField(model, dataValue) {
         this.setField("data",dataValue);
 
-        if(this.parentId) {
-            let parent = model.getMutableMember(this.parentId);
+        let parentId = this.getField("parentId");
+        if(parentId) {
+            let parent = model.getMutableMember(parentId);
             parent.dataUpdate(model,this);
         }
     }
