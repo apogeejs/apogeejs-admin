@@ -8,19 +8,22 @@ import Parent from "/apogee/datacomponents/Parent.js";
 /** This is a folder. */
 export default class Folder extends DependentMember {
 
-    constructor(name,parent,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,parent,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
 
         //mixin init where needed
         //This is not a root. Scope is inherited from the parent.
         this.contextHolderMixinInit(false);
         this.parentMixinInit(instanceToCopy);
 
+        //for the folder we set data even if the folder has an error or other invalid data
+        this.omitClearDataOnInvalid = true;
+
         //initialize data value if this is a new folder
         if(!instanceToCopy) {
             let dataMap = {};
             Object.freeze(dataMap);
-            this.setData(dataMap);
+            this.setData(model,dataMap);
         }
     }
 
@@ -36,7 +39,7 @@ export default class Folder extends DependentMember {
         this.updateDependencies(model,dependsOnMap);
 
         //set the data value for this child
-        this._spliceDataMap(child.getName(),child.getValue());
+        this._spliceDataMap(model,child.getName(),child.getData());
     }
 
     /** In this implementation updates the dependencies and updates the data value for the folder. See notes on why the update is
@@ -47,7 +50,7 @@ export default class Folder extends DependentMember {
         this.updateDependencies(model,dependsOnMap);
 
         //remove the data value for this child
-        this._spliceDataMap(child.getName());
+        this._spliceDataMap(model,child.getName());
     }
 
     /** In this implementation we update the data value for the folder. See notes on why this is
@@ -63,7 +66,7 @@ export default class Folder extends DependentMember {
             alert("Error - the table " + childId + " is not registered in the parent under the name "  + name);
             return;
         }
-        this._spliceDataMap(name,data);
+        this._spliceDataMap(model,name,data);
     }
 
     /** this method gets the hame the children inherit for the full name. */
@@ -187,7 +190,7 @@ export default class Folder extends DependentMember {
     }
 
     /** This does a partial update of the folder value, for a single child */
-    _spliceDataMap(addOrRemoveName,addData) {
+    _spliceDataMap(model,addOrRemoveName,addData) {
         //copy old data
         let oldDataMap = this.getData();
         let newDataMap = apogeeutil.jsonCopy(oldDataMap);
@@ -202,7 +205,7 @@ export default class Folder extends DependentMember {
         
         //make this immutable and set it as data for this folder - note we want to set the data whether or not we have an error!
         Object.freeze(newDataMap);
-        this.forceUpdateDataWithoutStateChange(newDataMap);
+        this.setData(model,newDataMap,true);
     }
 }
 

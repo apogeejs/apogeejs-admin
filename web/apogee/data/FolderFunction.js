@@ -23,7 +23,7 @@ export default class FolderFunction extends DependentMember {
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
             //set to an empty function
-            this.setData(function(){});
+            this.setData(model,function(){});
 
             //this field is used to disable the calculation of the value of this function
             //It is used in the "virtual model" to prevent any unnecessary downstream calculations
@@ -140,7 +140,7 @@ export default class FolderFunction extends DependentMember {
         //This prevents any object which calls this function from updating. It is inended to be 
         //used in the virtual workspace assoicated with this folder function
         if(this.getField("sterilized")) {
-            this.setResultInvalid();
+            this.setResultInvalid(model);
             this.clearCalcPending();
             return;
         }
@@ -153,13 +153,13 @@ export default class FolderFunction extends DependentMember {
             //check for code errors, if so set a data error
             try {
                 var folderFunctionFunction = this.getFolderFunctionFunction(model);
-                this.setData(folderFunctionFunction);
+                this.setData(model,folderFunctionFunction);
             }
             catch(error) {
                 if(error.stack) console.error(error.stack);
                 
                 //error in calculation
-                this.setError(error);
+                this.setError(model,error);
             }
         }
         

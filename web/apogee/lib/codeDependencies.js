@@ -31,12 +31,12 @@ export function getDependencyInfo(varInfo,model,contextManager) {
                 }
 
                 //add the pass through members to the dependency map (give precedence to normal dependencies)
-                passThroughDependencies.forEach(passThroughMember => {
-                    var memberId = passThroughMember.getId();
-                    if(dependsOnMap[memberId] == undefined) {
-                        dependsOnMap[memberId] = apogeeutil.PASS_THROUGH_DEPENDENCY;
-                    }
-                });
+                // passThroughDependencies.forEach(passThroughMember => {
+                //     var memberId = passThroughMember.getId();
+                //     if(dependsOnMap[memberId] == undefined) {
+                //         dependsOnMap[memberId] = apogeeutil.PASS_THROUGH_DEPENDENCY;
+                //     }
+                // });
             }
 		}
 	}

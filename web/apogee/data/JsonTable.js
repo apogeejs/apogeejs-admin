@@ -29,7 +29,7 @@ export default class JsonTable extends CodeableMember {
             //the data is the output of the function
             let memberFunction = memberGenerator();
             let data = memberFunction();
-            this.applyData(data);
+            this.applyData(model,data);
 
             //we must separately apply the asynch data set promise if there is one
             if((data)&&(data instanceof Promise)) {
@@ -51,13 +51,13 @@ export default class JsonTable extends CodeableMember {
     /** This method extends set data from member. It also
      * freezes the object so it is immutable. (in the future we may
      * consider copying instead, or allowing a choice)*/
-    setData(data) {
+    setData(model,data) {
         
         //make this object immutable
         apogeeutil.deepFreeze(data);
 
         //store the new object
-        return super.setData(data);
+        return super.setData(model,data);
     }
 
     /** This method creates a member from a json. It should be implemented as a static
@@ -92,7 +92,7 @@ export default class JsonTable extends CodeableMember {
 
             //apply the initial data
             //note for now this can not be a promise, so we do not need to also call applyAsynchData.
-            member.applyData(data,errorList);
+            member.applyData(model,data,errorList);
 
             //set the code fields to empty strings
             member.setField("functionBody","");

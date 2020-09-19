@@ -19,7 +19,7 @@ export default class FunctionTable extends CodeableMember {
 
     processMemberFunction(model,memberFunctionInitializer,memberGenerator) {
         var memberFunction = this.getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator);
-        this.setData(memberFunction);
+        this.setData(model,memberFunction);
     }
 
     getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator) {
@@ -75,31 +75,33 @@ export default class FunctionTable extends CodeableMember {
                 memberFunction.initializeIfNeeded();
             }
             catch(error) {
-                //handle potential error cases!!!:
+                //This error is thrown so it can be received by any member that depends on this function 
+                //when the function has not yet been called. If we do this during lock, then we only need
+                //notify the function member itself, and that has already been done. we will just ignore this error.
                 
-                if(error == apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE) {
-                    //This is not an error. I don't like to throw an error
-                    //for an expected condition, but I didn't know how else
-                    //to do this. See notes where this is thrown.
-                    this.setResultInvalid();
-                }
-                else if(error == apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE) {
-                    //This is not an error. I don't like to throw an error
-                    //for an expected condition, but I didn't know how else
-                    //to do this. See notes where this is thrown.
-                    this.setResultPending();
-                }
-                //--------------------------------------
-                else {
-                    //normal error in member function execution
+                // if(error == apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE) {
+                //     //This is not an error. I don't like to throw an error
+                //     //for an expected condition, but I didn't know how else
+                //     //to do this. See notes where this is thrown.
+                //     this.setResultInvalid(model);
+                // }
+                // else if(error == apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE) {
+                //     //This is not an error. I don't like to throw an error
+                //     //for an expected condition, but I didn't know how else
+                //     //to do this. See notes where this is thrown.
+                //     this.setResultPending(model);
+                // }
+                // //--------------------------------------
+                // else {
+                //     //normal error in member function execution
                 
-                    //this is an error in the code
-                    if(error.stack) {
-                        console.error(error.stack);
-                    }
+                //     //this is an error in the code
+                //     if(error.stack) {
+                //         console.error(error.stack);
+                //     }
     
-                    this.setError(error);
-                }
+                //     this.setError(model,error);
+                // }
             }
 
         }

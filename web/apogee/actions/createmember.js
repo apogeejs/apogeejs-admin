@@ -118,7 +118,7 @@ export function createMember(model,parent,memberJson) {
         //type not found! - create a dummy object and add an error to it
         let errorTableGenerator = Model.getMemberGenerator("apogee.ErrorMember");
         member = errorTableGenerator.createMember(parent,memberJson);
-        member.setError("Member type not found: " + memberJson.type);
+        member.setError(model,"Member type not found: " + memberJson.type);
         
         //store an error message, but this still counts as command done.
         actionResult.errorMsg = "Error creating member: member type not found: " + memberJson.type;

@@ -110,10 +110,10 @@ export default class DependentMember extends Member {
             this.createDependencyError(model,errorDependencies);
         }
         else if(resultPending) {
-            this.setResultPending();
+            this.setResultPending(model);
         }
         else if(resultInvalid) {
-            this.setResultInvalid();
+            this.setResultInvalid(model);
         }
     }
 
@@ -167,6 +167,6 @@ export default class DependentMember extends Member {
                 if(i > 0) message += ", ";
                 message += errorDependencies[i].getFullName(model);
             }
-            this.setError(message);   
+            this.setError(model,message);   
     }
 }

@@ -10,7 +10,7 @@ export default class ErrorTable extends Member {
         super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
 
         var dummyData = "";
-        this.setData(dummyData);
+        this.setData(model,dummyData);
     }
 
     //------------------------------
@@ -20,13 +20,13 @@ export default class ErrorTable extends Member {
     /** This method extends set data from member. It also
      * freezes the object so it is immutable. (in the future we may
      * consider copying instead, or allowing a choice)*/
-    setData(data) {
+    setData(model,data) {
         
         //make this object immutable
         apogeeutil.deepFreeze(data);
 
         //store the new object
-        return super.setData(data);
+        return super.setData(model,data);
     }
 
     /** This overrides the commplete json to just pass back the entire json sent in. */

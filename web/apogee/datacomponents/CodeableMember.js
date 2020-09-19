@@ -165,12 +165,12 @@ export default class CodeableMember extends DependentMember {
     calculate(model) {
         let compiledInfo = this.getField("compiledInfo");
         if(!compiledInfo) {
-            this.setError("Code not found for member: " + this.getName());
+            this.setError(model,"Code not found for member: " + this.getName());
             this.clearCalcPending();
             return;
         }
         else if(!compiledInfo.valid) {
-            this.setErrors(compiledInfo.errors);
+            this.setErrors(model,compiledInfo.errors);
             this.clearCalcPending();
             return;
         }
@@ -187,13 +187,13 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
                 //This is not an error. I don't like to throw an error
                 //for an expected condition, but I didn't know how else
                 //to do this. See notes where this is thrown.
-                this.setResultInvalid();
+                this.setResultInvalid(model);
             }
             else if(error == apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE) {
                 //This is not an error. I don't like to throw an error
                 //for an expected condition, but I didn't know how else
                 //to do this. See notes where this is thrown.
-                this.setResultPending();
+                this.setResultPending(model);
             }
             //--------------------------------------
             else {
@@ -205,7 +205,7 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
                     console.error(error.stack);
                 }
 
-                this.setError(error);
+                this.setError(model,error);
             }
         }
         
@@ -295,7 +295,7 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
             
             //make sure this in only called once
             if(this.dependencyInitInProgress) {
-                this.setError("Circular reference error");
+                this.setError(model,"Circular reference error");
                 //clear calc in progress flag
                 this.dependencyInitInProgress = false;
                 functionInitialized = true;
@@ -328,7 +328,7 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
                     console.error(error.stack);
                 }
 
-                this.setError(error);
+                this.setError(model,error);
                 functionInitializedSuccess = false;
             }
             
