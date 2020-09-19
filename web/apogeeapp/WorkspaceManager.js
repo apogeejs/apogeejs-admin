@@ -162,12 +162,10 @@ export default class WorkspaceManager extends FieldObject {
     // asynch run context methods
     //====================================
 
-    /** This is kept for legacy reasons. app.executeCommand should be called instead, which will
-     * run the command asynchronously. 
-     * @deprecated  */
+    /** This runs a command asynchronously */
     runFutureCommand(commandData) {
         //run command asynchronously
-        this.app.executeCommand(commandData);
+        setTimeout(() => this.app.executeCommand(commandData),0);
     }
 
     getModelRunContext() {
@@ -180,7 +178,7 @@ export default class WorkspaceManager extends FieldObject {
             modelActionCommand.action = action;
 
             //execut this command as a future command
-            this.app.executeCommand(modelActionCommand);
+            this.runFutureCommand(modelActionCommand);
         }
 
         return modelRunContext;
@@ -274,7 +272,7 @@ export default class WorkspaceManager extends FieldObject {
                 let loadModelCommand = {};
                 loadModelCommand.type = "loadModelManager";
                 loadModelCommand.json = json.code;
-                this.app.executeCommand(loadModelCommand);
+                this.runFutureCommand(loadModelCommand);
             }
 
             referenceLoadPromise.then(onReferencesLoaded);
