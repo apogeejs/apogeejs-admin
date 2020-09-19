@@ -37,32 +37,28 @@ export default class CommandManager {
         this.commandInProgress = false;
         this.commandQueue = [];
     }
-    
-    /** This method executes the given command, asynchronously */
-    executeCommand(command) {
-        setTimeout(() => this._executeSynchronous(command,false),0);
-    }
 
     /** This returns the command history. */
     getCommandHistory() {
         return this.commandHistory;
     }
-
-    //=========================================
-    // Private Methods
-    //=========================================
-
     
-    /** This method actually executes the command. It should only be called internally. To run a command,
-     * use executeCommand, which will put the command in the command queue and run it asynchronously.
-     * There is one exception to using this method directly - the command history runs command directly rather
-     * than doing it asynchronously. This is so the latest command executed is the one undone, and also because of
-     * how the command failure logic is currently implemented.
-     * 
-     * TBR - (1) what happens when the undo supercedes other commands
-     * that follow from the undone command. (2) Handling an infinite string of commands. We should implement a way
-     * to let the user stop a string of commands. */
-    _executeSynchronous(command,suppressFromHistory) {
+    /** This method executes the given command. Only one command will run at a time, so if one is in progress,
+     * the new command will fail. Run the command asynchronously, with setTimeout, if it is called from 
+     * an in process command. If it is not known if a command is running, the method isCommandInProgress can be called to 
+     * check, though this is not intended as a standard procedure.
+     * The flag supressFromHistory is intended for use in undo and redo from the command history and not normal use of this function.
+     * Some commands will have no undo, such as maybe open workspace. This is normally what will normally indaicate a command should not 
+     * be added to the history. */
+    executeCommand(command,suppressFromHistory) {
+
+        //make sure we only exectue one command at a time. Issue with delay if one is in progress
+        if(this.commandInProgress) {
+            //do not allow a command while another is in progress.
+            alert("Command ettempted while another in progress. Ignored");
+            return false;
+        }
+        this.commandInProgress = true;
 
         //get a mutable workspace manager instance
         let oldWorkspaceManager = this.app.getWorkspaceManager();
@@ -170,8 +166,18 @@ export default class CommandManager {
             commandDone = false;
         }
 
+        this.commandInProgress = false;
         return commandDone;
     }
+
+    /** This method returns true if a command is in process.  */
+    isCommandInProgress() {
+        return this.commandInProgress;
+    }
+
+    //=================================
+    // Private Methods
+    //=================================
 
     _changeMapToChangeList(changeMap) {
         let changeList = [];
