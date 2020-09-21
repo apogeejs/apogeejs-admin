@@ -92,7 +92,7 @@ export default class Model extends FieldObject {
             let member = oldMemberMap[memberId];
             if((member != this)&&(!member.getIsLocked())) {
                 //create a new copy of the member and register it.
-                let newMember = new member.constructor(member.getName(),member.getParentId(),member);
+                let newMember = new member.constructor(member.getName(),member);
                 newModel.workingMemberMap[newMember.getId()] = newMember;
             }
         }
