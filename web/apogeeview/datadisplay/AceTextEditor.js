@@ -57,19 +57,9 @@ export default class AceTextEditor extends DataDisplay {
 
         var editor = ace.edit(this.editorDiv);
         editor.setOptions(this.editorOptions);
-        //editor.renderer.setShowGutter(false);
         editor.setHighlightActiveLine(false);
         editor.setTheme("ace/theme/eclipse");
         editor.getSession().setMode(this.aceMode); 
-        //below lets us change the line numbers
-        // editor.getSession().gutterRenderer =  {
-        //     getWidth: function(session, lastLineNumber, config) {
-        //         return lastLineNumber.toString().length * config.characterWidth;
-        //     },
-        //     getText: function(session, row) {
-        //         return row+20;
-        //     }
-        // };
         editor.$blockScrolling = Infinity;
         editor.renderer.attachToShadowRoot(); 
         
