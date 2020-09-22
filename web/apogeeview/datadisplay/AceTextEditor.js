@@ -71,7 +71,19 @@ export default class AceTextEditor extends DataDisplay {
         //     }
         // };
         editor.$blockScrolling = Infinity;
-        editor.renderer.attachToShadowRoot();        
+        editor.renderer.attachToShadowRoot(); 
+        
+        editor.commands.addCommand({
+            name: "Save",
+            exec: () => this.save(),
+            bindKey: {mac: "cmd-s", win: "ctrl-s"}
+        })
+
+        editor.commands.addCommand({
+            name: "Revert",
+            exec: () => this.cancel(),
+            bindKey: {mac: "esc", win: "esc"}
+        })
         
         this.editor = editor;
         
