@@ -15,9 +15,11 @@ export default class Component extends FieldObject {
         //==============
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
+            this.setField("memberFieldMap",{});
+
             modelManager.registerComponent(this);
-            this.setField("member",member);
-            modelManager.registerMember(member.getId(),this,true);
+
+            this.registerMember(modelManager,member,"member",true);
         }
 
         //==============
@@ -218,19 +220,16 @@ export default class Component extends FieldObject {
     /** This method extends the member udpated function from the base.
      * @protected */    
     memberUpdated(updatedMember) {
-        
-        let member = this.getField("member");
-        if(updatedMember.getId() == member.getId()) {
-            this.setField("member",updatedMember);
+
+        let memberFieldMap = this.getField("memberFieldMap");
+        let fieldName = memberFieldMap[updatedMember.getId()];
+
+        //legacy case of old member registartion
+        if(!fieldName) {
+            fieldName = "member." + updatedMember.getName();
         }
-        else {
-            //there was an update to an internal field
-            let internalMemberName = "member." + updatedMember.getName();
-            this.setField(internalMemberName,updatedMember);
-            
-            //for now we will assume the internal members do not have their name update!!!
-            //maybe I should add a error check 
-        }
+
+        this.setField(fieldName,updatedMember);
     }
 
     /** This method is used for setting initial values in the property dialog. 
@@ -251,6 +250,20 @@ export default class Component extends FieldObject {
             this.readExtendedProperties(values);
         }
         return values;
+    }
+
+
+    /** This function should be used to register child members in the case of compound components. This
+     * will register the member with the modelManager and ensure update flags are properly handled. */
+    registerMember(modelManager,childMember,fieldName,isMainMember) {
+        this.setField(fieldName,childMember);
+        modelManager.registerMember(childMember.getId(),this,isMainMember);
+
+        //update childFieldMap
+        let oldMemberFieldMap = this.getField("memberFieldMap");
+        let memberFieldMap = apogeeutil.jsonCopy(oldMemberFieldMap);
+        memberFieldMap[childMember.getId()] = fieldName;
+        this.setField("memberFieldMap",memberFieldMap);
     }
 
     //======================================

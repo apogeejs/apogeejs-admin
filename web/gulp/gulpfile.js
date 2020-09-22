@@ -131,6 +131,7 @@ function copyWebAppPageTask() {
 
     return src('../applications/webapp/apogee.DEPLOY.html')
         .pipe(replace("BASE_HREF",baseHref))
+        .pipe(replace("APOGEE_VERSION",versionConfig.VERSION_NUMBER))
         .pipe(rename('apogee.html'))
         .pipe(dest(WEB_RELEASE_FOLDER));
 }

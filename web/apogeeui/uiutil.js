@@ -45,7 +45,10 @@ uiutil.MINIMIZE_CMD_IMAGE = "/minimize.png";
 uiutil.RESTORE_CMD_IMAGE = "/restore.png";
 uiutil.MAXIMIZE_CMD_IMAGE = "/maximize.png";
 uiutil.CLOSE_CMD_IMAGE = "/close_gray.png";
-uiutil.MENU_IMAGE = "/hamburger.png";
+uiutil.HAMBURGER_MENU_IMAGE = "/hamburger.png";
+uiutil.DOT_MENU_IMAGE = "/menuDots16_darkgray.png";
+uiutil.GENERIC_CELL_ICON = "/icons3/genericCellIcon.png";
+uiutil.GENERIC_PAGE_ICON = "/icons3/pageIcon.png";
 
 //=========================================
 // dom methods

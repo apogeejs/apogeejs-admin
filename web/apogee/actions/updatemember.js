@@ -111,7 +111,7 @@ function updateData(model,actionData) {
     }
 
     //apply the data
-    member.applyData(data);
+    member.applyData(model,data);
 
     //if the data is a promise, we must also initiate the asynchronous setting of the data
     if((data)&&(data instanceof Promise)) {

@@ -65,7 +65,7 @@ export default class FormDataComponentView extends ComponentView {
                 
             default:
     //temporary error handling...
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }
@@ -191,4 +191,4 @@ FormDataComponentView.TABLE_EDIT_SETTINGS = {
 FormDataComponentView.componentName = "apogeeapp.DataFormCell";
 FormDataComponentView.hasTabEntry = false;
 FormDataComponentView.hasChildEntry = true;
-FormDataComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";
+FormDataComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";

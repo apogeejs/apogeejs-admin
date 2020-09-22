@@ -16,7 +16,7 @@ export default class SpacerElement extends ConfigurableElement {
         containerElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_NONE;
         containerElement.style.padding = ConfigurableElement.ELEMENT_PADDING_NONE;
         
-        this.spacerElement = document.createElement("div");
+        let spacerElement = document.createElement("div");
         var spacerHeight;
         if(elementInitData.height !== undefined) {
             spacerHeight = elementInitData.height;
@@ -25,9 +25,9 @@ export default class SpacerElement extends ConfigurableElement {
             spacerHeight = SpacerElement.DEFAULT_HEIGHT;
         }
         //this.spacerElement.style.display = "table";
-        this.spacerElement.style.height = spacerHeight + "px";
+        spacerElement.style.height = spacerHeight + "px";
         
-        containerElement.appendChild(this.spacerElement);
+        containerElement.appendChild(spacerElement);
         
         this._postInstantiateInit(elementInitData);
     }

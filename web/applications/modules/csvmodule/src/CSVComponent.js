@@ -19,13 +19,17 @@ export default class CSVComponent extends Component {
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
             //internal tables
-            let dataMember = member.lookupChild(model,"csv_data");
-            this.setField("member.csv_data",dataMember);
-            modelManager.registerMember(dataMember.getId(),this,false);
+            let dataFolder = member.lookupChild(model,"data");
+            this.registerMember(modelManager,dataFolder,"member.data",false);
 
-            let inputMember = member.lookupChild(model,"csv_input");
-            this.setField("member.csv_input",inputMember);
-            modelManager.registerMember(inputMember.getId(),this,false);
+            let bodyMember = dataFolder.lookupChild(model,"body");
+            this.registerMember(modelManager,bodyMember,"member.data.body",false);
+
+            let headerMember = dataFolder.lookupChild(model,"header");
+            this.registerMember(modelManager,headerMember,"member.data.header",false);
+
+            let inputMember = member.lookupChild(model,"__input__");
+            this.registerMember(modelManager,inputMember,"member.input",false);
         }
     }
 }
@@ -36,38 +40,83 @@ CSVComponent.displayName = "CSV Cell";
 /** This is the univeral unique name for the component, used to deserialize the component. */
 CSVComponent.uniqueName = "apogeeapp.CSVCell";
 
-/** This is the json needed to create the necessary members for the  component */
+/** This is the json needed to create the necessary members for the  component 
+ * NOTE: we put the data tables inside a folder "data" so the formula in the input member, from the 
+ * form, does not collide with the internal tables. Well, unless you try to access data called data.body or data.header.
+*/
 CSVComponent.DEFAULT_MEMBER_JSON = {
     "type": "apogee.Folder",
     "childrenNotWriteable": true,
     "children": {
-        "csv_data": {
-            "name": "csv_data",
-            "type": "apogee.JsonMember",
-            "updateData": {
-                "argList": [],
-                "functionBody":`
-    if(csv_input.input) {
-        let result = __papaparse.parse(csv_input.input);
-        if(result.errors.length == 0) {
-            return result.data;
-        }
-        else {
-            let errorMsg = "Parsing Error: " + result.errors.join(";");
-            throw new Error(errorMsg);
-        }
-    }
-    else {
-        return [[]];
-    }
-`
-            }
-        },
-        "csv_input": {
-            "name": "csv_input",
+        "__input__": {
+            "name": "__input__",
             "type": "apogee.JsonMember",
             "updateData": {
                 "data": "",
+            }
+        },
+        "data": {
+            "name": "data",
+            "type": "apogee.Folder",
+            "childrenNotWriteable": true,
+            "children": {
+                "body": {
+                    "name": "body",
+                    "type": "apogee.JsonMember",
+                    "updateData": {
+                        "argList": [],
+                        "functionBody":`
+if(__input__.input) {
+    let options = {};
+    options.dynamicTyping = __input__.dynamicTyping;
+    options.skipEmptyLines = __input__.skipEmptyLines;
+    options.header = (__input__.outputFormat == "maps");
+    let result = __papaparse.parse(__input__.input,options);
+    if(result.errors.length == 0) {
+        let headerRow;
+        let body;
+        if(options.header) {
+            //row of objects
+            headerRow = result.meta.fields;
+            body = result.data;
+        }
+        else {
+            body = [];
+            if((result.data)&&(result.data.length > 0)) {                
+                result.data.forEach( (row,index) => {
+                    if(index == 0) {
+                        headerRow = row;
+                    }
+                    else {
+                        body.push(row);
+                    }
+                });            
+            }
+        }
+
+        if(!headerRow) headerRow = [];
+        apogeeMessenger.dataUpdate("header",headerRow);
+        return body;
+    }
+    else {
+        let errorMsg = "Parsing Error: " + result.errors.join(";");
+        throw new Error(errorMsg);
+    }
+}
+else {
+    apogeeMessenger.dataUpdate("header",[]);
+    return [[]];
+}
+        `
+                    }
+                },
+                "header": {
+                    "name": "header",
+                    "type": "apogee.JsonMember",
+                    "updateData": {
+                        "data": [],
+                    }
+                },
             }
         }
     }

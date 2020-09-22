@@ -101,6 +101,7 @@ export default class CommandHistory {
     undo() {
         let command = this._getNextUndoCommand(true);
         if((command)&&(command.undoCmd)) {
+            //in command history 
             let commandSuccess = this.commandManager.executeCommand(command.undoCmd,true);
             if(!commandSuccess) {
                 this._commandUndoneFailed();

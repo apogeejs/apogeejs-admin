@@ -8,6 +8,9 @@ export default class PageChildComponentDisplay {
     constructor(componentView, parentComponentDisplay) {
         this.componentView = componentView;
         this.parentComponentDisplay = parentComponentDisplay;
+
+        this.editModeViews = [];
+        this.inEditMode = false;
         
         //these are the header elements
         this.iconOverlayElement
@@ -29,8 +32,10 @@ export default class PageChildComponentDisplay {
         
         //connect to parent
         this.setIsPageShowing(this.parentComponentDisplay.getIsShowing());
-        this.parentComponentDisplay.addListener(uiutil.SHOWN_EVENT,() => this.setIsPageShowing(true));
-        this.parentComponentDisplay.addListener(uiutil.HIDDEN_EVENT,() => this.setIsPageShowing(false));
+        this.onShow = () => this.setIsPageShowing(true);
+        this.onHide = () => this.setIsPageShowing(false);
+        this.parentComponentDisplay.addListener(uiutil.SHOWN_EVENT,this.onShow);
+        this.parentComponentDisplay.addListener(uiutil.HIDDEN_EVENT,this.onHide);
     }
 
     getElement() {
@@ -60,10 +65,6 @@ export default class PageChildComponentDisplay {
             return null;
         }
     }
-
-    // getMember() {
-    //     return this.member;
-    // }
 
     componentUpdated(component) {
 
@@ -133,6 +134,21 @@ export default class PageChildComponentDisplay {
 
     /** This should be called by the component when it discards this display. */
     deleteDisplay() {
+        if(this.isDestroyed) return; 
+
+        //remove parent listeners
+        if(this.parentComponentDisplay) {
+            this.parentComponentDisplay.removeListener(uiutil.SHOWN_EVENT,this.onShow);
+            this.parentComponentDisplay.removeListener(uiutil.HIDDEN_EVENT,this.onHide);
+            this.parentComponentDisplay = null;
+        }
+        
+        //discard the menu
+        if(this.menu) {
+            this.menu.destroy();
+            this.menu = null;
+        }
+
         //dispose any view elements
         for(var viewType in this.displayContainerMap) {
             var displayContainer = this.displayContainerMap[viewType];
@@ -141,14 +157,34 @@ export default class PageChildComponentDisplay {
                 delete this.displayContainerMap[viewType];
             }
         }
+
+        //remove the dom elements
+        if(this.mainElement) {
+            this.mainElement.onclick = null;
+            this.mainElement.remove();
+        }
+        if(this.bannerContainer) this.bannerContainer.remove();
+        if(this.viewContainer) this.viewContainer.remove();
+        if(this.titleBarContainer) this.titleBarContainer.remove();
+        if(this.iconContainerElement) this.iconContainerElement.remove();
+        if(this.icon) this.icon.remove();
+        if(this.titleBarNameElement) this.titleBarNameElement.remove();
+        if(this.titleBarViewsElement) this.titleBarViewsElement.remove();
+
+        this.isDestroyed = true;
     }
 
     /** This function sets this child display to highlighted. It is intended for when this display is
      * inside the current text selection. */
     setHighlight(isHighlighted) {
         if(this.isHighlighted != isHighlighted) {
-            this.mainElement.className = isHighlighted ? "visiui_pageChild_mainClass_highlighted" : "visiui_pageChild_mainClass";
             this.isHighlighted = isHighlighted;
+            if(isHighlighted) {
+                this.mainElement.classList.add("visiui_pageChild_highlighted");
+            }
+            else {
+                this.mainElement.classList.remove("visiui_pageChild_highlighted");
+            }
         }  
     }
 
@@ -185,16 +221,24 @@ export default class PageChildComponentDisplay {
         
         //add the view elements
         var settings = this.componentView.getTableEditSettings();
-        var viewTypes = settings.viewModes;
+        var viewModes = settings.viewModes;
         
         this.displayContainerMap = {};  
-        if(viewTypes.length > 0) {
-            for(var i = 0; i < viewTypes.length; i++) {
-                var viewType = viewTypes[i];
+        if(viewModes.length > 0) {
+            for(var i = 0; i < viewModes.length; i++) {
+                var viewModeInfo = viewModes[i];
+                if((typeof(viewModeInfo) == "string")||(viewModeInfo instanceof String)) {
+                    //legacy - when only name was stored, not view info
+                    let viewName = viewModeInfo;
+                    viewModeInfo = {};
+                    viewModeInfo.name = viewName;
+                    viewModeInfo.label = viewName;
+                    viewModeInfo.isActive = (i == 0); //default is active
+                }
                 
                 var isMainView = (i == 0);
 
-                var displayContainer = new PageDisplayContainer(this.componentView, viewType, isMainView);
+                var displayContainer = new PageDisplayContainer(this, viewModeInfo);
                 
                 //add the view title element to the title bar
                 this.titleBarViewsElement.appendChild(displayContainer.getViewSelectorContainer());
@@ -203,7 +247,7 @@ export default class PageChildComponentDisplay {
                 this.viewContainer.appendChild(displayContainer.getDisplayElement());
                 
                 //store the display container object
-                this.displayContainerMap[viewType] = displayContainer;
+                this.displayContainerMap[viewModeInfo.name] = displayContainer;
             }
         }
 
@@ -215,27 +259,35 @@ export default class PageChildComponentDisplay {
     addTitleBar() {
         
         this.titleBarContainer = uiutil.createElementWithClass("div","visiui_pageChild_titleBarClass",this.mainElement);
-        this.titleBarMenuElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarMenuClass",this.titleBarContainer);
-        this.titleBarNameElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarNameClass",this.titleBarContainer);
-        this.titleBarViewsElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
+
+        //icon/menu
+        var iconSrc = this.componentView.getIconUrl();
+        if(!iconSrc) {
+            iconSrc = uiutil.getResourcePath(uiutil.GENERIC_CELL_ICON);
+        }
+
+        this.iconContainerElement = uiutil.createElementWithClass("div", "visiui-pageChild-icon-container",this.titleBarContainer);
+        this.icon = uiutil.createElementWithClass("img", "visiui-pageChild-icon",this.iconContainerElement);
+        this.icon.src = iconSrc; 
+        this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_pageChild_icon_overlay",this.iconContainerElement);
         
-        //------------------
-        // menu
-        //------------------
-        
-        var iconUrl = this.componentView.getIconUrl();
-        if(!iconUrl) iconUrl = uiutil.getResourcePath(uiutil.MENU_IMAGE);
-        
-        this.menu = Menu.createMenuFromImage(iconUrl);
-        var menuItemCallback = () => {
+        //label
+        this.titleBarNameElement = uiutil.createElementWithClass("div", "visiui_pageChild_titleBarNameClass",this.titleBarContainer);
+
+        //menu
+        let menuItemCallback = () => {
             return this.componentView.getMenuItems();
         }
+        let menuImage = uiutil.getResourcePath(uiutil.DOT_MENU_IMAGE);
+        this.menu = Menu.createMenuFromImage(menuImage);
         this.menu.setAsOnTheFlyMenu(menuItemCallback);
-    
-        this.titleBarMenuElement.appendChild(this.menu.getElement());
-        
-        //create the icon (menu) overlay
-        this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_pageChild_icon_overlay_style",this.titleBarMenuElement);
+        let menuElement = this.menu.getElement();
+        //update the style of the menu element
+        menuElement.style.verticalAlign = "middle";
+        this.titleBarContainer.appendChild(menuElement);
+
+        //views
+        this.titleBarViewsElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
 
     }
 
@@ -243,6 +295,40 @@ export default class PageChildComponentDisplay {
         if(this.isPageShowing != isPageShowing) {
             this.isPageShowing = isPageShowing;
             this.updateChildDisplayStates();
+        }
+    }
+
+    /** This method should be called when a given view type enters of exits edit mode */
+    notifyEditMode(viewInEditMode,viewTypeName) {
+        if(viewInEditMode) {
+            if(this.editModeViews.indexOf(viewTypeName) < 0) {
+                this.editModeViews.push(viewTypeName);
+            }
+        }
+        else {
+            let index = this.editModeViews.indexOf(viewTypeName);
+            if(index >= 0) {
+                this.editModeViews.splice(index,1);
+            }
+        }
+        let inEditMode = (this.editModeViews.length > 0);
+
+        if(inEditMode != this.inEditMode) this._setEditMode(inEditMode);
+    }
+
+    _setEditMode(inEditMode) {
+        //set component edit mode
+        this.inEditMode = inEditMode;
+        if(inEditMode) {
+            this.mainElement.classList.add("visiui_pageChild_editMode");
+        }
+        else {
+            this.mainElement.classList.remove("visiui_pageChild_editMode");
+        }
+            
+        //notify page
+        if(this.componentView) {
+            this.parentComponentDisplay.notifyEditMode(this.inEditMode,this.componentView);
         }
     }
 

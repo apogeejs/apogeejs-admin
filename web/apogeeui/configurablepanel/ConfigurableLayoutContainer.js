@@ -16,6 +16,8 @@ export default class ConfigurableLayoutContainer {
         //udpate padding and margin to 0
         this.domElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_NONE;
         this.domElement.style.padding = ConfigurableElement.ELEMENT_PADDING_NONE;
+
+        this.childLayouts = [];
     }
 
     /** This method returns the DOM element for this layout container. */
@@ -64,11 +66,18 @@ export default class ConfigurableLayoutContainer {
             //pass the element object to the form
             this.form.insertChildElement(elementObject);
         }
-        // else if(elementObject instanceof ConfigurableLayoutContainer) {
-        // }
-        // else {
-        //     throw new Error("Unknown form item class: " + typeof elementObject);
-        // } 
+        else if(elementObject instanceof ConfigurableLayoutContainer) {
+            this.childLayouts.push(elementObject);
+        }
+    }
+
+    destroy() {
+        this.childLayouts.forEach(childLayout => {
+            childLayout.destroy();
+        })
+        this.childLayouts = [];
+        this.form = null;
+        this.domElement = null;
     }
       
 }

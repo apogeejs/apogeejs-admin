@@ -30,6 +30,8 @@ export default class HoriontalLayout extends ConfigurableLayoutContainer {
         let domElement = this.getElement();
         domElement.appendChild(elementObject.getElement());
     }
+
+    //nothing to destroy
     
     //===================================
     // internal Methods

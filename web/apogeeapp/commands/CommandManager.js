@@ -37,15 +37,24 @@ export default class CommandManager {
         this.commandInProgress = false;
         this.commandQueue = [];
     }
+
+    /** This returns the command history. */
+    getCommandHistory() {
+        return this.commandHistory;
+    }
     
-    /** This method executes the given command and, if applicable, adds it to the queue. 
-     * Supress history does not add this command to the history. It is used by the history for
-     * undo commands/redo commands.
-    */
+    /** This method executes the given command. Only one command will run at a time, so if one is in progress,
+     * the new command will fail. Run the command asynchronously, with setTimeout, if it is called from 
+     * an in process command. If it is not known if a command is running, the method isCommandInProgress can be called to 
+     * check, though this is not intended as a standard procedure.
+     * The flag supressFromHistory is intended for use in undo and redo from the command history and not normal use of this function.
+     * Some commands will have no undo, such as maybe open workspace. This is normally what will normally indaicate a command should not 
+     * be added to the history. */
     executeCommand(command,suppressFromHistory) {
 
-        //make sure we only exectue one command at a time. For now just give up if this happens
+        //make sure we only exectue one command at a time. Issue with delay if one is in progress
         if(this.commandInProgress) {
+            //do not allow a command while another is in progress.
             alert("Command ettempted while another in progress. Ignored");
             return false;
         }
@@ -57,9 +66,16 @@ export default class CommandManager {
         if(oldWorkspaceManager) {
             newWorkspaceManager = oldWorkspaceManager.getMutableWorkspaceManager();
         }
-        else {
+        else if(command.type == "openWorkspace") {
+            //only command to run with no active workspace
             //instantiate a new empty workspace manager
             newWorkspaceManager = this.app.createWorkspaceManager();
+        }
+        else {
+            //no workspace to run command on
+            this.commandInProgress = false;
+            console.log("No workspace for command: " + command.type);
+            return;
         }
 
         var commandObject = CommandManager.getCommandObject(command.type);
@@ -154,14 +170,14 @@ export default class CommandManager {
         return commandDone;
     }
 
-    /** This returns the command history. */
-    getCommandHistory() {
-        return this.commandHistory;
+    /** This method returns true if a command is in process.  */
+    isCommandInProgress() {
+        return this.commandInProgress;
     }
 
-    //=========================================
+    //=================================
     // Private Methods
-    //=========================================
+    //=================================
 
     _changeMapToChangeList(changeMap) {
         let changeList = [];

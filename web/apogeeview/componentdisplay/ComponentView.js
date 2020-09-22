@@ -119,7 +119,14 @@ export default class ComponentView {
         }
         else {
             var resPath = this.constructor.ICON_RES_PATH;
-            if(!resPath) resPath = ComponentView.DEFAULT_ICON_RES_PATH;
+            if(!resPath) {
+                if(this.usesTabDisplay()) {
+                    resPath = ComponentView.DEFAULT_PAGE_ICON;
+                }
+                else {
+                    resPath = ComponentView.DEFAULT_CELL_ICON;
+                }
+            }
             return uiutil.getResourcePath(resPath);
         }
     }
@@ -298,9 +305,8 @@ export default class ComponentView {
             //first store the window state
             this.childDisplayState = this.childComponentDisplay.getStateJson();
             
-            //delete the window
+            //delete the display
             this.childComponentDisplay.deleteDisplay();
-            
             this.childComponentDisplay = null;
         }
     }
@@ -509,7 +515,8 @@ export default class ComponentView {
 ComponentView.DEFAULT_COMPONENT_TYPE_SORT_ORDER = 5;
 ComponentView.FOLDER_COMPONENT_TYPE_SORT_ORDER = 0;
 
-ComponentView.DEFAULT_ICON_RES_PATH = "/genericIcon.png";
+ComponentView.DEFAULT_CELL_ICON = "/icons3/genericCellIcon.png";
+ComponentView.DEFAULT_CELL_ICON = "/icons3/pageIcon.png";
 
 ComponentView.MENU_ITEM_OPEN = 0x01;
 

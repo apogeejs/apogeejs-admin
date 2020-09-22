@@ -21948,7 +21948,7 @@ class ChartJSComponentView extends ComponentView {
                 return new AceTextEditor(displayContainer,dataSource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
 
             default:
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }

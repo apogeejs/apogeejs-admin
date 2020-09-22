@@ -15,6 +15,8 @@ export default class AceTextEditor extends DataDisplay {
     constructor(displayContainer,dataSource,aceMode,options) {
         super(displayContainer,dataSource);
 
+        this.destroyed = false;
+
         this.editorDiv = uiutil.createElement("div");
 
         //========================
@@ -26,7 +28,9 @@ export default class AceTextEditor extends DataDisplay {
 
         this.aceMode = aceMode;
 
-        this.storedData = null;
+        this.inputData = null;
+        this.cachedDisplayData = null;
+        this.dataError = false;
 
         //configure the options
         if(!options) options = {};
@@ -49,28 +53,32 @@ export default class AceTextEditor extends DataDisplay {
     }
     
     createEditor() {
+        if(this.destroyed) return;
+
         var editor = ace.edit(this.editorDiv);
         editor.setOptions(this.editorOptions);
-        //editor.renderer.setShowGutter(false);
         editor.setHighlightActiveLine(false);
         editor.setTheme("ace/theme/eclipse");
         editor.getSession().setMode(this.aceMode); 
-        //below lets us change the line numbers
-        // editor.getSession().gutterRenderer =  {
-        //     getWidth: function(session, lastLineNumber, config) {
-        //         return lastLineNumber.toString().length * config.characterWidth;
-        //     },
-        //     getText: function(session, row) {
-        //         return row+20;
-        //     }
-        // };
         editor.$blockScrolling = Infinity;
-        editor.renderer.attachToShadowRoot();        
+        editor.renderer.attachToShadowRoot(); 
+        
+        editor.commands.addCommand({
+            name: "Save",
+            exec: () => this.save(),
+            bindKey: {mac: "cmd-s", win: "ctrl-s"}
+        })
+
+        editor.commands.addCommand({
+            name: "Revert",
+            exec: () => this.cancel(),
+            bindKey: {mac: "esc", win: "esc"}
+        })
         
         this.editor = editor;
         
-        if(this.storedData) {
-            this.setData(this.storedData);
+        if(this.cachedDisplayData) {
+            this.setData(this.cachedDisplayData);
         }
         
         //enter edit mode on change to the data
@@ -81,34 +89,52 @@ export default class AceTextEditor extends DataDisplay {
         return this.editorDiv;
     }
 
+    /** We override the save function to clear any error if there was one and the
+     * user saves - meaning we want to keep the editor data. */
+    save() {
+        if(this.destroyed) return;
+
+        //clear error flag since the user wants to save what is displayed
+        if(this.dataError) this.dataError = false;
+
+        super.save();
+    }
+
     getData() {
-        if(this.editor) {
-            this.storedData = this.editor.getSession().getValue();
+        if(this.destroyed) return null;
+
+        if((this.editor)&&(!this.dataError)) {
+            this.cachedDisplayData = this.editor.getSession().getValue();
+            this.inputData = this.cachedDisplayData;
         }
-        return this.storedData; 
+        return this.inputData; 
     }
     
     setData(text) {
+        if(this.destroyed) return;
+
+        this.inputData = text;
+        this.cachedDisplayData = text;
+        this.dataError = false;
+
         //The data source should give a text value "" if the data in invalid rather than sending
         //in a json, but we will do this check anyway.
         if(text == apogeeutil.INVALID_VALUE) {
             var errorMsg = "ERROR: Data value is not valid"
-            text = "";
+            this.cachedDisplayData = "";
+            this.dataError = true;
         }
 
         //check data is valid
         if(!apogeeutil.isString(text)) {
             var errorMsg = "ERROR: Data value is not text";
-            //this.setError(errorMsg);
-            text = errorMsg;
+            this.cachedDisplayData = errorMsg;
+            this.dataError = true;
         }
-            
-        //store the data
-        this.storedData = text;
         
         //place ineditor, if it is present
         if(this.editor) {
-            this.editor.getSession().setValue(text);
+            this.editor.getSession().setValue(this.cachedDisplayData);
 
             //set the edit mode and background color
             if(this.editOk) {
@@ -123,6 +149,8 @@ export default class AceTextEditor extends DataDisplay {
     }
     
     onLoad() {
+        if(this.destroyed) return;
+
         if(!this.editor) {
             this.createEditor();
         }
@@ -130,16 +158,24 @@ export default class AceTextEditor extends DataDisplay {
     }
 
     destroy() {
+        this.destroyed = true;
+
         if(this.editor) {
             this.editor.destroy();
             this.editor = null;
         }
+        this.editorDiv = null;
+        this.inputData = null;
+        this.cachedDisplayData = null;
+        this.editorOptions = null;
     }
     
     checkStartEditMode() {
+        if(this.destroyed) return;
+
         if((!this.displayContainer.isInEditMode())&&(this.editor)) {
             var activeData = this.editor.getSession().getValue();
-            if(activeData != this.storedData) {
+            if(activeData != this.cachedDisplayData) {
                 this.onTriggerEditMode();
             }
         }
@@ -153,6 +189,8 @@ export default class AceTextEditor extends DataDisplay {
      * By default there is none. Note that this modifies the json state of the view,
      * rather than providing a data object that will by added to it.. */
     addUiStateData(json) {
+        if(this.destroyed) return;
+
         if(this.editorOptions.maxLines) {
             json.height = this.editorOptions.maxLines * this.pixelsPerLine;
         }
@@ -160,6 +198,8 @@ export default class AceTextEditor extends DataDisplay {
 
     /** This method reads an data display state info from the view state json. */
     readUiStateData(json) {
+        if(this.destroyed) return;
+
         if(json.height) {
             let maxLines = Math.round(json.height / this.pixelsPerLine);
             if(maxLines >= MAX_MAX_LINES) {
@@ -201,6 +241,8 @@ export default class AceTextEditor extends DataDisplay {
      * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
      */
     setResizeHeightMode(resizeHeightMode) {
+        if(this.destroyed) return;
+
         if(resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
             this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
             this.editorOptions.maxLines = this.showSomeMaxLines;
@@ -224,6 +266,8 @@ export default class AceTextEditor extends DataDisplay {
      * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS;
     */
     adjustHeight(adjustment) {
+        if(this.destroyed) return;
+
         if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
             if(this.editor) {
                 let newMaxLines;

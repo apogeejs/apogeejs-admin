@@ -32,6 +32,8 @@ export default class JsonTableComponentView extends ComponentView {
             case JsonTableComponentView.VIEW_DATA:
                 var component = this.getComponent();
                 let dataView = component.getField("dataView");
+                //update the display container state bar
+                this._setDisplayContainerStatus(displayContainer,dataView);
                 switch(dataView) {
                     case JsonTableComponentView.COLORIZED_DATA_VEW:
                     default:
@@ -62,7 +64,7 @@ export default class JsonTableComponentView extends ComponentView {
                 
             default:
     //temporary error handling...
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }
@@ -77,6 +79,18 @@ export default class JsonTableComponentView extends ComponentView {
             return returnValue;
         }
         return dataDisplaySource;
+    }
+
+    _setDisplayContainerStatus(displayContainer,dataView) {
+        let displayBarElement = displayContainer.getDisplayBarElement();
+        if(displayBarElement) {
+            let statusElement = document.createElement("span");
+            statusElement.innerHTML = "Display Format: " + VIEW_DISPLAY_NAMES[dataView];
+            statusElement.style.fontSize = "smaller";
+            statusElement.style.color = "gray";
+            statusElement.style.marginLeft = "20px";
+            displayBarElement.appendChild(statusElement);
+        }
     }
 }
 
@@ -93,9 +107,9 @@ JsonTableComponentView.VIEW_CODE = "Formula";
 JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 JsonTableComponentView.VIEW_MODES = [
-    JsonTableComponentView.VIEW_DATA,
-    JsonTableComponentView.VIEW_CODE,
-    JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE
+    {name: JsonTableComponentView.VIEW_DATA, label: "Data", isActive: true},
+    {name: JsonTableComponentView.VIEW_CODE, label: "Formula", isActive: false},
+    {name: JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false},
 ];
 
 JsonTableComponentView.TABLE_EDIT_SETTINGS = {
@@ -110,6 +124,11 @@ JsonTableComponentView.GRID_DATA_VEW = "Grid";
 
 JsonTableComponentView.DEFAULT_DATA_VIEW = JsonTableComponentView.COLORIZED_DATA_VEW;
 
+let VIEW_DISPLAY_NAMES = {};
+VIEW_DISPLAY_NAMES[JsonTableComponentView.COLORIZED_DATA_VEW] = "JSON";
+VIEW_DISPLAY_NAMES[JsonTableComponentView.TEXT_DATA_VEW] = "Plain Text";
+VIEW_DISPLAY_NAMES[JsonTableComponentView.GRID_DATA_VEW] = "Grid";
+
 //===============================
 // External Settings
 //===============================
@@ -122,7 +141,7 @@ JsonTableComponentView.hasTabEntry = false;
 /** If true, this indicates the component has an entry appearing on the parent tab */
 JsonTableComponentView.hasChildEntry = true;
 /** This is the icon url for the component. */
-JsonTableComponentView.ICON_RES_PATH = "/componentIcons/dataTable.png";
+JsonTableComponentView.ICON_RES_PATH = "/icons3/jsonCellIcon.png";
 /** This field gives the default value for the JSON taht should be deserialized to
  * create the member for this object. The field "name" can be omitted. This will 
  * be added when the member is created. */
@@ -134,9 +153,9 @@ JsonTableComponentView.propertyDialogLines = [
         "type":"dropdown",
         "label":"Data Display Format: ",
         "entries":[
-            ["JSON",JsonTableComponentView.COLORIZED_DATA_VEW],
-            ["Plain Text",JsonTableComponentView.TEXT_DATA_VEW],
-            ["Grid",JsonTableComponentView.GRID_DATA_VEW]
+            [ VIEW_DISPLAY_NAMES[JsonTableComponentView.COLORIZED_DATA_VEW] , JsonTableComponentView.COLORIZED_DATA_VEW ],
+            [ VIEW_DISPLAY_NAMES[JsonTableComponentView.TEXT_DATA_VEW] , JsonTableComponentView.TEXT_DATA_VEW ],
+            [ VIEW_DISPLAY_NAMES[JsonTableComponentView.GRID_DATA_VEW] , JsonTableComponentView.GRID_DATA_VEW ]
         ],
         "key":"dataView"
     }

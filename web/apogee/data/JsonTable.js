@@ -8,8 +8,8 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 */
 export default class JsonTable extends CodeableMember {
 
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
     }
 
     //------------------------------
@@ -29,7 +29,7 @@ export default class JsonTable extends CodeableMember {
             //the data is the output of the function
             let memberFunction = memberGenerator();
             let data = memberFunction();
-            this.applyData(data);
+            this.applyData(model,data);
 
             //we must separately apply the asynch data set promise if there is one
             if((data)&&(data instanceof Promise)) {
@@ -51,19 +51,19 @@ export default class JsonTable extends CodeableMember {
     /** This method extends set data from member. It also
      * freezes the object so it is immutable. (in the future we may
      * consider copying instead, or allowing a choice)*/
-    setData(data) {
+    setData(model,data) {
         
         //make this object immutable
         apogeeutil.deepFreeze(data);
 
         //store the new object
-        return super.setData(data);
+        return super.setData(model,data);
     }
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(parentId,json) {
-        let member = new JsonTable(json.name,parentId,null,null,json.specialIdValue);
+    static fromJson(model,json) {
+        let member = new JsonTable(json.name,null,null,json.specialIdValue);
 
         //set initial data
         let initialData = json.updateData;
@@ -81,18 +81,17 @@ export default class JsonTable extends CodeableMember {
                 initialData.supplementalCode);
         }
         else {
-            //apply initial data
-            let data;
-            let errorList;
-
-            if(initialData.errorList) errorList = initialData.errorList;
-            else if(initialData.invalidError) data = apogeeutil.INVALID_VALUE;
-            else if(initialData.data !== undefined) data = initialData.data;
-            else data = "";
-
-            //apply the initial data
-            //note for now this can not be a promise, so we do not need to also call applyAsynchData.
-            member.applyData(data,errorList);
+            //set initial data
+            if(initialData.errorList) {
+                member.setErrors(model,initialData.errorList);
+            }
+            else if(initialData.invalidError) {
+                member.setResultInvalid(model);
+            }
+            else {
+                let data = (initialData.data !== undefined) ? initialData.data : "";
+                member.setData(model,data);
+            }
 
             //set the code fields to empty strings
             member.setField("functionBody","");

@@ -5,6 +5,9 @@
 }
 .dialogTitle {
     font-weight:bold;
+    font-size: bigger;
+}
+.dialogMessage {
 }
 .dialogButton {
     margin-left:20px;

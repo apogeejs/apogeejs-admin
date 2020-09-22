@@ -10,8 +10,8 @@ import Parent from "/apogee/datacomponents/Parent.js";
  * that is expanded into data objects. */
 export default class FolderFunction extends DependentMember {
 
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
 
         //mixin init where needed
         this.contextHolderMixinInit();
@@ -22,9 +22,6 @@ export default class FolderFunction extends DependentMember {
         //==============
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
-            //set to an empty function
-            this.setData(function(){});
-
             //this field is used to disable the calculation of the value of this function
             //It is used in the "virtual model" to prevent any unnecessary downstream calculations
             this.setField("sterilized",false)
@@ -62,10 +59,14 @@ export default class FolderFunction extends DependentMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(parentId,json) {
-        let member = new FolderFunction(json.name,parentId,null,null,json.specialIdValue);
+    static fromJson(model,json) {
+        let member = new FolderFunction(json.name,null,null,json.specialIdValue);
 
         //set initial data
+
+        //set to an empty function
+        member.setData(model,function(){});
+
         let initialData = json.updateData;
         let argList = ((initialData)&&(initialData.argList !== undefined)) ? initialData.argList : [];
         member.setField("argList",argList);
@@ -140,7 +141,7 @@ export default class FolderFunction extends DependentMember {
         //This prevents any object which calls this function from updating. It is inended to be 
         //used in the virtual workspace assoicated with this folder function
         if(this.getField("sterilized")) {
-            this.setResultInvalid();
+            this.setResultInvalid(model);
             this.clearCalcPending();
             return;
         }
@@ -153,13 +154,13 @@ export default class FolderFunction extends DependentMember {
             //check for code errors, if so set a data error
             try {
                 var folderFunctionFunction = this.getFolderFunctionFunction(model);
-                this.setData(folderFunctionFunction);
+                this.setData(model,folderFunctionFunction);
             }
             catch(error) {
                 if(error.stack) console.error(error.stack);
                 
                 //error in calculation
-                this.setError(error);
+                this.setError(model,error);
             }
         }
         

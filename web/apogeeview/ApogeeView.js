@@ -5,6 +5,7 @@ import {importWorkspace} from "/apogeeview/commandseq/importworkspaceseq.js";
 import {exportWorkspace} from "/apogeeview/commandseq/exportworkspaceseq.js";
 import {openWorkspace} from "/apogeeview/commandseq/openworkspaceseq.js";
 import {saveWorkspace} from "/apogeeview/commandseq/saveworkspaceseq.js";
+import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 import WorkspaceView from "/apogeeview/WorkspaceView.js";
 
@@ -269,7 +270,13 @@ export default class ApogeeView {
         //Workspace menu
         name = "File";
         this.workspaceMenu = Menu.createMenu(name);
-        menuBarLeft.appendChild(this.workspaceMenu.getElement());
+        //add custom spacing
+        let workspaceMenuElement = this.workspaceMenu.getElement();
+        workspaceMenuElement.style.marginLeft = "8px";
+        workspaceMenuElement.style.marginRight = "2px";
+        workspaceMenuElement.style.marginTop = "2px";
+        workspaceMenuElement.style.marginBottom = "2px";
+        menuBarLeft.appendChild(workspaceMenuElement);
         menus[name] = this.workspaceMenu;
         
         //populate the workspace menu on the fly - depends on workspace state
@@ -279,7 +286,13 @@ export default class ApogeeView {
         //Edit menu
         name = "Edit";
         this.editMenu = Menu.createMenu(name);
-        menuBarLeft.appendChild(this.editMenu.getElement());
+        //add custom spacing
+        let editMenuElement = this.editMenu.getElement();
+        editMenuElement.style.marginLeft = "8px";
+        editMenuElement.style.marginRight = "2px";
+        editMenuElement.style.marginTop = "2px";
+        editMenuElement.style.marginBottom = "2px";
+        menuBarLeft.appendChild(editMenuElement);
         menus[name] = this.editMenu;
         
         //populate the workspace menu on the fly - depends on workspace state
@@ -289,7 +302,13 @@ export default class ApogeeView {
         //Edit menu
         name = "Help";
         this.helpMenu = Menu.createMenu(name);
-        menuBarLeft.appendChild(this.helpMenu.getElement());
+        //add custom spacing
+        let helpMenuElement = this.helpMenu.getElement();
+        helpMenuElement.style.marginLeft = "8px";
+        helpMenuElement.style.marginRight = "2px";
+        helpMenuElement.style.marginTop = "2px";
+        helpMenuElement.style.marginBottom = "2px";
+        menuBarLeft.appendChild(helpMenuElement);
         menus[name] = this.helpMenu;
         
         //populate the workspace menu on the fly - depends on workspace state
@@ -439,9 +458,6 @@ export default class ApogeeView {
     getHelpMenuItems() {
         var menuItems = [];
         var menuItem;
-        
-        let helpCallback = () => true;
-        let aboutCallback = () => true;
 
         //help entry
         menuItem = {};
@@ -507,3 +523,22 @@ export default class ApogeeView {
 let componentClassMap = {};
 
 const RESIZE_TIMER_PERIOD_MS = 500;
+
+function helpCallback() {
+    let title = "Apogee Help";
+    let message;
+    //if we are in a browser, allow the user to open the link. Otherwise just print it.
+    if(__browser__) {
+        message = 'For help, please go to the website: <a href="https://www.apogeejs.com" target="_blank">https://www.apogeejs.com</a>'
+    }
+    else {
+        message = 'For help, please go to the website: <b>https://www.apogeejs.com</b>'
+    }
+    showSimpleActionDialog(title,message,["OK"]);
+}
+
+function aboutCallback() {
+    let title = "Apogee Programming Environment";
+    let message = "Version: " + __apogee_version__;
+    showSimpleActionDialog(title,message,["OK"]);
+}

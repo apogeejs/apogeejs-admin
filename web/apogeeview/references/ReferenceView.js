@@ -141,7 +141,7 @@ export default class ReferenceView {
 
 
 
-let REFERENCES_ICON_PATH = "/componentIcons/references.png";
+let REFERENCES_ICON_PATH = "/icons3/folderIcon.png";
 
 /** This function gets the display info for a given list. */
 function _getListDisplayInfo(entryType) {
@@ -167,8 +167,8 @@ let LIST_DISPLAY_INFO = {
         "ADD_ENTRY_TEXT":"Add Web Module",
         "UPDATE_ENTRY_TEXT":"Update Web Module",
         "REMOVE_ENTRY_TEXT":"Remove Web Module",
-        "LIST_ICON_PATH":"/componentIcons/folder.png",
-        "ENTRY_ICON_PATH":"/componentIcons/webModule.png"
+        "LIST_ICON_PATH":"/icons3/folderIcon.png",
+        "ENTRY_ICON_PATH":"/icons3/amdModuleIcon.png"
     },
 
     "css link": {
@@ -177,8 +177,8 @@ let LIST_DISPLAY_INFO = {
         "ADD_ENTRY_TEXT":"Add CSS Link",
         "UPDATE_ENTRY_TEXT":"Update CSS Link",
         "REMOVE_ENTRY_TEXT":"Remove CSS Link",
-        "LIST_ICON_PATH":"/componentIcons/folder.png",
-        "ENTRY_ICON_PATH": "/componentIcons/cssLink.png"
+        "LIST_ICON_PATH":"/icons3/folderIcon.png",
+        "ENTRY_ICON_PATH": "/icons3/cssLinkIcon.png"
     },
 
     "npm module": {
@@ -187,8 +187,8 @@ let LIST_DISPLAY_INFO = {
         "ADD_ENTRY_TEXT":"Add NPM Module",
         "UPDATE_ENTRY_TEXT":"Update NPM Module",
         "REMOVE_ENTRY_TEXT":"Remove NPM Module",
-        "LIST_ICON_PATH":"/componentIcons/folder.png",
-        "ENTRY_ICON_PATH":"/componentIcons/module.png"
+        "LIST_ICON_PATH":"/icons3/folderIcon.png",
+        "ENTRY_ICON_PATH":"/icons3/npmModuleIcon.png"
     },
 
     "es module": {
@@ -197,8 +197,8 @@ let LIST_DISPLAY_INFO = {
         "ADD_ENTRY_TEXT":"Add ES Web Module",
         "UPDATE_ENTRY_TEXT":"Update Web Module",
         "REMOVE_ENTRY_TEXT":"Remove Web Module",
-        "LIST_ICON_PATH":"/componentIcons/folder.png",
-        "ENTRY_ICON_PATH":"/componentIcons/webModule.png"
+        "LIST_ICON_PATH":"/icons3/folderIcon.png",
+        "ENTRY_ICON_PATH":"/icons3/esModuleIcon.png"
     },
 
     "js link": {
@@ -207,8 +207,8 @@ let LIST_DISPLAY_INFO = {
         "ADD_ENTRY_TEXT":"Add JS Script Link",
         "UPDATE_ENTRY_TEXT":"Update JS Script Link",
         "REMOVE_ENTRY_TEXT":"Remove JS Script Link",
-        "LIST_ICON_PATH":"/componentIcons/folder.png",
-        "ENTRY_ICON_PATH":"/componentIcons/javascriptLink.png"
+        "LIST_ICON_PATH":"/icons3/folderIcon.png",
+        "ENTRY_ICON_PATH":"/icons3/jsLinkIcon.png"
     }
 }
 
@@ -219,7 +219,7 @@ let DEFAULT_LIST_DISPLAY_INFO = {
     "ADD_ENTRY_TEXT":"Add Link",
     "UPDATE_ENTRY_TEXT":"Update Link",
     "REMOVE_ENTRY_TEXT":"Remove Link",
-    "LIST_ICON_PATH":"/componentIcons/folder.png",
-    "ENTRY_ICON_PATH":"/componentIcons/javascriptLink.png"
+    "LIST_ICON_PATH":"/icons3/folderIcon.png",
+    "ENTRY_ICON_PATH":"/icons3/javascriptLink.png"
 }
 

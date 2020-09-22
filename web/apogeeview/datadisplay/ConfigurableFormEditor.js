@@ -80,6 +80,12 @@ export default class ConfigurableFormEditor extends DataDisplay {
         }
     }
 
+    /** This does some cleanup */
+    destroy() {
+        this.panel.destroy();
+        this.panel = null;
+    }
+
     //===========================
     // Utilities for forms
     //===========================

@@ -13,14 +13,9 @@ export default class DropdownElement extends ConfigurableElement {
         var containerElement = this.getElement();
         
         //label
-        if(elementInitData.label) {
-            this.labelElement = document.createElement("span");
-            this.labelElement.className = "apogee_configurablePanelLabel";
-            this.labelElement.innerHTML = elementInitData.label;
-            containerElement.appendChild(this.labelElement);
-        }
-        else {
-            this.labelElement = null;
+        let labelElement = this.getLabelElement(elementInitData);
+        if(labelElement) {
+            containerElement.appendChild(labelElement);
         }
         
         this.valueMap = {};
@@ -53,10 +48,23 @@ export default class DropdownElement extends ConfigurableElement {
         this.setFocusElement(this.select);
 
         //add dom listeners
-        this.select.addEventListener("change",() => {
+        this.changeListener = () => {
             this.inputDone();
             this.valueChanged();
-        });
+        }
+        this.select.addEventListener("change",this.changeListener);
+
+        //hint
+        let hintElement = this.getHintElement(elementInitData);
+        if(hintElement) {
+            containerElement.appendChild(hintElement);
+        }
+
+        //help element
+        let helpElement = this.getHelpElement(elementInitData);
+        if(helpElement) {
+            containerElement.appendChild(helpElement);
+        }
         
         this._postInstantiateInit(elementInitData);
     }
@@ -80,6 +88,12 @@ export default class DropdownElement extends ConfigurableElement {
         if(standinValue !== undefined) {
             this.select.value = standinValue;
         }
+    }
+
+    destroy() {
+        super.destroy();
+        this.select.removeEventListener("change",this.changeListener);
+        this.select = null;
     }
     
     //===================================

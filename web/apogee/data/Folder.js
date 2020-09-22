@@ -8,36 +8,56 @@ import Parent from "/apogee/datacomponents/Parent.js";
 /** This is a folder. */
 export default class Folder extends DependentMember {
 
-    constructor(name,parent,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,parent,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
 
         //mixin init where needed
         //This is not a root. Scope is inherited from the parent.
         this.contextHolderMixinInit(false);
         this.parentMixinInit(instanceToCopy);
 
-        //initialize data value if this is a new folder
-        if(!instanceToCopy) {
-            let dataMap = {};
-            Object.freeze(dataMap);
-            this.setData(dataMap);
-        }
+        //for the folder we set data even if the folder has an error or other invalid data
+        this.omitClearDataOnInvalid = true;
     }
 
     //------------------------------
     // Parent Methods
     //------------------------------
 
+    /** In this implementation updates the dependencies and updates the data value for the folder. See notes on why the update is
+     * done here rather than in 'calculate' */
     onAddChild(model,child) {
         //set all children as dependents
         let dependsOnMap = this.calculateDependents(model);
         this.updateDependencies(model,dependsOnMap);
+
+        //set the data value for this child
+        this._spliceDataMap(model,child.getName(),child.getData());
     }
 
+    /** In this implementation updates the dependencies and updates the data value for the folder. See notes on why the update is
+     * done here rather than in 'calculate' */
     onRemoveChild(model,child) {
         //set all children as dependents
         let dependsOnMap = this.calculateDependents(model);
         this.updateDependencies(model,dependsOnMap);
+
+        //remove the data value for this child
+        this._spliceDataMap(model,child.getName());
+    }
+
+    /** In this implementation we update the data value for the folder. See notes on why this is
+     * done here rather than in 'calculate' */
+    onChildDataUpdate(model,child) {
+        var childId = child.getId();
+        let childIdMap = this.getChildIdMap();
+        var name = child.getName();
+        var data = child.getData();
+        if(childIdMap[name] != childId) {
+            alert("Error - the table " + childId + " is not registered in the parent under the name "  + name);
+            return;
+        }
+        this._spliceDataMap(model,name,data);
     }
 
     /** this method gets the hame the children inherit for the full name. */
@@ -54,36 +74,15 @@ export default class Folder extends DependentMember {
         return true;
     }
 
-    /** Calculate the data.  */
+    /** This usually calculates the value of the member. However, in the case of a folder the value is already updated
+     * once we initialize the impactors. We update the value incrementally so that we do not need to calculate all children
+     * before any data is read from the folder. If we waited, we would get a circular dependecy if we trie to specify the 
+     * name of a member including the path to it. We need to allow this to avoid name colisions at times.  */
     calculate(model) {
         //make sure impactors are calculated
         this.initializeImpactors(model);
         
-        //folders work slightly different because of pass thorugh dependencies. We will set the folder data
-        //value regardless of the state, meaning if the state is error or pending or invalid, we still set
-        //the data, along with maintaining the current state.
-
-        //make an immutable map of the data for each child
-        let childIdMap = this.getChildIdMap();
-        let dataMap = {};
-        for(let name in childIdMap) {
-            let childId = childIdMap[name];
-            let child = model.lookupMemberById(childId);
-            if(child) {
-                dataMap[name] = child.getData();
-            }
-        }
-        Object.freeze(dataMap);
-
-        let state = this.getState();
-        if((state != apogeeutil.STATE_ERROR)&&(state != apogeeutil.STATE_PENDING)&&(state != apogeeutil.STATE_INVALID)) {
-            //set the data state if there is no child error or other exceptional case
-            this.setData(dataMap);
-        }
-        else {
-            //if there is a child exceptional case, still set the data for the sake of pass through dependencies
-            this.forceUpdateDataWithoutStateChange(dataMap);
-        }
+        ///see note in method description - no calculation is done here. It is done incrementally as children are calculated.
         
         //clear calc pending flag
         this.clearCalcPending();
@@ -121,8 +120,12 @@ export default class Folder extends DependentMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(parentId,json) {
-        var folder = new Folder(json.name,parentId,null,null,json.specialIdValue);
+    static fromJson(model,json) {
+        var folder = new Folder(json.name,null,null,json.specialIdValue);
+
+        let dataMap = {};
+        Object.freeze(dataMap);
+        folder.setData(model,dataMap);
 
         if(json.childrenNotWriteable) {
             folder.setChildrenWriteable(false);
@@ -179,6 +182,26 @@ export default class Folder extends DependentMember {
             dependsOnMap[childId] = apogeeutil.NORMAL_DEPENDENCY;
         }
         return dependsOnMap;
+    }
+
+    /** This does a partial update of the folder value, for a single child */
+    _spliceDataMap(model,addOrRemoveName,addData) {
+        //shallow copy old data
+        let oldDataMap = this.getData();
+        let newDataMap = {};
+        Object.assign(newDataMap,oldDataMap);
+
+        //add or update this child data
+        if(addData !== undefined) {
+            newDataMap[addOrRemoveName] = addData;
+        }
+        else {
+            delete newDataMap[addOrRemoveName];
+        }
+        
+        //make this immutable and set it as data for this folder - note we want to set the data whether or not we have an error!
+        Object.freeze(newDataMap);
+        this.setData(model,newDataMap,true);
     }
 }
 

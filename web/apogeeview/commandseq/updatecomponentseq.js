@@ -151,7 +151,7 @@ export function updateComponent(componentView) {
                         if(newParentCommands.deletedComponentCommands) {
                             //flag a delete will be done
                             commandsDeleteComponent = true
-                            deleteMsg = "Are you sure you want to delete these apogee nodes: " + deletedComponentNames + "?";
+                            deleteMsg = "This action deletes cells on the new page. Are you sure you want to do that? Deleted cells: " + deletedComponentNames;
                             
                             //return if user rejects
                             if(!doDelete) return;
@@ -213,7 +213,7 @@ export function updateComponent(componentView) {
             let cancelAction = () => {
                 returnToEditor(componentView,submittedValues.name);
             };
-            showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
+            showSimpleActionDialog(deleteMsg,null,["OK","Cancel"],[doAction,cancelAction]);
         }
         else {
             //otherwise just take the action
@@ -280,6 +280,7 @@ export function getPropertiesDialogLayout(displayName,folderNames,additionalLine
     var nameLine = {};
     nameLine.type = "textField";
     nameLine.label = "Name: ";
+    nameLine.size = 40,
     nameLine.key = "name";
     nameLine.focus = true;
     lines.push(nameLine);

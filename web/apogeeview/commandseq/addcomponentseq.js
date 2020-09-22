@@ -96,10 +96,11 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
                     if(additionalCommandInfo.editorSetupCommand) commands.push(additionalCommandInfo.editorSetupCommand);
 
                     //add any delete commands
+                    //NOTE - currently we do not overwiret, so this will not be triggered
                     if(additionalCommandInfo.deletedComponentCommands){
                         //flag a delete will be done
                         commandsDeleteComponent = true
-                        deleteMsg = "Are you sure you want to delete these apogee nodes: " + additionalCommandInfo.deletedComponentShortNames + "?";
+                        deleteMsg = "This action will delete the selected cells. Are you sure you want to do that? Cells to delete: " + additionalCommandInfo.deletedComponentShortNames;
 
                         commands.push(...additionalCommandInfo.deletedComponentCommands);
                     } 
@@ -146,7 +147,7 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
                         parentComponentView.giveEditorFocusIfShowing();
                     }
                 };
-                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
+                showSimpleActionDialog(deleteMsg,null,["OK","Cancel"],[doAction,cancelAction]);
             }
             else {
                 //otherwise just take the action

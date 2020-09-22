@@ -8,25 +8,24 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
  */
 export default class PageDisplayContainer {
 
-    constructor(componentView, viewType, isMainView) {
+    constructor(componentDisplay, viewModeInfo) {
         
         //variables
-        this.isMainView = isMainView;
+        this.viewModeInfo = viewModeInfo;
         
         this.mainElement = null;
-        this.viewLabelHeaderElement = null;
+        this.viewToolbarElement = null;
         this.viewLabelElement = null;
         this.headerContainer = null;
         this.viewContainer = null;
+        this.viewDisplayElement = null;
 
         this.viewSelectorContainer = null;
         this.viewActiveElement = null;
         this.viewNameElement = null;
-
-        this.uiCompleted = false;
         
         this.isComponentShowing = false;
-        this.isViewActive = isMainView;
+        this.isViewActive = viewModeInfo.isActive;
         this.isContentLoaded = false;
         
         this.destroyViewOnInactive = true;
@@ -35,8 +34,10 @@ export default class PageDisplayContainer {
         
         this.content = null;
         
-        this.componentView = componentView;
-        this.viewType = viewType;
+        this.componentDisplay = componentDisplay;
+        this.componentView = componentDisplay.getComponentView();
+        this.viewTypeName = viewModeInfo.name;
+        this.viewTypeLabel = viewModeInfo.label;
         this.dataDisplay = null;
 
         this.heightUiActive = false;
@@ -45,6 +46,9 @@ export default class PageDisplayContainer {
         this.showMaxButton = null;
 
         this.savedUiState = {};
+
+        this.uiCompleted = false;
+        this.uiDestroyed = false;
         
         //initialize
         this.initUI();
@@ -52,6 +56,10 @@ export default class PageDisplayContainer {
 
     getComponentView() {
         return this.componentView;
+    }
+
+    getComponentDisplay() {
+        return this.componentDisplay;
     }
 
     getDataDisplay() {
@@ -71,23 +79,6 @@ export default class PageDisplayContainer {
     /** This returns the isComponentShowing status of the display. */
     getIsComponentShowing() {
         return this.isComponentShowing;
-    }
-
-    /** This method closes the window. If the argument forceClose is not
-     * set to true the "request_close" handler is called to check if
-     * it is ok to close the window. */
-    close(forceClose) {
-
-        if(!forceClose) {
-            //make a close request
-            var requestResponse = this.callHandler(uiutil.REQUEST_CLOSE,this);
-            if(requestResponse == uiutil.DENY_CLOSE) {
-                //do not close the window
-                return;
-            }
-        }
-
-        this.dispatchEvent(uiutil.CLOSE_EVENT,this);
     }
 
     getStateJson() {
@@ -131,6 +122,11 @@ export default class PageDisplayContainer {
         return this.mainElement;
     }
 
+    /** This method returns the display bar. It is a status and control bar for the data display to manage. */
+    getDisplayBarElement() {
+        return this.viewDisplayElement;
+    }
+
     //====================================
     // Private Methods
     //====================================
@@ -152,54 +148,96 @@ export default class PageDisplayContainer {
         //make the container
         this.mainElement = uiutil.createElementWithClass("div","visiui_displayContainer_mainClass",null);
 
-        //make the selector for the view, in the component title bar
+        //create the view header
+        this.viewToolbarElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.mainElement);
+
+        this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewToolbarElement);
+        this.viewLabelElement.innerHTML = this.viewTypeLabel;
+
+        this.sizingElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewSizingElementClass",this.viewToolbarElement);
+
+        //create the view display
+        this.viewDisplayElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplayBarClass",this.viewToolbarElement);
+        
+        //add the header elment (for the save bar)
+        this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
+
+        //add the view container
+        this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
+
+        //make the selector for the view, displayed in the component title bar
         this.viewSelectorContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
+        this.viewSelectorLink = uiutil.createElementWithClass("a","visiui_displayContainer_viewSelectorLinkClass",this.viewSelectorContainer);
 
-        this.viewActiveElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewActiveElementClass",this.viewSelectorContainer);
-        this.viewNameElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorClass",this.viewSelectorContainer);
-        
-        this.viewNameElement.innerHTML = this.viewType;
-
-        this.expandImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
-        this.expandImage.src = uiutil.getResourcePath(PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH);
+        this.expandImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewSelectorLink);
+        this.expandImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_CLOSED_IMAGE_PATH);
     
-        this.contractImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewActiveElement);
-        this.contractImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH);
+        this.contractImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewSelectorLink);
+        this.contractImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_OPENED_IMAGE_PATH);
 
-        this.viewSelectorContainer.onclick = () => this.setIsViewActive(!this.isViewActive);
-        
+        this.viewNameElement = uiutil.createElementWithClass("span","visiui_displayContainer_viewSelectorClass",this.viewSelectorLink);
+        this.viewNameElement.innerHTML = this.viewTypeLabel;
+
+        this.viewSelectorLink.href = "javascript:void(0)";
+        this.viewSelectorLink.onclick = () => this.setIsViewActive(!this.isViewActive);
+
         this.updateViewSelectorState();
+    }
+
+    /** This tears down any elements created in UI initialization */
+    destroyUI() {
+        if(!this.uiDestrpoyed) {
+            this.uiDestroyed = true;
+
+            this.mainElement = null;
+            this.viewToolbarElement = null;
+            this.viewLabelElement = null;
+
+            this.sizingElement = null;
+
+            this.viewDisplayElement = null;
+            this.headerContainer = null;
+            this.viewContainer = null;
+            this.viewSelectorContainer = null;
+
+            if(this.viewSelectorLink) {
+                this.viewSelectorLink.onclick = null;
+                this.viewSelectorLink = null;
+            }
+
+            this.expandImage = null;
+            this.contractImage = null;
+
+            this.viewNameElement = null;
+        }
     }
 
     /** This completes the UI. It should only be called when the data display has been created. */
     completeUI() {
-
         if(!this.dataDisplay) return;
-        
-        //make the label for the view
-        this.viewLabelHeaderElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelHeaderClass",this.mainElement);
-
-        this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewLabelHeaderElement);
-        this.viewLabelElement.innerHTML = this.viewType;
-
-        this.viewToolbarElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.viewLabelHeaderElement);
+        if(this.uiDestroyed) return;
 
         //add the view toolbar controls
-        this.populateViewToolbar();
-        
-        //add the header elment (for the save bar)
-        this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
-        
-        //add the view container
-        this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
+        this.populateSizingElement();
+
+        //populating the display element is initiated by the data display itself
 
         this.uiCompleted = true;
     }
 
-    /** This undoes the data display specific parts of the container ui */
+    /** This clears the data display specific parts of the container ui, so a new data display may be added. */
     uncompleteUI() {
-        uiutil.removeAllChildren(this.mainElement);
+        if(this.uiDestroyed) return;
+
+        if(this.showLessButton) this.showLessButton.onclick = null;
+        if(this.showMoreButton) this.showMoreButton.onclick = null;
+        if(this.showMaxButton) this.showMaxButton.onclick = null;
+        uiutil.removeAllChildren(this.sizingElement);
+        uiutil.removeAllChildren(this.viewDisplayElement);
+        uiutil.removeAllChildren(this.viewContainer);
+
         this.heightUiActive = false;
+
         this.uiCompleted = false;
     }
 
@@ -218,19 +256,27 @@ export default class PageDisplayContainer {
     }
 
     /** This method configures the toolbar for the view display. */
-    populateViewToolbar() {
+    populateSizingElement() {
+
+        //show the height controls
         if(this.dataDisplay.getUseContainerHeightUi()) {
-            this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
             this.showLessButton.innerHTML = "less";
             this.showLessButton.onclick = () => this.showLess();
-            this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showLessButton.title = "Descrease View Size";
+            this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
             this.showMoreButton.innerHTML = "more";
             this.showMoreButton.onclick = () => this.showMore();
-            this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.viewToolbarElement);
+            this.showMoreButton.title = "Increase View Size";
+            this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
             this.showMaxButton.innerHTML = "max";
             this.showMaxButton.onclick = () => this.showMax();
+            this.showMaxButton.title = "Show Max View Size";
             this.heightUiActive = true;
             this.updateViewSizeButtons()
+        }
+        else {
+            this.sizingElement.style.display = "none";
         }
     }
 
@@ -314,14 +360,16 @@ export default class PageDisplayContainer {
             if(!this.dataDisplayLoaded) {
                 if(!this.dataDisplay) {
                     //the display should be created only when it is made visible
-                    this.dataDisplay =  this.componentView.getDataDisplay(this,this.viewType);
-                    this.dataDisplay.readUiStateData(this.savedUiState);
-                    if(!this.uiCompleted) this.completeUI();
-                    this.setContent(this.dataDisplay.getContent());
-                    this.dataDisplay.showData();
+                    this.dataDisplay =  this.componentView.getDataDisplay(this,this.viewTypeName);
+                    if(this.dataDisplay) {
+                        this.dataDisplay.readUiStateData(this.savedUiState);
+                        if(!this.uiCompleted) this.completeUI();
+                        this.setContent(this.dataDisplay.getContent());
+                        this.dataDisplay.showData();
+                    }
                 }
             
-                if(this.dataDisplay.onLoad) this.dataDisplay.onLoad();
+                if((this.dataDisplay)&&(this.dataDisplay.onLoad)) this.dataDisplay.onLoad();
                 this.dataDisplayLoaded = true;
             }
         }
@@ -370,7 +418,7 @@ export default class PageDisplayContainer {
         this.savedUiState = this.getStateJson();
 
         //this destrpys the data display, not the container - bad name
-        this.destroy();
+        this.deleteDataDisplay();
 
         //this gets rid of the data display specific parts of the ui
         this.uncompleteUI();
@@ -381,6 +429,12 @@ export default class PageDisplayContainer {
 
     /** This method destroys the data display. */
     destroy() {
+        this.uncompleteUI();
+        this.destroyUI();
+        this.deleteDataDisplay();
+    }
+
+    deleteDataDisplay() {
         if(this.dataDisplay) {
             if(this.dataDisplay.destroy) {
                 this.dataDisplay.destroy();
@@ -409,6 +463,8 @@ export default class PageDisplayContainer {
     /** This method is called when the member is updated, to make sure the 
     * data display is up to date. */
     componentUpdated(component) {
+        if(this.uiDestroyed) return;
+
         //update the data display
         if(this.dataDisplay) {
             let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
@@ -442,6 +498,10 @@ export default class PageDisplayContainer {
             this.inEditMode = true;
             var saveBar = getSaveBar(onSave,onCancel);
             this.setHeaderContent(saveBar);
+            //take additional edit mode actions
+            this.mainElement.classList.add("visiui_displayContainer_editMode");
+            this.viewSelectorContainer.classList.add("visiui_displayContainer_viewSelectorContainerClass_editMode");
+            this.componentDisplay.notifyEditMode(true,this.viewTypeName);
         }
     }
 
@@ -450,18 +510,12 @@ export default class PageDisplayContainer {
         if(this.inEditMode) {
             this.inEditMode = false;
             this.setHeaderContent(null);
+            this.mainElement.classList.remove("visiui_displayContainer_editMode");
+            this.viewSelectorContainer.classList.remove("visiui_displayContainer_viewSelectorContainerClass_editMode");
+            this.componentDisplay.notifyEditMode(false,this.viewTypeName);
         }
         //select the associated node in the document.
         let parentComponentView = this.componentView.getParentComponentView();
-
-        //OMIT THIS FOR NOW
-        // if(parentComponentView) {
-        //     let name = this.componentView.getComponent().getName();
-        //     let commandData = parentComponentView.getSelectApogeeNodeCommand(name);
-        //     if(commandData) {
-        //         ???
-        //     }
-        // }
 
         //give the editor focus
         parentComponentView.giveEditorFocusIfShowing();
@@ -511,8 +565,8 @@ export default class PageDisplayContainer {
 }
 
 /** This method returns the main dom element for the window frame. */
-PageDisplayContainer.COMPONENT_LABEL_EXPAND_BUTTON_PATH = "/closed_gray.png";
-PageDisplayContainer.VIEW_TITLE_CONTRACT_BUTTON_PATH = "/opened_gray.png";
+PageDisplayContainer.VIEW_CLOSED_IMAGE_PATH = "/closed_black.png";
+PageDisplayContainer.VIEW_OPENED_IMAGE_PATH = "/opened_black.png";
 
 
 

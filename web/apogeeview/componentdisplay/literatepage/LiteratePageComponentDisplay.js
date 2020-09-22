@@ -7,10 +7,7 @@ import PageChildComponentDisplay from "/apogeeview/componentdisplay/literatepage
 import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 
 import {uiutil,Tab,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
-
-import { TextSelection } from "/prosemirror/dist/prosemirror-state.es.js";
-
-
+import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 /** This component represents a json table object. */
 export default class LiteratePageComponentDisplay {
@@ -21,12 +18,30 @@ export default class LiteratePageComponentDisplay {
 
         this.componentView = componentView;
 
+        this.childDisplayMap = {};
+        this.editModeComponentInfos = [];
+        this.inEditMode = false;
+
         this.isShowing = false;
 
         this.editorManager = this.componentView.getEditorManager();
+        this.editorView = null;
+        this.editorToolbarView = null;
+
+        //elements
+        this.contentElement = null;
+        this.editorToolbarContainer = null;
+        this.componentToolbarContainer = null;
+        this.bannerContainer = null;
+        this.editNoticeContainer = null;
+        this.headerElement = null;
 
         //this is used if we have to prepopolate and child component displays
         this.standInChildComponentDisplays = {};
+
+        //for cleanup
+        this.elementsWithOnclick = [];
+        this.isDestroyed = false;
 
         this.loadTabEntry();
     };
@@ -72,36 +87,30 @@ export default class LiteratePageComponentDisplay {
         }
     }
 
-    getChildComponentDisplay(name) {
+    getChildComponentDisplay(name,createIfMissing) {
+        //get id
         let folderComponent = this.componentView.getComponent();
         let folderMember = folderComponent.getParentFolderForChildren();
+        let memberId = folderMember.lookupChildId(name);
 
         //lookup component
-        var memberId = folderMember.lookupChildId(name);
         if (memberId) {
             var modelView = this.componentView.getModelView();
             var modelManager = modelView.getModelManager();
             var childComponentId = modelManager.getComponentIdByMemberId(memberId);
-            var childComponentView = modelView.getComponentViewByComponentId(childComponentId);
-            let childComponentDisplay;
-            if (childComponentView) {
-                childComponentDisplay = childComponentView.getComponentDisplay();
+            let childComponentDisplay = this.childDisplayMap[childComponentId];
+            if((!childComponentDisplay)&&(createIfMissing)) {
+                //we don't haven't added it yet, but we will pre-create it
+                childComponentDisplay = new PageChildComponentDisplay(null, this);
+                this.childDisplayMap[childComponentId] = childComponentDisplay;
             }
-            else {
-                //hold a standin if it is requested before we create it.
-                childComponentDisplay = this.standInChildComponentDisplays[name];
-                if(!childComponentDisplay) {
-                    childComponentDisplay = new PageChildComponentDisplay(null, this);
-                    this.standInChildComponentDisplays[name] = childComponentDisplay;
-                }
-            }
-
-            return childComponentDisplay
+            return childComponentDisplay;
         }
         else {
             return null;
         }
     }
+
 
     /** This creates and adds a display for the child component to the parent container. */
     addChild(childComponentView) {
@@ -110,29 +119,36 @@ export default class LiteratePageComponentDisplay {
         // Get component display
         //-----------------
         let childComponentDisplay;
+        let componentId = childComponentView.getComponent().getId();
 
         //create a new component display for this child
         if(childComponentView.constructor.hasChildEntry) {
-            //check if there is a component display already waiting
-            childComponentDisplay = this.standInChildComponentDisplays[childComponentView.getName()];
+            //check if there is a component display already waiting, pre-created
+            childComponentDisplay = this.childDisplayMap[componentId];
             if(childComponentDisplay) {
                 //set up the standin component display
                 childComponentDisplay.setComponentView(childComponentView);
-                delete this.standInChildComponentDisplays[childComponentView.getName()];
             }
             else {
                 childComponentDisplay = new PageChildComponentDisplay(childComponentView,this);
+                this.childDisplayMap[componentId] = childComponentDisplay;
             }
         }
 
-        //set this on the child
         if(childComponentDisplay) {
-            //set the component display
+            //set the child's component display
             childComponentView.setComponentDisplay(childComponentDisplay);
         }
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+    removeChild(childComponentView) {
+        let componentId = childComponentView.getComponent().getId();
+        delete this.childDisplayMap[componentId];
+
+        //make sure this isn't listed as being in edit mode
+        this.notifyEditMode(false,childComponentView);
+    }
+
 
     /** This is to record any state in the tab object. */
     getStateJson() {
@@ -143,9 +159,55 @@ export default class LiteratePageComponentDisplay {
     setStateJson(json) {
     }
 
+    /** This should be called when a child display enters or leaves edit mode. */
+    notifyEditMode(viewInEditMode,componentView) {
+        let componentId = componentView.getComponent().getId();
+        let index = this.editModeComponentInfos.findIndex( editInfo => editInfo.id == componentId );
+        if(viewInEditMode) {
+            if(index < 0) {
+                this.editModeComponentInfos.push(this._getEditInfo(componentView));
+            }
+        }
+        else {
+            if(index >= 0) {
+                this.editModeComponentInfos.splice(index,1);
+            }
+        }
+        let inEditMode = (this.editModeComponentInfos.length > 0);
+
+        this._setEditMode(inEditMode);
+    }
+
     //===============================
     // Private Functions
     //===============================
+
+    /** This retrieves the format of data to store for tracking edit mode in cells. */
+    _getEditInfo(componentView) {
+        let component = componentView.getComponent();
+        return {id: component.getId(), name: component.getName()}
+    }
+
+    /** This sets edit mode in the display. */
+    _setEditMode(inEditMode) {
+        //set component edit mode
+        this.inEditMode = inEditMode;
+
+        if(inEditMode) {
+            let msg = "Cells being edited: " + this._getNameListFromEditInfos();
+            this.editNoticeContainer.innerHTML = msg;
+        }
+        else {
+            this.editNoticeContainer.innerHTML = "";
+        }
+            
+    }
+
+    /** This constructs the name list for the current edito components. */
+    _getNameListFromEditInfos() {
+        return this.editModeComponentInfos.map(editInfo => editInfo.name).join(", ");
+    }
+
 
     /** @private */
     loadTabEntry() {
@@ -163,18 +225,20 @@ export default class LiteratePageComponentDisplay {
         else {
             this.tabHidden()
         }
-        this.tab.addListener(uiutil.SHOWN_EVENT,() => this.tabShown());
-        this.tab.addListener(uiutil.HIDDEN_EVENT,() => this.tabHidden());
-        this.tab.addListener(uiutil.CLOSE_EVENT,() => this.tabClosed());
+
+        this.tabShownListener = () => this.tabShown();
+        this.tabHiddenListener = () => this.tabHidden();
+        this.tabClosedListener = () => this.tabClosed();
+        this.beforeTabCloseHandler = () => this.beforeTabClose();
+        this.tab.addListener(uiutil.SHOWN_EVENT,this.tabShownListener);
+        this.tab.addListener(uiutil.HIDDEN_EVENT,this.tabHiddenListener);
+        this.tab.addListener(uiutil.CLOSE_EVENT,this.tabClosedListener);
+        this.tab.addHandler(uiutil.REQUEST_CLOSE,this.beforeTabCloseHandler);
 
         //------------------
-        // set menu
+        // set icon
         //------------------
-        var menu = this.tab.createMenu(this.componentView.getIconUrl());
-        var createMenuItemsCallback = () => {
-            return this.componentView.getMenuItems();
-        }
-        menu.setAsOnTheFlyMenu(createMenuItemsCallback);
+        this.tab.setIconUrl(this.componentView.getIconUrl());
 
         //-----------------
         //set the tab title
@@ -185,15 +249,6 @@ export default class LiteratePageComponentDisplay {
         // apply the banner state
         //-----------------
         this._setBannerState();
-
-        //-----------------------------
-        //add the handlers for the tab
-        //-----------------------------
-        var onClose = () => {
-            this.componentView.closeTabDisplay();
-            this.destroy();
-        }
-        this.tab.addListener(uiutil.CLOSE_EVENT,onClose);
     }
 
     _setBannerState() {
@@ -232,7 +287,7 @@ export default class LiteratePageComponentDisplay {
         this.editorToolbarContainer = uiutil.createElementWithClass("div","visiui_litPage_editorToolbar",this.headerElement);
         this.componentToolbarContainer = uiutil.createElementWithClass("div","visiui_litPage_componentToolbar",this.headerElement);
         this.bannerContainer = uiutil.createElementWithClass("div","visiui_litPage_banner",this.headerElement);
-
+        this.editNoticeContainer = uiutil.createElementWithClass("div","visiui_litPage_editNotice",this.headerElement);
         this.initComponentToolbar();
 
         //-------------------
@@ -285,6 +340,7 @@ export default class LiteratePageComponentDisplay {
                 //label
                 var textElement = uiutil.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
                 textElement.innerHTML = componentClass.displayName;
+                buttonElement.title = "Insert " + componentClass.displayName;
                 //add handler
                 buttonElement.onclick = () => {
 
@@ -296,6 +352,9 @@ export default class LiteratePageComponentDisplay {
 
                     addComponent(appView,app,componentClass,initialValues,null,null);
                 }
+
+                //for cleanup
+                this.elementsWithOnclick.push(buttonElement);
             }
         }
 
@@ -303,6 +362,7 @@ export default class LiteratePageComponentDisplay {
         var buttonElement = uiutil.createElementWithClass("div","visiui_litPage_componentButton",this.componentToolbarContainer);
         var textElement = uiutil.createElementWithClass("div","visiui_litPage_componentButtonText",buttonElement);
         textElement.innerHTML = "Additional Components...";
+        buttonElement.title = "Additional Cells to Insert"
         buttonElement.onclick = () => {
 
             this.editorView.focus();
@@ -316,6 +376,9 @@ export default class LiteratePageComponentDisplay {
             //I tacked on a piggyback for testing!!!
             addAdditionalComponent(appView,app,initialValues,null,null);
         }
+        //for cleanup
+        this.elementsWithOnclick.push(buttonElement);
+
         this.componentToolbarContainer.appendChild(buttonElement);
     }
 
@@ -325,12 +388,30 @@ export default class LiteratePageComponentDisplay {
         //start with an empty component display
         var initialEditorState = this.componentView.getEditorState();
         
-        this.editorView = this.editorManager.createEditorView(this.contentElement,this,initialEditorState);
+        let { editorView, toolbarView, plugins } = this.editorManager.createEditorView(this.contentElement,this,initialEditorState);
+        this.editorView = editorView;
+        this.editorToolbarView = toolbarView;
 
-        this.contentElement.addEventListener("click",event => this.onClickContentElement(event));
+        this.contentElement.onclick = event => this.onClickContentElement(event);
+        this.elementsWithOnclick.push(this.contentElement);
 
         //add the editor toolbar
-        this.editorToolbarContainer.appendChild(this.editorManager.editorToolbarElement);
+        this.editorToolbarContainer.appendChild(this.editorToolbarView.getElement());
+
+        //we need to call a command to set the plugins on the editor state
+        let pageComponent = this.componentView.getComponent();
+        var modelView = this.componentView.getModelView();
+
+        //we need to initialize the components in the editor state for this component
+        let command = {};
+        command.type = "literatePagePlugins";
+        command.componentId = pageComponent.getId();
+        command.plugins = plugins;
+        let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
+
+        //execute the command asynchronously - this may be triggered by another command (such as open workspace)
+        setTimeout(() => workspaceManager.getApp().executeCommand(command));
+        
         
     }
 
@@ -369,7 +450,7 @@ export default class LiteratePageComponentDisplay {
 
     /** This function sets the highlight state for the given node. */
     _setApogeeNodeHighlight(childName,inSelection) {
-        let childComponentDisplay = this.getChildComponentDisplay(childName);
+        let childComponentDisplay = this.getChildComponentDisplay(childName,false);
         if(childComponentDisplay) childComponentDisplay.setHighlight(inSelection); 
     }
     
@@ -378,13 +459,18 @@ export default class LiteratePageComponentDisplay {
      * page display.  
      * @protected */
     destroy() {
+        if(this.isDestroyed) return;
+
+        //close tab if it is still present
+        if(this.tab) this.closeTab();
+
+        //child components
         //we should probably have a less cumbesome way of doing this
         let pageComponent = this.componentView.getComponent();
         let folder = pageComponent.getParentFolderForChildren();
         var childIdMap = folder.getChildIdMap();
         var modelView = this.componentView.getModelView();
         var modelManager = modelView.getModelManager();
-
         for(var childName in childIdMap) {
             var childMemberId = childIdMap[childName];
             var childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
@@ -394,7 +480,48 @@ export default class LiteratePageComponentDisplay {
             }
         }
 
-        if(this.tab) this.closeTab();
+        for(let memberId in this.childDisplayMap) {
+            let childDisplay = this.childDisplayMap[memberId];
+            let childComponentView = childDisplay.getComponentView();
+            childComponentView.closeComponentDisplay();
+        }
+        this.childDisplayMap = [];
+
+        //we need to initialize the components in the editor state for this component
+        let command = {};
+        command.type = "literatePagePlugins";
+        command.componentId = pageComponent.getId();
+        command.plugins = [];
+        let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
+        
+        //execute the command asynchronously - this may be triggered by another command (such as close workspace)
+        setTimeout(() => workspaceManager.getApp().executeCommand(command));
+        
+        //editor view
+        if(this.editorView) {
+            this.editorView.destroy();
+            this.editorView = null;
+        }
+
+        //editor toolbar
+        if(this.editorToolbarView) {
+            this.editorToolbarView.destroy();
+            this.editorToolbarView = null;
+        }
+
+        //handler cleanmup
+        this.elementsWithOnclick.forEach( element => {
+            element.onclick = null;
+        })
+
+        //remove elements
+        if(this.contentElement) this.contentElement.remove();
+        if(this.editorToolbarContainer) this.editorToolbarContainer.remove();
+        if(this.componentToolbarContainer) this.componentToolbarContainer.remove();
+        if(this.bannerContainer) this.bannerContainer.remove();
+        if(this.headerElement) this.headerElement.remove();
+
+        this.isDestroyed = true;
     }
 
     /** @protected */
@@ -405,7 +532,10 @@ export default class LiteratePageComponentDisplay {
             if(this.editorView.state) {
                 let tr = this.editorView.state.tr;
                 tr.scrollIntoView();
-                setTimeout(() => this.editorView.dispatch(tr),0);
+                setTimeout(() => {
+                    //make sure editor view is still here
+                    if(this.editorView) this.editorView.dispatch(tr)
+                },0);
             }
         }
         this.dispatchEvent(uiutil.SHOWN_EVENT,this);
@@ -419,8 +549,31 @@ export default class LiteratePageComponentDisplay {
 
     tabClosed() {
         //delete the page
+        if(this.tabShownListener) {
+            this.tab.removeListener(uiutil.SHOWN_EVENT,this.tabShownListener);
+            this.tabShownListener = null;
+        }
+        if(this.tabHiddenListener) {
+            this.tab.removeListener(uiutil.HIDDEN_EVENT,this.tabHiddenListener);
+            this.tabHiddenListener = null;
+        }
+        if(this.tabClosedListener) {
+            this.tab.removeListener(uiutil.CLOSE_EVENT,this.tabClosedListener);
+            this.tabClosedListener = null;
+        }
         this.componentView.closeTabDisplay();
         this.dispatchEvent(uiutil.CLOSE_EVENT,this);
+    }
+
+    beforeTabClose() {
+        if(this.inEditMode) {
+            let msg = "Please save or cancel the following cells: " + this._getNameListFromEditInfos();
+            showSimpleActionDialog(msg,null,["OK"]);
+            return uiutil.DENY_CLOSE;
+        }
+        
+        //anything besides deny close is ok
+        return true;
     }
     
 }

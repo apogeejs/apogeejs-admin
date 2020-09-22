@@ -36,12 +36,8 @@ export default class ChartJSComponentView extends ComponentView {
                 dataSource = this._getInputFormDataSource();
                 return new ConfigurableFormEditor(displayContainer,dataSource);
 
-            case ChartJSComponentView.VIEW_CONFIG_DATA:
-                dataSource = this._getConfigDebugDataSource();
-                return new AceTextEditor(displayContainer,dataSource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
-
             default:
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }
@@ -79,35 +75,10 @@ export default class ChartJSComponentView extends ComponentView {
                 let reloadDataDisplay = this.getComponent().isFieldUpdated("chartType");
                 return {reloadData,reloadDataDisplay};
             }, 
-            getDisplayData: () => _getFormLayout(this.getComponent().getChartType()),
+            getDisplayData: () => getFormLayout(this.getComponent().getChartType()),
             getData: () => this._getFormData(),
             getEditOk: () => true,
             saveData: (formData) => this._onSubmit(formData)
-        }
-    }
-
-    /** This shows the raw data value for the component data member. */
-    _getConfigDebugDataSource() {
-
-        return {
-            doUpdate: () => {
-                //update the display when the member data is updated.
-                //NOTE - we only want to update the data from the form and its generated function
-                //we should prevent someone else from updating it.
-                let reloadData = this.getComponent().isMemberDataUpdated("member");
-                let reloadDataDisplay = this.getComponent().isFieldUpdated("debugOutputType");
-                return {reloadData,reloadDataDisplay};
-            },
-
-            getData: () => {
-                let debugChartConfig = this.getComponent().getField("debugOutputType")
-                if(debugChartConfig == "Chart Config") {
-                    return JSON.stringify(this._getChartConfig(),null,"\t")
-                }
-                else {
-                    return JSON.stringify(this.getComponent().getMember().getData(),null,"\t");
-                }
-            },
         }
     }
     
@@ -136,14 +107,19 @@ export default class ChartJSComponentView extends ComponentView {
             let chartType = this.getComponent().getChartType();
 
             if(memberData) {
-                if(memberData.inputType == "rawConfig") {
-                    //raw chart config entered
-                    //for chart js, this must be a editable, so we will make a copy
-                    chartConfig = apogeeutil.jsonCopy(memberData.configData);
-                }
-                else if(memberData.inputType == "json") {
-                    let chartJson = memberData.jsonData;
-                    chartConfig = createChartConfig(chartJson,chartType);
+                if(memberData.inputType == "config") {
+                    let configJson = memberData.configJson;
+                    if(memberData.configFormat == "apogee") {
+                        //"apogee format", matching form result
+                        chartConfig = createChartConfig(configJson,chartType);
+                    }
+                    else if(memberData.configFormat == "chartjs") {
+                        //raw chart js format
+                        chartConfig = apogeeutil.jsonCopy(configJson);
+                    }
+                    else {
+                        throw new Error("Input error: a valid config type is not given.");
+                    }
                 }
                 else if(memberData.inputType == "form") {
                     let chartJson = memberData.formData;
@@ -208,55 +184,6 @@ export default class ChartJSComponentView extends ComponentView {
 
 }
 
-function _getFormLayout(chartType) {
-    return [
-        {
-            type: "radioButtonGroup",
-            label: "Input Type: ",
-            entries: [["Form","form"],["JSON","json"],["Raw ChartJS Config","rawConfig"]],
-            horizontal: true,
-            value: "form", //initial default
-            key: "inputType"
-        },    
-        {
-            type: "textField",
-            label: "JSON Config: ",
-            key: "jsonData",
-            selector: {
-                parentKey: "inputType",
-                parentValue: "json"
-            },
-            meta: {
-                "expression": "simple"
-            }
-        },
-        {
-            type: "textField",
-            label: "ChartJS Config: ",
-            key: "configData",
-            selector: {
-                parentKey: "inputType",
-                parentValue: "rawConfig"
-            },
-            meta: {
-                "expression": "simple"
-            }
-        },
-        {
-            type: "panel",
-            selector: {
-                parentKey: "inputType",
-                parentValue: "form"
-            },
-            formData: getChartLayout(chartType),
-            key: "formData",
-            meta: {
-                "expression": "object"
-            }
-        }
-    ];
-}
-
 const DEFAULT_CHART_CONFIG_DATA = {
     line: {"categoryDataSeries": [] },
     bar: {"categoryDataSeries": [] },
@@ -269,12 +196,10 @@ const DEFAULT_CHART_CONFIG_DATA = {
 
 ChartJSComponentView.VIEW_CHART = "Chart";
 ChartJSComponentView.VIEW_INPUT = "Input";
-ChartJSComponentView.VIEW_CONFIG_DATA = "Config (Debug)";
 
 ChartJSComponentView.VIEW_MODES = [
-	ChartJSComponentView.VIEW_CHART,
-    ChartJSComponentView.VIEW_INPUT,
-    ChartJSComponentView.VIEW_CONFIG_DATA
+	{name: ChartJSComponentView.VIEW_CHART, label: "Chart", isActive: false},
+    {name: ChartJSComponentView.VIEW_INPUT, label: "Configuration", isActive: true}
 ];
 
 ChartJSComponentView.TABLE_EDIT_SETTINGS = {
@@ -287,15 +212,9 @@ ChartJSComponentView.TABLE_EDIT_SETTINGS = {
 ChartJSComponentView.propertyDialogLines = [
     {
         "type":"dropdown",
-        "heading":"Chart Types: ",
+        "label":"Chart Type: ",
         "entries":["line","bar","scatter"],
         "resultKey":"chartType"
-    },
-    {
-        "type":"dropdown",
-        "heading":"Config Output: ",
-        "entries":["JSON","Chart Config"],
-        "resultKey":"debugOutputType"
     }
 ];
 
@@ -312,7 +231,7 @@ ChartJSComponentView.hasTabEntry = false;
 ChartJSComponentView.hasChildEntry = true;
 
 /** This is the icon url for the component. */
-ChartJSComponentView.ICON_RES_PATH = "/componentIcons/chartControl.png";
+ChartJSComponentView.ICON_RES_PATH = "/icons3/chartCellIcon.png";
 
 
 //================================
@@ -350,7 +269,7 @@ class ChartJSDisplay extends DataDisplay {
         this.contentElement.appendChild(this.errorElement);
         this.wrapperElement.appendChild(this.contentElement);
 
-        //this.chart = new Chart(this.canvasElement,this.config);
+        this.initialized = true;
     }
     
     /** This method returns the content element for the data display REQUIRED */
@@ -360,6 +279,7 @@ class ChartJSDisplay extends DataDisplay {
     
     /** This sets the data into the editor display. REQUIRED */
     setData(config) {
+        if(!this.initialized) return;
 
         if((!config)||(config === apogeeutil.INVALID_VALUE)) {
             config = DEFAULT_CHART_CONFIG;
@@ -410,6 +330,8 @@ class ChartJSDisplay extends DataDisplay {
     }
 
     showChartErrorMessage(errorMsg) {
+        if(!this.initialized) return;
+
         //make sure proper elements are showing
         if(this.canvasElement.style.display != "none") this.canvasElement.style.display = "none";
         if(this.errorElement.style.display == "none") this.errorElement.style.display = "";
@@ -421,6 +343,20 @@ class ChartJSDisplay extends DataDisplay {
     /** This method is called on loading the display. OPTIONAL */
     // onLoad() {
     // }
+
+    destroy() {
+        if(this.chart) {
+            this.chart.destroy();
+            this.chart = null;
+        }
+        this.config = null;
+        this.wrapperElement = null;
+        this.contentElement = null;
+        this.errorElement = null;
+        this.canvasElement = null;
+        
+        this.initialized = false;
+    }
 }
 
 let DEFAULT_CHART_CONFIG = {
@@ -457,8 +393,95 @@ const CHART_INFO_MAP = {
     }
 }
 
-/** The constructs the chart form layout for a given chart type. */
-function getChartLayout(chartType) {
+const inputTypeHelp = "Indicates the way you will enter data:\n- <b>Form</b> gives you several fields to guide input for the chart data and style.\n- <b>Config JSON</b> lets you specify a single config JSON to specify the form data and style. See documentation for the required format for the config JSON."
+
+const configFormatHelp = "Two config formats are available. See the documentation for more information on each.\n- <b>Apogee Format</b> is the format that mirrors that data entered with the form input type.\n- <b>ChartJS Format</b> is the format of ChartJS. Using this allows more flexibility. "
+
+const configJsonHelp = "Enter the name of the cell containing the config json, or any other javascript expression returning the desired config json value. "
+
+const xValuesTypeHelp = "The x values can be (1) categories, such as days of the week or other discrete values, or (2) numeric values. "
+
+const categoryElementHelp = "This is a javascript expression, such as the name of a cell, giving the array of category values. If the categories are not provided, either here or in the data series, integer values will be used starting with 1."
+
+const numericDataFormatHelp = "Select the desired data format to enter the X and Y Values for the chart. "
+
+const numericXValuesHelp = "Enter a javascript expression, such as the name of a cell, giving the array of X values. "
+
+const numericYValuesHelp = "Enter a javascript expression, such as the name of a cell, giving the array of Y values.  "
+
+const numericXYPointsHelp = "Enter a javascript expression, such as the name of a cell, giving the array of values of objects containing the values x and y."
+
+const numericDataArrayHelp = "Enter a javascript expression, such as the name of a cell, giving the array of arbitrary objects. The X and Y values will be read from it using the function specified below."
+
+const numericXAccessorHelp = "Enter a javascript expression giving a function f to read the X value from the above data array: xValueArray = dataArray.map( f ); "
+
+const numericYAccessorHelp = "Enter a javascript expression giving a function f to read the Y value from the above data array: yValueArray = dataArray.map( f ); "
+
+const categoryDataFormatHelp = "This is the format for Y data. It can be either an array or a map (JSON object). In the case of the map, the keys are the category values."
+
+const categoryDataArrayHelp = "Enter a javascript expression, such as the name of a cell, giving the data array. The array can hold Y values or more complex structs. If it holds structs, use the 'Y Accessor' field to provide a function to read the y value from the struct."
+
+const categoryDataMapHelp = "Enter a javascript expression, such as the name of a cell, giving the data map (JSON Object). The keys are the category. The values can either be Y values or more complex structs. If it holds structs, use the 'Y Accessor' field to provide a function to read the y value from the struct."
+
+const categoryYAccessorHelp = "<em>Optional</em> Enter a javascript expression giving a function f to read the Y value from entries in the array or map entries. This is not needed if the entries are the y values to be graphed."
+
+/** This function constructs the overall form layout for the chart input. */
+function getFormLayout(chartType) {
+    return [
+        {
+            type: "radioButtonGroup",
+            label: "Input Type: ",
+            entries: [["Form", "form"], ["Config JSON", "config"]],
+            horizontal: true,
+            help: inputTypeHelp,
+            value: "form", //initial default
+            key: "inputType"
+        },
+        {
+            type: "radioButtonGroup",
+            label: "Config Format: ",
+            entries: [["Apogee Format", "apogee"], ["ChartJS Format", "chartjs"]],
+            horizontal: true,
+            help: configFormatHelp,
+            value: "apogee", //initial default
+            key: "configFormat",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "config"
+            },
+        },
+        {
+            type: "textField",
+            label: "Config JSON: ",
+            hint: "expression",
+            help: configJsonHelp,
+            key: "configJson",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "config"
+            },
+            meta: {
+                "expression": "simple"
+            }
+        },
+        {
+            type: "panel",
+            selector: {
+                parentKey: "inputType",
+                parentValue: "form"
+            },
+            formData: getChartFormLayout(chartType),
+            key: "formData",
+            meta: {
+                "expression": "object"
+            }
+        }
+    ];
+}
+
+
+/** The constructs the body of the layout for the "form" option of input. Or, in other words, this is the actual chart entry form.  */
+function getChartFormLayout(chartType) {
     let chartInfo = CHART_INFO_MAP[chartType];
 
     if (!chartInfo) throw new Error("Unrecognized chart type: " + chartType);
@@ -687,11 +710,15 @@ const baseNumericDataSeriesDataLayout = [
         label: "Data Format: ",
         entries: [["X Array and Y Array", "values"], ["XY Point Array", "points"], ["Data Array and X and Y Acccessors", "structs"]],
         value: "values", //default
+        help: numericDataFormatHelp,
         key: "dataFormat"
     },
     {
         type: "textField",
         label: "X Values: ",
+        size: 60,
+        hint: "expression",
+        help: numericXValuesHelp,
         key: "xValues",
         selector: {
             parentKey: "dataFormat",
@@ -705,6 +732,9 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Y Values: ",
+        size: 60,
+        hint: "expression",
+        help: numericYValuesHelp,
         key: "yValues",
         selector: {
             parentKey: "dataFormat",
@@ -718,6 +748,9 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "XY Point Array: ",
+        size: 60,
+        hint: "expression",
+        help: numericXYPointsHelp,
         key: "xyPoints",
         selector: {
             parentKey: "dataFormat",
@@ -731,6 +764,9 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Data Array: ",
+        size: 60,
+        hint: "expression",
+        help: numericDataArrayHelp,
         key: "dataArray",
         selector: {
             parentKey: "dataFormat",
@@ -744,6 +780,9 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "X Accessor: ",
+        size: 60,
+        hint: "expression",
+        help: numericXAccessorHelp,
         key: "xAccessor",
         selector: {
             parentKey: "dataFormat",
@@ -757,6 +796,9 @@ const baseNumericDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Y Accessor: ",
+        size: 60,
+        hint: "expression",
+        help: numericYAccessorHelp,
         key: "yAccessor",
         selector: {
             parentKey: "dataFormat",
@@ -773,18 +815,22 @@ const baseNumericDataSeriesDataLayout = [
 const baseCategoryDataSeriesDataLayout = [
     {
         type: "dropdown",
-        label: "Data Type: ",
-        entries: [["Y Array", "values"], ["Data Array and Y Acccessor", "structs"]],
+        label: "Data Format: ",
+        entries: [["Data Array", "array"], ["Data Map (JSON Object)", "map"]],
         value: "values", //default
+        help: categoryDataFormatHelp,
         key: "dataType"
     },
     {
         type: "textField",
-        label: "Y Values: ",
-        key: "yValues",
+        label: "Data Array: ",
+        size: 60,
+        hint: "expression",
+        help: categoryDataArrayHelp,
+        key: "dataArray",
         selector: {
             parentKey: "dataType",
-            parentValue: "values"
+            parentValue: "array"
         },
         meta: {
             "expression": "simple",
@@ -793,11 +839,14 @@ const baseCategoryDataSeriesDataLayout = [
     },
     {
         type: "textField",
-        label: "Data Array: ",
-        key: "dataArray",
+        label: "Data Map: ",
+        size: 60,
+        hint: "expression",
+        help: categoryDataMapHelp,
+        key: "dataMap",
         selector: {
             parentKey: "dataType",
-            parentValue: "structs"
+            parentValue: "map"
         },
         meta: {
             "expression": "simple",
@@ -807,11 +856,10 @@ const baseCategoryDataSeriesDataLayout = [
     {
         type: "textField",
         label: "Y Accessor: ",
+        size: 60,
+        hint: "expression, optional",
+        help: categoryYAccessorHelp,
         key: "yAccessor",
-        selector: {
-            parentKey: "dataType",
-            parentValue: "structs"
-        },
         meta: {
             "expression": "simple",
             "excludeValue": ""
@@ -837,6 +885,7 @@ const titleConfigElement = {
                 {
                     type: "textField",
                     label: "Text: ",
+                    size: 40,
                     key: "text",
                     meta: {
                         "excludeValue": ""
@@ -1342,9 +1391,13 @@ const yAxisConfigElement = {
 const categoryElement = {
     type: "textField",
     label: "X Category Array: ",
+    size: 60,
+    hint: "expression, optional",
+    help: categoryElementHelp,
     key: "xCategories",
     meta: {
-        "expression": "simple"
+        "expression": "simple",
+        "excludeValue": ""
     }
 };
 
@@ -1363,9 +1416,11 @@ const categoryElementWithSelector = (() => {
 const xValuesTypeElement = {
     type: "radioButtonGroup",
     label: "X Values Type: ",
+    size: 60,
     entries: [["Category", "category"], ["Numeric", "numeric"]],
     value: "category", //initial default
     horizontal: true,
+    help: xValuesTypeHelp,
     key: "xValuesType"
 }
 
@@ -1380,6 +1435,7 @@ const invisibleXValuesTypeElement = {
 const seriesLabelElement = {
     type: "textField",
     label: "Label: ",
+    size: 40,
     key: "label",
     meta: {
         "excludeValue": ""
@@ -1488,6 +1544,8 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
         xCategories = sourceData.xCategories;
     }
     else {
+        xCategories = [];
+
         //auto generator categories
         hasImplicitXCategories = true;
     }
@@ -1497,11 +1555,42 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
         let entry = {};
 
         //read the data
-        if (dataSeriesEntry.yValues !== undefined) {
-            entry.data = dataSeriesEntry.yValues;
+        if (dataSeriesEntry.dataArray !== undefined) {
+            if (dataSeriesEntry.yAccessor !== undefined) {
+                entry.data = dataSeriesEntry.dataArray.map(dataSeriesEntry.yAccessor);
+            }
+            else {
+                entry.data = dataSeriesEntry.dataArray;
+            }
         }
-        else if ((dataSeriesEntry.dataArray !== undefined) && (dataSeriesEntry.yAccessor)) {
-            entry.data = dataSeriesEntry.dataArray.map(dataSeriesEntry.yAccessor);
+        else if (dataSeriesEntry.dataMap !== undefined) {
+            //we need to convert to a row array
+            let data = [];
+            for (let cat in dataSeriesEntry.dataMap) {
+                let index = xCategories.indexOf(cat);
+                if (index < 0) {
+                    if (hasImplicitXCategories) {
+                        //if index is not found AND categories not specified, add the category to our category array
+                        index = xCategories.length;
+                        xCategories.push(cat);
+                    }
+                    else {
+                        //if categories ARE explicitly defined, ignore any unspecified category
+                        continue;
+                    }
+                }
+                let entry = dataSeriesEntry.dataMap[cat];
+                let value;
+                if (dataSeriesEntry.yAccessor !== undefined) {
+                    value = dataSeriesEntry.yAccessor(entry);
+                }
+                else {
+                    value = entry;
+                }
+
+                data[index] = value;
+            }
+            entry.data = data;
         }
         else {
             throw new Error("Input Y data is not defined!");
@@ -1518,7 +1607,7 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
     });
 
     //if needed construct explicit categories. It is simple integers, starting with 1
-    if (hasImplicitXCategories) {
+    if ((hasImplicitXCategories) && (xCategories.length === 0)) {
         xCategories = [];
         for (let i = 1; i <= maxYLength; i++) xCategories.push(i);
     }

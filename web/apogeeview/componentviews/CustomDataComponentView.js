@@ -100,7 +100,7 @@ export default class CustomDataComponentView extends ComponentView {
                 
             default:
     //temporary error handling...
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }
@@ -202,7 +202,7 @@ export default class CustomDataComponentView extends ComponentView {
 CustomDataComponentView.componentName = "apogeeapp.CustomDataCell";
 CustomDataComponentView.hasTabEntry = false;
 CustomDataComponentView.hasChildEntry = true;
-CustomDataComponentView.ICON_RES_PATH = "/componentIcons/formControl.png";
+CustomDataComponentView.ICON_RES_PATH = "/icons3/genericCellIcon.png";
 
 CustomDataComponentView.propertyDialogLines = [
     {

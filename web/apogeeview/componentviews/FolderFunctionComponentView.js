@@ -45,7 +45,7 @@ FolderFunctionComponentView.TABLE_EDIT_SETTINGS = {
 FolderFunctionComponentView.componentName = "apogeeapp.PageFunctionComponent";
 FolderFunctionComponentView.hasTabEntry = true;
 FolderFunctionComponentView.hasChildEntry = true;
-FolderFunctionComponentView.ICON_RES_PATH = "/componentIcons/folderFunction.png";
+FolderFunctionComponentView.ICON_RES_PATH = "/icons3/pageFunctionIcon.png";
 FolderFunctionComponentView.TREE_ENTRY_SORT_ORDER = ParentComponentView.FOLDER_COMPONENT_TYPE_SORT_ORDER;
 
 
@@ -53,11 +53,13 @@ FolderFunctionComponentView.propertyDialogLines = [
     {
         "type":"textField",
         "label":"Arg List: ",
+        "size": 80,
         "key":"argListString"
     },
     {
         "type":"textField",
         "label":"Return Val: ",
+        "size": 40,
         "key":"returnValueString"
     }
 ];

@@ -12,27 +12,35 @@ export default class CheckboxElement extends ConfigurableElement {
         var containerElement = this.getElement();
         
         //label
-        if(elementInitData.label) {
-            this.labelElement = document.createElement("span");
-            this.labelElement.className = "apogee_configurablePanelLabel";
-            this.labelElement.innerHTML = elementInitData.label;
-            containerElement.appendChild(this.labelElement);
-        }
-        else {
-            this.labelElement = null;
+        let labelElement = this.getLabelElement(elementInitData);
+        if(labelElement) {
+            containerElement.appendChild(labelElement);
         }
         
         //checkbox field
-        this.checkbox = uiutil.createElement("input",{"type":"checkbox"});
-        containerElement.appendChild(this.checkbox); 
+        this.checkbox = uiutil.createElement("input",{"type":"checkbox"}); 
+        containerElement.appendChild(this.checkbox);
 
         this.setFocusElement(this.checkbox);
         
         //add dom listeners for events
-        this.checkbox.addEventListener("change",() => {
+        this.changeListener = () => {
             this.inputDone();
             this.valueChanged();
-        });
+        }
+        this.checkbox.addEventListener("change",this.changeListener);
+
+        //hint
+        let hintElement = this.getHintElement(elementInitData);
+        if(hintElement) {
+            containerElement.appendChild(hintElement);
+        }
+
+        //help element
+        let helpElement = this.getHelpElement(elementInitData);
+        if(helpElement) {
+            containerElement.appendChild(helpElement);
+        }
         
         this._postInstantiateInit(elementInitData);
 
@@ -43,6 +51,15 @@ export default class CheckboxElement extends ConfigurableElement {
     getValue() {
         return this.checkbox.checked;
     } 
+
+    destroy() {
+        super.destroy();
+
+        this.checkbox.removeEventListener("change",this.changeListener);
+        this.changeListener = null;
+
+        this.checkbox = null;
+    }
 
     //===================================
     // protected Methods

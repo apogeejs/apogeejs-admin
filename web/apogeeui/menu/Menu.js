@@ -90,6 +90,10 @@ Menu.globalPress = function(event) {
     }
 }
 
+Menu.discardMenu = function(menuHeader) {
+
+}
+
 //================================
 // Internal
 //================================
@@ -106,8 +110,8 @@ Menu.show = function(menuBody) {
         Menu.activeMenu = menuBody;
         //set the header to active
         var menuHeader = menuBody.getMenuHeader();
-        if(menuHeader) {
-            menuHeader.className = "visiui-menu-heading visiui-menu-heading-active";
+        if((menuHeader)&&(menuHeader.domElement)) {
+            menuHeader.domElement.className = "visiui-menu-heading visiui-menu-heading-active";
         }
     }
 }
@@ -117,8 +121,8 @@ Menu.hideActiveMenu = function() {
         var activeMenu = Menu.activeMenu;
         //set the header to normal (not active)
         var menuHeader = activeMenu.getMenuHeader();
-        if(menuHeader) {
-            menuHeader.className = "visiui-menu-heading";
+        if((menuHeader)&&(menuHeader.domElement)) {
+            menuHeader.domElement.className = "visiui-menu-heading";
         }
         
         var parentElement = activeMenu.getParentElement();
@@ -275,6 +279,7 @@ class MenuBody {
         if(itemInfo.childMenuItems) {
             //create a parent menu item
             var childMenuBody = this.createChildMenuBody(itemInfo.childMenuItems);
+            itemInfo.childMenuBody = childMenuBody;
             var childMenuDiv = childMenuBody.getMenuElement();
             childMenuDiv.style.left = "100%";
             childMenuDiv.style.top = "0%";
@@ -313,6 +318,14 @@ class MenuBody {
     removeMenuItem(title) {
         var itemInfo = this.menuItems[title];
         if(itemInfo) {
+            //clean up the dom elements
+            if(itemInfo.childMenuBody) {
+                itemInfo.childMenUBody.removeAllMenuItems();
+            }
+            else {
+                itemInfo.element.onclick = null;
+            }
+
             this.menuDiv.removeChild(itemInfo.element);
             delete this.menuItems[title];
         }
@@ -353,6 +366,21 @@ class MenuBody {
         var childMenuBody = new MenuBody();
         childMenuBody.setMenuItems(menuItems);
         return childMenuBody;
+    }
+
+    destroy() {
+        for(let key in this.menuItems) {
+            itemInfo = this.menuItems[key];
+
+            if(itemInfo.childMenuItems) {
+                //create a parent menu item
+                var childMenuBody = this.createChildMenuBody(itemInfo.childMenuItems);
+                var childMenuDiv = childMenuBody.getMenuElement();
+                childMenuDiv.style.left = "100%";
+                childMenuDiv.style.top = "0%";
+                itemInfo.element.appendChild(childMenuDiv);
+            }
+        }
     }
 
 }
@@ -438,6 +466,14 @@ class MenuHeader {
      * for static menus where we do not want to populate it ahead of time. */
     setAsOnTheFlyMenu(getMenuItemsCallback) {
         this.menuBody.setAsOnTheFlyMenu(getMenuItemsCallback);
+    }
+
+    destroy() {
+        if(this.labelElement) this.labelElement.onmousedown = null;
+        this.labelElement = null;
+        this.domElement = null;
+        if(this.menuBody) this.menuBody.removeAllMenuItems();
+        this.menuBody = null;
     }
 
 }

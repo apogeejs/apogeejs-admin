@@ -40,7 +40,7 @@ export default class FunctionComponentView extends ComponentView {
                 
             default:
     //temporary error handling...
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }
@@ -69,12 +69,13 @@ FunctionComponentView.TABLE_EDIT_SETTINGS = {
 FunctionComponentView.componentName = "apogeeapp.FunctionCell";
 FunctionComponentView.hasTabEntry = false;
 FunctionComponentView.hasChildEntry = true;
-FunctionComponentView.ICON_RES_PATH = "/componentIcons/functionTable.png";
+FunctionComponentView.ICON_RES_PATH = "/icons3/functionCellIcon.png";
 
 FunctionComponentView.propertyDialogLines = [
     {
         "type":"textField",
         "label":"Arg List: ",
+        "size": 80,
         "key":"argListString"
     }
 ];

@@ -24,7 +24,7 @@ export default class EsModuleEntry extends ReferenceEntry {
                     url: this.getUrl(),
                     module: module
                 };
-                workspaceManager.runFutureCommand(commandData);
+                workspaceManager.getApp().executeCommand(commandData);
                 onLoad();
             }
             else {

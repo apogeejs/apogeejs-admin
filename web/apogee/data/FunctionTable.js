@@ -5,8 +5,8 @@ import CodeableMember from "/apogee/datacomponents/CodeableMember.js";
 /** This is a function. */
 export default class FunctionTable extends CodeableMember {
 
-    constructor(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
-        super(name,parentId,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
+    constructor(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        super(name,instanceToCopy,keepUpdatedFixed,specialCaseIdValue);
         
         //The messenger should not be available from the formula for this member
         //see details in the CodeableMember function below.
@@ -19,7 +19,7 @@ export default class FunctionTable extends CodeableMember {
 
     processMemberFunction(model,memberFunctionInitializer,memberGenerator) {
         var memberFunction = this.getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator);
-        this.setData(memberFunction);
+        this.setData(model,memberFunction);
     }
 
     getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator) {
@@ -75,31 +75,9 @@ export default class FunctionTable extends CodeableMember {
                 memberFunction.initializeIfNeeded();
             }
             catch(error) {
-                //handle potential error cases!!!:
-                
-                if(error == apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE) {
-                    //This is not an error. I don't like to throw an error
-                    //for an expected condition, but I didn't know how else
-                    //to do this. See notes where this is thrown.
-                    this.setResultInvalid();
-                }
-                else if(error == apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE) {
-                    //This is not an error. I don't like to throw an error
-                    //for an expected condition, but I didn't know how else
-                    //to do this. See notes where this is thrown.
-                    this.setResultPending();
-                }
-                //--------------------------------------
-                else {
-                    //normal error in member function execution
-                
-                    //this is an error in the code
-                    if(error.stack) {
-                        console.error(error.stack);
-                    }
-    
-                    this.setError(error);
-                }
+                //this error is already handled in the function table initializer
+                //it is rethrown so a calling member can also get the error, since it was not present at regular intialization
+                //if we initialize here in lock, that means there is nobody who called this.
             }
 
         }
@@ -112,8 +90,8 @@ export default class FunctionTable extends CodeableMember {
 
     /** This method creates a member from a json. It should be implemented as a static
      * method in a non-abstract class. */ 
-    static fromJson(parentId,json) {
-        let member = new FunctionTable(json.name,parentId,null,null,json.specialIdValue);
+    static fromJson(model,json) {
+        let member = new FunctionTable(json.name,null,null,json.specialIdValue);
 
         //set initial data
         let initialData = json.updateData;

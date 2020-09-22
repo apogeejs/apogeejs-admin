@@ -161,6 +161,8 @@ export default class WorkspaceManager extends FieldObject {
     //====================================
     // asynch run context methods
     //====================================
+
+    /** This runs a command asynchronously */
     runFutureCommand(commandData) {
         //run command asynchronously
         setTimeout(() => this.app.executeCommand(commandData),0);

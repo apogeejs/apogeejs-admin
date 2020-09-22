@@ -42,7 +42,7 @@ export default class ApogeeComponentView {
     //we will not display data in this time.
     let childComponentDisplay
     if (name) {
-      childComponentDisplay = this.pageDisplay.getChildComponentDisplay(name);
+      childComponentDisplay = this.pageDisplay.getChildComponentDisplay(name,true);
 
     }
 
@@ -85,7 +85,12 @@ export default class ApogeeComponentView {
   }
 
   destroy() {
-    //    if (this.innerView) this.close()
+    this.node = null;
+    this.view = null;
+    this.getPos = null;
+    this.pageDisplay = null;
+    this.dom = null;
+    this.contentDiv = null;
   }
 
   stopEvent(event) {

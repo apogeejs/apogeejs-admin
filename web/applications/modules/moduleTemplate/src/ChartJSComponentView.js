@@ -36,12 +36,8 @@ export default class ChartJSComponentView extends ComponentView {
                 dataSource = this._getInputFormDataSource();
                 return new ConfigurableFormEditor(displayContainer,dataSource);
 
-            case ChartJSComponentView.VIEW_CONFIG_DATA:
-                dataSource = this._getConfigDebugDataSource();
-                return new AceTextEditor(displayContainer,dataSource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
-
             default:
-                alert("unrecognized view element!");
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }
@@ -83,31 +79,6 @@ export default class ChartJSComponentView extends ComponentView {
             getData: () => this._getFormData(),
             getEditOk: () => true,
             saveData: (formData) => this._onSubmit(formData)
-        }
-    }
-
-    /** This shows the raw data value for the component data member. */
-    _getConfigDebugDataSource() {
-
-        return {
-            doUpdate: () => {
-                //update the display when the member data is updated.
-                //NOTE - we only want to update the data from the form and its generated function
-                //we should prevent someone else from updating it.
-                let reloadData = this.getComponent().isMemberDataUpdated("member");
-                let reloadDataDisplay = this.getComponent().isFieldUpdated("debugOutputType");
-                return {reloadData,reloadDataDisplay};
-            },
-
-            getData: () => {
-                let debugChartConfig = this.getComponent().getField("debugOutputType")
-                if(debugChartConfig == "Chart Config") {
-                    return JSON.stringify(this._getChartConfig(),null,"\t")
-                }
-                else {
-                    return JSON.stringify(this.getComponent().getMember().getData(),null,"\t");
-                }
-            },
         }
     }
     
@@ -290,12 +261,6 @@ ChartJSComponentView.propertyDialogLines = [
         "heading":"Chart Types: ",
         "entries":["line","bar","scatter"],
         "resultKey":"chartType"
-    },
-    {
-        "type":"dropdown",
-        "heading":"Config Output: ",
-        "entries":["JSON","Chart Config"],
-        "resultKey":"debugOutputType"
     }
 ];
 

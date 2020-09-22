@@ -68,6 +68,12 @@ export default class PanelElement extends ConfigurableElement {
             childElement.setValue(parentValue);
         }    
     }
+
+    destroy() {
+        super.destroy();
+        this.panel.destroy();
+        this.panel = null;
+    }
     
     //===================================
     // internal Methods

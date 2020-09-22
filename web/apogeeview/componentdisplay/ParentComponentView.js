@@ -20,14 +20,6 @@ export default class ParentComponentView extends ComponentView {
 
         //ccreate the editor manager
         this.editorManager = createProseMirrorManager(modelView.getApp(),component.getSchema());
-
-        //we need to call a command to set the plugins on the editor state for the associated component
-        let command = {};
-        command.type = "literatePagePlugins";
-        command.componentId = component.getId();
-        command.plugins = this.editorManager.getPlugins();
-        let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
-        workspaceManager.runFutureCommand(command);
     }
 
     createTreeDisplay() {
@@ -58,18 +50,22 @@ export default class ParentComponentView extends ComponentView {
     //----------------------
 
     /** This function adds a fhile componeent to the displays for this parent component. */
-    removeChild(childComponent) {
+    removeChild(childComponentView) {
         //remove from tree entry
         var treeEntry = this.getTreeEntry();
         if(treeEntry) {
-            var childTreeEntry = childComponent.getTreeEntry();
+            var childTreeEntry = childComponentView.getTreeEntry();
             if(childTreeEntry) {
                 treeEntry.removeChild(childTreeEntry);
             }
         }
+
+        if(this.tabDisplay) {
+            this.tabDisplay.removeChild(childComponentView); 
+        }
         
         //remove child windows - just hide them. They will be deleted in the component
-        childComponent.closeComponentDisplay();
+        childComponentView.closeComponentDisplay();
     }
 
     /** This function adds a fhile componeent to the displays for this parent component. */
@@ -312,7 +308,7 @@ export default class ParentComponentView extends ComponentView {
             if(allDeletedNames.length > 0) {
                 //flag a delete will be done
                 commandsDeleteComponent = true
-                deleteMsg = "Are you sure you want to delete these apogee nodes: " + allDeletedNames + "?";
+                deleteMsg = "This action will delete the selected cells. Are you sure you want to do that? Cells to delete: " + allDeletedNames;
             }
 
             //-------------------------
@@ -347,7 +343,7 @@ export default class ParentComponentView extends ComponentView {
                 let cancelAction = () => {
                     this.giveEditorFocusIfShowing();
                 };
-                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[okAction,cancelAction]);
+                showSimpleActionDialog(deleteMsg,null,["OK","Cancel"],[okAction,cancelAction]);
             }
             else {
                 //otherwise just take the action
@@ -688,16 +684,35 @@ export default class ParentComponentView extends ComponentView {
             let { empty } = state.selection;
             if(!empty) {
 
-                setupTransaction = state.tr.deleteSelection(); 
+                //BELOW I HAVE TWO MODELS FOR INSERTING A NEW NODE - OVER THE CURRENT SELECTION
+                //OR AFTER THE CURRENT SELECTION 
 
-                //see if we need to delete any apogee nodes
-                var deletedComponentShortNames = this.getDeletedApogeeComponentShortNames(setupTransaction);
-                commandInfo.deletedComponentShortNames = deletedComponentShortNames
+                //-----------------------------------------------
+                // START insert the node over the current selection
+                // It is commented out because some users got confused when a node got deleted when they added a new one,
+                // which happened in the case a node is selected.
+                
+                // setupTransaction = state.tr.deleteSelection(); 
 
-                if(deletedComponentShortNames.length > 0) {
-                    //create delete commands
-                    commandInfo.deletedComponentCommands = this.createDeleteComponentCommands(deletedComponentShortNames); 
-                }
+                // //see if we need to delete any apogee nodes
+                // var deletedComponentShortNames = this.getDeletedApogeeComponentShortNames(setupTransaction);
+                // commandInfo.deletedComponentShortNames = deletedComponentShortNames
+
+                // if(deletedComponentShortNames.length > 0) {
+                //     //create delete commands
+                //     commandInfo.deletedComponentCommands = this.createDeleteComponentCommands(deletedComponentShortNames); 
+                // }
+
+                //END insert over current selection
+                //------------------------------------------------
+
+                //-----------------------------------------------
+                // START insert the node at the end of the current selection
+                let $endPos = state.selection.$to;
+                let selection = new TextSelection($endPos,$endPos);
+                setupTransaction = state.tr.setSelection(selection);
+                // END insert the node at the end of the current selection
+                //------------------------------------------------
             }
         }
         else {
