@@ -401,7 +401,7 @@ const configJsonHelp = "Enter the name of the cell containing the config json, o
 
 const xValuesTypeHelp = "The x values can be (1) categories, such as days of the week or other discrete values, or (2) numeric values. "
 
-const categoryElementHelp = "This is a javascript expression, such as the name of a cell, giving the array of category values. If this is omitted, the categories will be integer values starting with 1."
+const categoryElementHelp = "This is a javascript expression, such as the name of a cell, giving the array of category values. If the categories are not provided, either here or in the data series, integer values will be used starting with 1."
 
 const numericDataFormatHelp = "Select the desired data format to enter the X and Y Values for the chart. "
 
@@ -417,13 +417,13 @@ const numericXAccessorHelp = "Enter a javascript expression giving a function f 
 
 const numericYAccessorHelp = "Enter a javascript expression giving a function f to read the Y value from the above data array: yValueArray = dataArray.map( f ); "
 
-const categoryDataFormatHelp = "Select the desired data format to enter the Y Values for the chart. "
+const categoryDataFormatHelp = "This is the format for Y data. It can be either an array or a map (JSON object). In the case of the map, the keys are the category values."
 
-const categoryYValuesHelp = "Enter a javascript expression, such as the name of a cell, giving the array of Y values.  "
+const categoryDataArrayHelp = "Enter a javascript expression, such as the name of a cell, giving the data array. The array can hold Y values or more complex structs. If it holds structs, use the 'Y Accessor' field to provide a function to read the y value from the struct."
 
-const categoryDataArrayHelp = "Enter a javascript expression, such as the name of a cell, giving the array of arbitrary objects. The Y values will be read from it using the function specified below."
+const categoryDataMapHelp = "Enter a javascript expression, such as the name of a cell, giving the data map (JSON Object). The keys are the category. The values can either be Y values or more complex structs. If it holds structs, use the 'Y Accessor' field to provide a function to read the y value from the struct."
 
-const categoryYAccessorHelp = "Enter a javascript expression giving a function f to read the Y value from the above data array: yValueArray = dataArray.map( f ); "
+const categoryYAccessorHelp = "<em>Optional</em> Enter a javascript expression giving a function f to read the Y value from entries in the array or map entries. This is not needed if the entries are the y values to be graphed."
 
 /** This function constructs the overall form layout for the chart input. */
 function getFormLayout(chartType) {
@@ -816,26 +816,10 @@ const baseCategoryDataSeriesDataLayout = [
     {
         type: "dropdown",
         label: "Data Format: ",
-        entries: [["Y Array", "values"], ["Data Array and Y Acccessor", "structs"]],
+        entries: [["Data Array", "array"], ["Data Map (JSON Object)", "map"]],
         value: "values", //default
         help: categoryDataFormatHelp,
         key: "dataType"
-    },
-    {
-        type: "textField",
-        label: "Y Values: ",
-        size: 60,
-        hint: "expression",
-        help: categoryYValuesHelp,
-        key: "yValues",
-        selector: {
-            parentKey: "dataType",
-            parentValue: "values"
-        },
-        meta: {
-            "expression": "simple",
-            "excludeValue": ""
-        }
     },
     {
         type: "textField",
@@ -846,7 +830,23 @@ const baseCategoryDataSeriesDataLayout = [
         key: "dataArray",
         selector: {
             parentKey: "dataType",
-            parentValue: "structs"
+            parentValue: "array"
+        },
+        meta: {
+            "expression": "simple",
+            "excludeValue": ""
+        }
+    },
+    {
+        type: "textField",
+        label: "Data Map: ",
+        size: 60,
+        hint: "expression",
+        help: categoryDataMapHelp,
+        key: "dataMap",
+        selector: {
+            parentKey: "dataType",
+            parentValue: "map"
         },
         meta: {
             "expression": "simple",
@@ -857,13 +857,9 @@ const baseCategoryDataSeriesDataLayout = [
         type: "textField",
         label: "Y Accessor: ",
         size: 60,
-        hint: "expression",
+        hint: "expression, optional",
         help: categoryYAccessorHelp,
         key: "yAccessor",
-        selector: {
-            parentKey: "dataType",
-            parentValue: "structs"
-        },
         meta: {
             "expression": "simple",
             "excludeValue": ""
@@ -1400,7 +1396,8 @@ const categoryElement = {
     help: categoryElementHelp,
     key: "xCategories",
     meta: {
-        "expression": "simple"
+        "expression": "simple",
+        "excludeValue": ""
     }
 };
 
@@ -1547,6 +1544,8 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
         xCategories = sourceData.xCategories;
     }
     else {
+        xCategories = [];
+
         //auto generator categories
         hasImplicitXCategories = true;
     }
@@ -1556,11 +1555,42 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
         let entry = {};
 
         //read the data
-        if (dataSeriesEntry.yValues !== undefined) {
-            entry.data = dataSeriesEntry.yValues;
+        if (dataSeriesEntry.dataArray !== undefined) {
+            if (dataSeriesEntry.yAccessor !== undefined) {
+                entry.data = dataSeriesEntry.dataArray.map(dataSeriesEntry.yAccessor);
+            }
+            else {
+                entry.data = dataSeriesEntry.dataArray;
+            }
         }
-        else if ((dataSeriesEntry.dataArray !== undefined) && (dataSeriesEntry.yAccessor)) {
-            entry.data = dataSeriesEntry.dataArray.map(dataSeriesEntry.yAccessor);
+        else if (dataSeriesEntry.dataMap !== undefined) {
+            //we need to convert to a row array
+            let data = [];
+            for (let cat in dataSeriesEntry.dataMap) {
+                let index = xCategories.indexOf(cat);
+                if (index < 0) {
+                    if (hasImplicitXCategories) {
+                        //if index is not found AND categories not specified, add the category to our category array
+                        index = xCategories.length;
+                        xCategories.push(cat);
+                    }
+                    else {
+                        //if categories ARE explicitly defined, ignore any unspecified category
+                        continue;
+                    }
+                }
+                let entry = dataSeriesEntry.dataMap[cat];
+                let value;
+                if (dataSeriesEntry.yAccessor !== undefined) {
+                    value = dataSeriesEntry.yAccessor(entry);
+                }
+                else {
+                    value = entry;
+                }
+
+                data[index] = value;
+            }
+            entry.data = data;
         }
         else {
             throw new Error("Input Y data is not defined!");
@@ -1577,7 +1607,7 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
     });
 
     //if needed construct explicit categories. It is simple integers, starting with 1
-    if (hasImplicitXCategories) {
+    if ((hasImplicitXCategories) && (xCategories.length === 0)) {
         xCategories = [];
         for (let i = 1; i <= maxYLength; i++) xCategories.push(i);
     }
