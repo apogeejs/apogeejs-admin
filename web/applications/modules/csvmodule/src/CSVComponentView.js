@@ -1,5 +1,5 @@
 //These are in lieue of the import statements
-let { ComponentView,ConfigurableFormEditor,dataDisplayHelper,HandsonGridEditor} = apogeeview;
+let { ComponentView,ConfigurableFormEditor,dataDisplayHelper,HandsonGridEditor,AceTextEditor} = apogeeview;
 let { getFormResultFunctionBody } = apogeeui;
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
@@ -22,7 +22,6 @@ export default class CSVComponentView extends ComponentView {
     getDataDisplay(displayContainer,viewType) {
 
         let dataDisplaySource;
-        let app = this.getModelView().getApp();
 
         //create the new view element;
         switch(viewType) {
@@ -34,8 +33,23 @@ export default class CSVComponentView extends ComponentView {
                 return editor;
 
             case CSVComponentView.VIEW_DATA:
-                dataDisplaySource = dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member.data.body");
-                return new HandsonGridEditor(displayContainer,dataDisplaySource);
+                //figure out if we want a grid or plain json
+                let inputMember = this.getComponent().getField("member.input");
+                let inputData = inputMember.getData();
+                let useMapsFormat = false;
+                if((inputData)&&(inputData.input)) {
+                    useMapsFormat = (inputData.outputFormat == "maps");
+                }
+
+                dataDisplaySource = this._getBodyDataSource(useMapsFormat);
+                if(useMapsFormat) {
+                    return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
+                }
+                else {
+                    return new HandsonGridEditor(displayContainer,dataDisplaySource);
+                }
+
+                
 
             case CSVComponentView.VIEW_INPUT:
                 dataDisplaySource = this._getInputFormDataSource();
@@ -65,6 +79,35 @@ export default class CSVComponentView extends ComponentView {
             getData: () => this._getFormData(),
             getEditOk: () => true,
             saveData: (formData) => this._onSubmit(formData)
+        }
+    }
+
+    _getBodyDataSource(useMapsFormat) {
+        return {
+            doUpdate: () => {
+                //return value is whether or not the data display needs to be udpated
+                let reloadData = this.getComponent().isMemberDataUpdated("member.data.body");
+                //we only need to reload if the output format changes, but for now we will reload for any input change 
+                let reloadDataDisplay = this.getComponent().isMemberDataUpdated("member.input");;
+                return {reloadData,reloadDataDisplay};
+            },
+    
+            getData: () => {
+                let jsonData = this.getComponent().getField("member.data.body").getData();
+                if(jsonData != apogeeutil.INVALID_VALUE) {
+                    if(useMapsFormat) {
+                        //return text for text editor
+                        return JSON.stringify(jsonData,null,JSON_TEXT_FORMAT_STRING);
+                    }
+                    else {
+                        //return json for grid editor
+                        return jsonData;
+                    }
+                }
+                else {
+                    return apogeeutil.INVALID_VALUE;
+                }
+            }
         }
     }
 
@@ -120,16 +163,24 @@ export default class CSVComponentView extends ComponentView {
                 }
             },
             {
+                type: "radioButtonGroup",
+                label: "Output Format: ",
+                entries: [["Array of Objects","maps"],["Array of Arrays (Grid)","arrays"]],
+                value: "maps",
+                key: "outputFormat",
+                help: OUTPUT_FORMAT_HELP_TEXT
+            },
+            {
                 type: "checkbox",
                 label: "Dynamic Typing: ",
-                value: false,
+                value: true,
                 key: "dynamicTyping",
                 help: DYNAMIC_TYPING_HELP_TEXT
             },
             {
                 type: "checkbox",
                 label: "Skip Empty Lines: ",
-                value: false,
+                value: true,
                 key: "skipEmptyLines",
                 help: SKIP_EMPTY_HELP_TEXT
             }
@@ -194,8 +245,11 @@ CSVComponentView.TABLE_EDIT_SETTINGS = {
     "defaultView": CSVComponentView.VIEW_DATA
 }
 
+const JSON_TEXT_FORMAT_STRING = "\t";
+
 const INPUT_HELP_TEXT = "This should be a javascript expression, such as the name of a cell, which gives the raw CSV text. It will be converted to JSON format." + 
 " To access this json value, use the expression <em>[cell name].data</em> to access the data rows and <em>[cell name].header</em>  to access the header row.";
+const OUTPUT_FORMAT_HELP_TEXT = "The output can be an array of JSON objects or an array of arrays. For the JSON Objects the keys will be the column names."
 const DYNAMIC_TYPING_HELP_TEXT = "Check this box to automatically convert numbers and booleans. If this is not selected, all data will be strings.";
 const SKIP_EMPTY_HELP_TEXT = "Check this box to omit a row with no content, often the last row.";
 

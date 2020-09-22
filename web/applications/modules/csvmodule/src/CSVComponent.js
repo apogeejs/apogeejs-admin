@@ -70,19 +70,28 @@ if(__input__.input) {
     let options = {};
     options.dynamicTyping = __input__.dynamicTyping;
     options.skipEmptyLines = __input__.skipEmptyLines;
+    options.header = (__input__.outputFormat == "maps");
     let result = __papaparse.parse(__input__.input,options);
     if(result.errors.length == 0) {
         let headerRow;
-        let body = [];
-        if((result.data)&&(result.data.length > 0)) {                
-            result.data.forEach( (row,index) => {
-                if(index == 0) {
-                    headerRow = row;
-                }
-                else {
-                    body.push(row);
-                }
-            });            
+        let body;
+        if(options.header) {
+            //row of objects
+            headerRow = result.meta.fields;
+            body = result.data;
+        }
+        else {
+            body = [];
+            if((result.data)&&(result.data.length > 0)) {                
+                result.data.forEach( (row,index) => {
+                    if(index == 0) {
+                        headerRow = row;
+                    }
+                    else {
+                        body.push(row);
+                    }
+                });            
+            }
         }
 
         if(!headerRow) headerRow = [];
