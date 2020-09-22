@@ -221,7 +221,10 @@ export default class ListElement extends ConfigurableElement {
             addButton.className = "listElement_addButton";
             let labelText = entryTypeJson.label ? "+ "+ entryTypeJson.label : "+";
             addButton.innerHTML = labelText;
-            addButton.onclick = () => this._insertElement(entryTypeJson);
+            addButton.onclick = () => {
+                this._insertElement(entryTypeJson);
+                this.inputDone();
+            }
             controlBar.appendChild(addButton);
             controlBar.appendChild(document.createElement("br"));
         });
@@ -254,6 +257,7 @@ export default class ListElement extends ConfigurableElement {
         
         //nofityof value change
         this.valueChanged();
+        
     }
 
     _createListEntryData(entryTypeJson) {
@@ -301,7 +305,10 @@ export default class ListElement extends ConfigurableElement {
         upButton.style.position = "absolute";
         upButton.style.top = "2px";
         upButton.style.left = "2px";
-        upButton.onclick = () => this._moveListEntryUp(listEntry);
+        upButton.onclick = () => {
+            this._moveListEntryUp(listEntry);
+            this.inputDone();
+        }
         controlBar.appendChild(upButton);
    
         let downButton = document.createElement("img");
@@ -310,7 +317,10 @@ export default class ListElement extends ConfigurableElement {
         downButton.style.position = "absolute";
         downButton.style.top = "15px";
         downButton.style.left = "2px";
-        downButton.onclick = () => this._moveListEntryDown(listEntry);
+        downButton.onclick = () => {
+            this._moveListEntryDown(listEntry);
+            this.inputDone();
+        }
         controlBar.appendChild(downButton);
    
         let deleteButton = document.createElement("img");
@@ -319,7 +329,10 @@ export default class ListElement extends ConfigurableElement {
         deleteButton.style.position = "absolute";
         deleteButton.style.top = "2px";
         deleteButton.style.left = "20px";
-        deleteButton.onclick = () => this._removeListEntry(listEntry);
+        deleteButton.onclick = () => {
+            this._removeListEntry(listEntry);
+            this.inputDone();
+        }
         controlBar.appendChild(deleteButton);
         
         this.contentContainer.appendChild(contentElement);
