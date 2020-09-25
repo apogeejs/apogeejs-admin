@@ -26,10 +26,8 @@ export function getMemberStateUndoCommand(model, memberId) {
         //here the object has data set. Check if an "alternate" data values was set - error, pending or invalid
         let state = member.getState();
         if(state == apogeeutil.STATE_ERROR) {
-            //member has an error
-            let errors = member.getErrors();
-            //Fix this to save all the 
-            command.data = errors[0];
+            //save a sngle error
+            command.data = [this.getErrorMsg()];
             
         }
         else if(state == apogeeutil.STATE_INVALID) {

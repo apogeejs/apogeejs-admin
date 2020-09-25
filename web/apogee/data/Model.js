@@ -118,6 +118,19 @@ export default class Model extends FieldObject {
         }
     }
 
+    /** This completes any lazy initialization. This must be done before the model and the members are locked. 
+     * Any member not yet initialized would be a lazy initialize function that was neever called. */
+    completeLazyInitialization() {
+        //member map includes all members and the model
+        let memberMap = this.getField("memberMap");
+        for(let id in memberMap) {
+            let member = memberMap[id];
+            if(member.lazyInitializeIfNeeded) {
+                member.lazyInitializeIfNeeded();
+            }
+        }
+    }
+
     /** This shoudl be called after all dependencies have been updated to store the
      * impacts map (We kept a mutable working copy during construction for efficiency)  */
     finalizeImpactsMap() {

@@ -23,7 +23,10 @@ export default class ConfigurablePanel {
         //---------------------------------------------------------
         
         //check for an invalid input
-        if((!formInitData)||(!formInitData.layout)||(formInitData.layout.constructor != Array)) {
+        if(formInitData === apogeeutil.INVALID_VALUE) {
+            formInitData = ConfigurablePanel.getErrorMessageLayoutInfo("Form Data Unavailable");
+        }
+        else if((!formInitData)||(!formInitData.layout)||(formInitData.layout.constructor != Array)) {
             formInitData = ConfigurablePanel.getErrorMessageLayoutInfo("Invalid form layout!");
         }
         

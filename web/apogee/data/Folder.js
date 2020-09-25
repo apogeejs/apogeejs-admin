@@ -31,8 +31,14 @@ export default class Folder extends DependentMember {
         let dependsOnMap = this.calculateDependents(model);
         this.updateDependencies(model,dependsOnMap);
 
-        //set the data value for this child
-        this._spliceDataMap(model,child.getName(),child.getData());
+        //recalculate data and state
+        let name = child.getName();
+        let data = child.getData();
+        let newDataMap = this._getSplicedDataMap(model,name,data);
+        let {state, errorDependencies} = this._calculateState(model);
+
+        //set the new state and data
+        this._setStateAndData(model,state,newDataMap,errorDependencies,true)
     }
 
     /** In this implementation updates the dependencies and updates the data value for the folder. See notes on why the update is
@@ -42,22 +48,33 @@ export default class Folder extends DependentMember {
         let dependsOnMap = this.calculateDependents(model);
         this.updateDependencies(model,dependsOnMap);
 
-        //remove the data value for this child
-        this._spliceDataMap(model,child.getName());
+        //recalculate data and state
+        let name = child.getName();
+        let newDataMap = this._getSplicedDataMap(model,name);
+        let {state, errorDependencies} = this._calculateState(model);
+
+        //set the new state and data
+        this._setStateAndData(model,state,newDataMap,errorDependencies,true);
     }
 
     /** In this implementation we update the data value for the folder. See notes on why this is
      * done here rather than in 'calculate' */
     onChildDataUpdate(model,child) {
-        var childId = child.getId();
+        let childId = child.getId();
         let childIdMap = this.getChildIdMap();
-        var name = child.getName();
-        var data = child.getData();
+        let name = child.getName();
         if(childIdMap[name] != childId) {
             alert("Error - the table " + childId + " is not registered in the parent under the name "  + name);
             return;
         }
-        this._spliceDataMap(model,name,data);
+
+        //get new data
+        let data = child.getData();
+        let newDataMap = this._getSplicedDataMap(model,name,data);
+        let {state, errorDependencies} = this._calculateState(model);
+
+        //set the new state and data
+        this._setStateAndData(model,state,newDataMap,errorDependencies,true);
     }
 
     /** this method gets the hame the children inherit for the full name. */
@@ -74,13 +91,32 @@ export default class Folder extends DependentMember {
         return true;
     }
 
+    /** We override the base implementation because we do NOT want to clear the state. We are setting it incrementally and
+     * we are keeping old values.  */
+    prepareForCalculate() {
+        //I should probably have a better way of doing this. Right now I am repeating part of the implementation
+        //of DependentMember.prepareForCalculate(). This is error prone, if someone changes that function.
+
+        this.calcPending = true;
+    }
+
     /** This usually calculates the value of the member. However, in the case of a folder the value is already updated
      * once we initialize the impactors. We update the value incrementally so that we do not need to calculate all children
      * before any data is read from the folder. If we waited, we would get a circular dependecy if we trie to specify the 
      * name of a member including the path to it. We need to allow this to avoid name colisions at times.  */
     calculate(model) {
-        //make sure impactors are calculated
-        this.initializeImpactors(model);
+        //here we will jsut make sure each impactor is calculated. We should bypass the other 
+        //code in initializeImpactors because of the incremental updating.
+        //I should probably have a better way of doing this. Right now I am repeating part of the implementation
+        //of DependentMember.prepareForCalculate(). This is error prone, if someone changes that function.
+
+        let dependsOnMap = this.getField("dependsOnMap");
+        for(var idString in dependsOnMap) {
+            let impactor = model.lookupMemberById(idString);
+            if((impactor.isDependent)&&(impactor.getCalcPending())) {
+                impactor.calculate(model);
+            }
+        }
         
         ///see note in method description - no calculation is done here. It is done incrementally as children are calculated.
         
@@ -185,7 +221,7 @@ export default class Folder extends DependentMember {
     }
 
     /** This does a partial update of the folder value, for a single child */
-    _spliceDataMap(model,addOrRemoveName,addData) {
+    _getSplicedDataMap(model,addOrRemoveName,addData) {
         //shallow copy old data
         let oldDataMap = this.getData();
         let newDataMap = {};
@@ -201,7 +237,46 @@ export default class Folder extends DependentMember {
         
         //make this immutable and set it as data for this folder - note we want to set the data whether or not we have an error!
         Object.freeze(newDataMap);
-        this.setData(model,newDataMap,true);
+        return newDataMap;
+    }
+
+    _calculateState(model) {
+        let errorDependencies = [];
+        let resultPending = false;
+        let resultInvalid = false;
+
+        let childIdMap = this.getChildIdMap();
+        for(var name in childIdMap) {
+            let childId = childIdMap[name];
+            var child = model.lookupMemberById(childId);
+            
+            let childState = child.getState();
+            if(childState == apogeeutil.STATE_ERROR) {
+                errorDependencies.push(child);
+            } 
+            else if(childState == apogeeutil.STATE_PENDING) {
+                resultPending = true;
+            }
+            else if(childState == apogeeutil.STATE_INVALID) {
+                resultInvalid = true;
+            }
+        }
+
+        let state;
+        if(errorDependencies.length > 0) {
+            state = apogeeutil.STATE_ERROR;
+        }
+        else if(resultPending) {
+            state = apogeeutil.STATE_PENDING;
+        }
+        else if(resultInvalid) {
+            state = apogeeutil.STATE_INVALID;
+        }
+        else {
+            state = apogeeutil.STATE_NORMAL;
+        }
+
+        return {state, errorDependencies};
     }
 }
 

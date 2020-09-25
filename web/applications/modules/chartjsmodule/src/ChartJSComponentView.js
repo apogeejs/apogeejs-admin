@@ -100,6 +100,11 @@ export default class ChartJSComponentView extends ComponentView {
     /** This method loads the config structure that will be passed to the chart data display. */
     _getChartConfig() {
         try {
+            //provide empty chart config data if model data not available
+            if(this.component.getMember().getState() != apogeeutil.STATE_NORMAL) {
+                return DEFAULT_CHART_CONFIG_DATA;
+            }
+
             //chart data is held as member value, calculated by formula generated from form input
             let memberData = this.getComponent().getMember().getData();
 
@@ -131,7 +136,7 @@ export default class ChartJSComponentView extends ComponentView {
             }
             else {
                 //provide empty chart config data
-                chartConfig = DEFAULT_CHART_CONFIG_DATA[chartType];
+                chartConfig = DEFAULT_CHART_CONFIG_DATA;
             }
 
             return chartConfig;
@@ -184,11 +189,7 @@ export default class ChartJSComponentView extends ComponentView {
 
 }
 
-const DEFAULT_CHART_CONFIG_DATA = {
-    line: {"categoryDataSeries": [] },
-    bar: {"categoryDataSeries": [] },
-    scatter: {"numericDataSeries": [] }
-}
+const DEFAULT_CHART_CONFIG_DATA = {};
 
 //======================================
 // Static properties
@@ -886,6 +887,7 @@ const titleConfigElement = {
                     type: "textField",
                     label: "Text: ",
                     size: 40,
+                    hint: "text",
                     key: "text",
                     meta: {
                         "excludeValue": ""
@@ -1436,6 +1438,7 @@ const seriesLabelElement = {
     type: "textField",
     label: "Label: ",
     size: 40,
+    hint: "text",
     key: "label",
     meta: {
         "excludeValue": ""
@@ -2061,3 +2064,4 @@ function _parseColorString(str) {
     return false;
 }
 //-- mergeOpacity private code end ---
+

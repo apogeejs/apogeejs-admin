@@ -156,6 +156,9 @@ export function doAction(model,actionData) {
     }
     
     model.clearConsecutiveQueuedTracking(); 
+
+    //check if any lazy initialized functions have not been initialized yet
+    model.completeLazyInitialization();
     
     //fire the events
     let changeList = changeMapToChangeList(model.getChangeMap());

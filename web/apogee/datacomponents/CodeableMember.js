@@ -239,8 +239,8 @@ let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
                 updateData.data = "<unknown pending value>";
             }
             else if(state == apogeeutil.STATE_ERROR) {
-                //save the errors as strings only
-                updateData.errorList = this.getErrors().map(error => error.toString());
+                //save a single error
+                updateData.errorList = [this.getErrorMsg()];
             }
             else {
                 //save the data value

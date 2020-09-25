@@ -61,13 +61,13 @@ export default class FunctionTable extends CodeableMember {
         return __functionTableWrapper(initMember,this.getName());
     }
 
-    /** Add to the base lock function - The function is lazy initialized so it can call itself without a 
+    /** The function is lazy initialized so it can call itself without a 
      * ciruclar reference. The initialization happens on the first actual call. This is OK if we are doing the
      * model calculation. but if it is first called _AFTER_ the model has completed being calculated, such as
      * externally, then we will get a locked error when the lazy initialization happens. Instead, we will
      * complete the lazy initialization before the lock is done. At this point we don't need to worry about
      * circular refernce anyway, since the model has already completed its calculation. */
-    lock() {
+    lazyInitializeIfNeeded() {
         //check if the function is initialized
         let memberFunction = this.getData();
         if((memberFunction)&&(memberFunction.initializeIfNeeded)) {
@@ -81,7 +81,6 @@ export default class FunctionTable extends CodeableMember {
             }
 
         }
-        super.lock();
     }
 
     //------------------------------

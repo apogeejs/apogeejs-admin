@@ -89,12 +89,12 @@ export function createMember(model,parent,memberJson) {
             //with a failed redo.
         }
 
+        //register member with model
+        model.registerMember(member);
+
         //pass this child to the parent
         member.setParentId(parent.getId());
         parent.addChild(model,member);
-
-        //register member with model
-        model.registerMember(member);
 
         //set action flags for successfull new member
         actionResult.updateModelDependencies = true;

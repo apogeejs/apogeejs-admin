@@ -33,7 +33,7 @@ export default class JsonTable extends CodeableMember {
 
             //we must separately apply the asynch data set promise if there is one
             if((data)&&(data instanceof Promise)) {
-                this.applyAsynchData(model,data);
+                this.applyAsynchFutureValue(model,data);
             }
         } 
     }

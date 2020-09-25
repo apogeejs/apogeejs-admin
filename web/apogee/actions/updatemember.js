@@ -115,7 +115,7 @@ function updateData(model,actionData) {
 
     //if the data is a promise, we must also initiate the asynchronous setting of the data
     if((data)&&(data instanceof Promise)) {
-        member.applyAsynchData(model,data);
+        member.applyAsynchFutureValue(model,data);
     }
     
     actionResult.actionDone = true;

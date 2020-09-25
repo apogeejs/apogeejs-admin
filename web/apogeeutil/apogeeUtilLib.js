@@ -7,7 +7,7 @@ let apogeeutil = {};
 export {apogeeutil as default};
 
 /** None State - used by members. This indicates no state information is present. */
-apogeeutil.STATE_NORMAL = "none";
+apogeeutil.STATE_NONE = "none";
 
 /** Normal State - used by members */
 apogeeutil.STATE_NORMAL = "normal";

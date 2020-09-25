@@ -107,7 +107,7 @@ export default class DependentMember extends Member {
         }
 
         if(errorDependencies.length > 0) {
-            this.createDependencyError(model,errorDependencies);
+            this.setErrors(model,errorDependencies);
         }
         else if(resultPending) {
             this.setResultPending(model);
@@ -156,17 +156,5 @@ export default class DependentMember extends Member {
         }
 
         return dependenciesUpdated;
-    }
-
-    /** This method creates an dependency error, given a list of impactors that have an error. 
-     * @private */
-    createDependencyError(model,errorDependencies) {
-            //dependency error found
-            var message = "Error in dependency: ";
-            for(var i = 0; i < errorDependencies.length; i++) {
-                if(i > 0) message += ", ";
-                message += errorDependencies[i].getFullName(model);
-            }
-            this.setError(model,message);   
     }
 }

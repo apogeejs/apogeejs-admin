@@ -507,6 +507,7 @@ const titleConfigElement = {
 					type: "textField",
 					label: "Text: ",
 					size: 40,
+					hint: "text",
 					key: "text",
 					meta: {
 						"excludeValue": ""
@@ -1057,6 +1058,7 @@ const seriesLabelElement = {
     type: "textField",
     label: "Label: ",
     size: 40,
+    hint: "text",
     key: "label",
     meta: {
         "excludeValue": ""

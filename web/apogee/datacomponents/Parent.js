@@ -115,7 +115,7 @@ Parent.removeChild = function(model,child) {
 //Parent.onRemoveChild(model,child);
 
 /** This method is called when a child valud changes. */
-Parent.dataUpdate = function(model,child) {
+Parent.childDataUpdate = function(model,child) {
     if(this.onChildDataUpdate) {
         this.onChildDataUpdate(model,child);
     }
