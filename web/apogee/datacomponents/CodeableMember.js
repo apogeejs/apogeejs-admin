@@ -174,12 +174,9 @@ export default class CodeableMember extends DependentMember {
             this.clearCalcPending();
             return;
         }
-
-//temporary - re create the initializer
-let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
       
         try {
-            this.processMemberFunction(model,memberFunctionInitializer,compiledInfo.memberFunctionGenerator);
+            this.processMemberFunction(model,compiledInfo.memberFunctionGenerator);
         }
         catch(error) {
             

@@ -17,15 +17,18 @@ export default class FunctionTable extends CodeableMember {
     // Codeable Methods
     //------------------------------
 
-    processMemberFunction(model,memberFunctionInitializer,memberGenerator) {
-        var memberFunction = this.getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator);
+    processMemberFunction(model,memberGenerator) {
+        var memberFunction = this.getLazyInitializedMemberFunction(model,memberGenerator);
         this.setData(model,memberFunction);
     }
 
-    getLazyInitializedMemberFunction(memberFunctionInitializer,memberGenerator) {
+    getLazyInitializedMemberFunction(model,memberGenerator) {
+
+        let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
 
         //create init member function for lazy initialization
         //we need to do this for recursive functions, or else we will get a circular reference
+        //here we have logic to notify of an error or other problem in the function
         var initMember = () => {
             var impactorSuccess = memberFunctionInitializer();
             if(impactorSuccess) {
@@ -57,8 +60,25 @@ export default class FunctionTable extends CodeableMember {
             } 
         }
 
-        //this is called from separate code to make debugging more readable
-        return __functionTableWrapper(initMember,this.getName());
+        //create the lazy initialize function
+        let memberInitialized = false;
+        let source = {};
+
+        source.initIfNeeded = () => {
+            if(!memberInitialized) {
+                source.memberFunction = initMember();
+                memberInitialized = true;
+            }
+        }
+
+        //create the wrapped function - we call this from the debug file to make this cleaner for the
+        //user, since they will run through it from the debugger.
+        let wrappedMemberFunction = __functionTableWrapper(this.getName(),source);
+
+        //add an function on this function to allow external initialization if needed (if the function is not called before the model is locked)
+        wrappedMemberFunction.initIfNeeded = source.initIfNeeded;
+
+        return wrappedMemberFunction;
     }
 
     /** The function is lazy initialized so it can call itself without a 
@@ -70,16 +90,15 @@ export default class FunctionTable extends CodeableMember {
     lazyInitializeIfNeeded() {
         //check if the function is initialized
         let memberFunction = this.getData();
-        if((memberFunction)&&(memberFunction.initializeIfNeeded)) {
+        if((memberFunction)&&(memberFunction.initIfNeeded)) {
             try {
-                memberFunction.initializeIfNeeded();
+                memberFunction.initIfNeeded();
             }
             catch(error) {
                 //this error is already handled in the function table initializer
                 //it is rethrown so a calling member can also get the error, since it was not present at regular intialization
                 //if we initialize here in lock, that means there is nobody who called this.
             }
-
         }
     }
 
@@ -145,5 +164,4 @@ FunctionTable.generator.setCodeOk = true;
 
 //register this member
 Model.addMemberGenerator(FunctionTable.generator);
-
 

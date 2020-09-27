@@ -17,34 +17,21 @@ __globals__.__customControlDebugHook = function(args) {
 /** This is a wrapper used in function table creation to help make 
  * debugging more readable, rather than placing this code in the section that
  * is obfuscated. */
-__globals__.__functionTableWrapper = function(initMember,functionName) {
-
-    var memberFunction;
-    var memberInitialized = false;
-
-    var initializeIfNeeded = () => {
-        if(!memberInitialized) {
-            memberFunction = initMember();
-            memberInitialized = true;
-        }
-    }
+__globals__.__functionTableWrapper = function(functionName,source) {
 
     //create member function for lazy initialization
-    var wrapperMemberFunction = function(argList) {
-        initializeIfNeeded();
+    var wrappedMemberFunction = function(argList) {
+        source.initIfNeeded();
         try {
-            return memberFunction.apply(null,arguments);
+            return source.memberFunction.apply(null,arguments);
         }
         catch(error) {
             console.error("Error in function call to " + functionName);
             throw error;
         }
     }
-
-    //add an function on this function to allow external initialization
-    wrapperMemberFunction.initializeIfNeeded = initializeIfNeeded;
     
-    return wrapperMemberFunction;
+    return wrappedMemberFunction;
 }
 
 

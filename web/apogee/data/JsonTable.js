@@ -23,7 +23,9 @@ export default class JsonTable extends CodeableMember {
         return [];
     }
         
-    processMemberFunction(model,memberFunctionInitializer,memberGenerator) {
+    processMemberFunction(model,memberGenerator) {
+        let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
+
         let initialized = memberFunctionInitializer();
         if(initialized) {
             //the data is the output of the function
