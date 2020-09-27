@@ -68,6 +68,7 @@ export default class DependentMember extends Member {
     /** This does any init needed for calculation.  */
     prepareForCalculate() {
         this.calcPending = true;
+
         //clear any errors, and other state info
         this.clearState();
     }
@@ -75,45 +76,59 @@ export default class DependentMember extends Member {
     ///** This updates the member based on a change in a dependency.  */
     //calculate(model);
 
+    /** This method calculates the contribution to the state of the member based on it dependencies. */
+    calculateDependentState(model,doSetState) {
+        let errorDependencies = [];
+        let resultPending = false;
+        let resultInvalid = false;
+
+        let dependsOnMap = this.getField("dependsOnMap");
+        for(var idString in dependsOnMap) {
+            let impactor = model.lookupMemberById(idString);
+            
+            let impactorState = impactor.getState();
+            if(impactorState == apogeeutil.STATE_ERROR) {
+                errorDependencies.push(impactor);
+            } 
+            else if(impactorState == apogeeutil.STATE_PENDING) {
+                resultPending = true;
+            }
+            else if(impactorState == apogeeutil.STATE_INVALID) {
+                resultInvalid = true;
+            }
+        }
+
+        let state;
+        if(errorDependencies.length > 0) {
+            state = apogeeutil.STATE_ERROR;
+            if(doSetState) this.setErrors(model,errorDependencies);
+        }
+        else if(resultPending) {
+            state = apogeeutil.STATE_PENDING;
+            if(doSetState) this.setResultPending(model);
+        }
+        else if(resultInvalid) {
+            state = apogeeutil.STATE_INVALID;
+            if(doSetState) this.setResultInvalid(model);
+        }
+        else {
+            state = apogeeutil.STATE_NORMAL;
+            //state not set in normal case - will be set when data is set
+        }
+
+        return {state, errorDependencies};
+    }
+
     /** This method makes sure any impactors are set. It sets a dependency 
      * error if one or more of the dependencies has a error. */
     initializeImpactors(model) {
-        var errorDependencies = [];
-        var resultPending = false;
-        var resultInvalid = false;
-        
         //make sure dependencies are up to date
         let dependsOnMap = this.getField("dependsOnMap");
         for(var idString in dependsOnMap) {
-            let dependsOnType = dependsOnMap[idString];
             let impactor = model.lookupMemberById(idString);
             if((impactor.isDependent)&&(impactor.getCalcPending())) {
                 impactor.calculate(model);
             }
-
-            //inherit the the state of the impactor only if it is a normal dependency, as oppose to a pass through dependency
-            if(dependsOnType == apogeeutil.NORMAL_DEPENDENCY) {
-                let impactorState = impactor.getState();
-                if(impactorState == apogeeutil.STATE_ERROR) {
-                    errorDependencies.push(impactor);
-                } 
-                else if(impactorState == apogeeutil.STATE_PENDING) {
-                    resultPending = true;
-                }
-                else if(impactorState == apogeeutil.STATE_INVALID) {
-                    resultInvalid = true;
-                }
-            }
-        }
-
-        if(errorDependencies.length > 0) {
-            this.setErrors(model,errorDependencies);
-        }
-        else if(resultPending) {
-            this.setResultPending(model);
-        }
-        else if(resultInvalid) {
-            this.setResultInvalid(model);
         }
     }
 

@@ -136,6 +136,7 @@ export default class Member extends FieldObject {
         }
         else {
             //If this happens, we will just make it state normal 
+            throw new Error("INVALID STATE: member " + this.getName());
             return apogeeutil.STATE_NORMAL;
         }
     }
@@ -201,33 +202,33 @@ export default class Member extends FieldObject {
 
     /** This method sets the state to none, signifying an invalid state. */
     clearState() {
-        this.setField("state",apogeeutil.STATE_NONE);
+        this.setField("state",{"state":apogeeutil.STATE_NONE});
     }
 
     /** This method sets the data for this object. This is the object used by the 
      * code which is identified by this name, for example the JSON object associated
      * with a JSON table. */
     setData(model,data) {
-        this._setStateAndData(model,apogeeutil.STATE_NORMAL,data);
+        this.setStateAndData(model,apogeeutil.STATE_NORMAL,data);
     }
 
     /** This method sets an error for this member. It will be valid for the current round of calculation of
      * this member. The error should be a javascript Error object, an apogee Member (signifying a dependnecy
      * error), a string, or another type, which will be interpretted as a string. */
     setError(model,error) {
-        this._setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,[error]);
+        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,[error]);
     }
 
     /** This method sets the error for this dependent. See setError for more details. */
     setErrors(model,errorList) {
-        this._setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,errorList);
+        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,errorList);
     }
 
     /** This sets the result pending flag. The promise triggering the pending state should also be passed if there
      * is one for this member. If the state is pending because it depends on a pending member, the promise should be
      * left as undefined.*/
     setResultPending(model,promise) {
-        this._setStateAndData(model,apogeeutil.STATE_PENDING,apogeeutil.INVALID_VALUE);
+        this.setStateAndData(model,apogeeutil.STATE_PENDING,apogeeutil.INVALID_VALUE);
         if(promise) {
             this.setField("pendingPromise",promise);
         }
@@ -236,7 +237,7 @@ export default class Member extends FieldObject {
     /** This sets the result invalid flag. If the result is invalid, any
      * table depending on this will also have an invalid value. */
     setResultInvalid(model) {
-        this._setStateAndData(model,apogeeutil.STATE_INVALID,apogeeutil.INVALID_VALUE);
+        this.setStateAndData(model,apogeeutil.STATE_INVALID,apogeeutil.INVALID_VALUE);
     }
 
     /** This methos sets the data, where the data can be a generalized value
@@ -294,6 +295,59 @@ export default class Member extends FieldObject {
 
         //call appropriate action when the promise completes
         promise.then(asynchCallback).catch(asynchErrorCallback);
+    }
+
+    
+    /** This method updates the state and data. This should not typically be called directly instead the individual
+     * data and state setters should be called.
+     * The data value will be applied regardless of the state. The error list is applied only if the state is ERROR. */
+    setStateAndData(model,state,data,errorList) {
+        //set data as specified
+        if(data == undefined) {
+            this.clearField("data");
+        }
+        else {
+            this.setField("data",data);
+        }
+
+        //set the state if it is error or if it changes
+        let oldStateStruct = this.getState();
+        if((state == apogeeutil.STATE_ERROR)||(!oldStateStruct)||(state != oldStateStruct.state)) {
+            //update the state
+            let newStateStruct = {};
+
+            //do some safety checks on the error list
+            if(state == apogeeutil.STATE_ERROR) {
+                //make sure there is an error list
+                if(!errorList) errorList = [];
+
+                newStateStruct.state = apogeeutil.STATE_ERROR;
+                newStateStruct.errorList = errorList;
+                if(errorList.length > 0) {
+                    newStateStruct.errorMsg = errorList.join("\n");
+                }
+                else {
+                    newStateStruct.errorMsg = UNKNOWN_ERROR_MSG_PREFIX + this.getName();
+                }
+            }
+            else {
+                newStateStruct.state = state;
+            }
+            this.setField("state",newStateStruct);
+        }
+
+        //clear the pending promise
+        //note that the pending promise must be set elsewhere if we are in pending
+        if(this.getField("pendingPromise")) {
+            this.clearField("pendingPromise");
+        }
+
+        //notify parent of update
+        let parentId = this.getField("parentId");
+        if(parentId) {
+            let parent = model.getMutableMember(parentId);
+            parent.childDataUpdate(model,this);
+        }
     }
 
     //========================================
@@ -356,56 +410,6 @@ export default class Member extends FieldObject {
     // State setting methods
     //----------------------------------
 
-    /** This method updates the state and data. The data value will be applied regardless of 
-     * the state. The error list is applied only if the state is ERROR. */
-    _setStateAndData(model,state,data,errorList) {
-        //set data as specified
-        if(data == undefined) {
-            this.clearField("data");
-        }
-        else {
-            this.setField("data",data);
-        }
-
-        //set the state if it is error or if it changes
-        let oldStateStruct = this.getState();
-        if((state == apogeeutil.STATE_ERROR)||(!oldStateStruct)||(state != oldStateStruct.state)) {
-            //update the state
-            let newStateStruct = {};
-
-            //do some safety checks on the error list
-            if(state == apogeeutil.STATE_ERROR) {
-                //make sure there is an error list
-                if(!errorList) errorList = [];
-
-                newStateStruct.state = apogeeutil.STATE_ERROR;
-                newStateStruct.errorList = errorList;
-                if(errorList.length > 0) {
-                    newStateStruct.errorMsg = errorList.join("\n");
-                }
-                else {
-                    newStateStruct.errorMsg = UNKNOWN_ERROR_MSG_PREFIX + this.getName();
-                }
-            }
-            else {
-                newStateStruct.state = state;
-            }
-            this.setField("state",newStateStruct);
-        }
-
-        //clear the pending promise
-        //note that the pending promise must be set elsewhere if we are in pending
-        if(this.getField("pendingPromise")) {
-            this.clearField("pendingPromise");
-        }
-
-        //notify parent of update
-        let parentId = this.getField("parentId");
-        if(parentId) {
-            let parent = model.getMutableMember(parentId);
-            parent.childDataUpdate(model,this);
-        }
-    }
 
     /** This method adds any errors from the new addedErrorList to the oldErrorList if
      * they are not already present. */

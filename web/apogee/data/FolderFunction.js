@@ -148,10 +148,11 @@ export default class FolderFunction extends DependentMember {
 
         //make sure the data is set in each impactor
         this.initializeImpactors(model);
+        this.calculateDependentState(model,true);
 
         let state = this.getState();
         if((state != apogeeutil.STATE_ERROR)&&(state != apogeeutil.STATE_PENDING)&&(state != apogeeutil.STATE_INVALID)) {
-            //check for code errors, if so set a data error
+            //calculate folder function is no issue in dependent
             try {
                 var folderFunctionFunction = this.getFolderFunctionFunction(model);
                 this.setData(model,folderFunctionFunction);

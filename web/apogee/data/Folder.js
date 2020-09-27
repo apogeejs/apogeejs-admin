@@ -15,9 +15,6 @@ export default class Folder extends DependentMember {
         //This is not a root. Scope is inherited from the parent.
         this.contextHolderMixinInit(false);
         this.parentMixinInit(instanceToCopy);
-
-        //for the folder we set data even if the folder has an error or other invalid data
-        this.omitClearDataOnInvalid = true;
     }
 
     //------------------------------
@@ -35,10 +32,10 @@ export default class Folder extends DependentMember {
         let name = child.getName();
         let data = child.getData();
         let newDataMap = this._getSplicedDataMap(model,name,data);
-        let {state, errorDependencies} = this._calculateState(model);
+        let {state, errorDependencies} = this.calculateDependentState(model,false);
 
         //set the new state and data
-        this._setStateAndData(model,state,newDataMap,errorDependencies,true)
+        this.setStateAndData(model,state,newDataMap,errorDependencies,true)
     }
 
     /** In this implementation updates the dependencies and updates the data value for the folder. See notes on why the update is
@@ -51,10 +48,10 @@ export default class Folder extends DependentMember {
         //recalculate data and state
         let name = child.getName();
         let newDataMap = this._getSplicedDataMap(model,name);
-        let {state, errorDependencies} = this._calculateState(model);
+        let {state, errorDependencies} = this.calculateDependentState(model,false);
 
         //set the new state and data
-        this._setStateAndData(model,state,newDataMap,errorDependencies,true);
+        this.setStateAndData(model,state,newDataMap,errorDependencies,true);
     }
 
     /** In this implementation we update the data value for the folder. See notes on why this is
@@ -71,10 +68,11 @@ export default class Folder extends DependentMember {
         //get new data
         let data = child.getData();
         let newDataMap = this._getSplicedDataMap(model,name,data);
-        let {state, errorDependencies} = this._calculateState(model);
+        //calculate dependent state but do not set it yet
+        let {state, errorDependencies} = this.calculateDependentState(model,false);
 
-        //set the new state and data
-        this._setStateAndData(model,state,newDataMap,errorDependencies,true);
+        //here we will always set the data whether or not there are any issues in dependents
+        this.setStateAndData(model,state,newDataMap,errorDependencies,true);
     }
 
     /** this method gets the hame the children inherit for the full name. */
@@ -91,35 +89,20 @@ export default class Folder extends DependentMember {
         return true;
     }
 
-    /** We override the base implementation because we do NOT want to clear the state. We are setting it incrementally and
-     * we are keeping old values.  */
-    prepareForCalculate() {
-        //I should probably have a better way of doing this. Right now I am repeating part of the implementation
-        //of DependentMember.prepareForCalculate(). This is error prone, if someone changes that function.
-
-        this.calcPending = true;
-    }
-
     /** This usually calculates the value of the member. However, in the case of a folder the value is already updated
      * once we initialize the impactors. We update the value incrementally so that we do not need to calculate all children
      * before any data is read from the folder. If we waited, we would get a circular dependecy if we trie to specify the 
      * name of a member including the path to it. We need to allow this to avoid name colisions at times.  */
     calculate(model) {
-        //here we will jsut make sure each impactor is calculated. We should bypass the other 
-        //code in initializeImpactors because of the incremental updating.
-        //I should probably have a better way of doing this. Right now I am repeating part of the implementation
-        //of DependentMember.prepareForCalculate(). This is error prone, if someone changes that function.
-
-        let dependsOnMap = this.getField("dependsOnMap");
-        for(var idString in dependsOnMap) {
-            let impactor = model.lookupMemberById(idString);
-            if((impactor.isDependent)&&(impactor.getCalcPending())) {
-                impactor.calculate(model);
-            }
+        //make sure the data is set in each impactor
+        this.initializeImpactors(model);
+        
+        //see note in method description - no calculation is done here. It is done incrementally as children are calculated.
+        //BUT if there was no update of children, we will just reset the current data value
+        if(this.getState() == apogeeutil.STATE_NONE) {
+            this.setData(model,this.getData());
         }
-        
-        ///see note in method description - no calculation is done here. It is done incrementally as children are calculated.
-        
+
         //clear calc pending flag
         this.clearCalcPending();
     }
@@ -127,7 +110,6 @@ export default class Folder extends DependentMember {
     /** This method updates the dependencies of any children
      * based on an object being added. */
     updateDependeciesForModelChange(model,additionalUpdatedMembers) {
-
         //update dependencies of this folder
         let oldDependsOnMap = this.getDependsOn();
         let newDependsOnMap = this.calculateDependents(model);
@@ -240,44 +222,6 @@ export default class Folder extends DependentMember {
         return newDataMap;
     }
 
-    _calculateState(model) {
-        let errorDependencies = [];
-        let resultPending = false;
-        let resultInvalid = false;
-
-        let childIdMap = this.getChildIdMap();
-        for(var name in childIdMap) {
-            let childId = childIdMap[name];
-            var child = model.lookupMemberById(childId);
-            
-            let childState = child.getState();
-            if(childState == apogeeutil.STATE_ERROR) {
-                errorDependencies.push(child);
-            } 
-            else if(childState == apogeeutil.STATE_PENDING) {
-                resultPending = true;
-            }
-            else if(childState == apogeeutil.STATE_INVALID) {
-                resultInvalid = true;
-            }
-        }
-
-        let state;
-        if(errorDependencies.length > 0) {
-            state = apogeeutil.STATE_ERROR;
-        }
-        else if(resultPending) {
-            state = apogeeutil.STATE_PENDING;
-        }
-        else if(resultInvalid) {
-            state = apogeeutil.STATE_INVALID;
-        }
-        else {
-            state = apogeeutil.STATE_NORMAL;
-        }
-
-        return {state, errorDependencies};
-    }
 }
 
 //add components to this class                     

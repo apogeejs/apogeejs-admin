@@ -281,7 +281,7 @@ export default class CodeableMember extends DependentMember {
     //processMemberFunction 
     
     /** This makes sure user code of object function is ready to execute.  */
-    createMemberFunctionInitializer(model) {
+    initializeMemberFunction(model) {
         //we want to hold these as closure variables
         let functionInitialized = false;
         let functionInitializedSuccess = false;
@@ -304,8 +304,10 @@ export default class CodeableMember extends DependentMember {
             try {
                 //make sure the data is set in each impactor
                 this.initializeImpactors(model);
+                this.calculateDependentState(model,true);
                 let state = this.getState();
                 if((state == apogeeutil.STATE_ERROR)||(state == apogeeutil.STATE_PENDING)||(state == apogeeutil.STATE_INVALID)) {
+                    //stop initialization if there is an issue in a dependent
                     this.dependencyInitInProgress = false;
                     functionInitialized = true;
                     functionInitializedSuccess = false;
@@ -334,7 +336,7 @@ export default class CodeableMember extends DependentMember {
             return functionInitializedSuccess;
         }
 
-        return memberFunctionInitializer;
+        return memberFunctionInitializer();
 
     }
 

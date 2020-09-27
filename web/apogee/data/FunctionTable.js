@@ -24,14 +24,13 @@ export default class FunctionTable extends CodeableMember {
 
     getLazyInitializedMemberFunction(model,memberGenerator) {
 
-        let memberFunctionInitializer = this.createMemberFunctionInitializer(model);
-
         //create init member function for lazy initialization
         //we need to do this for recursive functions, or else we will get a circular reference
         //here we have logic to notify of an error or other problem in the function
         var initMember = () => {
-            var impactorSuccess = memberFunctionInitializer();
+            var impactorSuccess = this.initializeMemberFunction(model);
             if(impactorSuccess) {
+                //this returns the member function
                 return memberGenerator();
             }
             else {
