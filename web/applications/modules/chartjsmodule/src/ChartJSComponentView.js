@@ -215,7 +215,7 @@ ChartJSComponentView.propertyDialogLines = [
         "type":"dropdown",
         "label":"Chart Type: ",
         "entries":["line","bar","scatter"],
-        "resultKey":"chartType"
+        "key":"chartType"
     }
 ];
 
@@ -454,6 +454,7 @@ function getFormLayout(chartType) {
         {
             type: "textField",
             label: "Config JSON: ",
+            size: 60,
             hint: "expression",
             help: configJsonHelp,
             key: "configJson",
