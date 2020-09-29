@@ -23,6 +23,25 @@ export default class FormDataComponentView extends ComponentView {
     // Protected and Private Instance Methods
     //==============================
 
+    /* The banner error message is overridden to show errors from the child members rather than from the 
+     * containing folder, which would just be dependency errors. */
+    getBannerErrorMessage(member) {
+        let msgList = [];
+
+        //we will ust print error messages from each internal components that can have errors
+        //note the data member does not have code
+        let layoutFunctionMember = this.getComponent().getField("member.layout");
+        if(layoutFunctionMember.getState() == apogeeutil.STATE_ERROR) {
+            msgList.push("layout: " + layoutFunctionMember.getErrorMsg());
+        }
+        let isInputValidFunctionMember = this.getComponent().getField("member.isInputValid");
+        if(isInputValidFunctionMember.getState() == apogeeutil.STATE_ERROR) {
+            msgList.push("isInputValid: " + isInputValidFunctionMember.getErrorMsg());
+        }
+
+        return msgList.join(";\n");
+    }
+
     /**  This method retrieves the table edit settings for this component instance
      * @protected */
     getTableEditSettings() {

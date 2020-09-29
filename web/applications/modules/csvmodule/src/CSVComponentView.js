@@ -61,6 +61,28 @@ export default class CSVComponentView extends ComponentView {
         }
     }
 
+    /* The banner error message is overridden to show errors from the child members rather than from the 
+     * containing folder, which would just be dependency errors. */
+    getBannerErrorMessage(member) {
+        let msgList = [];
+
+        //we will ust print error messages from each internal components that can have errors
+        let headerMember = this.getComponent().getField("member.data.header");
+        if(headerMember.getState() == apogeeutil.STATE_ERROR) {
+            msgList.push("header: " + headerMember.getErrorMsg());
+        }
+        let bodyMember = this.getComponent().getField("member.data.body");
+        if(bodyMember.getState() == apogeeutil.STATE_ERROR) {
+            msgList.push("data: " + bodyMember.getErrorMsg());
+        }
+        let inputMember = this.getComponent().getField("member.input");
+        if(inputMember.getState() == apogeeutil.STATE_ERROR) {
+            msgList.push("configuration (__input__): " + inputMember.getErrorMsg());
+        }
+
+        return msgList.join(";\n");
+    }
+
     //=================================
     // Implementation Methods
     //=================================

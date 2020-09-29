@@ -155,16 +155,13 @@ export default class Member extends FieldObject {
      * dependency error), strings or other objects (which should be converted to strings). */
     getErrors() {
         let stateStruct = this.getField("state");
-        let errorList;
         if(stateStruct) {
-            //If this happens, we will just make it state normal
-            errorList = stateStruct.errorList;
+            return stateStruct.errorList;
         }
-        if(!errorList) {
-            //just return an emptylist
-            errorList = [];
+        else {
+            //this shouldn't happen if the state is actually an error state
+            return [];
         }
-        return errorList;
     }
 
     getErrorMsg() {
@@ -172,8 +169,8 @@ export default class Member extends FieldObject {
         let errorMsgs = [];
         let dependentMemberNames = [];
         errorList.forEach( errorEntry => {
-            if(errorEntry instanceof Member) {
-                dependentMemberNames.push(errorEntry.getName());
+            if(errorEntry.isDependsOnError) {
+                dependentMemberNames.push(errorEntry.name);
             }
             else errorMsgs.push(errorEntry.toString());
         })
@@ -183,6 +180,17 @@ export default class Member extends FieldObject {
         
         let errorMsg = errorMsgs.join("; ");
         return errorMsg;
+    }
+
+    getDependsOnError() {
+        let stateStruct = this.getField("state");
+        if(stateStruct) {
+            return stateStruct.dependsOnError;
+        }
+        else {
+            //this shouldn't happen if the state is actually an error state
+            return {};
+        }
     }
 
     /** This returns true if the member is not up to date, typically
@@ -216,26 +224,12 @@ export default class Member extends FieldObject {
      * this member. The error should be a javascript Error object, an apogee Member (signifying a dependnecy
      * error), a string, or another type, which will be interpretted as a string. */
     setError(model,error) {
-        let newErrorList;
-        if(this.getState() == apogeeutil.STATE_ERROR) {
-            newErrorList = this._getMergedErrorList(this.getErrors(),[error]);
-        }
-        else {
-            newErrorList = [error];
-        }
-        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,newErrorList);
+        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,[error]);
     }
 
     /** This method adds the following errors for this member. See setError for more details. */
     setErrors(model,errorList) {
-        let newErrorList;
-        if(this.getState() == apogeeutil.STATE_ERROR) {
-            newErrorList = this._getMergedErrorList(this.getErrors(),errorList);
-        }
-        else {
-            newErrorList = errorList;
-        }
-        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,newErrorList);
+        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,errorList);
     }
 
     /** This sets the result pending flag. The promise triggering the pending state should also be passed if there
@@ -325,7 +319,7 @@ export default class Member extends FieldObject {
         }
 
         //set the state if it is error or if it changes
-        let oldStateStruct = this.getState();
+        let oldStateStruct = this.getField("state");
         if((state == apogeeutil.STATE_ERROR)||(!oldStateStruct)||(state != oldStateStruct.state)) {
             //update the state
             let newStateStruct = {};
@@ -335,14 +329,31 @@ export default class Member extends FieldObject {
                 //make sure there is an error list
                 if(!errorList) errorList = [];
 
-                newStateStruct.state = apogeeutil.STATE_ERROR;
-                newStateStruct.errorList = errorList;
-                if(errorList.length > 0) {
-                    newStateStruct.errorMsg = errorList.join("\n");
+                let newErrorList;
+                let dependsOnError;
+                if(oldStateStruct.state == apogeeutil.STATE_ERROR) {
+                    newErrorList = this._getMergedErrorList(oldStateStruct.errorList,errorList);
+                    //keep the old depends on error, because some people might already have a copy of it
+                    //but update it for new error list
+                    //this is cheating because this should be immutable if we store it as a field
+                    //I'm not sure what better to do right now.
+                    dependsOnError = oldStateStruct.dependsOnError;
+                    dependsOnError.errorList = newErrorList;
                 }
                 else {
-                    newStateStruct.errorMsg = UNKNOWN_ERROR_MSG_PREFIX + this.getName();
+                    newErrorList = errorList;
+                    //instantiate the "depends on error"
+                    dependsOnError = new Error("Error in dependency: " + this.getName());
+                    dependsOnError.isDependsOnError = true;
+                    dependsOnError.errorList = newErrorList;
+                    dependsOnError.id = this.getId();
+                    //note - name can change, but if it does this should be recalculated
+                    dependsOnError.name = this.getName(); 
                 }
+
+                newStateStruct.state = apogeeutil.STATE_ERROR;
+                newStateStruct.errorList = newErrorList;
+                newStateStruct.dependsOnError = dependsOnError;
             }
             else {
                 newStateStruct.state = state;

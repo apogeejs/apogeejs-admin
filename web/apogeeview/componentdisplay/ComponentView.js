@@ -74,11 +74,18 @@ export default class ComponentView {
                 return bannerConstants.INVALID_MESSAGE;
 
             case apogeeutil.STATE_ERROR:
-                return member.getErrorMsg();
+                return this.getBannerErrorMessage(member);
 
             default:
                 return "Unknown state: " + state; 
         }
+    }
+
+    /** This gets the banner error message for the component. It is separated so it can be overwritten 
+     * for compound components. These have the member being a folder. They will just have dependency
+     * errors for the child members. */
+    getBannerErrorMessage(member) {
+        return member.getErrorMsg();
     }
 
     /** This method gets the parent component view of the current component view. 
