@@ -98,9 +98,16 @@ export default class Folder extends DependentMember {
         this.initializeImpactors(model);
         
         //see note in method description - no calculation is done here. It is done incrementally as children are calculated.
-        //BUT if there was no update of children, we will just reset the current data value
+        //BUT if there was no update of children since prepare for calculate,
+        //we will recalculate state and reset current value.
         if(this.getState() == apogeeutil.STATE_NONE) {
-            this.setData(model,this.getData());
+            //get new data
+            let data = this.getData();
+            let {state, errorDependencies} = this.calculateDependentState(model,false);
+            if(state == apogeeutil.STATE_NONE) state = apogeeutil.STATE_NORMAL;
+
+            //here we will always set the data whether or not there are any issues in dependents
+            this.setStateAndData(model,state,data,errorDependencies,true);
         }
 
         //clear calc pending flag

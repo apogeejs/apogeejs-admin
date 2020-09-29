@@ -212,16 +212,30 @@ export default class Member extends FieldObject {
         this.setStateAndData(model,apogeeutil.STATE_NORMAL,data);
     }
 
-    /** This method sets an error for this member. It will be valid for the current round of calculation of
+    /** This method adds the following error for this member. It will be valid for the current round of calculation of
      * this member. The error should be a javascript Error object, an apogee Member (signifying a dependnecy
      * error), a string, or another type, which will be interpretted as a string. */
     setError(model,error) {
-        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,[error]);
+        let newErrorList;
+        if(this.getState() == apogeeutil.STATE_ERROR) {
+            newErrorList = this._getMergedErrorList(this.getErrors(),[error]);
+        }
+        else {
+            newErrorList = [error];
+        }
+        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,newErrorList);
     }
 
-    /** This method sets the error for this dependent. See setError for more details. */
+    /** This method adds the following errors for this member. See setError for more details. */
     setErrors(model,errorList) {
-        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,errorList);
+        let newErrorList;
+        if(this.getState() == apogeeutil.STATE_ERROR) {
+            newErrorList = this._getMergedErrorList(this.getErrors(),errorList);
+        }
+        else {
+            newErrorList = errorList;
+        }
+        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,newErrorList);
     }
 
     /** This sets the result pending flag. The promise triggering the pending state should also be passed if there
