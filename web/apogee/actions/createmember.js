@@ -57,6 +57,7 @@ function createMemberAction(model,actionData) {
 export function createMember(model,parent,memberJson) {
 
     let member;
+    let errorMemberCreated = false;
     let actionResult = {};
     actionResult.event = ACTION_EVENT;
     
@@ -68,62 +69,61 @@ export function createMember(model,parent,memberJson) {
 
     if(generator) {
         member = generator.createMember(model,memberJson); 
-
-        //this codde attempts to write  the member ID into the command that created the member.
-        //We want this in our stored commands so we can use it for "redo" and have a member created
-        //with the same ID. That way subsequent redo commands will correctly access the replacement member.
-        //This doesn't seem like an optimal way to add this info to the input command. 
-        //However, for now this is the earliest peice of code that actually touches each create action.
-        //An alternative is to place a predetermined ID in the command before it is executed, in the 
-        //command code. However, I didn't do that for now because there is not a one-to-one map from 
-        //commands to actions. A single command often creates a hierarchy of members, all of which we 
-        //would want to "modify". 
-        try {
-            if(!memberJson.specialIdValue) {
-                memberJson.specialIdValue = member.getId();
-            }
-        }
-        catch(error) {
-            //we couldn't write into the command. It may be immutable
-            //downstream redo commands won't work, but we'll cleanly handle that case then
-            //with a failed redo.
-        }
-
-        //register member with model
-        model.registerMember(member);
-
-        //pass this child to the parent
-        member.setParentId(parent.getId());
-        parent.addChild(model,member);
-
-        //set action flags for successfull new member
-        actionResult.updateModelDependencies = true;
-        if((member.hasCode)&&(member.hasCode())) {
-            actionResult.recalculateMember = true;
-        }
-        else {
-            actionResult.recalculateDependsOnMembers = true;
-        }
-
-        //instantiate children if there are any
-        if(memberJson.children) {
-            actionResult.childActionResults = [];
-            for(let childName in memberJson.children) {
-                let childJson = memberJson.children[childName];
-                let childActionResult = createMember(model,member,childJson);
-                actionResult.childActionResults.push(childActionResult);
-            }
-        }
     }
     else {
         //type not found! - create a dummy object and add an error to it
         let errorTableGenerator = Model.getMemberGenerator("apogee.ErrorMember");
         member = errorTableGenerator.createMember(parent,memberJson);
         member.setError(model,"Member type not found: " + memberJson.type);
-        
-        //store an error message, but this still counts as command done.
-        actionResult.errorMsg = "Error creating member: member type not found: " + memberJson.type;
+        errorMemberCreated = true;
     }
+
+    //this codde attempts to write  the member ID into the command that created the member.
+    //We want this in our stored commands so we can use it for "redo" and have a member created
+    //with the same ID. That way subsequent redo commands will correctly access the replacement member.
+    //This doesn't seem like an optimal way to add this info to the input command. 
+    //However, for now this is the earliest peice of code that actually touches each create action.
+    //An alternative is to place a predetermined ID in the command before it is executed, in the 
+    //command code. However, I didn't do that for now because there is not a one-to-one map from 
+    //commands to actions. A single command often creates a hierarchy of members, all of which we 
+    //would want to "modify". 
+    try {
+        if(!memberJson.specialIdValue) {
+            memberJson.specialIdValue = member.getId();
+        }
+    }
+    catch(error) {
+        //we couldn't write into the command. It may be immutable
+        //downstream redo commands won't work, but we'll cleanly handle that case then
+        //with a failed redo.
+    }
+
+    //register member with model
+    model.registerMember(member);
+
+    //pass this child to the parent
+    member.setParentId(parent.getId());
+    parent.addChild(model,member);
+
+    //set action flags for successfull new member
+    actionResult.updateModelDependencies = true;
+    if((member.hasCode)&&(member.hasCode())) {
+        actionResult.recalculateMember = true;
+    }
+    else {
+        actionResult.recalculateDependsOnMembers = true;
+    }
+
+    //instantiate children if there are any
+    if((memberJson.children)&&(!errorMemberCreated)) {
+        actionResult.childActionResults = [];
+        for(let childName in memberJson.children) {
+            let childJson = memberJson.children[childName];
+            let childActionResult = createMember(model,member,childJson);
+            actionResult.childActionResults.push(childActionResult);
+        }
+    }
+    
 
     actionResult.member = member;
     actionResult.actionDone = true;

@@ -234,14 +234,6 @@ export default class Model extends FieldObject {
         return exceedsLimit;
     }
 
-    /** This should be called wo abort any queued actions. */
-    setCalculationCanceled() {
-        //reset queued action variables
-        this.clearCommandQueue();
-        
-        alert("The tables are left in improper state because the calculation was aborted. :( ");
-    }
-
     /** This should be called when there is not a queued action. */
     clearConsecutiveQueuedTracking() {
         this.consecutiveActionCount = 0;

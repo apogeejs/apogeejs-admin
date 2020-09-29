@@ -190,6 +190,15 @@ export default class ModelManager extends FieldObject {
         return this.workingChangeMap;
     }
 
+    getChangeMapAll() {
+        let changeMapAll = {};
+        let componentMap = this.getField("componentMap");
+        for(var id in componentMap) {
+            changeMapAll[id] = {action: "component_updated", instance: componentMap[id]};
+        }
+        return changeMapAll;
+    }
+
     /** This method locks the model manager and all components. */
     lockAll() {
         this.workingChangeMap = null;

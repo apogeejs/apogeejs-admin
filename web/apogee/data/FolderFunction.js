@@ -368,7 +368,8 @@ export default class FolderFunction extends DependentMember {
     loadOutputElementId(model,internalFolder) {
         let returnValueString = this.getField("returnValue");
         var returnValueMember = internalFolder.lookupChild(model,returnValueString);
-        return returnValueMember.getId();
+        if(returnValueMember) return returnValueMember.getId();
+        else return null;
     }
 }
 

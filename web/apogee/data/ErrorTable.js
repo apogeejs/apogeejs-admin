@@ -37,9 +37,15 @@ export default class ErrorTable extends Member {
         //note - we send in the complete JSON so we can return is on saving
         let member = new ErrorTable(json.name,null,null,json.specialIdValue);
 
+        //this is a bit clumsy, but we don't want to save the "specialIdValue",
+        //so we delete it if it is present
+        //in other tables, it is just not added when we save the object
+        let cleanedJson = apogeeutil.jsonCopy(json);
+        if(cleanedJson.specialIdValue) delete cleanedJson.specialIdValue;
+
         //set the initial data
         member.setData(model,"");
-        member.setField("completeJson",json);
+        member.setField("completeJson",cleanedJson);
 
         return member;
     }

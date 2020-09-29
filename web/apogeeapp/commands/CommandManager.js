@@ -160,8 +160,27 @@ export default class CommandManager {
             commandDone = true;
         }
         else {
-            //failure - keep the old workspace 
-            alert("Command failed: " + commandErrrorMsg);
+            //We want to update the state of any event listeners back to the state
+            //before the failed calculation. For example, any failed code updates shoul
+            //be cleared.
+            try {
+                let changeMapAll = oldWorkspaceManager.getChangeMapAll();
+                let changeListAll = this._changeMapToChangeList(changeMapAll);
+
+                this._publishEvents(changeListAll);
+
+                //failure - keep the old workspace 
+                alert("Command failed and changes were undone: " + commandErrrorMsg);
+            }
+            catch(error) {
+                //failure - and we couldn't clean up the UI! 
+                //hopefully this won't happen
+                let FAILED_COMMAND_AND_UI_ECOVERY_MSG = "Command failed and internal changes were undone. " +
+                    "HOWEVER, the display improper values becuase of a failed UI update! " +
+                    "(1) If the error is limited to pages, you can close all pages and it should be cleared when they reopen. " +
+                    "(2) You can try saving. The problems shoudl be cleared when the workspae is reopened.";
+                alert(FAILED_COMMAND_AND_UI_ECOVERY_MSG);
+            }
 
             commandDone = false;
         }

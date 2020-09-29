@@ -119,6 +119,15 @@ export default class ReferenceManager extends FieldObject {
         return this.workingChangeMap;
     }
 
+    getChangeMapAll() {
+        let changeMapAll = {};
+        let referenceEntryMap = this.getField("referenceEntryMap");
+        for(let id in referenceEntryMap) {
+            changeMapAll[id] = {action: "referenceEntry_updated", instance: referenceEntryMap[id]};
+        }
+        return changeMapAll;
+    }
+
     /** This method locks the reference manager and all reference entries. */
     lockAll() {
         this.workingChangeMap = null;

@@ -91,6 +91,21 @@ export default class WorkspaceManager extends FieldObject {
         return changeMap;
     }
 
+    getChangeMapAll() {
+        let changeMapAll = {};
+        changeMapAll[this.getId()] = {action: "workspaceManager_updated", instance: this};
+
+        let referenceManager = this.getReferenceManager();
+        let referenceChangeMap = referenceManager.getChangeMapAll();
+        if(referenceChangeMap) Object.assign(changeMapAll,referenceChangeMap);
+
+        let modelManager = this.getModelManager();
+        let modelChangeMap = modelManager.getChangeMapAll();
+        if(modelChangeMap) Object.assign(changeMapAll,modelChangeMap);
+
+        return changeMapAll;
+    }
+
     /** This method locks this workspace instance and all the contained object instances. */
     lockAll() {
         //we maybe shouldn't be modifying the members in place, but we will do it anyway

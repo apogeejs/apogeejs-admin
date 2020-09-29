@@ -40,7 +40,7 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  *  actionPending: (Rather than actionDone, actionPending will be returned if doAction is called while another action is in
  *      process. This should only happen for actions being called by the messenger.)
  *  errorMsg: (An error message in the case actionDone is false.)
- *  model: (The model object which was acted on.)
+ *  model: (The model object which was acted on. This is not returned if the action was not done.)
  *  changeList: (An array of changed objects:)
  *      - event: (the change to the object: created/updated/deleted)
  *      - model: (the model, if the object was the model)
@@ -108,12 +108,8 @@ export function doAction(model,actionData) {
     //execute the main action
     let {success, errorMsg} = internalDoAction(model,actionData);
     if(!success) {
-        model.clearCommandQueue();
-        model.lockAll();
-
         let changeResult = {};
         changeResult.actionDone = false;
-        changeResult.model = model;
         changeResult.errorMsg = errorMsg;
         return changeResult;
     }
@@ -128,12 +124,8 @@ export function doAction(model,actionData) {
             //ask user if about continueing
             var doContinue = confirm("The calculation is taking a long time. Continue?");
             if(!doContinue) {
-                model.setCalculationCanceled();
-                model.lockAll();
-
                 let changeResult = {};
                 changeResult.actionDone = false;
-                changeResult.model = model;
                 changeResult.errorMsg = "The calculation was canceled";
                 return changeResult;         
             }
@@ -143,12 +135,8 @@ export function doAction(model,actionData) {
             //this action is run synchronously
             let {success, errorMsg} = internalDoAction(model,savedMessengerAction);
             if(!success) {
-                model.clearCommandQueue();
-                model.lockAll();
-
                 let changeResult = {};
                 changeResult.actionDone = false;
-                changeResult.model = model;
                 changeResult.errorMsg = errorMsg;
                 return changeResult;
             }
