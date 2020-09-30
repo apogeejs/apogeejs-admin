@@ -110,13 +110,15 @@ export default class FunctionTable extends CodeableMember {
     static fromJson(model,json) {
         let member = new FunctionTable(json.name,null,null,json.specialIdValue);
 
-        //set initial data
-        let initialData = json.updateData;
+        //get a copy of the initial data and set defaults if needed
+        let initialData = {};
+        Object.assign(initialData,json.updateData);
 
-        var argList = initialData.argList ? initialData.argList : [];
-        var functionBody = initialData.functionBody ? initialData.functionBody : "";
-        var supplementalCode = initialData.supplementalCode ? initialData.supplementalCode : "";
-        member.applyCode(argList,functionBody,supplementalCode);
+        if(!initialData.argList) initialData.argList = [];
+        if(!initialData.functionBody) initialData.functionBody = "";
+        if(!initialData.supplementalCode) initialData.supplementalCode = "";
+
+        member.setUpdateData(model,initialData);
 
         return member;
     }

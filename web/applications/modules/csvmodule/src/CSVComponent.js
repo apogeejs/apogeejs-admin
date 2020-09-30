@@ -53,6 +53,7 @@ CSVComponent.DEFAULT_MEMBER_JSON = {
             "type": "apogee.JsonMember",
             "updateData": {
                 "data": "",
+                "contextParentGeneration": 2
             }
         },
         "data": {

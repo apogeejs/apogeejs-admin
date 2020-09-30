@@ -65,38 +65,13 @@ export default class JsonTable extends CodeableMember {
     static fromJson(model,json) {
         let member = new JsonTable(json.name,null,null,json.specialIdValue);
 
-        //set initial data
-        let initialData = json.updateData;
-        if(!initialData) {
-            //default initail value
-            initialData = {};
-            initialData.data = "";
-        }  
+        //get a copy of the initial data and set defaults if needed
+        let initialData = {};
+        Object.assign(initialData,json.updateData);
 
-        //apply the initial data
-        if(initialData.functionBody !== undefined) {
-            //apply initial code
-            member.applyCode(initialData.argList,
-                initialData.functionBody,
-                initialData.supplementalCode);
-        }
-        else {
-            //set initial data
-            if(initialData.errorList) {
-                member.setErrors(model,initialData.errorList);
-            }
-            else if(initialData.invalidError) {
-                member.setResultInvalid(model);
-            }
-            else {
-                let data = (initialData.data !== undefined) ? initialData.data : "";
-                member.setData(model,data);
-            }
+        if((!initialData.functionBody)&&(!initialData.data)) initialData.data = "";
 
-            //set the code fields to empty strings
-            member.setField("functionBody","");
-            member.setField("supplementalCode","");
-        }
+        member.setUpdateData(model,initialData);
 
         return member;
     }
