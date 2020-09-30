@@ -113,8 +113,7 @@ export default class Member extends FieldObject {
         }
         
         if(this.getUpdateData) {
-            var updateData = this.getUpdateData();
-            json.updateData = updateData;
+            json.updateData = this.getUpdateData();
         }
         return json;
     }
