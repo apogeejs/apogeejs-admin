@@ -111,6 +111,7 @@ export default class ModelManager extends FieldObject {
         var component;
         var componentClass = componentInfo.getComponentClass(componentJson.type);
         if((componentClass)&&(member.constructor.generator.type != "apogee.ErrorMember")) {
+
             //create empty component
             component = new componentClass(member,this);
 

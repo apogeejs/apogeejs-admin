@@ -1,15 +1,18 @@
 //These are in lieue of the import statements
-let { ComponentView,ConfigurableFormEditor,dataDisplayHelper,HandsonGridEditor,AceTextEditor} = apogeeview;
-let { getFormResultFunctionBody } = apogeeui;
+let {FormInputBaseComponentView,HandsonGridEditor,AceTextEditor} = apogeeview;
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
  * for how to set the data. */
-export default class CSVComponentView extends ComponentView {
+export default class CSVComponentView extends FormInputBaseComponentView {
 
     constructor(modelView,component) {
         super(modelView,component);
     };
+
+    //=================================
+    // Implementation Methods
+    //=================================
 
     /**  This method retrieves the table edit settings for this component instance
      * @protected */
@@ -20,10 +23,7 @@ export default class CSVComponentView extends ComponentView {
     /** This method should be implemented to retrieve a data display of the give type. 
      * @protected. */
     getDataDisplay(displayContainer,viewType) {
-
         let dataDisplaySource;
-
-        //create the new view element;
         switch(viewType) {
 
             case CSVComponentView.VIEW_HEADER:
@@ -34,11 +34,11 @@ export default class CSVComponentView extends ComponentView {
 
             case CSVComponentView.VIEW_DATA:
                 //figure out if we want a grid or plain json
-                let inputMember = this.getComponent().getField("member.input");
-                let inputData = inputMember.getData();
+                let formResultMember = this.getComponent().getField("member.formResult");
+                let formResultData = formResultMember.getData();
                 let useMapsFormat = false;
-                if((inputData)&&(inputData.input)) {
-                    useMapsFormat = (inputData.outputFormat == "maps");
+                if(formResultData) {
+                    useMapsFormat = (formResultData.outputFormat == "maps");
                 }
 
                 dataDisplaySource = this._getBodyDataSource(useMapsFormat);
@@ -49,11 +49,8 @@ export default class CSVComponentView extends ComponentView {
                     return new HandsonGridEditor(displayContainer,dataDisplaySource);
                 }
 
-                
-
             case CSVComponentView.VIEW_INPUT:
-                dataDisplaySource = this._getInputFormDataSource();
-                return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
+                return this.getFormDataDisplay(displayContainer);
 
             default:
                 console.error("unrecognized view element: " + viewType);
@@ -61,116 +58,9 @@ export default class CSVComponentView extends ComponentView {
         }
     }
 
-    /* The banner error message is overridden to show errors from the child members rather than from the 
-     * containing folder, which would just be dependency errors. */
-    getBannerErrorMessage(member) {
-        let msgList = [];
-
-        //we will ust print error messages from each internal components that can have errors
-        let headerMember = this.getComponent().getField("member.data.header");
-        if(headerMember.getState() == apogeeutil.STATE_ERROR) {
-            msgList.push("header: " + headerMember.getErrorMsg());
-        }
-        let bodyMember = this.getComponent().getField("member.data.body");
-        if(bodyMember.getState() == apogeeutil.STATE_ERROR) {
-            msgList.push("data: " + bodyMember.getErrorMsg());
-        }
-        let inputMember = this.getComponent().getField("member.input");
-        if(inputMember.getState() == apogeeutil.STATE_ERROR) {
-            msgList.push("configuration (__input__): " + inputMember.getErrorMsg());
-        }
-
-        return msgList.join(";\n");
-    }
-
-    //=================================
-    // Implementation Methods
-    //=================================
-
-    /** This is the data source for the input form data display */
-    _getInputFormDataSource() {
-        return {
-            doUpdate: () => {
-                //data updates should only be triggered by the form itself
-                let reloadData = this.getComponent().isMemberDataUpdated("member.input");
-                //form layout constant
-                let reloadDataDisplay = false;
-                return {reloadData,reloadDataDisplay};
-            }, 
-            getDisplayData: () => this._getFormLayout(),
-            getData: () => this._getFormData(),
-            getEditOk: () => true,
-            saveData: (formData) => this._onSubmit(formData)
-        }
-    }
-
-    _getBodyDataSource(useMapsFormat) {
-        return {
-            doUpdate: () => {
-                //return value is whether or not the data display needs to be udpated
-                let reloadData = this.getComponent().isMemberDataUpdated("member.data.body");
-                //we only need to reload if the output format changes, but for now we will reload for any input change 
-                let reloadDataDisplay = this.getComponent().isMemberDataUpdated("member.input");;
-                return {reloadData,reloadDataDisplay};
-            },
-    
-            getData: () => {
-                let jsonData = this.getComponent().getField("member.data.body").getData();
-                if(jsonData != apogeeutil.INVALID_VALUE) {
-                    if(useMapsFormat) {
-                        //return text for text editor
-                        return JSON.stringify(jsonData,null,JSON_TEXT_FORMAT_STRING);
-                    }
-                    else {
-                        //return json for grid editor
-                        return jsonData;
-                    }
-                }
-                else {
-                    return apogeeutil.INVALID_VALUE;
-                }
-            }
-        }
-    }
-
-    _getHeaderDataSource() {
-        return {
-            doUpdate: () => {
-                //return value is whether or not the data display needs to be udpated
-                let reloadData = this.getComponent().isMemberDataUpdated("member.data.header");
-                let reloadDataDisplay = false;
-                return {reloadData,reloadDataDisplay};
-            },
-    
-            getData: () => {
-                let headerRow = this.getComponent().getField("member.data.header").getData();
-                if(headerRow != apogeeutil.INVALID_VALUE) {
-                    //for display wrap header row into a matrix
-                    return [headerRow];
-                }
-                else {
-                    return apogeeutil.INVALID_VALUE;
-                }
-            }
-        }
-    }
-
-    //=====================================
-    // Private Methods
-    //=====================================
-
-    /** This method gets the form value data that will be passed to the input form. */
-    _getFormData() {
-        let memberData = this.getComponent().getField("member.input").getData();
-        if((memberData)&&(memberData.storedFormValue)) {
-            return memberData.storedFormValue;
-        }
-        else {
-            return {};
-        }
-    }
-
-    _getFormLayout() {
+    /** This method returns the form layout.
+     * @protected. */
+    getFormLayout() {
         return [
             {
                 type: "textField",
@@ -208,49 +98,77 @@ export default class CSVComponentView extends ComponentView {
             }
         ]
     }
+
+    //==========================
+    // Private Methods
+    //==========================
+
+    _getBodyDataSource(useMapsFormat) {
+        return {
+            doUpdate: () => {
+                //return value is whether or not the data display needs to be udpated
+                let reloadData = this.getComponent().isMemberDataUpdated("member.data");
+                //we only need to reload if the output format changes, but for now we will reload for any input change 
+                let reloadDataDisplay = this.getComponent().isMemberDataUpdated("member.formData");
+                return {reloadData,reloadDataDisplay};
+            },
     
-    /** This method saves the form result converted to a function body that handles expression inputs.
-     * This is saved to the formula for the member object. */
-    _onSubmit(formData) {
-        //load the form meta - we have to look it up from the data display (this is a little clumsy)
-        let formMeta;
-        let formEditor = this.getCurrentDataDisplayInstance(CSVComponentView.VIEW_INPUT);
-        if(formEditor) {
-            formMeta = formEditor.getFormMeta();
+            getData: () => {
+                let allData = this.getComponent().getField("member.data").getData();
+                if(allData != apogeeutil.INVALID_VALUE) {
+                    let bodyData = allData.body;
+                    if(useMapsFormat) {
+                        if(!bodyData) bodyData = [];
+                        //return text for text editor
+                        return JSON.stringify(bodyData,null,JSON_TEXT_FORMAT_STRING);
+                    }
+                    else {
+                        //return json for grid editor
+                        if(!bodyData) bodyData = [[]];
+                        return bodyData;
+                    }
+                }
+                else {
+                    return apogeeutil.INVALID_VALUE;
+                }
+            }
         }
+    }
 
-        if(!formMeta) {
-            //data display should be present if the person submitted the form
-            console.error("Unknown error loading the form meta value.");
-            //return true indicates the submit is completed
-            return true;
+    _getHeaderDataSource() {
+        return {
+            doUpdate: () => {
+                //return value is whether or not the data display needs to be udpated
+                let reloadData = this.getComponent().isMemberDataUpdated("member.data");
+                //we only need to reload if the output format changes, but for now we will reload for any input change 
+                let reloadDataDisplay = this.getComponent().isMemberDataUpdated("member.formData");
+                return {reloadData,reloadDataDisplay};
+            },
+    
+            getData: () => {
+                let allData = this.getComponent().getField("member.data").getData();
+                if(allData != apogeeutil.INVALID_VALUE) {
+                    let header = allData.header;
+                    if(!header) header = [];
+                    //convert to grid for grid display
+                    return [header];
+                }
+                else {
+                    return apogeeutil.INVALID_VALUE;
+                }
+            }
         }
-        
-        //get the function body
-        let functionBody = getFormResultFunctionBody(formData,formMeta);
-
-        //set the code
-        var member = this.getComponent().getField("member.input");
-
-        var commandData = {};
-        commandData.type = "saveMemberCode";
-        commandData.memberId = member.getId();
-        commandData.argList = [];
-        commandData.functionBody = functionBody;
-        commandData.supplementalCode = "";
-        
-        let app = this.getModelView().getApp();
-        app.executeCommand(commandData);
-
-        //if we got this far the form save should be accepted
-        return true;
-    }       
+    }
 
 }
 
 //======================================
 // Static properties
 //======================================
+
+//===================================
+// View Definitions Constants (referenced internally)
+//==================================
 
 CSVComponentView.VIEW_HEADER = "Header";
 CSVComponentView.VIEW_DATA = "Data";
@@ -263,23 +181,12 @@ CSVComponentView.VIEW_MODES = [
 ];
 
 CSVComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": CSVComponentView.VIEW_MODES,
-    "defaultView": CSVComponentView.VIEW_DATA
+    "viewModes": CSVComponentView.VIEW_MODES
 }
-
-const JSON_TEXT_FORMAT_STRING = "\t";
-
-const INPUT_HELP_TEXT = "This should be a javascript expression, such as the name of a cell, which gives the raw CSV text. It will be converted to JSON format." + 
-" To access this json value, use the expression <em>[cell name].data</em> to access the data rows and <em>[cell name].header</em>  to access the header row.";
-const OUTPUT_FORMAT_HELP_TEXT = "The output can be an array of JSON objects or an array of arrays. For the JSON Objects the keys will be the column names."
-const DYNAMIC_TYPING_HELP_TEXT = "Check this box to automatically convert numbers and booleans. If this is not selected, all data will be strings.";
-const SKIP_EMPTY_HELP_TEXT = "Check this box to omit a row with no content, often the last row.";
-
-const HEADER_GRID_PIXEL_HEIGHT = 75;
 
 
 //===============================
-// External Settings
+// Required External Settings
 //===============================
 
 /** This is the component name with which this view is associated. */
@@ -292,4 +199,19 @@ CSVComponentView.hasChildEntry = true;
 
 /** This is the icon url for the component. */
 CSVComponentView.ICON_RES_PATH = "/icons3/gridCellIcon.png";
+
+//-----------------------
+// Other random internal constants
+//-----------------------
+
+const JSON_TEXT_FORMAT_STRING = "\t";
+
+const INPUT_HELP_TEXT = "This should be a javascript expression, such as the name of a cell, which gives the raw CSV text. It will be converted to JSON format." + 
+" To access this json value, use the expression <em>[cell name].data</em> to access the data rows and <em>[cell name].header</em>  to access the header row.";
+const OUTPUT_FORMAT_HELP_TEXT = "The output can be an array of JSON objects or an array of arrays. For the JSON Objects the keys will be the column names."
+const DYNAMIC_TYPING_HELP_TEXT = "Check this box to automatically convert numbers and booleans. If this is not selected, all data will be strings.";
+const SKIP_EMPTY_HELP_TEXT = "Check this box to omit a row with no content, often the last row.";
+
+const HEADER_GRID_PIXEL_HEIGHT = 75;
+
 

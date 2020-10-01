@@ -3,6 +3,7 @@ export {default as Apogee} from "/apogeeapp/Apogee.js";
 export {default as BaseFileAccess} from "/apogeeapp/BaseFileAccess.js";
 
 export {default as Component} from "/apogeeapp/component/Component.js";
+export {default as FormInputBaseComponent} from "/apogeeapp/components/FormInputBaseComponent.js";
 
 export {default as componentInfo} from "/apogeeapp/componentConfig.js";
 

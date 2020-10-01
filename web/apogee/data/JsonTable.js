@@ -23,17 +23,13 @@ export default class JsonTable extends CodeableMember {
         return [];
     }
         
-    /** This is he process member function from codeable. There is an added argument, "argumentArray"
-     * That can be used to pass in arguments to the member function. To use this, you must 
-     * override getArgList and this function processMemberFunction to provide the argument array to pass in.
-     * By default the argument list is empty.
-     */
-    processMemberFunction(model,memberGenerator,argumentArray) {
+    /** This is he process member function from codeable. */
+    processMemberFunction(model,memberGenerator) {
         let initialized = this.initializeMemberFunction(model);
         if(initialized) {
             //the data is the output of the function
             let memberFunction = memberGenerator();
-            let data = memberFunction.apply(null,argumentArray);
+            let data = memberFunction();
             this.applyData(model,data);
 
             //we must separately apply the asynch data set promise if there is one
