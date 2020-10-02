@@ -294,14 +294,11 @@ export default class ConfigurableElement {
         else {
             throw new Error("A child selectable element must contain a value or list of values: " + selectorConfig.key)
         }
-
-        //optional value
-        let keepActiveOnHide =  selectorConfig.keepActiveOnHide;
         
         let parentElement = this.form.getEntry(parentKey);
         if(!parentElement) throw new Error("Parent element " + parentKey + " not found for selectable child element " + selectorConfig.key);
         
-        let onValueChange = parentElement._getDependentSelectHandler(this,target,targetIsMultichoice,keepActiveOnHide)
+        let onValueChange = parentElement._getDependentSelectHandler(this,target,targetIsMultichoice,selectorConfig.action)
         
         if(onValueChange) {
             parentElement._addDependentCallback(onValueChange);
@@ -344,7 +341,10 @@ export default class ConfigurableElement {
     
     /** This method returns the onValueChange handler to make the dependent element
      * visible when the parent element (as the element depended on) has the/a proper value. */
-    _getDependentSelectHandler(dependentElement,target,targetIsMultichoice,keepActiveOnHide) {
+    _getDependentSelectHandler(dependentElement,target,targetIsMultichoice,action) {
+
+        if(!action) action = ConfigurablePanelConstants.DEFAULT_SELECTOR_ACTION;
+
         //handle cases of potential multiple target values and multiple select parents
         let valueMatch;
         if(this.isMultiselect) {
@@ -366,16 +366,23 @@ export default class ConfigurableElement {
         
         //this is the function that will do the test at compare time
         return parentValue => {
-            let state;
-            if(valueMatch(parentValue)) {
-                state = ConfigurablePanelConstants.STATE_NORMAL;
+            let match = valueMatch(parentValue);
+            if(action == ConfigurablePanelConstants.SELECTOR_ACTION_VALUE) {
+                if(dependentElement.getValue() !== match) {
+                    dependentElement.setValue(match);
+                }
             }
             else {
-                state = (keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE);
-            }
-
-            if(dependentElement.getState() != state) {
-                dependentElement.setState(state);
+                let state; 
+                if(match) {
+                    state = ConfigurablePanelConstants.STATE_NORMAL;
+                }
+                else {
+                    state = ConfigurablePanelConstants.SELECTOR_FALSE_STATE[action];
+                }
+                if(dependentElement.getState() != state) {
+                    dependentElement.setState(state);
+                }
             }
         }
     }
