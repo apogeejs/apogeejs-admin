@@ -12,6 +12,7 @@ export default class ConfigurableElement {
         this.state = ConfigurablePanelConstants.STATE_NORMAL;
         this.key = elementInitData.key;
         this.meta = elementInitData.meta;
+        this.selectorConfig = elementInitData.selector;
         this.isMultiselect = false;
         this.focusElement = null;
 
@@ -100,6 +101,10 @@ export default class ConfigurableElement {
         return this.form;
     }
 
+    getBaseForm() {
+        return this.form.getBaseForm();
+    }
+
     addOnChange(onChange) {
         this.onChangeListeners.push(onChange);
     }
@@ -111,6 +116,13 @@ export default class ConfigurableElement {
     /** This is used to determine what type of child element this is for a panel. */
     get elementType() {
         return "ConfigurableElement";
+    }
+
+    /** This method is called during configuration to populate the selectors of the element. */
+    populateSelectors() {
+        if(this.selectorConfig) {
+            this._addSelector(this.selectorConfig);
+        }
     }
 
     //==================================
@@ -239,27 +251,6 @@ export default class ConfigurableElement {
         if(elementInitData.onInput) {
             this.addOnInput(elementInitData.onInput);
         }
-        
-        //dependent element logic
-        if(elementInitData.selector) {
-            this._addSelector(elementInitData.selector);
-        }
-        if(elementInitData.inherit) {
-            if(Array.isArray(elementInitData.inherit)) {
-                elementInitData.inherit.forEach(inheritConfig => this._addInherit(inheritConfig));
-            }
-            else {
-                throw new Error("Inherit config should be an array: " + elementInitData.key);
-            }
-        }
-        if(elementInitData.react) {
-            if(Array.isArray(elementInitData.react)) {
-                elementInitData.react.forEach(reactConfig => this._addReact(reactConfig));
-            }
-            else {
-                throw new Error("React config should be an array: " + elementInitData.key);
-            }
-        }
     }
     
     _setDisabled(isDisabled) {};
@@ -278,9 +269,16 @@ export default class ConfigurableElement {
     /** This processes a selector entry from the init data */
     _addSelector(selectorConfig) {
         //parent element
-        let parentKey = selectorConfig.parentKey;
-        if(!parentKey) throw new Error("Parent key is required for a selectable child element:" + selectorConfig.key); 
-
+        let parentElement;
+        if(selectorConfig.parentKey) {
+            parentElement = this.form.getEntry(selectorConfig.parentKey);
+        }
+        else if(selectorConfig.parentPath) {
+            let baseForm = this.getBaseForm();
+            parentElement = baseForm.getEntryFromPath(selectorConfig.parentPath);
+        }
+        if(!parentElement) throw new Error("Parent element not found for selectable child element " + selectorConfig.key);
+        
         //get the target values. This can bve a single value of a list of values
         let target, targetIsMultichoice;
         if(selectorConfig.parentValue !== undefined) {
@@ -295,49 +293,12 @@ export default class ConfigurableElement {
             throw new Error("A child selectable element must contain a value or list of values: " + selectorConfig.key)
         }
         
-        let parentElement = this.form.getEntry(parentKey);
-        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for selectable child element " + selectorConfig.key);
-        
-        let onValueChange = parentElement._getDependentSelectHandler(this,target,targetIsMultichoice,selectorConfig.action)
+        let onValueChange = parentElement._getDependentSelectHandler(this,target,targetIsMultichoice,selectorConfig.action);
         
         if(onValueChange) {
             parentElement._addDependentCallback(onValueChange);
         }
     }
-
-    /** This processes a inherit entry from the init data */
-    _addInherit(inheritConfig) {
-        let parentKey = inheritConfig.parentKey;
-        let childKey = inheritConfig.childKey;
-
-        if(!parentKey) throw new Error("A parent key is required for a inherit child element:" + inheritConfig.key);
-        if(!childKey) throw new Error("A child key is required for an inherit child element: " + inheritConfig.key)
-        let parentElement = this.form.getEntry(parentKey);
-        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for inherit child element " + inheritConfig.key);
-        if(!this.inherit) throw new Error("The element " + inheritConfig.key + " does not support inherit");
-        
-        let onValueChange = (parentValue) => {
-            this.inherit(childKey,parentValue);
-        }
-        parentElement._addDependentCallback(onValueChange);
-    }
-
-    /** This processes a react entry from the init data */
-    _addReact(reactConfig) {
-        let parentKey = reactConfig.parentKey;
-        let onValueChangeGenerator = reactConfig.generator;
-
-        if(!parentKey) throw new Error("A parent key is required for a react child element:" + reactConfig.key);
-        if(!onValueChangeGenerator) throw new Error("A callback generator is required for an react child element: " + reactConfig.key)
-        let parentElement = this.form.getEntry(parentKey);
-        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for react child element " + reactConfig.key);
-        
-        let onValueChange = onValueChangeGenerator(this);
-        if(onValueChange) {
-            parentElement._addDependentCallback(onValueChange);
-        }
-    }
-
     
     /** This method returns the onValueChange handler to make the dependent element
      * visible when the parent element (as the element depended on) has the/a proper value. */

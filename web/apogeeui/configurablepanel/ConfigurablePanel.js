@@ -13,8 +13,15 @@ export default class ConfigurablePanel {
         this.layouts = [];
         this.panelDomElement = this.createPanelDomElement(ConfigurablePanel.PANEL_CLASS_NORMAL); 
     }
-    
+
     configureForm(formInitData) {
+        //first create form
+        this.createForm(formInitData);
+        //selectors must be initialized after complete form is created
+        this.populateSelectors();
+    }
+    
+    createForm(formInitData) {
         
         //TEMPORARY - legacy check correction----------------------
         if((formInitData)&&(formInitData.constructor == Array)) {
@@ -37,6 +44,11 @@ export default class ConfigurablePanel {
         try {
             //create elements     
             formInitData.layout.forEach(elementInitData => this.addToPanel(elementInitData));
+
+            // //add selectors
+            // this.elementObjects.forEach(elementObject => {
+            //     elementObject.initSelector();
+            // }); 
 
             //additional init
             if(formInitData.onChange) {
@@ -65,11 +77,6 @@ export default class ConfigurablePanel {
                 this.configureForm(errorLayoutInfo);
             }
         }
-    }
-    
-    /** This method returns the ConfigurableElement for the given key. */
-    getEntry(key) {
-        return this.elementObjects.find(elementObject => elementObject.getKey() == key);
     }
 
     /** This returns the meta value for the panel. */
@@ -187,6 +194,60 @@ export default class ConfigurablePanel {
         this.layouts = [];
         this.panelDomElement = null; 
     }
+
+    //------------------
+    // Entry interface
+    //------------------
+
+    /** This method returns the ConfigurableElement for the given key. */
+    getEntry(key) {
+        return this.elementObjects.find(elementObject => elementObject.getKey() == key);
+    }
+
+    /** This gets an entry from the given path, where the path is an array of keys. 
+     * Start index is the index of the key for this element. If it is omitted the value is
+     * assumed to be 0.
+    */
+    getEntryFromPath(path,startIndex) {
+        if(startIndex === undefined) startIndex = 0;
+        if(startIndex >= path.length) {
+            //invalid path
+            return 0;
+        }
+
+        let childKey = path[startIndex];
+        let childElement = this.getEntry(childKey);
+        if(startIndex === path.length - 1) {
+            return childElement;
+        }
+        else {
+            if(childElement.getEntryFromPath) {
+                //this means we can look up children from this element
+                return childElement.getEntryFromPath(path,startIndex+1);
+            }
+            else {
+                //invalid path
+                return null;
+            }
+        }
+    }
+
+    setParentForm(form) {
+        this.parentForm = form;
+    }
+
+    getBaseForm() {
+        return this.parentForm ? this.parentForm.getBaseForm() : this;
+    }
+
+    /** This method is called during configuration to populate the selectors of the form. */
+    populateSelectors() {
+        this.elementObjects.forEach(elementObject => elementObject.populateSelectors());
+    }
+
+    //---------------------
+    // static methods
+    //---------------------
     
     /** This method is used to register configurable elements with the panel */
     static addConfigurableElement(constructorFunction) {
@@ -203,7 +264,7 @@ export default class ConfigurablePanel {
         layout.push(entry);
         return {"layout":layout, "isErrorLayout": true};
     }
-    
+
     //=================================
     // Private methods
     //=================================
