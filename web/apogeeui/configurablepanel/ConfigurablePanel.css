@@ -126,3 +126,6 @@
 .apogee_configurableElementHelpTextAddon {
     text-align: left;
 }
+.apogee_configubleElementErrorDiv {
+    color: red;
+}

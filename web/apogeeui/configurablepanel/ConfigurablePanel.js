@@ -227,7 +227,7 @@ export default class ConfigurablePanel {
             }
             else {
                 //invalid path
-                return null;
+                return undefined;
             }
         }
     }

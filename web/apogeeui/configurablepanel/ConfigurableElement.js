@@ -25,6 +25,8 @@ export default class ConfigurableElement {
         this.domElement.style.padding = ConfigurableElement.ELEMENT_PADDING_STANDARD;
         this.domElement.style.display = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE;
 
+        this.errorDiv;
+
         this.visibleDisplayStyle = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE;
     }
     
@@ -121,7 +123,15 @@ export default class ConfigurableElement {
     /** This method is called during configuration to populate the selectors of the element. */
     populateSelectors() {
         if(this.selectorConfig) {
-            this._addSelector(this.selectorConfig);
+            try {
+                this._addSelector(this.selectorConfig);
+            }
+            catch(error) {
+                let errorMsg = "Error calling selector: " + error.toString();
+                console.error(errorMsg);
+                if(error.stack) console.error(error.stack);
+                this.setElementErrorMsg(errorMsg)
+            }
         }
     }
 
@@ -227,6 +237,17 @@ export default class ConfigurableElement {
             return null;
         }
     }
+
+    /** This sets the content of a div that displays an error mesage */
+    setElementErrorMsg(errorMsg) {
+        if(!this.errorDiv) {
+            //add an error display
+            this.errorDiv = document.createElement("div");
+            this.errorDiv.className = "apogee_configubleElementErrorDiv";
+            this.domElement.append(this.errorDiv);
+        }
+        this.errorDiv.innerHTML = errorMsg;
+    }
     
     //===================================
     // internal Methods
@@ -268,18 +289,55 @@ export default class ConfigurableElement {
 
     /** This processes a selector entry from the init data */
     _addSelector(selectorConfig) {
-        //parent element
-        let parentElement;
-        if(selectorConfig.parentKey) {
-            parentElement = this.form.getEntry(selectorConfig.parentKey);
-        }
-        else if(selectorConfig.parentPath) {
-            let baseForm = this.getBaseForm();
-            parentElement = baseForm.getEntryFromPath(selectorConfig.parentPath);
-        }
-        if(!parentElement) throw new Error("Parent element not found for selectable child element " + selectorConfig.key);
+
+        //get parent element list
+        let parentKeys = selectorConfig.parentKey ? [selectorConfig.parentKey] : selectorConfig.parentKeys;
+        if(!parentKeys) throw new Error("Parent key(s) not found for selectable child element " + selectorConfig.key);
+        let parentElements = parentKeys.map( parentKey => {
+            if(Array.isArray(parentKey)) {
+                //absolute path
+                let baseForm = this.getBaseForm();
+                return baseForm.getEntryFromPath(parentKey);
+            }
+            else {
+                //local key in form
+                return this.form.getEntry(parentKey);
+
+            }
+        })
+        if(parentElements.indexOf(undefined) >= 0) throw new Error("Parent element not found for selectable child element " + selectorConfig.key);
+
         
-        //get the target values. This can bve a single value of a list of values
+        //get the internal function
+        let actionFunction;
+        if(selectorConfig.actionFunction) {
+            actionFunction = selectorConfig.actionFunction;
+        }
+        else {
+            actionFunction = this._getPredefinedActionFunction(selectorConfig,parentElements);
+        }
+        if(!actionFunction) throw new Error("Action function not found for selectable child element " + selectorConfig.key);
+
+        //handler
+        let functionArgs = [this].concat(parentElements);
+        let onValueChange = () => actionFunction.apply(null,functionArgs);
+        
+        if(onValueChange) {
+            parentElements.forEach(parentElement =>parentElement._addDependentCallback(onValueChange));
+        }
+    }
+
+    /** This method gets an instance of a predefined action function for the given selector config. */
+    _getPredefinedActionFunction(selectorConfig,parentElements) {
+
+        //these only apply to single parent objects, not multiple parents
+        let inputParentElement = parentElements[0];
+
+        //get the action
+        let action = selectorConfig.action;
+        if(!action) action = ConfigurablePanelConstants.DEFAULT_SELECTOR_ACTION;
+
+        //get the target values. This can be a single value of a list of values
         let target, targetIsMultichoice;
         if(selectorConfig.parentValue !== undefined) {
             target = selectorConfig.parentValue;
@@ -292,23 +350,11 @@ export default class ConfigurableElement {
         else {
             throw new Error("A child selectable element must contain a value or list of values: " + selectorConfig.key)
         }
-        
-        let onValueChange = parentElement._getDependentSelectHandler(this,target,targetIsMultichoice,selectorConfig.action);
-        
-        if(onValueChange) {
-            parentElement._addDependentCallback(onValueChange);
-        }
-    }
-    
-    /** This method returns the onValueChange handler to make the dependent element
-     * visible when the parent element (as the element depended on) has the/a proper value. */
-    _getDependentSelectHandler(dependentElement,target,targetIsMultichoice,action) {
 
-        if(!action) action = ConfigurablePanelConstants.DEFAULT_SELECTOR_ACTION;
-
+        //get the match check function
         //handle cases of potential multiple target values and multiple select parents
         let valueMatch;
-        if(this.isMultiselect) {
+        if(inputParentElement.isMultiselect) {
             if(targetIsMultichoice) {
                 valueMatch = parentValue => containsCommonValue(target,parentValue);
             }
@@ -326,11 +372,11 @@ export default class ConfigurableElement {
         }
         
         //this is the function that will do the test at compare time
-        return parentValue => {
-            let match = valueMatch(parentValue);
+        return (childElement,parentElement) => {
+            let match = valueMatch(parentElement.getValue());
             if(action == ConfigurablePanelConstants.SELECTOR_ACTION_VALUE) {
-                if(dependentElement.getValue() !== match) {
-                    dependentElement.setValue(match);
+                if(childElement.getValue() !== match) {
+                    childElement.setValue(match);
                 }
             }
             else {
@@ -341,8 +387,8 @@ export default class ConfigurableElement {
                 else {
                     state = ConfigurablePanelConstants.SELECTOR_FALSE_STATE[action];
                 }
-                if(dependentElement.getState() != state) {
-                    dependentElement.setState(state);
+                if(childElement.getState() != state) {
+                    childElement.setState(state);
                 }
             }
         }
@@ -356,19 +402,35 @@ export default class ConfigurableElement {
         this.dependentCallbacks.push(onValueChange);
 
         //call now to initialize state
-        onValueChange(this.getValue());
+        try {
+            onValueChange();
+        }
+        catch(error) {
+            let errorMsg = "Error calling selector: " + error.toString();
+            console.error(errorMsg);
+            if(error.stack) console.error(error.stack);
+            this.setElementErrorMsg(errorMsg);
+        }
     }
 
     /** This function calls all the onValueChange callbacks for dependent elements. */
-    _callDependentCallbacks(value) {
+    _callDependentCallbacks() {
         if(this.dependentCallbacks) {
-            this.dependentCallbacks.forEach( onValueChange => onValueChange(value) );
+            try {
+                this.dependentCallbacks.forEach( onValueChange => onValueChange() );
+            }
+            catch(error) {
+                let errorMsg = "Error calling selector: " + error.toString();
+                console.error(errorMsg);
+                if(error.stack) console.error(error.stack);
+                this.setElementErrorMsg(errorMsg)
+            }
         }
     }
 
     _initForDependents() {
         this.dependentCallbacks = [];
-        this.addOnChange( (value,form) => this._callDependentCallbacks(value) );
+        this.addOnChange( (value,form) => this._callDependentCallbacks() );
     }
             
 }
