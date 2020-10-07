@@ -220,7 +220,7 @@ export default class Component extends FieldObject {
     /** This method extends the member udpated function from the base.
      * @protected */    
     memberUpdated(updatedMember) {
-
+console.log("component member updated: " + updatedMember.getName() + ", " + updatedMember.getId() + ", " + updatedMember.instanceNumber);
         let memberFieldMap = this.getField("memberFieldMap");
         let fieldName = memberFieldMap[updatedMember.getId()];
 
@@ -261,7 +261,8 @@ export default class Component extends FieldObject {
 
         //update childFieldMap
         let oldMemberFieldMap = this.getField("memberFieldMap");
-        let memberFieldMap = apogeeutil.jsonCopy(oldMemberFieldMap);
+        let memberFieldMap = {};
+        Object.assign(memberFieldMap,oldMemberFieldMap);
         memberFieldMap[childMember.getId()] = fieldName;
         this.setField("memberFieldMap",memberFieldMap);
     }

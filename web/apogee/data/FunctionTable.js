@@ -65,8 +65,8 @@ export default class FunctionTable extends CodeableMember {
 
         source.initIfNeeded = () => {
             if(!memberInitialized) {
-                source.memberFunction = initMember();
                 memberInitialized = true;
+                source.memberFunction = initMember();
             }
         }
 

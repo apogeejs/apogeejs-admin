@@ -39,7 +39,7 @@ ChartJSCell.formResultToChartConfig = function(formResult) {
                 let configJson = formResult.configJson;
                 if(formResult.configFormat == "apogee") {
                     //"apogee format", matching form result
-                    let chartType = memberData.chartType;
+                    let chartType = formResult.chartType;
                     chartConfig = createChartConfig(configJson,chartType);
                 }
                 else if(formResult.configFormat == "chartjs") {

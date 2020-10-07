@@ -340,8 +340,14 @@ let loadmodelmanager = {};
  * been loaded.
  */
 loadmodelmanager.executeCommand = function(workspaceManager,commandData) {
-    let modelManager = workspaceManager.getMutableModelManager();
-    return modelManager.load(workspaceManager,commandData.json);
+    try {
+        let modelManager = workspaceManager.getMutableModelManager();
+        return modelManager.load(workspaceManager,commandData.json);
+    }
+    catch(error) {
+        alert("The workspace failed to load cleanly: " + error.toString());
+        throw error;
+    }
 }
 
 loadmodelmanager.commandInfo = {

@@ -17,6 +17,9 @@ export default class FieldObject {
      * object to match the original.
      */
     constructor(objectType,instanceToCopy,keepUpdatedFixed,specialCaseIdValue) {
+        //this is a (semi-) unique number of each instance (There is no provision for wrapping - so there could be repeats)
+        this.instanceNumber = _getInstanceNumber();
+
         if(!instanceToCopy) {
             if(specialCaseIdValue) {
                 this.id = specialCaseIdValue;
@@ -29,7 +32,6 @@ export default class FieldObject {
         else {
             this.id = instanceToCopy.id;
             this.objectType = instanceToCopy.objectType;
-
         }
 
         this.fieldMap = {};
@@ -159,3 +161,14 @@ function _createId(objectType) {
 /** This is used for Id generation.
  * @private */
 let nextId = 1;
+
+
+/** This is intended for debug use only. It gives a unique number for each instance created. There is no provision made
+ * for wrapping of this number, and it should be used in a way where that doesn't matter. */
+function _getInstanceNumber() {
+    return nextInstanceNumber++;
+}
+
+/** This is used for unique instance number generation.
+ * @private */
+let nextInstanceNumber = 1;
