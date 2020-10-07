@@ -1,5 +1,4 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
-import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import { getFormResultFunctionBody } from "/apogeeui/apogeeUiLib.js";
 
@@ -65,7 +64,7 @@ export default class FormInputBaseComponentView extends ComponentView {
     _onSubmit(formData) {
         //load the form meta - we have to look it up from the data display (this is a little clumsy)
         let formMeta;
-        let formEditor = this.getCurrentDataDisplayInstance(CSVComponentView.VIEW_INPUT);
+        let formEditor = this.getCurrentDataDisplayInstance(FormInputBaseComponentView.VIEW_INPUT);
         if(formEditor) {
             formMeta = formEditor.getFormMeta();
         }
@@ -109,3 +108,8 @@ export default class FormInputBaseComponentView extends ComponentView {
     }       
 
 }
+
+//This is the standard formview mode info
+FormInputBaseComponentView.VIEW_INPUT = "Input"
+
+FormInputBaseComponentView.INPUT_VIEW_MODE_INFO = {name: FormInputBaseComponentView.VIEW_INPUT, label: "Configuration", isActive: true}

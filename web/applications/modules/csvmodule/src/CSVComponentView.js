@@ -172,12 +172,11 @@ export default class CSVComponentView extends FormInputBaseComponentView {
 
 CSVComponentView.VIEW_HEADER = "Header";
 CSVComponentView.VIEW_DATA = "Data";
-CSVComponentView.VIEW_INPUT = "Input";
 
 CSVComponentView.VIEW_MODES = [
     {name: CSVComponentView.VIEW_HEADER, label: "Header", isActive: false},
-	{name: CSVComponentView.VIEW_DATA, label: "Data", isActive: false},
-    {name: CSVComponentView.VIEW_INPUT, label: "Configuration", isActive: true}
+    {name: CSVComponentView.VIEW_DATA, label: "Data", isActive: false},
+    FormInputBaseComponentView.INPUT_VIEW_MODE_INFO
 ];
 
 CSVComponentView.TABLE_EDIT_SETTINGS = {
