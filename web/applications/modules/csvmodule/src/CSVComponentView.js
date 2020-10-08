@@ -189,7 +189,7 @@ CSVComponentView.TABLE_EDIT_SETTINGS = {
 //===============================
 
 /** This is the component name with which this view is associated. */
-CSVComponentView.componentName = "apogeeapp.CSVCell";
+CSVComponentView.componentName = "apogeeapp.ParseCSVCell";
 
 /** If true, this indicates the component has a tab entry */
 CSVComponentView.hasTabEntry = false;

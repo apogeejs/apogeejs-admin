@@ -58,4 +58,4 @@ const DATA_MEMBER_FUNCTION_BODY = `
     }
 `
 
-FormInputBaseComponent.initializeClass(CSVComponent,"CSV Cell","apogeeapp.CSVCell",DATA_MEMBER_FUNCTION_BODY);
+FormInputBaseComponent.initializeClass(CSVComponent,"Parse CSV Cell","apogeeapp.ParseCSVCell",DATA_MEMBER_FUNCTION_BODY);

@@ -1,7 +1,7 @@
 {
   "name": "csv-module",
-  "officialRelease": true,
-  "version": "0.1.0",
+  "officialRelease": false,
+  "version": "1.0.1",
   "src_module": "CSVComponentModule.js",
   "npm_module": "csvmodule.cjs.js",
   "es_module": "csvmodule.esm.js",
