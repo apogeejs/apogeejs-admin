@@ -1191,6 +1191,30 @@ button for each type of entry allowed. The label will indicate the associated ty
     border-style: inset;
     border: 1px solid rgba(0,0,0,.7);
 }
+.apogee_tooltip_element {
+    position: relative;
+    display: inline-block;
+}
+.apogee_tooltip_text {
+    visibility: hidden;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    padding: 3px;
+    background-color: rgb(245,245,245);
+    color: darkblue;
+    border: 1px solid darkblue;
+    text-align: center;
+    z-index: 100;
+}
+.apogee_tooltip_element:hover .apogee_tooltip_text {
+    visibility: visible;
+}
+.apogee_tooltip_element:hover {
+    visibility: visible;
+    background-color: rgba(128,128,144,.35);
+}
+
 .ProseMirror {
   position: relative;
 }
