@@ -178,8 +178,8 @@ export default class PageDisplayContainer {
         this.viewNameElement = uiutil.createElementWithClass("span","visiui_displayContainer_viewSelectorClass",this.viewSelectorLink);
         this.viewNameElement.innerHTML = this.viewTypeLabel;
 
-        this.viewSelectorLink.href = "javascript:void(0)";
-        this.viewSelectorLink.onclick = () => this.setIsViewActive(!this.isViewActive);
+        this.viewSelectorLink.href = "#";
+        this.viewSelectorLink.onclick = () => { this.setIsViewActive(!this.isViewActive); return false; }
 
         this.updateViewSelectorState();
     }

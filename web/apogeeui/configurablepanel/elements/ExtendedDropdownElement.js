@@ -122,7 +122,6 @@ export default class ExtendedDropdownElement extends ConfigurableElement {
     _createHeadLink() {
         let headLink = document.createElement("a");
         headLink.className = "apogee_configurableExtendedHeadLink";
-        headLink.href = "javascript:void(0);";
 
         headLink.onmousedown = e => ExtendedDropdownElement._onHeadMouseDown(e,this);
         headLink.onkeydown = e => this._onHeadKeyDown(e);
