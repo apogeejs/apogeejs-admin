@@ -274,6 +274,8 @@ export default class ListElement extends ConfigurableElement {
         var elementObject = ConfigurablePanel.instantiateConfigurableType(this.getForm(),elementInitData);
 
         if(elementObject instanceof ConfigurableElement) {
+            elementObject.populateSelectors();
+            
             listEntry.elementObject = elementObject;
             listEntry.element = this._createListDomElement(listEntry);
         }

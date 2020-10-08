@@ -44,6 +44,13 @@ export default class CodeableMember extends DependentMember {
             //"supplementalCode";
             //"compiledInfo"
         }
+        else {
+            //this is treated as a fixed variable rather than a field
+            //it can be set only on creation
+            if(instanceToCopy.contextParentGeneration) {
+                this.contextParentGeneration = instanceToCopy.contextParentGeneration;
+            }
+        }
         
         //==============
         //Working variables
@@ -121,7 +128,7 @@ export default class CodeableMember extends DependentMember {
         
         if((this.hasCode())&&(compiledInfo.valid)) {
             //set the dependencies
-            var dependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getContextManager());
+            var dependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getCodeContextManager(model));
             this.updateDependencies(model,dependsOnMap);
             
         }
@@ -139,7 +146,7 @@ export default class CodeableMember extends DependentMember {
                     
             //calculate new dependencies
             let oldDependsOnMap = this.getDependsOn();
-            let newDependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getContextManager());
+            let newDependsOnMap = getDependencyInfo(compiledInfo.varInfo,model,this.getCodeContextManager(model));
 
             if(!apogeeutil.jsonEquals(oldDependsOnMap,newDependsOnMap)) {
                 //if dependencies changes, make a new mutable copy and add this to 
@@ -213,7 +220,7 @@ export default class CodeableMember extends DependentMember {
     // Member Methods
     //------------------------------
 
-    /** This gets an update structure to upsate a newly instantiated member
+    /** This gets an update structure to update a newly instantiated member
     /* to match the current object. */
     getUpdateData() {
         var updateData = {};
@@ -244,14 +251,51 @@ export default class CodeableMember extends DependentMember {
                 updateData.data = this.getData();
             }
         }
+
+        if(this.contextParentGeneration) {
+            updateData.contextParentGeneration = this.contextParentGeneration;
+        }
+
         return updateData;
+    }
+
+    /** This member initialized the codeable fields for a member. */
+    setUpdateData(model,initialData) {
+        //apply the initial data
+        if(initialData.functionBody !== undefined) {
+            //apply initial code
+            this.applyCode(initialData.argList,
+                initialData.functionBody,
+                initialData.supplementalCode);
+        }
+        else {
+            //set initial data
+            if(initialData.errorList) {
+                this.setErrors(model,initialData.errorList);
+            }
+            else if(initialData.invalidError) {
+                this.setResultInvalid(model);
+            }
+            else {
+                let data = (initialData.data !== undefined) ? initialData.data : "";
+                this.setData(model,data);
+            }
+
+            //set the code fields to empty strings
+            this.setField("functionBody","");
+            this.setField("supplementalCode","");
+        }
+
+        if(initialData.contextParentGeneration) {
+            this.contextParentGeneration = initialData.contextParentGeneration;
+        }
     }
 
     //------------------------------
     //ContextHolder methods
     //------------------------------
 
-    /** This method retrieve creates the loaded context manager. */
+    /** This method creates the context manager for this member. */
     createContextManager() {
         return new ContextManager(this);
     }
@@ -270,6 +314,42 @@ export default class CodeableMember extends DependentMember {
     supressMessenger(doSupressMessenger) {
         this.doSupressMessenger = doSupressMessenger;
     }
+
+    /** This function just returns the context manager for the code for this object. 
+     * This is nominally the context manager for this object. However, There is an allowance
+     * to use a replacement for the context manager as used in the code.
+     * This is specifically intended for compound members where the end user is providing code,
+     * such as through a form with expressions for input. In this case we want to code to be executed as
+     * if it were on a different member. In the above menetioned case, the code should be from the parent page 
+     * where the user is entering the form data. To do this, the contextParentGeneration should be set to 
+     * the number of parent generations that should be used for the context member.
+     */
+    getCodeContextManager(model) {
+        let contextMember;
+        if(this.contextParentGeneration) {
+            contextMember = this.getRemoteContextMember(model);
+        }
+        else {
+            contextMember = this;
+        }
+
+        return contextMember.getContextManager();
+    }
+
+    /** This function is used to get a remote context member */
+    getRemoteContextMember(model) {
+        let contextMember = this;
+        let parentCount = this.contextParentGeneration;
+        while((parentCount)&&(contextMember)) {
+            contextMember = contextMember.getParent(model);
+            parentCount--;
+        }
+        //if we have not context member, revert to the local object
+        if(!contextMember) contextMember = this;
+        return contextMember;
+    }
+
+
 
     //===================================
     // Private Functions
@@ -317,7 +397,7 @@ export default class CodeableMember extends DependentMember {
                 //set the context
                 let compiledInfo = this.getField("compiledInfo");
                 let messenger = this.doSupressMessenger ? undefined : new Messenger(model,this);
-                compiledInfo.memberFunctionContextInitializer(model,this.getContextManager(),messenger);
+                compiledInfo.memberFunctionContextInitializer(model,this.getCodeContextManager(model),messenger);
                 
                 functionInitializedSuccess = true;
             }

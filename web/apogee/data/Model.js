@@ -80,6 +80,10 @@ export default class Model extends FieldObject {
      * This ensures if we look up a mutable member from here we get a different instance from what was 
      * in our original model instance. */
     getCleanCopy(newRunContext) {
+        //make sure the stored fields are up to date
+        if(this.workingImpactsMap) this.finalizeImpactsMap();
+        if(this.workingMemberMap) this.finalizeMemberMap();
+
         let newModel = new Model(newRunContext,this);
 
         //update the member map for the new model
@@ -122,9 +126,9 @@ export default class Model extends FieldObject {
      * Any member not yet initialized would be a lazy initialize function that was neever called. */
     completeLazyInitialization() {
         //member map includes all members and the model
-        let memberMap = this.getField("memberMap");
-        for(let id in memberMap) {
-            let member = memberMap[id];
+        let activeMemberMap = this._getActiveMemberMap();
+        for(let id in activeMemberMap) {
+            let member = activeMemberMap[id];
             if(member.lazyInitializeIfNeeded) {
                 member.lazyInitializeIfNeeded();
             }
@@ -282,8 +286,8 @@ export default class Model extends FieldObject {
     //============================
 
     lookupMemberById(memberId) {
-        let memberMap = this._getMemberMap()
-        return memberMap[memberId];
+        let activeMemberMap = this._getActiveMemberMap()
+        return activeMemberMap[memberId];
     }
 
     /** This method returns a mutable member for the given ID. If the member is already unlocked, that member will be
@@ -372,7 +376,9 @@ export default class Model extends FieldObject {
         delete this.workingMemberMap[memberId];
     }
 
-    _getMemberMap() {
+    /** This should be called to get a copy of the active working map when no changes are being
+     * made to the map. If changes are being made, typically they should be done to the workingMemberMap.  */
+    _getActiveMemberMap() {
         return this.workingMemberMap ? this.workingMemberMap : this.getField("memberMap");
     }
 

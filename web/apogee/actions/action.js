@@ -212,7 +212,7 @@ function internalDoAction(model,actionData) {
 
             //populate recalc list
             let recalculateList = createRecalculateList(model,actionModifiedMembers,additionalUpdatedMembers);
-            
+   
             //recalculate all needed objects
             callRecalculateList(model,recalculateList);
 

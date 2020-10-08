@@ -16,7 +16,8 @@ export default class PanelElement extends ConfigurableElement {
         
         var formInitData = elementInitData.formData;
         this.panel = new ConfigurablePanel();
-        this.panel.configureForm(formInitData);
+        this.panel.setParentForm(form);
+        this.panel.createForm(formInitData);
         var panelElement = this.panel.getElement();
         containerElement.appendChild(panelElement);
 
@@ -49,6 +50,22 @@ export default class PanelElement extends ConfigurableElement {
     /** We override the standard giveFocus method to pass it on to a child element. */
     giveFocus() {
         return this.panel.giveFocus();
+    }
+
+    //------------------
+    // Entry interface
+    //------------------
+
+    /** This gets an entry from the given path, where the path is an array of keys. */
+    getEntryFromPath(path,startIndex) {
+        return this.panel.getEntryFromPath(path,startIndex);
+    }
+
+    populateSelectors() {
+        //element selector
+        super.populateSelectors();
+        //panel child element selectors
+        this.panel.populateSelectors();
     }
 
     //===================================

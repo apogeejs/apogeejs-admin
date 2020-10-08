@@ -12,6 +12,7 @@ export default class ConfigurableElement {
         this.state = ConfigurablePanelConstants.STATE_NORMAL;
         this.key = elementInitData.key;
         this.meta = elementInitData.meta;
+        this.selectorConfig = elementInitData.selector;
         this.isMultiselect = false;
         this.focusElement = null;
 
@@ -23,6 +24,8 @@ export default class ConfigurableElement {
         this.domElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_STANDARD;
         this.domElement.style.padding = ConfigurableElement.ELEMENT_PADDING_STANDARD;
         this.domElement.style.display = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE;
+
+        this.errorDiv;
 
         this.visibleDisplayStyle = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE;
     }
@@ -100,6 +103,10 @@ export default class ConfigurableElement {
         return this.form;
     }
 
+    getBaseForm() {
+        return this.form.getBaseForm();
+    }
+
     addOnChange(onChange) {
         this.onChangeListeners.push(onChange);
     }
@@ -111,6 +118,21 @@ export default class ConfigurableElement {
     /** This is used to determine what type of child element this is for a panel. */
     get elementType() {
         return "ConfigurableElement";
+    }
+
+    /** This method is called during configuration to populate the selectors of the element. */
+    populateSelectors() {
+        if(this.selectorConfig) {
+            try {
+                this._addSelector(this.selectorConfig);
+            }
+            catch(error) {
+                let errorMsg = "Error calling selector: " + error.toString();
+                console.error(errorMsg);
+                if(error.stack) console.error(error.stack);
+                this.setElementErrorMsg(errorMsg)
+            }
+        }
     }
 
     //==================================
@@ -215,6 +237,17 @@ export default class ConfigurableElement {
             return null;
         }
     }
+
+    /** This sets the content of a div that displays an error mesage */
+    setElementErrorMsg(errorMsg) {
+        if(!this.errorDiv) {
+            //add an error display
+            this.errorDiv = document.createElement("div");
+            this.errorDiv.className = "apogee_configubleElementErrorDiv";
+            this.domElement.append(this.errorDiv);
+        }
+        this.errorDiv.innerHTML = errorMsg;
+    }
     
     //===================================
     // internal Methods
@@ -239,27 +272,6 @@ export default class ConfigurableElement {
         if(elementInitData.onInput) {
             this.addOnInput(elementInitData.onInput);
         }
-        
-        //dependent element logic
-        if(elementInitData.selector) {
-            this._addSelector(elementInitData.selector);
-        }
-        if(elementInitData.inherit) {
-            if(Array.isArray(elementInitData.inherit)) {
-                elementInitData.inherit.forEach(inheritConfig => this._addInherit(inheritConfig));
-            }
-            else {
-                throw new Error("Inherit config should be an array: " + elementInitData.key);
-            }
-        }
-        if(elementInitData.react) {
-            if(Array.isArray(elementInitData.react)) {
-                elementInitData.react.forEach(reactConfig => this._addReact(reactConfig));
-            }
-            else {
-                throw new Error("React config should be an array: " + elementInitData.key);
-            }
-        }
     }
     
     _setDisabled(isDisabled) {};
@@ -277,11 +289,55 @@ export default class ConfigurableElement {
 
     /** This processes a selector entry from the init data */
     _addSelector(selectorConfig) {
-        //parent element
-        let parentKey = selectorConfig.parentKey;
-        if(!parentKey) throw new Error("Parent key is required for a selectable child element:" + selectorConfig.key); 
 
-        //get the target values. This can bve a single value of a list of values
+        //get parent element list
+        let parentKeys = selectorConfig.parentKey ? [selectorConfig.parentKey] : selectorConfig.parentKeys;
+        if(!parentKeys) throw new Error("Parent key(s) not found for selectable child element " + selectorConfig.key);
+        let parentElements = parentKeys.map( parentKey => {
+            if(Array.isArray(parentKey)) {
+                //absolute path
+                let baseForm = this.getBaseForm();
+                return baseForm.getEntryFromPath(parentKey);
+            }
+            else {
+                //local key in form
+                return this.form.getEntry(parentKey);
+
+            }
+        })
+        if(parentElements.indexOf(undefined) >= 0) throw new Error("Parent element not found for selectable child element " + selectorConfig.key);
+
+        
+        //get the internal function
+        let actionFunction;
+        if(selectorConfig.actionFunction) {
+            actionFunction = selectorConfig.actionFunction;
+        }
+        else {
+            actionFunction = this._getPredefinedActionFunction(selectorConfig,parentElements);
+        }
+        if(!actionFunction) throw new Error("Action function not found for selectable child element " + selectorConfig.key);
+
+        //handler
+        let functionArgs = [this].concat(parentElements);
+        let onValueChange = () => actionFunction.apply(null,functionArgs);
+        
+        if(onValueChange) {
+            parentElements.forEach(parentElement =>parentElement._addDependentCallback(onValueChange));
+        }
+    }
+
+    /** This method gets an instance of a predefined action function for the given selector config. */
+    _getPredefinedActionFunction(selectorConfig,parentElements) {
+
+        //these only apply to single parent objects, not multiple parents
+        let inputParentElement = parentElements[0];
+
+        //get the action
+        let action = selectorConfig.action;
+        if(!action) action = ConfigurablePanelConstants.DEFAULT_SELECTOR_ACTION;
+
+        //get the target values. This can be a single value of a list of values
         let target, targetIsMultichoice;
         if(selectorConfig.parentValue !== undefined) {
             target = selectorConfig.parentValue;
@@ -295,59 +351,10 @@ export default class ConfigurableElement {
             throw new Error("A child selectable element must contain a value or list of values: " + selectorConfig.key)
         }
 
-        //optional value
-        let keepActiveOnHide =  selectorConfig.keepActiveOnHide;
-        
-        let parentElement = this.form.getEntry(parentKey);
-        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for selectable child element " + selectorConfig.key);
-        
-        let onValueChange = parentElement._getDependentSelectHandler(this,target,targetIsMultichoice,keepActiveOnHide)
-        
-        if(onValueChange) {
-            parentElement._addDependentCallback(onValueChange);
-        }
-    }
-
-    /** This processes a inherit entry from the init data */
-    _addInherit(inheritConfig) {
-        let parentKey = inheritConfig.parentKey;
-        let childKey = inheritConfig.childKey;
-
-        if(!parentKey) throw new Error("A parent key is required for a inherit child element:" + inheritConfig.key);
-        if(!childKey) throw new Error("A child key is required for an inherit child element: " + inheritConfig.key)
-        let parentElement = this.form.getEntry(parentKey);
-        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for inherit child element " + inheritConfig.key);
-        if(!this.inherit) throw new Error("The element " + inheritConfig.key + " does not support inherit");
-        
-        let onValueChange = (parentValue) => {
-            this.inherit(childKey,parentValue);
-        }
-        parentElement._addDependentCallback(onValueChange);
-    }
-
-    /** This processes a react entry from the init data */
-    _addReact(reactConfig) {
-        let parentKey = reactConfig.parentKey;
-        let onValueChangeGenerator = reactConfig.generator;
-
-        if(!parentKey) throw new Error("A parent key is required for a react child element:" + reactConfig.key);
-        if(!onValueChangeGenerator) throw new Error("A callback generator is required for an react child element: " + reactConfig.key)
-        let parentElement = this.form.getEntry(parentKey);
-        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for react child element " + reactConfig.key);
-        
-        let onValueChange = onValueChangeGenerator(this);
-        if(onValueChange) {
-            parentElement._addDependentCallback(onValueChange);
-        }
-    }
-
-    
-    /** This method returns the onValueChange handler to make the dependent element
-     * visible when the parent element (as the element depended on) has the/a proper value. */
-    _getDependentSelectHandler(dependentElement,target,targetIsMultichoice,keepActiveOnHide) {
+        //get the match check function
         //handle cases of potential multiple target values and multiple select parents
         let valueMatch;
-        if(this.isMultiselect) {
+        if(inputParentElement.isMultiselect) {
             if(targetIsMultichoice) {
                 valueMatch = parentValue => containsCommonValue(target,parentValue);
             }
@@ -365,17 +372,24 @@ export default class ConfigurableElement {
         }
         
         //this is the function that will do the test at compare time
-        return parentValue => {
-            let state;
-            if(valueMatch(parentValue)) {
-                state = ConfigurablePanelConstants.STATE_NORMAL;
+        return (childElement,parentElement) => {
+            let match = valueMatch(parentElement.getValue());
+            if(action == ConfigurablePanelConstants.SELECTOR_ACTION_VALUE) {
+                if(childElement.getValue() !== match) {
+                    childElement.setValue(match);
+                }
             }
             else {
-                state = (keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE);
-            }
-
-            if(dependentElement.getState() != state) {
-                dependentElement.setState(state);
+                let state; 
+                if(match) {
+                    state = ConfigurablePanelConstants.STATE_NORMAL;
+                }
+                else {
+                    state = ConfigurablePanelConstants.SELECTOR_FALSE_STATE[action];
+                }
+                if(childElement.getState() != state) {
+                    childElement.setState(state);
+                }
             }
         }
     }
@@ -388,19 +402,35 @@ export default class ConfigurableElement {
         this.dependentCallbacks.push(onValueChange);
 
         //call now to initialize state
-        onValueChange(this.getValue());
+        try {
+            onValueChange();
+        }
+        catch(error) {
+            let errorMsg = "Error calling selector: " + error.toString();
+            console.error(errorMsg);
+            if(error.stack) console.error(error.stack);
+            this.setElementErrorMsg(errorMsg);
+        }
     }
 
     /** This function calls all the onValueChange callbacks for dependent elements. */
-    _callDependentCallbacks(value) {
+    _callDependentCallbacks() {
         if(this.dependentCallbacks) {
-            this.dependentCallbacks.forEach( onValueChange => onValueChange(value) );
+            try {
+                this.dependentCallbacks.forEach( onValueChange => onValueChange() );
+            }
+            catch(error) {
+                let errorMsg = "Error calling selector: " + error.toString();
+                console.error(errorMsg);
+                if(error.stack) console.error(error.stack);
+                this.setElementErrorMsg(errorMsg)
+            }
         }
     }
 
     _initForDependents() {
         this.dependentCallbacks = [];
-        this.addOnChange( (value,form) => this._callDependentCallbacks(value) );
+        this.addOnChange( (value,form) => this._callDependentCallbacks() );
     }
             
 }

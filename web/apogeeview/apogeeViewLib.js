@@ -7,6 +7,8 @@ export {default as ApogeeView} from "/apogeeview/ApogeeView.js";
 export {default as ApogeeWebView} from "/apogeeview/ApogeeWebView.js";
 export {default as ComponentView} from "/apogeeview/componentdisplay/ComponentView.js";
 
+export {default as FormInputBaseComponentView} from "/apogeeview/componentviews/FormInputBaseComponentView.js";
+
 //needed just for web lib
 export {default as WebComponentDisplay} from "/apogeeview/componentdisplay/webpage/WebComponentDisplay.js";
 
