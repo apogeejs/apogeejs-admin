@@ -205,7 +205,7 @@ export default class DataDisplay {
         return this.dataSource;
     }
 
-    getDisplayContainer() {
-        return this.displayContainer;
+    getComponentView() {
+        return this.displayContainer.getComponentView();
     }
 }

@@ -60,7 +60,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         let dataSource = this.getDataSource();
         let html = dataSource.getHtml();
         let resource = dataSource.getResource();
-        let componentView = this.getDisplayContainer().getComponentView();
+        let componentView = this.getComponentView();
         let member = dataSource.getContextMember();
 
         let displayData = dataSource.getDisplayData ? dataSource.getDisplayData() : undefined;

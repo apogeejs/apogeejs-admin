@@ -73,7 +73,7 @@
         <script type="module">
             import {ApogeeWebView} from "/applications/webclientlib/webClientLib.js";
         
-            let workspaceUrl = "covidWorkspace.json";
+            let workspaceUrl = "usCovidWorkspace2.json";
             let appView;
             let stateTab,countyTab,statePage,countyPage;
 
@@ -83,22 +83,22 @@
 
             //state page components we want to show
             let stateComponentInfo = [
-                ["usStatePlots.graphingOptions","stateGraphOptionsElement","Form"],
-                ["usStatePlots.stateSelector","stateSelectElement","Form"],
-                ["usStatePlots.scaledCasesChart","stateCasesElement","Chart"],
-                ["usStatePlots.scaledNewCasesChart","stateNewCasesElement","Chart"],
-                ["usStatePlots.scaledDeathsChart","stateDeathsElement","Chart"],
-                ["usStatePlots.scaledNewDeathsChart","stateNewDeathsElement","Chart"]
+                ["statePlots.graphingOptions","stateGraphOptionsElement","Form"],
+                ["statePlots.stateSelector","stateSelectElement","Form"],
+                ["statePlots.casesChart","stateCasesElement","Chart"],
+                ["statePlots.newCasesChart","stateNewCasesElement","Chart"],
+                ["statePlots.deathsChart","stateDeathsElement","Chart"],
+                ["statePlots.newDeathsChart","stateNewDeathsElement","Chart"]
             ];
 
             //county page components we want to show
             let countyComponentInfo = [
-                ["usCountyPlots.graphingOptions","countyGraphOptionsElement","Form"],
-                ["usCountyPlots.stateSelector","countySelectElement","Form"],
-                ["usCountyPlots.scaledCasesChart","countyCasesElement","Chart"],
-                ["usCountyPlots.scaledNewCasesChart","countyNewCasesElement","Chart"],
-                ["usCountyPlots.scaledDeathsChart","countyDeathsElement","Chart"],
-                ["usCountyPlots.scaledNewDeathsChart","countyNewDeathsElement","Chart"]
+                ["countyPlots.graphingOptions","countyGraphOptionsElement","Form"],
+                ["countyPlots.stateSelector","countySelectElement","Form"],
+                ["countyPlots.casesChart","countyCasesElement","Chart"],
+                ["countyPlots.newCasesChart","countyNewCasesElement","Chart"],
+                ["countyPlots.deathsChart","countyDeathsElement","Chart"],
+                ["countyPlots.newDeathsChart","countyNewDeathsElement","Chart"]
             ];
 
             /** This does initialization after the page loads */

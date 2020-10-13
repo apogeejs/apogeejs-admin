@@ -235,8 +235,6 @@ export default class PageChildComponentDisplay {
                     viewModeInfo.label = viewName;
                     viewModeInfo.isActive = (i == 0); //default is active
                 }
-                
-                var isMainView = (i == 0);
 
                 var displayContainer = new PageDisplayContainer(this, viewModeInfo);
                 

@@ -1,4 +1,4 @@
-import {uiutil} from "/apogeeui/apogeeUiLib.js";
+import {uiutil,bannerConstants,getBanner} from "/apogeeui/apogeeUiLib.js";
 import {getSaveBar} from "/apogeeview/componentdisplay/toolbar.js";
 
 /** This is a standin for the display conatiner for the literate page
@@ -10,6 +10,8 @@ export default class WebDisplayContainer {
     constructor(componentView, viewType) {
         
         this.mainElement = null;
+        this.viewDisplayElement = null;
+        this.bannerContainer = null;
         this.headerContainer = null;
         this.viewContainer = null;
         
@@ -103,6 +105,11 @@ export default class WebDisplayContainer {
         return this.mainElement;
     }
 
+    /** This method returns the display bar. It is a status and control bar for the data display to manage. */
+    getDisplayBarElement() {
+        return this.viewDisplayElement;
+    }
+
     //====================================
     // Initialization Methods
     //====================================
@@ -112,6 +119,13 @@ export default class WebDisplayContainer {
         
         //make the container
         this.mainElement = uiutil.createElementWithClass("div","visiui_displayContainer_mainClass",null);
+
+        //create the view display bar
+        this.viewDisplayElement = document.createElement("div");
+        this.mainElement.appendChild(this.viewDisplayElement);
+
+        //add banner container
+        this.bannerContainer = uiutil.createElementWithClass("div","visiui_pageChild_bannerContainerClass",this.mainElement);
         
         //add the header elment (for the save bar)
         this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
@@ -128,6 +142,10 @@ export default class WebDisplayContainer {
         
         if(this.isShowing) {
             if(!this.dataDisplayLoaded) {
+
+                //set the banner state
+                this._setBannerState();
+
                 if(!this.dataDisplay) {
                     //the display should be created only when it is made visible
                     this.dataDisplay =  this.componentView.getDataDisplay(this,this.viewType);
@@ -151,6 +169,26 @@ export default class WebDisplayContainer {
             
         //fyi - this is remove code, when we need to add it
         //[]
+    }
+
+    _setBannerState() {
+        if(!this.componentView) return;
+
+        let bannerState = this.componentView.getBannerState();
+        let bannerMessage = this.componentView.getBannerMessage();
+
+        //update the banner
+        var bannerDiv;
+        if(bannerState == bannerConstants.BANNER_TYPE_NONE) {
+            bannerDiv = null;
+        }
+        else {
+            bannerDiv = getBanner(bannerMessage,bannerState);
+        }
+        uiutil.removeAllChildren(this.bannerContainer);
+        if(bannerDiv) {
+            this.bannerContainer.appendChild(bannerDiv);
+        }
     }
 
     //------------------------------
@@ -205,6 +243,11 @@ export default class WebDisplayContainer {
     /** This method is called when the member is updated, to make sure the 
     * data display is up to date. */
    componentUpdated(component) {
+
+    if(component.isMemberFieldUpdated("member","state")) {
+        this._setBannerState();
+    }
+
     //update the data display
     if(this.dataDisplay) {
         let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
@@ -216,7 +259,7 @@ export default class WebDisplayContainer {
             //don't reload data if we are in edit mode. It will reload after completion, whether through cancel or save.
             if(!this.inEditMode) {
                 this.dataDisplay.showData();
-                this.updateViewSizeButtons();
+                //this.updateViewSizeButtons();
             }
         }
     }
