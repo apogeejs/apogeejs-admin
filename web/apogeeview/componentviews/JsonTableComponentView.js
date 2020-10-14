@@ -2,6 +2,7 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HandsonGridEditor from "/apogeeview/datadisplay/HandsonGridEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 export default class JsonTableComponentView extends ComponentView {
 
@@ -84,6 +85,7 @@ export default class JsonTableComponentView extends ComponentView {
     _setDisplayContainerStatus(displayContainer,dataView) {
         let displayBarElement = displayContainer.getDisplayBarElement();
         if(displayBarElement) {
+            uiutil.removeAllChildren(displayBarElement);
             let statusElement = document.createElement("span");
             statusElement.innerHTML = "Display Format: " + VIEW_DISPLAY_NAMES[dataView];
             statusElement.style.fontSize = "smaller";
