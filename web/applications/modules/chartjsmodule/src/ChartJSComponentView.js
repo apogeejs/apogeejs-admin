@@ -394,6 +394,30 @@ const FORM_LAYOUT = [
 				
 			},
 			{
+				"type": "textField",
+				"label": "X Category Accessor: ",
+				"size": 60,
+				"hint": "function, optional",
+				"help": "Enter a javascript expression giving a function f to read the X category value from the above data array: categoryArray = categoryDataArray.map( f ); ",
+				"key": "xCatAccessor",
+				"meta": {
+					"expression": "simple",
+					"excludeValue": ""
+				},
+				"selector": {
+				  parentKeys: [["chartType"],["formData","xValuesType"]],
+				  actionFunction: (child,ct,xvt) => {
+				    let chartType = ct.getValue();
+				    if((chartType == "bar")||((chartType == "line")&&(xvt.getValue() == "category"))) {
+				      child.setState("normal");
+				    }
+				    else {
+				      child.setState("inactive");
+				    }
+				  }
+				}
+			},
+			{
 				"type": "list",
 				"label": "Plot Series Data",
 				"entryType": {
@@ -406,15 +430,11 @@ const FORM_LAYOUT = [
 								"label": "Data Format: ",
 								"entries": [
 									[
-										"X Array and Y Array",
+										"X Array and Y Arrays",
 										"values"
 									],
 									[
-										"XY Point Array",
-										"points"
-									],
-									[
-										"Data Array and X and Y Acccessors",
+										"Single Data Array",
 										"structs"
 									]
 								],
@@ -424,7 +444,7 @@ const FORM_LAYOUT = [
 							},
 							{
 								"type": "textField",
-								"label": "X Values: ",
+								"label": "X Data Array: ",
 								"size": 60,
 								"hint": "expression",
 								"help": "Enter a javascript expression, such as the name of a cell, giving the array of X values. ",
@@ -440,7 +460,7 @@ const FORM_LAYOUT = [
 							},
 							{
 								"type": "textField",
-								"label": "Y Values: ",
+								"label": "Y Data Array: ",
 								"size": 60,
 								"hint": "expression",
 								"help": "Enter a javascript expression, such as the name of a cell, giving the array of Y values.  ",
@@ -448,22 +468,6 @@ const FORM_LAYOUT = [
 								"selector": {
 									"parentKey": "dataFormat",
 									"parentValue": "values"
-								},
-								"meta": {
-									"expression": "simple",
-									"excludeValue": ""
-								}
-							},
-							{
-								"type": "textField",
-								"label": "XY Point Array: ",
-								"size": 60,
-								"hint": "expression",
-								"help": "Enter a javascript expression, such as the name of a cell, giving the array of values of objects containing the values x and y.",
-								"key": "xyPoints",
-								"selector": {
-									"parentKey": "dataFormat",
-									"parentValue": "points"
 								},
 								"meta": {
 									"expression": "simple",
@@ -490,13 +494,9 @@ const FORM_LAYOUT = [
 								"type": "textField",
 								"label": "X Accessor: ",
 								"size": 60,
-								"hint": "expression",
+								"hint": "function, optional",
 								"help": "Enter a javascript expression giving a function f to read the X value from the above data array: xValueArray = dataArray.map( f ); ",
 								"key": "xAccessor",
-								"selector": {
-									"parentKey": "dataFormat",
-									"parentValue": "structs"
-								},
 								"meta": {
 									"expression": "simple",
 									"excludeValue": ""
@@ -506,13 +506,9 @@ const FORM_LAYOUT = [
 								"type": "textField",
 								"label": "Y Accessor: ",
 								"size": 60,
-								"hint": "expression",
+								"hint": "function, optional",
 								"help": "Enter a javascript expression giving a function f to read the Y value from the above data array: yValueArray = dataArray.map( f ); ",
 								"key": "yAccessor",
-								"selector": {
-									"parentKey": "dataFormat",
-									"parentValue": "structs"
-								},
 								"meta": {
 									"expression": "simple",
 									"excludeValue": ""
@@ -1024,7 +1020,7 @@ const FORM_LAYOUT = [
 								"type": "textField",
 								"label": "Y Accessor: ",
 								"size": 60,
-								"hint": "expression, optional",
+								"hint": "function, optional",
 								"help": "<em>Optional</em> Enter a javascript expression giving a function f to read the Y value from entries in the array or map entries. This is not needed if the entries are the y values to be graphed.",
 								"key": "yAccessor",
 								"meta": {

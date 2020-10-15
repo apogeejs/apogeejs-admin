@@ -151,19 +151,19 @@ function getXNumericChartData(sourceData, chartInfo, generalChartOptions) {
             entry.data = [];
             for (let i = 0; i < dataSeriesEntry.xValues.length; i++) {
                 let point = {
-                    x: dataSeriesEntry.xValues[i],
-                    y: dataSeriesEntry.yValues[i]
+                    x: dataSeriesEntry.xAccessor ? dataSeriesEntry.xAccessor(dataSeriesEntry.xValues[i]) : dataSeriesEntry.xValues[i],
+                    y: dataSeriesEntry.yAccessor ? dataSeriesEntry.yAccessor(dataSeriesEntry.yValues[i]) : dataSeriesEntry.yValues[i],
                 }
                 entry.data.push(point);
             }
         }
-        else if ((dataSeriesEntry.dataArray !== undefined) && (dataSeriesEntry.xAccessor) && (dataSeriesEntry.yAccessor)) {
-            //data array and x and y accessor function
+        else if (dataSeriesEntry.dataArray !== undefined) {
+            //data array and x and y accessor function (no accessor means point format)
             entry.data = [];
             for (let i = 0; i < dataSeriesEntry.dataArray.length; i++) {
                 let point = {
-                    x: dataSeriesEntry.xAccessor(dataSeriesEntry.dataArray[i]),
-                    y: dataSeriesEntry.yAccessor(dataSeriesEntry.dataArray[i])
+                    x: dataSeriesEntry.xAccessor ? dataSeriesEntry.xAccessor(dataSeriesEntry.dataArray[i]) : dataSeriesEntry.dataArray[i].x,
+                    y: dataSeriesEntry.yAccessor ? dataSeriesEntry.yAccessor(dataSeriesEntry.dataArray[i]) : dataSeriesEntry.dataArray[i].y
                 }
                 entry.data.push(point);
             }
@@ -196,7 +196,7 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
     let maxYLength = 0;
 
     if (sourceData.xCategories) {
-        xCategories = sourceData.xCategories;
+        xCategories = sourceData.xCatAccessor ? sourceData.xCategories.map(sourceData.xCatAccessor) : sourceData.xCategories;
     }
     else {
         xCategories = [];

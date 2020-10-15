@@ -10,15 +10,9 @@ export function getFormResultFunctionBody(formValue,formMeta) {
     //load the converted data
     _loadPanelLines(parentObjectName,formValue,formMeta,functionLines);
 
-    //save the raw form data too - to reload the form
-    let assigneeName = parentObjectName + '["' + STORED_FORM_VALUE_NAME + '"]'; 
-    _loadSimpleValueEntry(assigneeName,formValue,functionLines)
-
     functionLines.push("return output;")
     return functionLines.join("\n");
 }
-
-const STORED_FORM_VALUE_NAME = "storedFormValue";
 
 /** This loads a value to an assignee, as part of the form result function body. */
 function _loadEntry(assigneeName,value,meta,functionLines) {
