@@ -1,0 +1,7 @@
+{
+    "ABOUT": "This version of the config file should be used for a distribution to the Apogee web site",
+    "OFFICIAL_RELEASE": true,
+    "VERSION_RELEASE_HOST": "https://apogeejs.com",
+    "VERSION_NUMBER": "1.2.1",
+    "VERSION_ASSETS_PATH": "/lib/v1.2.1" 
+}
