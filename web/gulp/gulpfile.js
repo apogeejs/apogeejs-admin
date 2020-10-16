@@ -6,6 +6,7 @@ const rollup = require('rollup');
 const replace = require('gulp-replace');
 const rename = require('gulp-rename');
 const createResolveIdPlugin = require("./absoluteRefPlugin.js");
+const fs = require("fs");
 
 //for absolute references
 const PATH_TO_ABSOLUTE_ROOT = "..";
@@ -31,14 +32,28 @@ const WEB_RELEASE_FOLDER = WEB_FOLDER + "/" + RELEASE_NAME;
 const LIB_RELEASE_FOLDER = LIB_FOLDER + "/" + RELEASE_NAME;
 const TEMP_FOLDER = "temp";
 
-const fs = require("fs");
-if((fs.existsSync(WEB_RELEASE_FOLDER))||(fs.existsSync(LIB_RELEASE_FOLDER))) {
-    throw new Error("The release folder already exists! Please verify this is the proper destination and clear it.");
-}
+
+
 
 //======================================
 // Release Info
 //======================================
+
+function makeSureReleaseNotPresent() {
+    let promise1 = new Promise( (resolve,reject) => {
+        fs.stat(WEB_RELEASE_FOLDER, (err, stats) => {
+            if (err) resolve("File is not present!");
+            else reject("Release is already present! If this should not be true, check the version numbers");
+        });
+    })
+    let promise2 = new Promise( (resolve,reject) => {
+        fs.stat(WEB_RELEASE_FOLDER, (err, stats) => {
+            if (err) resolve("File is not present!");
+            else reject("Release is already present! If this should not be true, check the version numbers");
+        });
+    })
+    return Promise.all([promise1,promise2]);
+}
 
 //base files - version info
 const BASE_FILES = [
@@ -301,6 +316,33 @@ function copyFilesTask(fileList,destFolder) {
         .pipe(dest(destFolder));
 }
 
+//===========================
+// Push Release tasks
+//===========================
+
+const SERVER_WEBLIB_FOLDER = "../../../ApogeeJS-website/web/lib";
+
+function makeSureReleaseNotAlreadyThere() {
+    let promise = new Promise( (resolve,reject) => {
+        fs.stat(SERVER_WEBLIB_FOLDER + "/" + RELEASE_NAME, (err, stats) => {
+            if (err) resolve("File is not present!");
+            else reject("Release is present on server!");
+        });
+    })
+    return promise;
+}
+
+function copyFolderToServer() {
+    //note - the "base" entry is needed so they source directoy structure is kept, rather than flattening it
+    return src(WEB_RELEASE_FOLDER + "/**/*",{base: WEB_FOLDER})
+        .pipe(dest(SERVER_WEBLIB_FOLDER))
+}
+
+let pushRelease = series(
+    makeSureReleaseNotAlreadyThere,
+    copyFolderToServer
+)
+
 //============================
 // Exports
 //============================
@@ -312,6 +354,7 @@ function copyFilesTask(fileList,destFolder) {
 
 //This task executes the complete release
 exports.release = series(
+    makeSureReleaseNotPresent,
     parallel(
         copyReleaseInfoTask,
         packageCssTask,
@@ -324,3 +367,4 @@ exports.release = series(
         releaseWebClientLibTask,
     )
 );
+exports.pushRelease = pushRelease;
