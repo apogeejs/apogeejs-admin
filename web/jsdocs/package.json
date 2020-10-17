@@ -1,0 +1,6 @@
+{
+  "description": "documentation generator",
+  "dependencies": {
+    "jsdoc": "3.6.4"
+  }
+}
