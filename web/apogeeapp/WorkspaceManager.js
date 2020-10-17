@@ -257,7 +257,7 @@ export default class WorkspaceManager extends FieldObject {
         //check file format
         if(json) {
             if(json.version != WorkspaceManager.FILE_VERSION) {
-                let msg = "Version mismatch. Expected version " + WorkspaceManager.FILE_VERSION + ", Found version " + workspaceJson.version;
+                let msg = "Version mismatch. Expected version " + WorkspaceManager.FILE_VERSION + ", Found version " + json.version;
                 alert(msg);
                 throw new Error(msg);
             }
