@@ -3,9 +3,9 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatepage/proseMirrorSetup.js";
 
 import { TextSelection, NodeSelection, EditorState, Selection } from "/prosemirror/dist/prosemirror-state.es.js";
-import { Step } from "/prosemirror/dist/prosemirror-transform.es.js";
 import { Slice } from "/prosemirror/dist/prosemirror-model.es.js"
 import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
+import { GapCursor } from "/prosemirror/dist/prosemirror-gapcursor.es.js";
 
 //this constant is used (or hopefully not) in correctCreateInfoforRepeatedNames
 const MAX_SUFFIX_INDEX = 99999;
@@ -629,9 +629,21 @@ export default class ParentComponentView extends ComponentView {
     /** This will move the selection to the end of the document. */
     getSelectEndOfDocumentCommand() {
         let state = this.getEditorState();
+        //check the node
+        let lastNode = state.doc.content.content[state.doc.content.content.length-1];
         let endPos = state.doc.content.size;
         let $endPos = state.doc.resolve(endPos);
-        let selection = TextSelection.between($endPos, $endPos);
+        let selection;
+        //We should get a different criteria here
+        //We want to use the gap cursor if the last element is not a textblock or a parent to a text block (list!)
+        //Currently only the apogeeComponent fits. 
+        //If we add new blocks we might need new criteria, but I am not sure what it is now.
+        if(lastNode.type.name == "apogeeComponent") {
+            selection = new GapCursor($endPos);
+        }
+        else {
+            selection = TextSelection.between($endPos, $endPos);
+        }
         let transaction = state.tr.setSelection(selection).scrollIntoView();
         return this.createEditorCommand(transaction);
     }
