@@ -49,7 +49,7 @@ export default class TextFieldElement extends ConfigurableElement {
     }
 
     getValue() {
-        return this.inputElement.value.trim();
+        return this.inputElement.value;
     }  
     
     //===================================

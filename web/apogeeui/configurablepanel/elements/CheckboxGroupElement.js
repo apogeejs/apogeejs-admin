@@ -21,9 +21,12 @@ export default class CheckboxGroupElement extends ConfigurableElement {
             containerElement.appendChild(labelElement);
         }
 
+        //horizonal - defaults to true. Is false if vetical flag is set to true or horizontal is set to false
+        let doHorizontal = !((elementInitData.horizontal === false)||(elementInitData.vertical === true))
+
         //hint
         //if not horizontal, put the hint and help after the label
-        if(!elementInitData.horizontal) {
+        if(!doHorizontal) {
             //hint element
             let hintElement = this.getHintElement(elementInitData);
             if(hintElement) {
@@ -49,7 +52,7 @@ export default class CheckboxGroupElement extends ConfigurableElement {
         let focusElementSet = false;
         var addCheckbox = (checkboxInfo,index) => {
             var buttonContainer = uiutil.createElement("div");
-            buttonContainer.style.display = elementInitData.horizontal ? "inline-block" : "block";
+            buttonContainer.style.display = doHorizontal ? "inline-block" : "block";
             containerElement.appendChild(buttonContainer);
 
             var checkbox = uiutil.createElement("input");
@@ -80,7 +83,7 @@ export default class CheckboxGroupElement extends ConfigurableElement {
             buttonContainer.appendChild(checkbox);
             buttonContainer.appendChild(document.createTextNode(label));
 
-            if(elementInitData.horizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
+            if(doHorizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
             
             if(elementInitData.disabled) checkbox.disabled = true;
 
@@ -91,7 +94,7 @@ export default class CheckboxGroupElement extends ConfigurableElement {
 
         //hint
         //if  horizontal, put the hint and help at the end
-        if(elementInitData.horizontal) {
+        if(doHorizontal) {
             let hintElement = this.getHintElement(elementInitData);
             if(hintElement) {
                 containerElement.appendChild(hintElement);

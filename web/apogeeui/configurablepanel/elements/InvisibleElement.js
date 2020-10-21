@@ -1,6 +1,7 @@
 import ConfigurableElement from "/apogeeui/configurablepanel/ConfigurableElement.js";
 
-/** This is an text field element configurable element.
+/** This element holds a value that can only be set during configuration. The element is not 
+ * visible on the form.
  * 
  * @class 
  */
@@ -10,6 +11,10 @@ export default class InvisibleElement extends ConfigurableElement {
         //and show it, in which case they will get an empty element with margins.
         //maybe we should have a way to not create the element in the first place.
         super(form,elementInitData);
+
+        //we set the element value here in initialization and do not allow it to be set
+        //elsewhere. We disabled the setValue method.
+        this.value = elementInitData.value;
 
         //update the class to be invisible
         this.setVisibleDisplayStyle(ConfigurableElement.ELEMENT_DISPLAY_INVISIBLE);
@@ -27,9 +32,9 @@ export default class InvisibleElement extends ConfigurableElement {
     // protected Methods
     //==================================
 
-    /** This method updates the UI value for a given element. */
+    /** This does NOT update the value. The value is only set in initialization. */
     setValueImpl(value) {
-        this.value = value;
+        //no action!
     }
 }
 
