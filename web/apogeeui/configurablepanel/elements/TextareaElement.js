@@ -19,6 +19,7 @@ export default class TextareaElement extends ConfigurableElement {
         
         //text field
         this.inputElement = uiutil.createElement("textarea");
+        this.inputElement.style.verticalAlign = "top";
         if(elementInitData.rows) {
             this.inputElement.rows = elementInitData.rows;
         }
