@@ -220,7 +220,7 @@ export default class Component extends FieldObject {
     /** This method extends the member udpated function from the base.
      * @protected */    
     memberUpdated(updatedMember) {
-console.log("component member updated: " + updatedMember.getName() + ", " + updatedMember.getId() + ", " + updatedMember.instanceNumber);
+//console.log("component member updated: " + updatedMember.getName() + ", " + updatedMember.getId() + ", " + updatedMember.instanceNumber);
         let memberFieldMap = this.getField("memberFieldMap");
         let fieldName = memberFieldMap[updatedMember.getId()];
 

@@ -294,7 +294,6 @@ export default class HandsonGridEditor extends DataDisplay {
     }
 
     afterChange() {
-        console.log("after change called");
         this.gridEdited();
     }
 

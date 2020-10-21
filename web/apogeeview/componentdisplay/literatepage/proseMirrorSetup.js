@@ -69,12 +69,12 @@ export function createProseMirrorManager(app, schema) {
     //state debug plugin
     //===========================
 
-    let stateCheckPlugin = new Plugin({
-        view(editorView) {
-            let stateCheck = new StateCheck(editorView);
-            return stateCheck;
-        }
-    })
+    // let stateCheckPlugin = new Plugin({
+    //     view(editorView) {
+    //         let stateCheck = new StateCheck(editorView);
+    //         return stateCheck;
+    //     }
+    // })
 
     //==============================
     // Create the editor
@@ -117,8 +117,8 @@ export function createProseMirrorManager(app, schema) {
             keymap({ "Mod-z": undo, "Mod-y": redo }),
             keymap(baseKeymap),
             gapCursor(),
-            toolbarPlugin,
-            stateCheckPlugin
+            toolbarPlugin  /*,
+            stateCheckPlugin*/
         ];
 
         var nodeViews = {};

@@ -128,8 +128,6 @@ export default class ParentComponentView extends ComponentView {
     /** This method is called to respond to transactions created in the editor. */
     applyTransaction(transaction) {
         
-        //console.log("New Transaction:");
-        //console.log("Doc changed: " + transaction.docChanged);
         let editorState = this.getEditorState();
 
         //this will hold the resulting command
