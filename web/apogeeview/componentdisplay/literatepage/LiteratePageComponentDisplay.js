@@ -82,7 +82,7 @@ export default class LiteratePageComponentDisplay {
             this._checkSelectionForNodeHighlights(editorData);
         }
 
-        if(component.isMemberFieldUpdated("member","state")) {
+        if(component.isStateUpdated()) {
             this._setBannerState();
         }
     }
@@ -265,7 +265,7 @@ export default class LiteratePageComponentDisplay {
         }
 
         if(this.tab) {
-            var iconOverlay = getIconOverlay(bannerState);
+            var iconOverlay = getIconOverlay(bannerState,bannerMessage);
             if(iconOverlay) {
                 this.tab.setIconOverlay(iconOverlay);
             }

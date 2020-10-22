@@ -69,7 +69,7 @@ export function getBanner(text,bannerState) {
 
 /** This method creates an icon overlay for a given banner state. This should 
  * not be called for banner state bannerConstants.BANNER_TYPE_NONE */
-export function getIconOverlay(bannerState) {
+export function getIconOverlay(bannerState,tooltip) {
     var resource;
     if(bannerState == bannerConstants.BANNER_TYPE_INVALID) {
         resource = bannerConstants.INVALID_ICON_IMAGE;
@@ -89,6 +89,7 @@ export function getIconOverlay(bannerState) {
     if(resource) {
         var url = uiutil.getResourcePath(resource);
         iconOverlayElement.src = url;
+        if(tooltip) iconOverlayElement.title = tooltip;
     }
     return iconOverlayElement;
 }

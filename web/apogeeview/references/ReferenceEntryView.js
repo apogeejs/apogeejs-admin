@@ -28,8 +28,8 @@ export default class ReferenceEntryView {
             this.treeEntry.setLabel(nickname);
         }
 
-        if(referenceEntry.isFieldUpdated("state")) {
-            this.treeEntry.setBannerState(this.referenceEntry.getState());
+        if((referenceEntry.isFieldUpdated("state"))||(referenceEntry.isFieldUpdated("stateMsg"))) {
+            this.treeEntry.setBannerState(this.referenceEntry.getState(),this.referenceEntry.getStateMsg());
         }
     }
 
@@ -43,7 +43,7 @@ export default class ReferenceEntryView {
         var menuItemsCallback = () => this._getMenuItems();
 
         var treeEntry = new TreeEntry(label, iconUrl, null, menuItemsCallback, false);
-        treeEntry.setBannerState(this.referenceEntry.getState());
+        treeEntry.setBannerState(this.referenceEntry.getState(),this.referenceEntry.getStateMsg());
         return treeEntry;
     }
 

@@ -26,6 +26,7 @@ export default class ReferenceEntry extends FieldObject {
 
             //we create in a pending state because the link is not loaded.
             this.setField("state",apogeeutil.STATE_PENDING);
+            this.setField("stateMsg",PENDING_STATE_MSG);
 
             let nickname = referenceData.nickname;
             if(!nickname) nickname = this.createNickname(referenceData.url); 
@@ -49,6 +50,10 @@ export default class ReferenceEntry extends FieldObject {
 
     getState() {
         return this.getField("state");
+    }
+
+    getStateMsg() {
+        return this.getField("stateMsg");
     }
 
     getUrl() {
@@ -178,13 +183,20 @@ export default class ReferenceEntry extends FieldObject {
     }
 
     setPendingState() {
-        this.setState(apogeeutil.STATE_PENDING,"loading");
+        this.setState(apogeeutil.STATE_PENDING,PENDING_STATE_MSG);
     }
 
     setState(state,msg) {
-        if(this.state != state) {
+        let currentState = this.getField("state");
+        let currentMessage = this.getField("stateMsg");
+        if(currentState != state) {
             //for now we are not tracking msg. If we do, we should check for that change too
             this.setField("state",state);
+        }
+        if(currentMessage != msg) {
+            //for now we are not tracking msg. If we do, we should check for that change too
+            if(msg !== undefined) this.setField("stateMsg",msg);
+            else this.clearField("stateMsg");
         }
     }
 
@@ -278,3 +290,6 @@ updatelinkstatus.commandInfo = {
 }
 
 CommandManager.registerCommand(updatelinkstatus);
+
+
+const PENDING_STATE_MSG = "loading..."

@@ -51,7 +51,7 @@ export default class TreeComponentDisplay {
             this._setLabel();
         }
 
-        if(component.isMemberFieldUpdated("member","state")) {
+        if(component.isStateUpdated()) {
             this._setBannerState();
         }
     }
@@ -112,16 +112,7 @@ export default class TreeComponentDisplay {
     }
 
     _setBannerState() {
-        let bannerState = this.componentView.getBannerState();
-        //let bannerMessage = this.componentView.getBannerMessage();
-
-        var iconOverlay = getIconOverlay(bannerState);
-        if(iconOverlay) {
-            this.treeEntry.setIconOverlay(iconOverlay);
-        }
-        else {
-            this.treeEntry.clearIconOverlay();
-        }
+        this.treeEntry.setBannerState(this.componentView.getBannerState(),this.componentView.getBannerMessage());
     }
 
     /** This is used to sort the child tree entries. 

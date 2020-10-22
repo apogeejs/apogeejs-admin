@@ -72,7 +72,7 @@ export default class PageChildComponentDisplay {
             this._setTitle();
         }
 
-        if(component.isMemberFieldUpdated("member","state")) {
+        if(component.isStateUpdated()) {
             this._setBannerState();
         }
 
@@ -387,7 +387,7 @@ export default class PageChildComponentDisplay {
         }
         
         //update the icon overlay
-        var iconOverlay = getIconOverlay(bannerState);
+        var iconOverlay = getIconOverlay(bannerState,bannerMessage);
         if(iconOverlay) {
             this.setIconOverlay(iconOverlay);
         }

@@ -201,8 +201,8 @@ export default class TreeEntry {
         uiutil.removeAllChildren(this.iconOverlayElement);
     }
 
-    setBannerState(bannerState) {
-        var iconOverlay = getIconOverlay(bannerState);
+    setBannerState(bannerState,tooltip) {
+        var iconOverlay = getIconOverlay(bannerState,tooltip);
         if(iconOverlay) {
             this.setIconOverlay(iconOverlay);
         }
