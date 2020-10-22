@@ -70,10 +70,10 @@ export function processCode(argList,functionBody,supplementalCode,codeLabel) {
         return compiledInfo;
     }
 
-    //create and execute the generator function to get the member function generator
-    //and the memberFunctionContextInitializer
-    var generatorFunction = createGeneratorFunction(compiledInfo.varInfo, combinedFunctionBody);
     try {
+        //create and execute the generator function to get the member function generator
+        //and the memberFunctionContextInitializer
+        var generatorFunction = createGeneratorFunction(compiledInfo.varInfo, combinedFunctionBody);
         //get the generated fucntion
         var generatedFunctions = generatorFunction();
         compiledInfo.memberFunctionGenerator = generatedFunctions.memberGenerator;
