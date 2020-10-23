@@ -140,7 +140,7 @@ export function removeLink(app,referenceEntry,displayInfo) {
 
     //verify the delete
     let deleteMsg = "Are you sure you want to delete this link?"
-    apogeeUserConfirm(deleteMsg,null,"Delete","Cancel",doAction,cancelAction);
+    apogeeUserConfirm(deleteMsg,"Delete","Cancel",doAction,cancelAction);
 }
 
 

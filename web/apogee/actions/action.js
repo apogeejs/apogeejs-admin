@@ -121,8 +121,8 @@ export function doAction(model,actionData) {
         var runQueuedAction = true;
 
         if(model.checkConsecutiveQueuedActionLimitExceeded()) {
-            //ask user if about continueing - THIS MUST BE SYNCHRONOUS FOR NOW
-            var doContinue = confirm("The calculation is taking a long time. Continue?");
+            //ask user if about continueing - THIS MUST BE SYNCHRONOUS FOR NOW. Default to cancel calculation
+            var doContinue = apogeeUserConfirmSynchronous("The calculation is taking a long time: Continue?","Continue","Cancel",false);
             if(!doContinue) {
                 let changeResult = {};
                 changeResult.actionDone = false;

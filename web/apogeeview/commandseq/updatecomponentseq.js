@@ -213,7 +213,7 @@ export function updateComponent(componentView) {
             let cancelAction = () => {
                 returnToEditor(componentView,submittedValues.name);
             };
-            apogeeUserConfirm(deleteMsg,null,"Delete","Cancel",doAction,cancelAction);
+            apogeeUserConfirm(deleteMsg,"Delete","Cancel",doAction,cancelAction);
         }
         else {
             //otherwise just take the action

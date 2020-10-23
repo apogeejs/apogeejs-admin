@@ -341,7 +341,7 @@ export default class ParentComponentView extends ComponentView {
                 let cancelAction = () => {
                     this.giveEditorFocusIfShowing();
                 };
-                apogeeUserConfirm(deleteMsg,null,"Delete","Cancel",doAction,cancelAction);
+                apogeeUserConfirm(deleteMsg,"Delete","Cancel",doAction,cancelAction);
             }
             else {
                 //otherwise just take the action

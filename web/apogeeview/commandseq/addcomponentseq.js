@@ -147,7 +147,7 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
                         parentComponentView.giveEditorFocusIfShowing();
                     }
                 };
-                apogeeUserConfirm(deleteMsg,null,"OK","Cancel",doAction,cancelAction);
+                apogeeUserConfirm(deleteMsg,"OK","Cancel",doAction,cancelAction);
             }
             else {
                 //otherwise just take the action

@@ -12,7 +12,7 @@ export function deleteComponent(componentView) {
         returnToEditor(componentView);
     };
     let deleteMsg = "Are you sure you want to delete this object:" + componentView.getName() + "?"
-    apogeeUserConfirm(deleteMsg,null,"Delete","Cancel",doDelete,doCancel);
+    apogeeUserConfirm(deleteMsg,"Delete","Cancel",doDelete,doCancel);
 }
 
 function returnToEditor(componentView) {

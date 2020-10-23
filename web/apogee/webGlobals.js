@@ -11,4 +11,7 @@ __globals__.apogeeLog = (msg) => console.log(message);
 __globals__.apogeeUserAlert = (msg) => undefined;
 
 /** This function asynchronously lets the confirm or cancel an action. */
-__globals__.apogeeUserConfirm = (title,msg,okText,cancelText,okAction,cancelAction,defaultToOk) => defaultToOk ? okAction : cancelAction;
+__globals__.apogeeUserConfirm = (msg,okText,cancelText,okAction,cancelAction,defaultToOk) => defaultToOk ? okAction : cancelAction;
+
+/** This synchronous funtion returns true or false for ok or cancel. */
+__globals__.apogeeUserConfirmSynchronous = (msg,okText,cancelText,defaultToOk) => defaultToOk;

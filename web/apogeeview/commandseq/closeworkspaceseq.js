@@ -21,7 +21,7 @@ export function closeWorkspace(app) {
     if(activeWorkspaceManager.getIsDirty()) {
         let cancelAction = () => true;
         let deleteMsg = "There is unsaved data. Are you sure you want to close the workspace?";
-        apogeeUserConfirm(deleteMsg,null,"Close","Cancel",doAction,cancelAction);
+        apogeeUserConfirm(deleteMsg,"Close","Cancel",doAction,cancelAction);
     }
     else {
         doAction();
