@@ -552,7 +552,7 @@ export default class ParentComponentView extends ComponentView {
             return new TextSelection($newAnchor,$newHead);
         }
         else if(selection instanceof NodeSelection) {
-            return new TextSelection($newAnchor);
+            return new NodeSelection($newAnchor);
         }
         else {
             throw new Exception("Unknown selection type: " + selection.constructor.name);

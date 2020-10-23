@@ -157,6 +157,7 @@
 }
 .visiui_displayContainer_viewSelectorLinkClass {
     text-decoration:none;
+    display: inline;
 }
 .visiui_displayContainer_viewActiveElementClass {
     display: inline;

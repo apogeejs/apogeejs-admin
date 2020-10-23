@@ -7,7 +7,7 @@ import PageChildComponentDisplay from "/apogeeview/componentdisplay/literatepage
 import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 
 import {uiutil,Tab,bannerConstants,getBanner,getIconOverlay} from "/apogeeui/apogeeUiLib.js";
-import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
+import { NodeSelection }  from "/prosemirror/dist/prosemirror-state.es.js";
 
 /** This component represents a json table object. */
 export default class LiteratePageComponentDisplay {

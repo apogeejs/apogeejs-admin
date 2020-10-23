@@ -167,7 +167,9 @@ export default class PageDisplayContainer {
 
         //make the selector for the view, displayed in the component title bar
         this.viewSelectorContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
-        this.viewSelectorLink = uiutil.createElementWithClass("a","visiui_displayContainer_viewSelectorLinkClass",this.viewSelectorContainer);
+        //this is set from link to div so it can not get focus. later, we _do_ want it to get focuus, but if it does we need to make
+        //sure button presses are handled properly. (as it would have been, enter does not work to leave the cell)
+        this.viewSelectorLink = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorLinkClass",this.viewSelectorContainer);
 
         this.expandImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewSelectorLink);
         this.expandImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_CLOSED_IMAGE_PATH);
@@ -178,7 +180,6 @@ export default class PageDisplayContainer {
         this.viewNameElement = uiutil.createElementWithClass("span","visiui_displayContainer_viewSelectorClass",this.viewSelectorLink);
         this.viewNameElement.innerHTML = this.viewTypeLabel;
 
-        this.viewSelectorLink.href = "#";
         this.viewSelectorLink.onclick = () => { this.setIsViewActive(!this.isViewActive); return false; }
 
         this.updateViewSelectorState();
