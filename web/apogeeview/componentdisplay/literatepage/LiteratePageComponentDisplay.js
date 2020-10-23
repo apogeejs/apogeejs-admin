@@ -568,7 +568,7 @@ export default class LiteratePageComponentDisplay {
     beforeTabClose() {
         if(this.inEditMode) {
             let msg = "Please save or cancel the following cells: " + this._getNameListFromEditInfos();
-            showSimpleActionDialog(msg,null,["OK"]);
+            apogeeUserAlert(msg);
             return uiutil.DENY_CLOSE;
         }
         

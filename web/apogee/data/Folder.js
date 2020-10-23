@@ -61,7 +61,7 @@ export default class Folder extends DependentMember {
         let childIdMap = this.getChildIdMap();
         let name = child.getName();
         if(childIdMap[name] != childId) {
-            alert("Error - the table " + childId + " is not registered in the parent under the name "  + name);
+            apogeeUserAlert("Error - the table " + childId + " is not registered in the parent under the name "  + name);
             return;
         }
 

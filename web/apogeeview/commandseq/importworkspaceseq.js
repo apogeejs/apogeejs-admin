@@ -10,13 +10,13 @@ import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 
     //make sure there is not an open workspace
     if(!app.getWorkspaceManager()) {
-        alert("There must be an open workspace to import a workspace.");
+        apogeeUserAlert("There must be an open workspace to import a workspace.");
         return false;
     }    
 
     var onOpen = function(err,workspaceData,fileMetadata) {
         if(err) {
-            alert("Error importing workspace: " + err);
+            apogeeUserAlert("Error importing workspace: " + err);
             return false;
         }
         else if(workspaceData) {
@@ -62,11 +62,11 @@ function openWorkspace(appView,app,componentClass,workspaceText,fileMetadata) {
 		var workspaceImportDialogFunction = () => addComponent(appView,app,initialProperties,serializedMemberJson,serializedComponentsJson);
         
         var linkLoadError = function(errorMsg) {
-            alert("Error loading links: " + errorMsg);
+            apogeeUserAlert("Error loading links: " + errorMsg);
         }
         
         var workspaceImportError2 = function(errorMsg) {
-            alert(errorMsg);
+            apogeeUserAlert(errorMsg);
         }
         
         //load links then import the workspace. On a link load error, continue with importing the workspace
@@ -77,7 +77,7 @@ function openWorkspace(appView,app,componentClass,workspaceText,fileMetadata) {
     catch(error) {
         if(error.stack) console.error(error.stack);
         
-        alert("Error importing workspace: " + error.message);
+        apogeeUserAlert("Error importing workspace: " + error.message);
         return false;
     }
     
@@ -91,7 +91,7 @@ function openWorkspace(appView,app,componentClass,workspaceText,fileMetadata) {
 function openWorkspaceFromUrl(app,url) {
     var actionCompletedCallback = function(success,errorMsg) {
         if(!success) {
-            alert(errroMsg);
+            apogeeUserAlert(errroMsg);
         }
     };
     

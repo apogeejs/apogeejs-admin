@@ -43,6 +43,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
     getData() {
         if(!this.panel) {
             //why is this happening? DEBUG!!!
+            console.log("Doh!")
             return this.changeReferenceValue;
         }
         //get the form value, and set it to the refernece for changes to the form 

@@ -42,7 +42,7 @@ export function addLink(app,displayInfo) {
 
         //validate url- for now just make sure it is not zero length
         if((!newValues.url)||(newValues.url.length === 0)) {
-            alert("The url must not be empty");
+            apogeeUserAlert("The url must not be empty");
             return false;
         }
 
@@ -94,7 +94,7 @@ export function updateLink(app,referenceEntry,displayInfo) {
 
         //validate url- for now just make sure it is not zero length
         if((!newValues.url)||(newValues.url.length === 0)) {
-            alert("The url must not be empty");
+            apogeeUserAlert("The url must not be empty");
             return false;
         }
 
@@ -139,7 +139,8 @@ export function removeLink(app,referenceEntry,displayInfo) {
     let cancelAction = () => true;
 
     //verify the delete
-    showSimpleActionDialog("Are you sure you want to delete this link?",null,["Delete","Cancel"],[doAction,cancelAction]);
+    let deleteMsg = "Are you sure you want to delete this link?"
+    apogeeUserConfirm(deleteMsg,null,"Delete","Cancel",doAction,cancelAction);
 }
 
 

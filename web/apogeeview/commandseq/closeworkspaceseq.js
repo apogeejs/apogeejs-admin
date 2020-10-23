@@ -8,7 +8,7 @@ export function closeWorkspace(app) {
     
     var activeWorkspaceManager = app.getWorkspaceManager();
     if(activeWorkspaceManager === null) {
-        alert("There is no workspace close.");
+        apogeeUserAlert("There is no workspace close.");
         return;
     }
     
@@ -20,7 +20,8 @@ export function closeWorkspace(app) {
     //if the workspace is not saved give the user a warning and chance to cancel
     if(activeWorkspaceManager.getIsDirty()) {
         let cancelAction = () => true;
-        showSimpleActionDialog("There is unsaved data. Are you sure you want to close the workspace?",null,["Close","Cancel"],[doAction,cancelAction]);
+        let deleteMsg = "There is unsaved data. Are you sure you want to close the workspace?";
+        apogeeUserConfirm(deleteMsg,null,"Close","Cancel",doAction,cancelAction);
     }
     else {
         doAction();

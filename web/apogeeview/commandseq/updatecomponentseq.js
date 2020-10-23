@@ -79,7 +79,7 @@ export function updateComponent(componentView) {
             if(newValues.name) {
                 var nameResult = validateTableName(newValues.name);
                 if(!nameResult.valid) {
-                    alert(nameResult.errorMessage);
+                    apogeeUserAlert(nameResult.errorMessage);
                     return false;
                 }
             }
@@ -213,7 +213,7 @@ export function updateComponent(componentView) {
             let cancelAction = () => {
                 returnToEditor(componentView,submittedValues.name);
             };
-            showSimpleActionDialog(deleteMsg,null,["OK","Cancel"],[doAction,cancelAction]);
+            apogeeUserConfirm(deleteMsg,null,"Delete","Cancel",doAction,cancelAction);
         }
         else {
             //otherwise just take the action

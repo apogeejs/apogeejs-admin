@@ -239,7 +239,7 @@ export default class CodeableMember extends DependentMember {
             }
             else if(state == apogeeutil.STATE_PENDING) {
                 //pending value - we can't do anything with this
-                alert("There is a pending result in a field being saved. This may not be saved properly.");
+                apogeeUserAlert("There is a pending result in a field being saved. This may not be saved properly.");
                 updateData.data = "<unknown pending value>";
             }
             else if(state == apogeeutil.STATE_ERROR) {

@@ -258,7 +258,6 @@ export default class WorkspaceManager extends FieldObject {
         if(json) {
             if(json.version != WorkspaceManager.FILE_VERSION) {
                 let msg = "Version mismatch. Expected version " + WorkspaceManager.FILE_VERSION + ", Found version " + json.version;
-                alert(msg);
                 throw new Error(msg);
             }
         }
@@ -345,7 +344,6 @@ loadmodelmanager.executeCommand = function(workspaceManager,commandData) {
         return modelManager.load(workspaceManager,commandData.json);
     }
     catch(error) {
-        alert("The workspace failed to load cleanly: " + error.toString());
         throw error;
     }
 }

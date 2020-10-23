@@ -100,7 +100,7 @@ export default class CustomDataComponent extends Component {
         catch(error) {
             if(error.stack) console.error(error.stack);
             
-            alert("Error creating custom control: " + error.message);
+            apogeeUserAlert("Error creating custom control: " + error.message);
         }
     }
 

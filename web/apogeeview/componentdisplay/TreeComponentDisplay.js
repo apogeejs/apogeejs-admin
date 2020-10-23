@@ -42,7 +42,7 @@ export default class TreeComponentDisplay {
     // }
 
     deleteDisplay() {
-        alert("Delete tree component display not implemneted");
+        apogeeUserAlert("Delete tree component display not implemneted");
     }
 
     componentUpdated(component) {

@@ -51,7 +51,7 @@ export default class DataDisplay {
             saveComplete = this.dataSource.saveData(data);
         }
         else {
-            alert("Error: Data not saved: save callback not set!");
+            apogeeUserAlert("Error: Data not saved: save callback not set!");
             saveComplete = true;
         }
 

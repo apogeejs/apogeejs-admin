@@ -160,7 +160,7 @@ export default class FormDataComponentView extends ComponentView {
                 if(typeof validateResult != 'string') {
                     validateResult = "Improper format for isInputValid function. It should return true or an error message";
                 }
-                alert(validateResult);
+                apogeeUserAlert(validateResult);
                 return false;
             }
 

@@ -47,7 +47,7 @@ export function updateWorkspaceProperties(workspaceManager) {
         if(newValues.name !== initialValues.name) {
             //validate name - for now just make sure it is not zero length
             if(newValues.length === 0) {
-                alert("The name must not be empty");
+                apogeeUserAlert("The name must not be empty");
                 return false;
             }
 

@@ -18,14 +18,14 @@ export function saveWorkspace(app,fileAccessObject,requestDirectSave) {
         if(requestDirectSave) doDirectSave = fileAccessObject.directSaveOk(fileMetadata);
     }
     else {
-        alert("There is no workspace open.");
+        apogeeUserAlert("There is no workspace open.");
         return;
     }
 
     //clear workspace dirty flag on completion of save
     var onSave = (err,fileSaved,updatedFileMetadata) => {
         if(err) {
-            alert("There was an error saving the file: " + err.toString());
+            apogeeUserAlert("There was an error saving the file: " + err.toString());
         }
         else if(fileSaved) {
             var workspaceManager = app.getWorkspaceManager();

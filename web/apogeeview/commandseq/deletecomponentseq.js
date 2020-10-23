@@ -11,7 +11,8 @@ export function deleteComponent(componentView) {
     let doCancel = () => {
         returnToEditor(componentView);
     };
-    showSimpleActionDialog("Are you sure you want to delete this object:" + componentView.getName() + "?",null,["OK","Cancel"],[doDelete,doCancel]);
+    let deleteMsg = "Are you sure you want to delete this object:" + componentView.getName() + "?"
+    apogeeUserConfirm(deleteMsg,null,"Delete","Cancel",doDelete,doCancel);
 }
 
 function returnToEditor(componentView) {

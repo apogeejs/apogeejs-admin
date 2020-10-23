@@ -72,7 +72,7 @@ export default class WorkspaceView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for workspace update: " + error.toString());
+            apogeeUserAlert("Error updating display for workspace update: " + error.toString());
         }
     }
 

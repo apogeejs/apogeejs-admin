@@ -25,13 +25,13 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
         //get the active workspace
         var workspaceManager = app.getWorkspaceManager();
         if(!workspaceManager) {
-            alert("There is no open workspace.");
+            apogeeUserAlert("There is no open workspace.");
             return;
         }     
 
         var modelManager = workspaceManager.getModelManager();
         if(!modelManager) {
-            alert("The workspace has not been loaded yet.");
+            apogeeUserAlert("The workspace has not been loaded yet.");
             return;
         }    
 
@@ -60,7 +60,7 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
             //validate the name
             var nameResult = validateTableName(userInputProperties.name);
             if(!nameResult.valid) {
-                alert(nameResult.errorMessage);
+                apogeeUserAlert(nameResult.errorMessage);
                 return false;
             }
 
@@ -147,7 +147,7 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
                         parentComponentView.giveEditorFocusIfShowing();
                     }
                 };
-                showSimpleActionDialog(deleteMsg,null,["OK","Cancel"],[doAction,cancelAction]);
+                apogeeUserConfirm(deleteMsg,null,"OK","Cancel",doAction,cancelAction);
             }
             else {
                 //otherwise just take the action
@@ -177,7 +177,7 @@ export function addAdditionalComponent(appView,app,optionalInitialProperties,opt
             addComponent(appView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
         }
         else {
-            alert("Unknown component type: " + componentType);
+            apogeeUserAlert("Unknown component type: " + componentType);
         }
     }
     //get the display names

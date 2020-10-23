@@ -89,7 +89,7 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
                         if(error.stack) console.error(error.stack);
                         
                         //parsing error
-                        alert("There was an error parsing the JSON input: " +  error.message);
+                        apogeeUserAlert("There was an error parsing the JSON input: " +  error.message);
                         return false;
                     }
                 }

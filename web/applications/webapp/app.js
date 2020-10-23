@@ -13,6 +13,11 @@ window.apogeeapp = apogeeapp;
 window.apogeeui = apogeeui;
 window.apogeeview = apogeeview;
 
+//implementation of global alert functions
+//__globals__.apogeeLog = (msg) => console.log(message);
+__globals__.apogeeUserAlert = (msg) => apogeeview.showSimpleActionDialog(msg,null,["OK"]);
+__globals__.apogeeUserConfirm = (title,msg,okText,cancelText,okAction,cancelAction,defaultToOk) => apogeeview.showSimpleActionDialog(title,msg,[okText,cancelText],[okAction,cancelAction]);
+
 let appView;
 
 window.init = function(includeBasePathInfo) {

@@ -10,7 +10,7 @@ export function exportWorkspace(app,fileAccessObject) {
     //get the active workspace
     var workspaceManager = app.getWorkspaceManager();
     if(!workspaceManager) {
-        alert("There is no open workspace.");
+        apogeeUserAlert("There is no open workspace.");
         return;
     }   
 
@@ -29,13 +29,13 @@ export function exportWorkspace(app,fileAccessObject) {
 
         var workspaceText = getWorkspaceText(app,folder);
         if(!workspaceText) {
-            alert("There is no workspace open.");
+            apogeeUserAlert("There is no workspace open.");
             return;
         }
 
         let onSave = (err,fileSaved,fileMetadata) => {
             if(err) {
-                alert("There was an error saving the file: " + err.toString());
+                apogeeUserAlert("There was an error saving the file: " + err.toString());
             }
         }
 

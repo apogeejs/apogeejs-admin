@@ -24,7 +24,7 @@ export default class CommandHistory {
     addToHistory(undoCommand,redoCommand,description) {
         
         if((!undoCommand)||(!redoCommand)) {
-            alert("Both the undo command and redo command must be provided");
+            apogeeUserAlert("Both the undo command and redo command must be provided");
             return;
         }
         
@@ -113,7 +113,7 @@ export default class CommandHistory {
         }
         else {
             //the ui should not let us get here
-            alert("There is not command to undo");
+            apogeeUserAlert("There is no command to undo");
         }  
     }
     
@@ -132,7 +132,7 @@ export default class CommandHistory {
         }
         else {
             //the ui should not let us get here
-            alert("There is not command to redo");
+            apogeeUserAlert("There is not command to redo");
         }  
     }
     

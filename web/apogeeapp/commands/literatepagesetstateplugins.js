@@ -29,12 +29,15 @@ literatepagesetstateplugins.executeCommand = function(workspaceManager,commandDa
     let modelManager = workspaceManager.getMutableModelManager();
     let component = modelManager.getMutableComponentByComponentId(commandData.componentId);
 
-    let oldEditorState = component.getEditorState();
-    let plugins = commandData.plugins;
+    //note - component may not exist, in the case this was triggered by delete component
+    if(component) {
+        let oldEditorState = component.getEditorState();
+        let plugins = commandData.plugins;
 
-    let newEditorState = attachPluginsToEditorState(oldEditorState,plugins);
+        let newEditorState = attachPluginsToEditorState(oldEditorState,plugins);
 
-    component.setEditorState(newEditorState);
+        component.setEditorState(newEditorState);
+    }
 }
 
 literatepagesetstateplugins.commandInfo = {

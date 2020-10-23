@@ -121,7 +121,7 @@ export function doAction(model,actionData) {
         var runQueuedAction = true;
 
         if(model.checkConsecutiveQueuedActionLimitExceeded()) {
-            //ask user if about continueing
+            //ask user if about continueing - THIS MUST BE SYNCHRONOUS FOR NOW
             var doContinue = confirm("The calculation is taking a long time. Continue?");
             if(!doContinue) {
                 let changeResult = {};

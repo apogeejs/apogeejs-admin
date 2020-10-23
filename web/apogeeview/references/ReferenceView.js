@@ -72,7 +72,7 @@ export default class ReferenceView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for created reference entry: " + error.toString());
+            apogeeUserAlert("Error updating display for created reference entry: " + error.toString());
         }
     }
 
@@ -86,7 +86,7 @@ export default class ReferenceView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for created reference entry: " + error.toString());
+            apogeeUserAlert("Error updating display for created reference entry: " + error.toString());
         }
     }
 
@@ -98,7 +98,7 @@ export default class ReferenceView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for reference entry: " + error.toString());
+            apogeeUserAlert("Error updating display for reference entry: " + error.toString());
         }
     }
 
@@ -110,7 +110,7 @@ export default class ReferenceView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for deleted reference entry: " + error.toString());
+            apogeeUserAlert("Error updating display for deleted reference entry: " + error.toString());
         }
     }
 

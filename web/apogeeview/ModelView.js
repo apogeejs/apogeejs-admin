@@ -106,7 +106,7 @@ export default class ModelView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for created component: " + error.toString());
+            apogeeUserAlert("Error updating display for created component: " + error.toString());
         }
     }
 
@@ -118,7 +118,7 @@ export default class ModelView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for component: " + error.toString());
+            apogeeUserAlert("Error updating display for component: " + error.toString());
         }
     }
 
@@ -146,7 +146,7 @@ export default class ModelView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for delete component: " + error.toString());
+            apogeeUserAlert("Error updating display for delete component: " + error.toString());
         }
     }
 
@@ -163,7 +163,7 @@ export default class ModelView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for model update: " + error.toString());
+            apogeeUserAlert("Error updating display for model update: " + error.toString());
         }
     }
 

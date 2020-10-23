@@ -55,7 +55,7 @@ export default class CommandManager {
         //make sure we only exectue one command at a time. Issue with delay if one is in progress
         if(this.commandInProgress) {
             //do not allow a command while another is in progress.
-            alert("Command ettempted while another in progress. Ignored");
+            apogeeUserAlert("Command ettempted while another in progress. Ignored");
             return false;
         }
         this.commandInProgress = true;
@@ -154,7 +154,7 @@ export default class CommandManager {
             if(undoError) {
                 //process an error on creating the history - clear the current history
                 this.commandHistory.clearHistory();
-                alert("The command was succesful but there was an error in the history. Undo is not available. Error: " + undoErrorMsg);
+                apogeeUserAlert("The command was succesful but there was an error in the history. Undo is not available. Error: " + undoErrorMsg);
             }
 
             commandDone = true;
@@ -164,13 +164,15 @@ export default class CommandManager {
             //before the failed calculation. For example, any failed code updates shoul
             //be cleared.
             try {
-                let changeMapAll = oldWorkspaceManager.getChangeMapAll();
-                let changeListAll = this._changeMapToChangeList(changeMapAll);
+                if(oldWorkspaceManager) {
+                    let changeMapAll = oldWorkspaceManager.getChangeMapAll();
+                    let changeListAll = this._changeMapToChangeList(changeMapAll);
 
-                this._publishEvents(changeListAll);
+                    this._publishEvents(changeListAll);
+                }
 
                 //failure - keep the old workspace 
-                alert("Command failed and changes were undone: " + commandErrrorMsg);
+                apogeeUserAlert("Command failed: " + commandErrrorMsg);
             }
             catch(error) {
                 //failure - and we couldn't clean up the UI! 
@@ -179,7 +181,7 @@ export default class CommandManager {
                     "HOWEVER, the display improper values becuase of a failed UI update! " +
                     "(1) If the error is limited to pages, you can close all pages and it should be cleared when they reopen. " +
                     "(2) You can try saving. The problems shoudl be cleared when the workspae is reopened.";
-                alert(FAILED_COMMAND_AND_UI_ECOVERY_MSG);
+                    apogeeUserAlert(FAILED_COMMAND_AND_UI_ECOVERY_MSG);
             }
 
             commandDone = false;
@@ -226,13 +228,6 @@ export default class CommandManager {
     // Static Methods
     //=========================================
     
-    /** This message does a standard error alert for the user. If the error is
-     * fatal, meaning the application is not in a stable state, the flag isFatal
-     * should be set to true. Otherwise it can be omitted or set to false.  */
-    static errorAlert(errorMsg) {
-        alert(errorMsg);
-    }
-    
     /** This registers a command. The command object should hold two functions,
      * executeCommand(workspaceManager,commandData,optionalAsynchOnComplete) and, if applicable, createUndoCommand(workspaceManager,commandData)
      * and it should have the metadata commandInfo.
@@ -242,7 +237,7 @@ export default class CommandManager {
         //repeat warning
         let existingCommandObject = CommandManager.commandMap[commandObject.commandInfo.type];
         if(existingCommandObject) {
-            alert("The given command already exists in the command manager: " + commandObject.commandInfo.type + ". It will be replaced with the new command");
+            apogeeUserAlert("The given command already exists in the command manager: " + commandObject.commandInfo.type + ". It will be replaced with the new command");
         }
         
         CommandManager.commandMap[commandObject.commandInfo.type] = commandObject;

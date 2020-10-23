@@ -84,7 +84,7 @@ function createLine(lineDef,formActions) {
     }
     else {
         //print an error message
-        alert("Error: Unknown for element type: " + lineDef.type);
+        apogeeUserAlert("Error: Unknown for element type: " + lineDef.type);
         return null;
     }
 }

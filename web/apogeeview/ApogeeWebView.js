@@ -241,7 +241,7 @@ export default class ApogeeWebView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for created component: " + error.toString());
+            apogeeUserAlert("Error updating display for created component: " + error.toString());
         }
     }
 
@@ -268,7 +268,7 @@ export default class ApogeeWebView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for component: " + error.toString());
+            apogeeUserAlert("Error updating display for component: " + error.toString());
         }
     }
 
@@ -285,7 +285,7 @@ export default class ApogeeWebView {
         catch(error) {
             if(error.stack) console.error(error.stack);
 
-            alert("Error updating display for delete component: " + error.toString());
+            apogeeUserAlert("Error updating display for delete component: " + error.toString());
         }
     }
 
