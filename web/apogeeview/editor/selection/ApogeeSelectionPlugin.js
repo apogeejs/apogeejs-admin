@@ -3,6 +3,7 @@ import {TextSelection, NodeSelection, Plugin} from "/prosemirror/dist/prosemirro
 import {Decoration, DecorationSet} from "/prosemirror/dist/prosemirror-view.es.js"
 
 import {GapSelection} from "./GapSelection.js"
+import {isLeafBlock, isInline} from "./selectionUtils.js"
 
 // :: () → Plugin
 // Create a gap cursor plugin. When enabled, this will capture clicks
@@ -13,243 +14,333 @@ import {GapSelection} from "./GapSelection.js"
 // `style/gapcursor.css` from the package's directory or add your own
 // styles to make it visible.
 export const apogeeSelectionPlugin = function() {
-  return new Plugin({
-    props: {
-      decorations: drawGapCursor,
+    return new Plugin({
+        props: {
+            decorations: drawGapCursor,
 
-      createSelectionBetween(_view, $anchor, $head) {
-        if((GapSelection.validEnd($anchor))||(GapSelection.validEnd($head))) return new GapSelection($anchor, $head)
-      },
+            createSelectionBetween(_view, $anchor, $head) {
+                if((GapSelection.isGapLocation($anchor))||(GapSelection.isGapLocation($head))) return new GapSelection($anchor, $head)
+            },
 
-      handleClick,
-      handleKeyDown
-    }
-  })
+            handleClick,
+            handleKeyDown
+        }
+    })
 }
 
 export {GapSelection}
 
 const handleKeyDown = keydownHandler({
-  "ArrowLeft": arrow("horiz", -1, false),
-  "ArrowRight": arrow("horiz", 1, false),
-  "ArrowUp": arrow("vert", -1, false),
-  "ArrowDown": arrow("vert", 1, false),
-  "Shift-ArrowLeft": arrow("horiz", -1, true),
-  "Shift-ArrowRight": arrow("horiz", 1, true),
-  "Shift-ArrowUp": arrow("vert", -1, true),
-  "Shift-ArrowDown": arrow("vert", 1, true)
+    "ArrowLeft": arrow("horiz", -1, false),
+    "ArrowRight": arrow("horiz", 1, false),
+    "ArrowUp": arrow("vert", -1, false),
+    "ArrowDown": arrow("vert", 1, false),
+    "Shift-ArrowLeft": arrow("horiz", -1, true),
+    "Shift-ArrowRight": arrow("horiz", 1, true),
+    "Shift-ArrowUp": arrow("vert", -1, true),
+    "Shift-ArrowDown": arrow("vert", 1, true)
 })
 
 //code
 
+////////////////////////////////////////////////////////////
+// DOH! in code below, I use thehead for the moving part of the selection
+// if there is a non-empty selection and a non-shift arrow, the
+// end that moves depends on the arrow direction
+
 
 function arrow(axis, dir, shiftPressed) {
-  let dirStr = axis == "vert" ? (dir > 0 ? "down" : "up") : (dir > 0 ? "right" : "left")
-  return function(state, dispatch, view) {
-    let selection = state.selection
-    let {$head, $anchor} = selection;
+    return function(state, dispatch, view) {
+        let selection = state.selection
+        let {$head, $anchor} = selection;
 
-    console.log(axis + " " + dir + " " + shiftPressed);
-    if(selection instanceof NodeSelection) {
-      if(_isLeafBlock(selection.node)) {
-        let $newHead, $newAnchor;
-        //get the new head - in the direction of travel from anchor
-        //we won't assume the order of the current head and anchor
-        if( ($head.pos > $anchor.pos) === (dir === 1) ) {
-          $newHead = $head;
-          $newAnchor = shiftPressed ? $anchor : $head
+        if(selection instanceof NodeSelection) {
+            //case 1: node selection
+            if(isLeafBlock(selection.node)) {
+                return _createGapSelectionNearNode($anchor,$head,axis,dir,shiftPressed,state,dispatch);
+            }
+            else {
+                //just give up if we are not in a leaf block
+                return false;
+            }
         }
         else {
-          $newHead = $anchor;
-          $newAnchor = shiftPressed ? $head : $anchor
+            //other cases need the moving side of the selection
+            //get the moving side of the selection
+            let $movingPos, $otherPos;
+            if(shiftPressed) {
+                //when shift, head always moves 
+                $movingPos = $head;
+                $otherPos = $anchor;
+            }
+            else {
+                //without shift, the end in direction of motion moves
+                $movingPos = (dir > 0) ? $head.max($anchor) : $head.min($anchor);
+                $otherPos = ($movingPos === $head) ? $anchor : $head;
+            }
+
+            if(GapSelection.isGapLocation($movingPos)) {
+                //create new selection leaving a gap position
+                return _createSelectionMovingFromGap($movingPos,$otherPos,axis,dir,shiftPressed,state,dispatch)
+            }
+            else if ($movingPos.parent.isTextblock) {
+                //create new selection leavnig a text position
+                return _createSelectionMovingFromText($movingPos,$otherPos,axis,dir,shiftPressed,state,dispatch,view)
+            }
         }
-        if (dispatch) dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)))
-        return true
-      }
-      else {
-        //just give up if we are not in a leaf block
+        //nto handled
         return false;
-      }
     }
-    else if($head.depth === 0) { //should do a better test!!!
-      //the head is in a gap. navigate in the direction of travel until we reacn an inline node
-      let doc = $head.parent;
-      let pos;
-      let $newHead, $newAnchor;
-      let headType, anchorType
-
-      //////////////////////////////////////////////////////////////
-      //do the following code differently?
-      //- get $head.nodeBefore or $head.nodeAfter
-      //- check the type
-      //-- list (or other container) - cycle through its children from start/end to find fist text block
-      //-- text block - get position at start/end fro type text position
-      //-- leaf block - get position before/after for type gap position
-      //////////////////////////////////////////////////////////////
-      //from the current gap, find the next gap or inline node, whichever comes first
-      for(pos = $head.pos; !headType; pos += dir) {
-        if((pos > doc.content.size)||(pos < 0)) {
-          //we reached the end of the doc
-          //no new selection, but return this as handled
-          return true;
-        }
-        let node = _getNextNodeAt(doc,pos,dir);
-        if(!node) {
-          //this will happen if we back into a non-leaf
-        }
-        else if(_isLeafBlock(node)) {
-          //the next gap follows this
-          $newHead = doc.resolve(pos + dir);
-          headType = "gap"
-        }
-        else if(_isInline(node)) {
-          //this is the next position for text
-          $newHead = doc.resolve(pos);
-          headType = "text"
-        }
-      }
-      /////////////////////////////////////////////////////////////////
-      
-      //get the new anchor
-      if(shiftPressed) {
-        $newAnchor = $anchor;
-        anchorType = $newAnchor.depth ? "text" : "gap" //I am assuming it is 0 or in text. I maybe should be more careful
-      }
-      else {
-        $newAnchor = $newHead;
-        anchorType = headType
-      }
-
-      if((headType == "gap")||(anchorType == "gap")) {
-        //gap selection
-        if (dispatch) dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)))
-        return true
-      }
-      else {
-        //text selection
-        if (dispatch) dispatch(state.tr.setSelection(new TextSelection($newAnchor,$newHead)))
-        return true
-      }
-    }
-    else if ($head.parent.isTextblock) {
-      //if we are in a text block and the next node is a leaf block, see if we leave the current text block
-      /////////////////////////////////////////////////////////////////////////
-      //- get index of current block within parent: $head.index($head.depth-1), $head.node($head.depth-1).childCount (double check indices)
-      //- get "next" block in the parent's parent. If we are at the end of grandparent, get the "next" grandparent, etc
-      //- look for textBlock or leafBlock.  
-      //
-      //- If the next block is a leaf block, then we need to check if we exit the current text block.
-      //--If we do, we make a gap selection before/after the leaf block.
-      //--If we do not, then we can do a let do default handling of the selection. 
-
-      //_leavesTextblockHorizontal
-      //_leavesTextblockVertical
-      let x = 0;
-      return false;
-    }
-    //nto handled
-    return false;
-  }
 }
 
+/** This handle mouse clicks to make selections. Text and Node selections use default handling.
+ * Here we make Gap Selections if needed. A Gap Selection is used if the cursor is at a gap location
+ * or at least one end of a non-empty selection is at a gap location
+ */
 function handleClick(view, pos, event) {
-  if (!view.editable) return false
-  let $pos = view.state.doc.resolve(pos)
-  if (!GapSelection.validEnd($pos)) return false
-  let {inside} = view.posAtCoords({left: event.clientX, top: event.clientY})
-  if (inside > -1 && NodeSelection.isSelectable(view.state.doc.nodeAt(inside))) return false
-  let $newHead = $pos;
-  let $newAnchor;
-  if(event.shiftKey) {
-    $newAnchor = view.state.selection.$anchor;
-  }
-  else {
-    $newAnchor = $newHead;
-  }
-  view.dispatch(view.state.tr.setSelection(new GapSelection($newAnchor,$newHead)))
-  return true
+    if (!view.editable) return false
+    let $pos = view.state.doc.resolve(pos);
+
+    //to be a gap selection one side must be a gap location
+    let headWillBeGap = GapSelection.isGapLocation($pos);
+    let tailWillBeGap;
+    if(event.shiftKey) {
+        tailWillBeGap = (view.state.selection instanceof GapSelection)&&(view.state.selection.this.anchorIsGap);  
+    }
+    else {
+        tailWillBeGap = headWillBeGap;
+    }
+    if(! ((headWillBeGap)||(tailWillBeGap)) ) return false;
+    
+    //create the gap position 
+    let $newHead = $pos;
+    let $newAnchor;
+    if(event.shiftKey) {
+        $newAnchor = view.state.selection.$anchor;
+    }
+    else {
+        $newAnchor = $newHead;
+    }
+    view.dispatch(view.state.tr.setSelection(new GapSelection($newAnchor,$newHead)))
+    return true
 }
 
 function drawGapCursor(state) {
-  if (!(state.selection instanceof GapSelection)) return null
-  let widgets = [];
-  if(state.selection.headIsGap) widgets.push(_createWidget(state.selection.head))
-  if(state.selection.anchorIsGap) widgets.push(_createWidget(state.selection.anchor))
-  return DecorationSet.create(state.doc,widgets)
+    if (!(state.selection instanceof GapSelection)) return null
+    let widgets = [];
+    if(state.selection.headIsGap) widgets.push(_createWidget(state.selection.head))
+    if(state.selection.anchorIsGap) widgets.push(_createWidget(state.selection.anchor))
+    return DecorationSet.create(state.doc,widgets)
 }
 
 function _createWidget(pos) {
-  let node = document.createElement("div")
-  node.className = "ProseMirror-gapcursor"
-  return Decoration.widget(pos, node, {key: "gapselectioncursor"})
+    let node = document.createElement("div")
+    node.className = "ProseMirror-gapcursor"
+    return Decoration.widget(pos, node, {key: "gapselectioncursor"})
 }
 
+//=================================
+// Internal Functions
+//=================================
 
+/** This method creates a GapSelection around the node, with the head in
+ * the direction of travel (+1 or -1). 
+ * Returns true if the operation either succeeds or would succeed (if dispatch 
+ * were present) */
+function _createGapSelectionNearNode($anchor,$head,axis,dir,shiftPressed,state,dispatch) {
+    //execute if dispatch present
+    if (dispatch) {
+        let $newHead, $newAnchor;
+        //get the new head - in the direction of travel from anchor
+        //we won't assume the order of the current head and anchor
+        if( ($head.pos > $anchor.pos) === (dir > 0) ) {
+            $newHead = $head;
+            $newAnchor = shiftPressed ? $anchor : $head
+        }
+        else {
+            $newHead = $anchor;
+            $newAnchor = shiftPressed ? $head : $anchor
+        }
+        dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)))
+    }
+    return true;
+}
+
+/** This sets a new selection updating the previous selection for motion in the given direction
+ * from the moving side of the selection.
+ * This handles a vertical and horizontal arrow the same, currently not caching position information into
+ * the next line for the case of vertical arrow. */
+function _createSelectionMovingFromGap($movingPos,$otherPos,axis,dir,shiftPressed,state,dispatch) {
+    //the head is in a gap. navigate in the direction of travel until we reacn an inline node
+    let doc = $movingPos.parent;
+    let pos;
+    let $newHead, $newAnchor;
+    let headType, anchorType
+
+    //////////////////////////////////////////////////////////////
+    //do the following code differently?
+    //- get $head.nodeBefore or $head.nodeAfter
+    //- check the type
+    //-- list (or other container) - cycle through its children from start/end to find fist text block
+    //-- text block - get position at start/end fro type text position
+    //-- leaf block - get position before/after for type gap position
+    //////////////////////////////////////////////////////////////
+    //from the current gap, find the next gap or inline node, whichever comes first
+    for(pos = $movingPos.pos; !headType; pos += dir) {
+        if((pos > doc.content.size)||(pos < 0)) {
+            //we reached the end of the doc
+            //no new selection, but return this as handled
+            return true;
+        }
+        let node = _getNextNodeAt(doc,pos,dir);
+        if(!node) {
+            //this will happen if we back into a non-leaf
+        }
+        else if(isLeafBlock(node)) {
+            //the next gap follows this
+            $newHead = doc.resolve(pos + dir);
+            headType = "gap"
+        }
+        else if(isInline(node)) {
+            //this is the next position for text
+            $newHead = doc.resolve(pos);
+            headType = "text"
+        }
+    }
+    /////////////////////////////////////////////////////////////////
+    
+    //get the new anchor
+    if(shiftPressed) {
+        $newAnchor = $otherPos;
+        anchorType = $newAnchor.depth ? "text" : "gap" //I am assuming it is 0 or in text. I maybe should be more careful
+    }
+    else {
+        $newAnchor = $newHead;
+        anchorType = headType
+    }
+
+    if((headType == "gap")||(anchorType == "gap")) {
+        //gap selection
+        if (dispatch) dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)))
+        return true
+    }
+    else {
+        //text selection
+        if (dispatch) dispatch(state.tr.setSelection(new TextSelection($newAnchor,$newHead)))
+        return true
+    }
+}
+
+/** This sets a new selection updating the previous selection for motion in the given direction
+ * from the moving side of the selection (or takes no action, letting the default selection happen) */
+function _createSelectionMovingFromText($movingPos,$otherPos,axis,dir,shiftPressed,state,dispatch,view) {
+    //if we are in a text block and the next node is a leaf block, see if we leave the current text block
+    //---------------------------------------------------------------------------------------------------------------
+    // SCHEMA ASSUMPTION - We are assuming leaf nodes are always in the root level of the document, not in containers
+    // further, we are not allowed to have an empty container block.
+    //---------------------------------------------------------------------------------------------------------------
+
+    //if we do not leave the current block, we will allow default selection handling.
+    //but this is potentially expensive, at least for vertical, so we will do that check last
+
+    //if our current text block is _not_ in the root level, our next block may be the next block in this grandparent
+    //with our assumption, this would be a text block or a container of 1 or more text blocks.
+    let grandparentDepth = $movingPos.depth-1
+    if(grandparentDepth !== 0) {
+        if($movingPos.index(grandparentDepth) !== ((dir > 0) ? $movingPos.node(grandparentDepth).childCount-1 : 0)) {
+            //we are not the end block in the direction of motion
+            //next block is a text block
+            //use the default select handling
+            return false
+        } 
+    }
+
+    //check if the next block at document level is a leaf block (since we assume they are only at root level)
+    let doc = $movingPos.doc;
+    let nextBlockInRoot = doc.maybeChild($movingPos.index(0) + ((dir > 0) ? 1 : -1) );
+    if((nextBlockInRoot)&&(isLeafBlock(nextBlockInRoot))) {
+        //next block in direction of travel is a leaf block. We will make a gap selection if we leave the current block
+        //we will do that check now (as mentioned above)
+
+        //check if we leave the current block
+        if( !( (axis == "vert") ? _leavesTextblockVertical(view, $movingPos, dir) : _leavesTextblockHorizontal(view, $movingPos, dir)) ) {
+            //we do not leave the current block
+            //use default selection handling
+            return false;
+        }
+
+        //get the position ouside the current block and document level
+        let newHeadPos = (dir > 0) ? $movingPos.end(1) + 1 : $movingPos.start(1) - 1;
+        let $newHead = doc.resolve(newHeadPos);
+        let $newAnchor = shiftPressed ? $otherPos : $newHead;
+        if (dispatch) dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)))
+        return true
+    }
+    else {
+        //next is text or we leav document
+        //use default selection handling
+        return false;
+    }
+}
 
 function _getNextNodeAt(doc,pos,dir) {
-  if(dir == 1) {
-    return doc.nodeAt(pos)
-  }
-  else if(dir == -1) {
-    return doc.nodeAt(pos-1)
-  }
-  else {
-    throw new Error("Get next node should be called with 1 or -1");
-  }
+    if(dir == 1) {
+        return doc.nodeAt(pos)
+    }
+    else if(dir == -1) {
+        return doc.nodeAt(pos-1)
+    }
+    else {
+        throw new Error("Get next node should be called with 1 or -1");
+    }
 }
-
-function _isLeafBlock(node) {
-  if(!node) return false;
-  return node.isBlock && (node.isAtom || node.isLeaf);
-}
-
-function _isInline(node) {
-  if(!node) return false;
-  return node.isInline;
-}
-
 
 ////////////////////////////////////////////////////////////////
+
+//=========================
+// Deep internal functions copied from ProseMirror domCoords.js and dom.js.
+// I needed a few modifications.
+//=========================
 
 /** This is a copied version of endOfTextblockHorizontal from domCoords. I needed a modified version
  * of its partner function. When I copied this, the copy is only valid for the case
  * of non-bidirectional text. I am not supporting it, yet. */
 function _leavesTextblockHorizontal(view, $pos, dir) {
-  let offset = $pos.parentOffset, atStart = !offset, atEnd = offset == $pos.parent.content.size
-  return dir == "left" || dir == "backward" ? atStart : atEnd
+    let offset = $pos.parentOffset, atStart = !offset, atEnd = offset == $pos.parent.content.size
+    return (dir < 0) ? atStart : atEnd
 }
 
 
 /** This is a copied version of endOfTextblockVertical from domCoords, because I wanted it to be slightly 
  * different - the original only gives the right result for no shift key. */
 function _leavesTextblockVertical(view, $pos, dir) {
-  let {node: dom} = view.docView.domFromPos($pos.pos)
-  for (;;) {
-    let nearest = view.docView.nearestDesc(dom, true)
-    if (!nearest) break
-    if (nearest.node.isBlock) { dom = nearest.dom; break }
-    dom = nearest.dom.parentNode
-  }
-  let coords = view.coordsAtPos($pos.pos)
-  for (let child = dom.firstChild; child; child = child.nextSibling) {
-    let boxes
-    if (child.nodeType == 1) boxes = child.getClientRects()
-    else if (child.nodeType == 3) boxes = __copied_textRange(child, 0, child.nodeValue.length).getClientRects()
-    else continue
-    for (let i = 0; i < boxes.length; i++) {
-      let box = boxes[i]
-      if (box.bottom > box.top && (dir == "up" ? box.bottom < coords.top + 1 : box.top > coords.bottom - 1))
-        return false
+    let {node: dom} = view.docView.domFromPos($pos.pos)
+    for (;;) {
+        let nearest = view.docView.nearestDesc(dom, true)
+        if (!nearest) break
+        if (nearest.node.isBlock) { dom = nearest.dom; break }
+        dom = nearest.dom.parentNode
     }
-  }
-  return true
+    let coords = view.coordsAtPos($pos.pos)
+    for (let child = dom.firstChild; child; child = child.nextSibling) {
+        let boxes
+        if (child.nodeType == 1) boxes = child.getClientRects()
+        else if (child.nodeType == 3) boxes = __copied_textRange(child, 0, child.nodeValue.length).getClientRects()
+        else continue
+        for (let i = 0; i < boxes.length; i++) {
+            let box = boxes[i]
+            if (box.bottom > box.top && ((dir < 0) ? box.bottom < coords.top + 1 : box.top > coords.bottom - 1))
+                return false
+        }
+    }
+    return true
 
 }
 
-
+/** was dom.js textRange */
 function __copied_textRange(node, from, to) {
-  let range = document.createRange()
-  range.setEnd(node, to == null ? node.nodeValue.length : to)
-  range.setStart(node, from || 0)
-  return range
+    let range = document.createRange()
+    range.setEnd(node, to == null ? node.nodeValue.length : to)
+    range.setStart(node, from || 0)
+    return range
 }

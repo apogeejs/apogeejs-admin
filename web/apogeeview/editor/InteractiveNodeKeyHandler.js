@@ -11,7 +11,7 @@ const PASSTHROUGH_KEYMAP = {
     "ArrowLeft": dummyFunction,
     "ArrowRight": dummyFunction,
     "ArrowUp": dummyFunction,
-    "Shift-ArrowDown": dummyFunction,
+    "ArrowDown": dummyFunction,
     "Shift-ArrowLeft": dummyFunction,
     "Shift-ArrowRight": dummyFunction,
     "Shift-ArrowUp": dummyFunction,
