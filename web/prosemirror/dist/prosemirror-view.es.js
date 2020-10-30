@@ -3374,8 +3374,10 @@ class MouseDown {
 
     let pos = this.pos;
     if (this.view.state.doc != this.startDoc) pos = this.view.posAtCoords(eventCoords(event));
-
-    if (this.allowDefault || !pos) {
+//////////////////////////////////////////////////////////////    
+    if (/*this.allowDefault ||*/ !pos) {
+    //if (this.allowDefault || !pos) {
+///////////////////////////////////////////////////////////////
       setSelectionOrigin(this.view, "pointer");
     } else if (handleSingleClick(this.view, pos.pos, pos.inside, event, this.selectNode)) {
       event.preventDefault();
