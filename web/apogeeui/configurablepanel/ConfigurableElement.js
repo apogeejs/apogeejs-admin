@@ -196,7 +196,7 @@ export default class ConfigurableElement {
     getLabelElement(elementInitData) {
         if(elementInitData.label) {
             let labelElement = document.createElement("span");
-            labelElement.className = "apogee_configurablePanelLabel";
+            labelElement.className = "apogee_configurablePanelLabel apogee_configurableElement_hideSelection";
             labelElement.innerHTML = elementInitData.label;
             return labelElement;
         }

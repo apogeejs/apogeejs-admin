@@ -14,10 +14,12 @@ export function getSaveBar(onSave,onCancel) {
         });
 
     saveDiv.appendChild(document.createTextNode("Edit: "));
+    saveDiv.className = "visiui_hideSelection";
 
     var saveBarSaveButton = document.createElement("button");
     saveBarSaveButton.innerHTML = "Save";
     saveBarSaveButton.onclick = onSave;
+    saveBarSaveButton.className = "visiui_hideSelection";
     saveDiv.appendChild(saveBarSaveButton);
 
     saveDiv.appendChild(document.createTextNode(" "));
@@ -25,6 +27,7 @@ export function getSaveBar(onSave,onCancel) {
     var saveBarCancelButton = document.createElement("button");
     saveBarCancelButton.innerHTML = "Cancel";
     saveBarCancelButton.onclick = onCancel;
+    saveBarCancelButton.className = "visiui_hideSelection";
     saveDiv.appendChild(saveBarCancelButton);
     
     return saveDiv;

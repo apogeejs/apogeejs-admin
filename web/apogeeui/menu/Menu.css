@@ -26,7 +26,6 @@
 
     overflow: visible;
 }
-
 .visiui-menu-heading {
     display:inline-block;
     position:relative;
@@ -40,6 +39,12 @@
 .visiui-menu-heading-active {
     background-color:rgba(128,128,144,.35);
     outline: 3px solid rgba(128,128,144,.35);
+}
+.visiui-menu-label {
+    user-select: none;
+}
+.visiui-menu-label::selection {
+    background: transparent;
 }
 .visiui-menu-label:hover {
     background-color:rgba(128,128,144,.35);

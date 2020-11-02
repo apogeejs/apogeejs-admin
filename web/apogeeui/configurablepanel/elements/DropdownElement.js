@@ -20,6 +20,7 @@ export default class DropdownElement extends ConfigurableElement {
         
         this.valueMap = {};
         this.select = uiutil.createElement("select");
+        this.select.className = "apogee_configurableElement_hideSelection";
         var addEntry = (entryInfo,index) => {
             var label;
             var value;

@@ -151,7 +151,7 @@ export default class PageDisplayContainer {
         //create the view header
         this.viewToolbarElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.mainElement);
 
-        this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass",this.viewToolbarElement);
+        this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass visiui_hideSelection",this.viewToolbarElement);
         this.viewLabelElement.innerHTML = this.viewTypeLabel;
 
         this.sizingElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewSizingElementClass",this.viewToolbarElement);
@@ -169,15 +169,15 @@ export default class PageDisplayContainer {
         this.viewSelectorContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
         //this is set from link to div so it can not get focus. later, we _do_ want it to get focuus, but if it does we need to make
         //sure button presses are handled properly. (as it would have been, enter does not work to leave the cell)
-        this.viewSelectorLink = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorLinkClass",this.viewSelectorContainer);
+        this.viewSelectorLink = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorLinkClass visiui_hideSelection",this.viewSelectorContainer);
 
-        this.expandImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewSelectorLink);
+        this.expandImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass visiui_hideSelection",this.viewSelectorLink);
         this.expandImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_CLOSED_IMAGE_PATH);
     
-        this.contractImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass",this.viewSelectorLink);
+        this.contractImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass visiui_hideSelection",this.viewSelectorLink);
         this.contractImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_OPENED_IMAGE_PATH);
 
-        this.viewNameElement = uiutil.createElementWithClass("span","visiui_displayContainer_viewSelectorClass",this.viewSelectorLink);
+        this.viewNameElement = uiutil.createElementWithClass("span","visiui_displayContainer_viewSelectorClass visiui_hideSelection",this.viewSelectorLink);
         this.viewNameElement.innerHTML = this.viewTypeLabel;
 
         this.viewSelectorLink.onclick = () => { this.setIsViewActive(!this.isViewActive); return false; }
@@ -261,15 +261,15 @@ export default class PageDisplayContainer {
 
         //show the height controls
         if(this.dataDisplay.getUseContainerHeightUi()) {
-            this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
+            this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
             this.showLessButton.innerHTML = "less";
             this.showLessButton.onclick = () => this.showLess();
             this.showLessButton.title = "Descrease View Size";
-            this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
+            this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
             this.showMoreButton.innerHTML = "more";
             this.showMoreButton.onclick = () => this.showMore();
             this.showMoreButton.title = "Increase View Size";
-            this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass",this.sizingElement);
+            this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
             this.showMaxButton.innerHTML = "max";
             this.showMaxButton.onclick = () => this.showMax();
             this.showMaxButton.title = "Show Max View Size";

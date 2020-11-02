@@ -75,7 +75,7 @@ export default class ShowHideLayout extends ConfigurableLayoutContainer {
             this.headingElement.appendChild(this.titleElement);
         }
         this.control = document.createElement("img");
-        this.control.className = "apogee_configurableShowHideControl";
+        this.control.className = "apogee_configurableShowHideControl apogee_configurableElement_hideSelection";
         this.headingElement.appendChild(this.control);
         this.headingElement.onclick = () => this._toggleState();
 

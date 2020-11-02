@@ -14,6 +14,7 @@ export default class ApogeeComponentView {
     // The node's representation in the editor
     this.dom = document.createElement("div");
     this.dom.className = "page-apogee-comp";
+    this.dom.draggable = false;
 
     this.contentDiv = document.createElement("div");
     this.contentDiv.className = "page-apogee-comp-container"

@@ -91,6 +91,8 @@ export default class JsonTableComponentView extends ComponentView {
             statusElement.style.fontSize = "smaller";
             statusElement.style.color = "gray";
             statusElement.style.marginLeft = "20px";
+            statusElement.style.userSelect ; "none";
+            statusElement.className = "visiui_hideSelection";
             displayBarElement.appendChild(statusElement);
         }
     }

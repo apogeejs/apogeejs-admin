@@ -265,11 +265,11 @@ export default class PageChildComponentDisplay {
         }
 
         this.iconContainerElement = uiutil.createElementWithClass("div", "visiui-pageChild-icon-container",this.titleBarContainer);
-        this.icon = uiutil.createElementWithClass("img", "visiui-pageChild-icon",this.iconContainerElement);
+        this.icon = uiutil.createElementWithClass("img", "visiui-pageChild-icon visiui_hideSelection",this.iconContainerElement);
         this.icon.src = iconSrc; 
-        this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_pageChild_icon_overlay",this.iconContainerElement);
+        this.iconOverlayElement = uiutil.createElementWithClass("div","visiui_pageChild_icon_overlay visiui_hideSelection",this.iconContainerElement);
         
-        //label
+        //cell name label (note - keep this selectable so users can copy the name)
         this.titleBarNameElement = uiutil.createElementWithClass("div", "visiui_pageChild_titleBarNameClass",this.titleBarContainer);
 
         //menu
