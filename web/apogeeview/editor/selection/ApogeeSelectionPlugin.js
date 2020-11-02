@@ -161,7 +161,7 @@ function _createGapSelectionNearNode($anchor,$head,axis,dir,shiftPressed,state,d
             $newHead = $anchor;
             $newAnchor = shiftPressed ? $head : $anchor
         }
-        dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)))
+        dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)).scrollIntoView())
     }
     return true;
 }
@@ -221,12 +221,12 @@ function _createSelectionMovingFromGap($movingPos,$otherPos,axis,dir,shiftPresse
 
     if((headType == "gap")||(anchorType == "gap")) {
         //gap selection
-        if (dispatch) dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)))
+        if (dispatch) dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)).scrollIntoView())
         return true
     }
     else {
         //text selection
-        if (dispatch) dispatch(state.tr.setSelection(new TextSelection($newAnchor,$newHead)))
+        if (dispatch) dispatch(state.tr.setSelection(new TextSelection($newAnchor,$newHead)).scrollIntoView())
         return true
     }
 }
@@ -273,7 +273,7 @@ function _createSelectionMovingFromText($movingPos,$otherPos,axis,dir,shiftPress
         let newHeadPos = (dir > 0) ? $movingPos.end(1) + 1 : $movingPos.start(1) - 1;
         let $newHead = doc.resolve(newHeadPos);
         let $newAnchor = shiftPressed ? $otherPos : $newHead;
-        if (dispatch) dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)))
+        if (dispatch) dispatch(state.tr.setSelection(new GapSelection($newAnchor,$newHead)).scrollIntoView())
         return true
     }
     else {
