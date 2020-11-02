@@ -58,6 +58,7 @@ export default class AceTextEditor extends DataDisplay {
         var editor = ace.edit(this.editorDiv);
         editor.setOptions(this.editorOptions);
         editor.setHighlightActiveLine(false);
+        editor.setAutoScrollEditorIntoView(true);
         editor.setTheme("ace/theme/eclipse");
         editor.getSession().setMode(this.aceMode); 
         editor.$blockScrolling = Infinity;
