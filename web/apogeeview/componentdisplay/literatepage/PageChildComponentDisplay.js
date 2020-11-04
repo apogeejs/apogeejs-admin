@@ -287,6 +287,10 @@ export default class PageChildComponentDisplay {
         //views
         this.titleBarViewsElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
 
+        //cell type label
+        this.cellTypeLabel = uiutil.createElementWithClass("div","visiui_pageChild_cellTypeLabelClass",this.titleBarContainer);
+        this.cellTypeLabel.innerHTML = this.componentView.getComponent().constructor.displayName;
+
     }
 
     setIsPageShowing(isPageShowing) {

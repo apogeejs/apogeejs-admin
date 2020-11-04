@@ -96,6 +96,13 @@
     font-size: larger;
     color:darkblue;
 }
+.visiui_pageChild_cellTypeLabelClass {
+    display: inline;
+    padding-left: 25px;
+    vertical-align: middle;
+    font-size: smaller;
+    color: gray;
+}
 .visiui-pageChild-icon-container {
     display:inline-block;
     position: relative;

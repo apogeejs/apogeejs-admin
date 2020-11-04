@@ -503,6 +503,28 @@ export default class PageDisplayContainer {
             this.mainElement.classList.add("visiui_displayContainer_editMode");
             this.viewSelectorContainer.classList.add("visiui_displayContainer_viewSelectorContainerClass_editMode");
             this.componentDisplay.notifyEditMode(true,this.viewTypeName);
+
+            //save listener for display view
+            if(!this.saveKeyListener) {
+                this.saveKeyListener = event => {
+                    if((event.keyCode == 83)&&(event.ctrlKey)&&(!__OS_IS_MAC__)) {
+                        if(this.inEditMode) onSave();
+                        event.preventDefault();
+                        return true;
+                    }
+                    if((event.keyCode == 83)&&(event.metaKey)&&(__OS_IS_MAC__)) {
+                        if(this.inEditMode) onSave();
+                        event.preventDefault();
+                        return true;
+                    }
+                    else if(event.keyCode == 27) {
+                        if(this.inEditMode) onCancel();
+                        event.preventDefault();
+                        return true;
+                    }
+                }
+            }
+            this.mainElement.addEventListener("keydown",this.saveKeyListener);
         }
     }
 
@@ -511,6 +533,7 @@ export default class PageDisplayContainer {
         if(this.inEditMode) {
             this.inEditMode = false;
             this.setHeaderContent(null);
+            this.mainElement.removeEventListener("keyDown",this.saveKeyListener);
             this.mainElement.classList.remove("visiui_displayContainer_editMode");
             this.viewSelectorContainer.classList.remove("visiui_displayContainer_viewSelectorContainerClass_editMode");
             this.componentDisplay.notifyEditMode(false,this.viewTypeName);
