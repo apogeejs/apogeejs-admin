@@ -190,6 +190,10 @@ export default class PageDisplayContainer {
         if(!this.uiDestrpoyed) {
             this.uiDestroyed = true;
 
+            if(this.onKeyDown) {
+                this.mainElement.removeEventListener("keyDown",this.onKeyDown);
+                this.onKeyDown = null;
+            }
             this.mainElement = null;
             this.viewToolbarElement = null;
             this.viewLabelElement = null;
@@ -505,26 +509,8 @@ export default class PageDisplayContainer {
             this.componentDisplay.notifyEditMode(true,this.viewTypeName);
 
             //save listener for display view
-            if(!this.saveKeyListener) {
-                this.saveKeyListener = event => {
-                    if((event.keyCode == 83)&&(event.ctrlKey)&&(!__OS_IS_MAC__)) {
-                        if(this.inEditMode) onSave();
-                        event.preventDefault();
-                        return true;
-                    }
-                    if((event.keyCode == 83)&&(event.metaKey)&&(__OS_IS_MAC__)) {
-                        if(this.inEditMode) onSave();
-                        event.preventDefault();
-                        return true;
-                    }
-                    else if(event.keyCode == 27) {
-                        if(this.inEditMode) onCancel();
-                        event.preventDefault();
-                        return true;
-                    }
-                }
-            }
-            this.mainElement.addEventListener("keydown",this.saveKeyListener);
+            this.onKeyDown = event => this.keyDownHandler(event,onSave,onCancel);
+            this.mainElement.addEventListener("keydown",this.onKeyDown);
         }
     }
 
@@ -533,7 +519,10 @@ export default class PageDisplayContainer {
         if(this.inEditMode) {
             this.inEditMode = false;
             this.setHeaderContent(null);
-            this.mainElement.removeEventListener("keyDown",this.saveKeyListener);
+            if(this.onKeyDown) {
+                this.mainElement.removeEventListener("keydown",this.onKeyDown);
+                this.onKeyDown = null;
+            }
             this.mainElement.classList.remove("visiui_displayContainer_editMode");
             this.viewSelectorContainer.classList.remove("visiui_displayContainer_viewSelectorContainerClass_editMode");
             this.componentDisplay.notifyEditMode(false,this.viewTypeName);
@@ -554,6 +543,25 @@ export default class PageDisplayContainer {
     //====================================
     // Internal Methods
     //====================================
+
+    /** This handles key input */
+    keyDownHandler(keyEvent,onSave,onCancel) {
+        if((keyEvent.keyCode == 83)&&(keyEvent.ctrlKey)&&(!__OS_IS_MAC__)) {
+            if(this.inEditMode) onSave();
+            keyEvent.preventDefault();
+            return true;
+        }
+        else if((keyEvent.keyCode == 83)&&(keyEvent.metaKey)&&(__OS_IS_MAC__)) {
+            if(this.inEditMode) onSave();
+            keyEvent.preventDefault();
+            return true;
+        }
+        else if(keyEvent.keyCode == 27) {
+            if(this.inEditMode) onCancel();
+            keyEvent.preventDefault();
+            return true;
+        }
+    }
 
     /** This sets the content for the window. If null (or otherwise false) is passed
      * the content will be set to empty.*/

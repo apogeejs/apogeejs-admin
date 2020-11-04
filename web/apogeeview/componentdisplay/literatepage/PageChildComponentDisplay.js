@@ -18,6 +18,7 @@ export default class PageChildComponentDisplay {
         this.bannerContainer = null;
 
         this.titleBarNameElement = null;
+        this.cellTypeLabel = null;
         
         this.displayContainerMap = null;
         
@@ -169,6 +170,7 @@ export default class PageChildComponentDisplay {
         if(this.iconContainerElement) this.iconContainerElement.remove();
         if(this.icon) this.icon.remove();
         if(this.titleBarNameElement) this.titleBarNameElement.remove();
+        if(this.cellTypeLabel) this.titleBarNameElement.remove();
         if(this.titleBarViewsElement) this.titleBarViewsElement.remove();
 
         this.isDestroyed = true;
@@ -288,7 +290,7 @@ export default class PageChildComponentDisplay {
         this.titleBarViewsElement = uiutil.createElementWithClass("div","visiui_pageChild_titleBarViewsClass",this.titleBarContainer);
 
         //cell type label
-        this.cellTypeLabel = uiutil.createElementWithClass("div","visiui_pageChild_cellTypeLabelClass",this.titleBarContainer);
+        this.cellTypeLabel = uiutil.createElementWithClass("div","visiui_pageChild_cellTypeLabelClass visiui_hideSelection",this.titleBarContainer);
         this.cellTypeLabel.innerHTML = this.componentView.getComponent().constructor.displayName;
 
     }

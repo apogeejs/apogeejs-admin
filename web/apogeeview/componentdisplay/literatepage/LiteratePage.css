@@ -102,6 +102,7 @@
     vertical-align: middle;
     font-size: smaller;
     color: gray;
+    user-select: none;
 }
 .visiui-pageChild-icon-container {
     display:inline-block;
