@@ -81,9 +81,17 @@ export default class CheckboxGroupElement extends ConfigurableElement {
 
             this.checkboxList.push(checkbox);
             buttonContainer.appendChild(checkbox);
-            buttonContainer.appendChild(document.createTextNode(label));
+            let checkboxLabel = document.createElement("span");
+            checkboxLabel.innerHTML = label;
+            checkboxLabel.className = "apogee_configurableElement_hideSelection";
+            buttonContainer.appendChild(checkboxLabel);
 
-            if(doHorizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
+            if(doHorizontal) {
+                let spacer = document.createElement("span");
+                spacer.innerHTML = "\u00A0\u00A0\u00A0\u00A0";
+                spacer.className = "apogee_configurableElement_hideSelection";
+                buttonContainer.appendChild(spacer);
+            }
             
             if(elementInitData.disabled) checkbox.disabled = true;
 

@@ -164,6 +164,15 @@ export default class ApogeeView {
         this.splitPane.addListener("move",() => this.onSplitPaneResize());
         window.addEventListener("resize",() => this.onWindowResize());
 
+        //-------------------------------
+        // disable drag globally
+        //---------------------------------
+
+        //disable dragging globally by stapping drag start in window during capture
+        let preventAction = (event) => {
+            event.preventDefault();
+        }
+        window.addEventListener("dragstart",preventAction,true);
     }
 
     //------------------------------

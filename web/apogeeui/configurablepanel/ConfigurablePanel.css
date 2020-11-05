@@ -20,29 +20,38 @@
 .apogee_configurablePanelHeading_1 {
     font-size: 2em;
     font-weight: bold;
+    user-select: none;
 }
 .apogee_configurablePanelHeading_2 {
     font-size: 1.5em;
     font-weight: bold;
+    user-select: none;
 }
 .apogee_configurablePanelHeading_3 {
     font-size: 1.17em;
     font-weight: bold;
+    user-select: none;
 }
 .apogee_configurablePanelHeading_4 {
     font-weight: bold;
+    user-select: none;
+    user-select: none;
 }
 .apogee_configurablePanelHeading_5 {
     font-size: .83em;
     font-weight: bold;
+    user-select: none;
+    user-select: none;
 }
 .apogee_configurablePanelHeading_6 {
     font-size: .67em;
     font-weight: bold;
+    user-select: none;
 }
 .apogee_configurablePanelLabel {
     font-weight: bold;
     vertical-align: middle; 
+    user-select: none;
 }
 .apogee_configurablePanelHint {
     font-style: italic;
@@ -51,6 +60,7 @@
     vertical-align: middle; 
     margin-right: 3px;
     margin-left: 3px;
+    user-select: none;
 }
 .apogee_configurablePanelButton {
     margin-left:20px;
@@ -128,4 +138,8 @@
 }
 .apogee_configubleElementErrorDiv {
     color: red;
+    user-select: none;
+}
+.apogee_configurableElement_hideSelection::selection {
+    background: transparent;
 }

@@ -13,6 +13,10 @@
     border: 1px solid darkblue;
     text-align: center;
     z-index: 100;
+    user-select: none;
+}
+.apogee_tooltip_help_image {
+    user-select: none;
 }
 .apogee_tooltip_element:hover .apogee_tooltip_text {
     visibility: visible;

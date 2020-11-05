@@ -15,3 +15,8 @@ __globals__.apogeeUserConfirm = (msg,okText,cancelText,okAction,cancelAction,def
 
 /** This synchronous funtion returns true or false for ok or cancel. */
 __globals__.apogeeUserConfirmSynchronous = (msg,okText,cancelText,defaultToOk) => defaultToOk;
+
+//a global def we wil use in UI
+// declare global: os, navigator
+__globals__.__OS_IS_MAC__ = typeof navigator != "undefined" ? /Mac/.test(navigator.platform)
+    : typeof os != "undefined" ? os.platform() == "darwin" : false;

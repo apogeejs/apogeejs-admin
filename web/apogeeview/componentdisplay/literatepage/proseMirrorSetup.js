@@ -16,7 +16,8 @@ import { baseKeymap } from "/apogeeview/editor/apogeeCommands.js";
 import { Plugin } from "/prosemirror/dist/prosemirror-state.es.js";
 import { EditorView } from "/prosemirror/dist/prosemirror-view.es.js";
 import { keymap } from "/prosemirror/dist/prosemirror-keymap.es.js";
-import { gapCursor } from "/prosemirror/dist/prosemirror-gapcursor.es.js";
+//import { gapCursor } from "/prosemirror/dist/prosemirror-gapcursor.es.js";
+import { apogeeSelectionPlugin } from "/apogeeView/editor/selection/ApogeeSelectionPlugin.js";
 
 import ApogeeComponentView from "/apogeeview/editor/ApogeeComponentView.js";
 
@@ -69,12 +70,19 @@ export function createProseMirrorManager(app, schema) {
     //state debug plugin
     //===========================
 
-    // let stateCheckPlugin = new Plugin({
-    //     view(editorView) {
-    //         let stateCheck = new StateCheck(editorView);
-    //         return stateCheck;
-    //     }
-    // })
+    let stateCheckPlugin = new Plugin({
+        view(editorView) {
+            let stateCheck = new StateCheck(editorView);
+            return stateCheck;
+        },
+
+        props: {
+            createSelectionBetween(_view, $anchor, $head) {
+                console.log("XXX Create Selection between: " + $anchor.pos + " - " + $head.pos);
+                return false;
+              },
+        }
+    })
 
     //==============================
     // Create the editor
@@ -116,9 +124,9 @@ export function createProseMirrorManager(app, schema) {
             getInteractiveNodePlugin(),
             keymap({ "Mod-z": undo, "Mod-y": redo }),
             keymap(baseKeymap),
-            gapCursor(),
-            toolbarPlugin  /*,
-            stateCheckPlugin*/
+            apogeeSelectionPlugin(),
+            toolbarPlugin,
+            stateCheckPlugin
         ];
 
         var nodeViews = {};

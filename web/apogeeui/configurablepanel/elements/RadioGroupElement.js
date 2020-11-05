@@ -82,9 +82,17 @@ export default class RadioGroupElement extends ConfigurableElement {
 
             this.buttonList.push(radio);
             buttonContainer.appendChild(radio);
-            buttonContainer.appendChild(document.createTextNode(label));
+            let buttonLabel = document.createElement("span");
+            buttonLabel.innerHTML = label;
+            buttonLabel.className = "apogee_configurableElement_hideSelection";
+            buttonContainer.appendChild(buttonLabel);
             
-            if(doHorizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
+            if(doHorizontal) {
+                let spacer = document.createElement("span");
+                spacer.innerHTML = "\u00A0\u00A0\u00A0\u00A0";
+                spacer.className = "apogee_configurableElement_hideSelection";
+                buttonContainer.appendChild(spacer);
+            }
 
             //add dom listeners
             radio.addEventListener("change",this.changeListener);

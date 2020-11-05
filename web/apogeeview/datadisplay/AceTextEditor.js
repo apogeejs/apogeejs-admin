@@ -55,27 +55,37 @@ export default class AceTextEditor extends DataDisplay {
     createEditor() {
         if(this.destroyed) return;
 
-        var editor = ace.edit(this.editorDiv);
-        editor.setOptions(this.editorOptions);
-        editor.setHighlightActiveLine(false);
-        editor.setTheme("ace/theme/eclipse");
-        editor.getSession().setMode(this.aceMode); 
-        editor.$blockScrolling = Infinity;
-        editor.renderer.attachToShadowRoot(); 
+        this.editor = ace.edit(this.editorDiv);
+        this.editor.setOptions(this.editorOptions);
+        this.editor.setHighlightActiveLine(false);
+        this.editor.setAutoScrollEditorIntoView(true);
+        this.editor.setTheme("ace/theme/eclipse");
+        this.editor.getSession().setMode(this.aceMode); 
+        this.editor.$blockScrolling = Infinity;
+        this.editor.renderer.attachToShadowRoot(); 
         
-        editor.commands.addCommand({
+        this.editor.commands.addCommand({
             name: "Save",
             exec: () => this.save(),
             bindKey: {mac: "cmd-s", win: "ctrl-s"}
         })
 
-        editor.commands.addCommand({
+        this.editor.commands.addCommand({
             name: "Revert",
             exec: () => this.cancel(),
             bindKey: {mac: "esc", win: "esc"}
         })
         
-        this.editor = editor;
+
+        //handle focus change
+        this.editor.on("blur",() => this.onEditorBlur());
+        this.editor.on("focus",() => this.onEditorFocus());
+        if(this.editor.isFocused()) {
+            this.onEditorFocus();
+        }
+        else {
+            this.onEditorBlur();
+        }
         
         if(this.cachedDisplayData) {
             this.setData(this.cachedDisplayData);
@@ -178,6 +188,20 @@ export default class AceTextEditor extends DataDisplay {
             if(activeData != this.cachedDisplayData) {
                 this.onTriggerEditMode();
             }
+        }
+    }
+
+    onEditorBlur() {
+        if(this.editor) {
+            this.editor.renderer.$cursorLayer.element.style.display = "none";
+            this.editor.renderer.$markerBack.element.style.display = "none";
+        }
+    }
+
+    onEditorFocus() {
+        if(this.editor) {
+            this.editor.renderer.$cursorLayer.element.style.display = "";
+            this.editor.renderer.$markerBack.element.style.display = "";
         }
     }
 

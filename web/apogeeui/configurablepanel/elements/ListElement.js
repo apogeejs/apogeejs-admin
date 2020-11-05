@@ -218,7 +218,7 @@ export default class ListElement extends ConfigurableElement {
         controlBar.className = "listElement_listControlBar";
         this.entryTypes.forEach(entryTypeJson => {
             let addButton= document.createElement("button");
-            addButton.className = "listElement_addButton";
+            addButton.className = "listElement_addButton apogee_configurableElement_hideSelection";
             let labelText = entryTypeJson.label ? "+ "+ entryTypeJson.label : "+";
             addButton.innerHTML = labelText;
             addButton.onclick = () => {
@@ -226,7 +226,9 @@ export default class ListElement extends ConfigurableElement {
                 this.inputDone();
             }
             controlBar.appendChild(addButton);
-            controlBar.appendChild(document.createElement("br"));
+            let lineBreak = document.createElement("br");
+            lineBreak.className = "apogee_configurableElement_hideSelection";
+            controlBar.appendChild(lineBreak);
         });
         listContainer.appendChild(controlBar);
 
@@ -303,7 +305,7 @@ export default class ListElement extends ConfigurableElement {
         controlBar.className = "listElement_itemControlBar";
         let upButton = document.createElement("img");
         upButton.src = this.upUrl;
-        upButton.className = "listElement_itemButton";
+        upButton.className = "listElement_itemButton apogee_configurableElement_hideSelection";
         upButton.style.position = "absolute";
         upButton.style.top = "2px";
         upButton.style.left = "2px";
@@ -315,7 +317,7 @@ export default class ListElement extends ConfigurableElement {
    
         let downButton = document.createElement("img");
         downButton.src = this.downUrl;
-        downButton.className = "listElement_itemButton";
+        downButton.className = "listElement_itemButton apogee_configurableElement_hideSelection";
         downButton.style.position = "absolute";
         downButton.style.top = "15px";
         downButton.style.left = "2px";
@@ -327,7 +329,7 @@ export default class ListElement extends ConfigurableElement {
    
         let deleteButton = document.createElement("img");
         deleteButton.src = this.closeUrl;
-        deleteButton.className = "listElement_itemButton";
+        deleteButton.className = "listElement_itemButton apogee_configurableElement_hideSelection";
         deleteButton.style.position = "absolute";
         deleteButton.style.top = "2px";
         deleteButton.style.left = "20px";
