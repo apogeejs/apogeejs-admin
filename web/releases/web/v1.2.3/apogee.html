@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Apogee</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <base href="/lib/v1.2.3/" target="_blank">
+        <script type="text/javascript" src="webGlobals.js"></script>
+        <script type="text/javascript" src="debugHook.js"></script>
+        <script type="module" src="apogeeWebApp.js"></script>
+        <script tyep="text/javascript">
+            const includeBasePathInfo = {
+                "resources": "resources",
+                "aceIncludes": "ace_includes"
+            };
+
+            const __apogee_version__ = "1.2.3";
+            const __browser__ = true;
+        </script>
+        <link rel="stylesheet" type="text/css" href="cssBundle.css">
+	</head>
+    <body onload="init(includeBasePathInfo)" onbeforeunload="return beforeUnloadHandler()">
+        <div id="appContainer"></div>
+	</body>
+</html>
