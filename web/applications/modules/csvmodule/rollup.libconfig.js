@@ -2,6 +2,9 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import pkg from './package.json';
 
+//prevent someone from accidentally changing the library
+throw new Error("This is temporaril diabled to prevent accidental use!");
+
 let inputLibModule = "src/" + pkg.uncompiled_lib;
 let outputLibModule = "src/" + pkg.compiled_lib;
 

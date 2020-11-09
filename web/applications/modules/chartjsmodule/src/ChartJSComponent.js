@@ -141,12 +141,20 @@ function getXNumericChartData(sourceData, chartInfo, generalChartOptions) {
 
         //read the data - one of three formats
         if (dataSeriesEntry.xyPoints !== undefined) {
+            //this option is no longer supported
+            if(!Array.isArray(dataSeriesEntry.xyPoints)) throw new Error("The value for xyPoints must be an Array!");
+
             //points, format {x:x, y:y}
             entry.data = dataSeriesEntry.xyPoints;
         }
         else if ((dataSeriesEntry.xValues !== undefined) && (dataSeriesEntry.yValues !== undefined)) {
+            if(!Array.isArray(dataSeriesEntry.xValues)) throw new Error("The value of X Data Array must be an Array!");
+            if(!Array.isArray(dataSeriesEntry.yValues)) throw new Error("The value of Y Data Array must be an Array!");
+
             //x and y value arrays
             if (dataSeriesEntry.xValues.length != dataSeriesEntry.yValues.length) throw new Error("Data series x and y values are not the same length!");
+            if((dataSeriesEntry.xAccessor)&&(!(dataSeriesEntry.xAccessor instanceof Function))) throw new Error("If an X Accessor is used, it must be a Function");
+            if((dataSeriesEntry.yAccessor)&&(!(dataSeriesEntry.yAccessor instanceof Function))) throw new Error("If a Y Accessor is used, it must be a Function");
 
             entry.data = [];
             for (let i = 0; i < dataSeriesEntry.xValues.length; i++) {
@@ -158,6 +166,10 @@ function getXNumericChartData(sourceData, chartInfo, generalChartOptions) {
             }
         }
         else if (dataSeriesEntry.dataArray !== undefined) {
+            if(!Array.isArray(dataSeriesEntry.dataArray)) throw new Error("The value for Data Array must be an Array!");
+            if((dataSeriesEntry.xAccessor)&&(!(dataSeriesEntry.xAccessor instanceof Function))) throw new Error("If an X Accessor is used, it must be a Function");
+            if((dataSeriesEntry.yAccessor)&&(!(dataSeriesEntry.yAccessor instanceof Function))) throw new Error("If a Y Accessor is used, it must be a Function");
+
             //data array and x and y accessor function (no accessor means point format)
             entry.data = [];
             for (let i = 0; i < dataSeriesEntry.dataArray.length; i++) {
@@ -196,6 +208,9 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
     let maxYLength = 0;
 
     if (sourceData.xCategories) {
+        if(!Array.isArray(sourceData.xCategories)) throw new Error("The value for X Categories must be an Array, or left blank!");
+        if((sourceData.xCatAccessor)&&(!(sourceData.xCatAccessor instanceof Function))) throw new Error("If a Category Accessor is used, it must be a Function");
+
         xCategories = sourceData.xCatAccessor ? sourceData.xCategories.map(sourceData.xCatAccessor) : sourceData.xCategories;
     }
     else {
@@ -211,7 +226,11 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
 
         //read the data
         if (dataSeriesEntry.dataArray !== undefined) {
+            if(!Array.isArray(dataSeriesEntry.dataArray)) throw new Error("The value for Data Array must be an Array!");
+
             if (dataSeriesEntry.yAccessor !== undefined) {
+                if(!(dataSeriesEntry.yAccessor instanceof Function)) throw new Error("If a Y Accessor is used, it must be a Function");
+
                 entry.data = dataSeriesEntry.dataArray.map(dataSeriesEntry.yAccessor);
             }
             else {
@@ -219,6 +238,8 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
             }
         }
         else if (dataSeriesEntry.dataMap !== undefined) {
+            if(Array.isArray(dataSeriesEntry.dataMap)) throw new Error("The value for Data Map should be a JSON Object, not a JSON Array!");
+
             //we need to convert to a row array
             let data = [];
             for (let cat in dataSeriesEntry.dataMap) {
@@ -237,6 +258,8 @@ function getXCategoryChartData(sourceData, chartInfo, generalChartOptions) {
                 let entry = dataSeriesEntry.dataMap[cat];
                 let value;
                 if (dataSeriesEntry.yAccessor !== undefined) {
+                    if(!(dataSeriesEntry.yAccessor instanceof Function)) throw new Error("If a Y Accessor is used, it must be a Function");
+
                     value = dataSeriesEntry.yAccessor(entry);
                 }
                 else {

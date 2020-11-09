@@ -67,7 +67,7 @@ export default class CSVComponentView extends FormInputBaseComponentView {
                 label: "Input Text Data: ",
                 size: 60,
                 key: "input",
-                hint: "expression",
+                hint: "reference",
                 help: INPUT_HELP_TEXT,
                 meta: {
                     expression: "simple",
@@ -205,7 +205,7 @@ CSVComponentView.ICON_RES_PATH = "/icons3/gridCellIcon.png";
 
 const JSON_TEXT_FORMAT_STRING = "\t";
 
-const INPUT_HELP_TEXT = "This should be a javascript expression, such as the name of a cell, which gives the raw CSV text. It will be converted to JSON format." + 
+const INPUT_HELP_TEXT = "This should be the name of a cell or a javascript expression that gives the raw CSV text. It will be converted to JSON format." + 
 " To access this json value, use the expression <em>[cell name].data</em> to access the data rows and <em>[cell name].header</em>  to access the header row.";
 const OUTPUT_FORMAT_HELP_TEXT = "The output can be an array of JSON objects or an array of arrays. For the JSON Objects the keys will be the column names."
 const DYNAMIC_TYPING_HELP_TEXT = "Check this box to automatically convert numbers and booleans. If this is not selected, all data will be strings.";

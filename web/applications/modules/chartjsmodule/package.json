@@ -1,7 +1,7 @@
 {
   "name": "chartjs-module",
-  "officialRelease": true,
-  "version": "3.1.0",
+  "officialRelease": false,
+  "version": "3.1.1",
   "npm_module": "chartjsmodule.cjs.js",
   "es_module": "chartjsmodule.esm.js",
   "chart_lib": "src/chartjs.esm.js",

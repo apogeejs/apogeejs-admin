@@ -2,6 +2,9 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import pkg from './package.json';
 
+//prevent someone from accidentally changing the library
+throw new Error("This is temporaril diabled to prevent accidental use!");
+
 
 //This can be used to construct a es deployable module from the npm source module
 export default [

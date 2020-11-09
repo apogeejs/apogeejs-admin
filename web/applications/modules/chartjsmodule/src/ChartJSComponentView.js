@@ -327,7 +327,7 @@ const FORM_LAYOUT = [
 		"type": "textField",
 		"label": "Config JSON: ",
 		"size": 60,
-		"hint": "expression",
+		"hint": "reference",
 		"help": "Enter the name of the cell containing the config json, or any other javascript expression returning the desired config json value. ",
 		"key": "configJson",
 		"selector": {
@@ -347,21 +347,21 @@ const FORM_LAYOUT = [
 		"formData": [
 			{
 				"type": "radioButtonGroup",
-				"label": "X Values Type: ",
+				"label": "Coordinates Type: ",
 				"size": 60,
 				"entries": [
 					[
-						"Category",
+						"Y Values in discrete categories",
 						"category"
 					],
 					[
-						"Numeric",
+						"XY plot",
 						"numeric"
 					]
 				],
 				"value": "category",
-				"horizontal": true,
-				"help": "The x values can be (1) categories, such as days of the week or other discrete values, or (2) numeric values. ",
+				"vertical": true,
+				"help": "Values can be plotted (1) by categories, such as days of the week or other discrete values, or (2) as an XY plot, where numeric values control this position of points along both axes. ",
 				"key": "xValuesType",
 				"selector": {
 					"parentKey": ["chartType"],
@@ -372,8 +372,8 @@ const FORM_LAYOUT = [
 				"type": "textField",
 				"label": "X Category Array: ",
 				"size": 60,
-				"hint": "expression, optional",
-				"help": "This is a javascript expression, such as the name of a cell, giving the array of category values. If the categories are not provided, either here or in the data series, integer values will be used starting with 1.",
+				"hint": "reference, optional",
+				"help": "Enter the name of a cell of a javascript expression giving the array of category values. If the categories are not provided, either here or in the data series, integer values will be used starting with 1.",
 				"key": "xCategories",
 				"meta": {
 					"expression": "simple",
@@ -398,7 +398,7 @@ const FORM_LAYOUT = [
 				"label": "X Category Accessor: ",
 				"size": 60,
 				"hint": "function, optional",
-				"help": "Enter a javascript expression giving a function f to read the X category value from the above data array: categoryArray = categoryDataArray.map( f ); ",
+				"help": "Enter a javascript expression or the name of a cell giving a function f to read the X category value from the above data array: categoryArray = categoryDataArray.map( f ); ",
 				"key": "xCatAccessor",
 				"meta": {
 					"expression": "simple",
@@ -446,8 +446,8 @@ const FORM_LAYOUT = [
 								"type": "textField",
 								"label": "X Data Array: ",
 								"size": 60,
-								"hint": "expression",
-								"help": "Enter a javascript expression, such as the name of a cell, giving the array of X values. ",
+								"hint": "reference",
+								"help": "Enter the name of a cell or a javascript expression giving the array of X values. ",
 								"key": "xValues",
 								"selector": {
 									"parentKey": "dataFormat",
@@ -462,8 +462,8 @@ const FORM_LAYOUT = [
 								"type": "textField",
 								"label": "Y Data Array: ",
 								"size": 60,
-								"hint": "expression",
-								"help": "Enter a javascript expression, such as the name of a cell, giving the array of Y values.  ",
+								"hint": "reference",
+								"help": "Enter the name of a cell or a javascript expression giving the array of Y values.  ",
 								"key": "yValues",
 								"selector": {
 									"parentKey": "dataFormat",
@@ -478,8 +478,8 @@ const FORM_LAYOUT = [
 								"type": "textField",
 								"label": "Data Array: ",
 								"size": 60,
-								"hint": "expression",
-								"help": "Enter a javascript expression, such as the name of a cell, giving the array of arbitrary objects. The X and Y values will be read from it using the function specified below.",
+								"hint": "reference",
+								"help": "Enter the name of a cell or a javascript expression giving the array of arbitrary objects. The X and Y values will be read from it using the function specified below.",
 								"key": "dataArray",
 								"selector": {
 									"parentKey": "dataFormat",
@@ -495,7 +495,7 @@ const FORM_LAYOUT = [
 								"label": "X Accessor: ",
 								"size": 60,
 								"hint": "function, optional",
-								"help": "Enter a javascript expression giving a function f to read the X value from the above data array: xValueArray = dataArray.map( f ); ",
+								"help": "Enter a javascript expression or the name of a cell giving a function f to read the X value from the above data array: xValueArray = dataArray.map( f ); ",
 								"key": "xAccessor",
 								"meta": {
 									"expression": "simple",
@@ -507,7 +507,7 @@ const FORM_LAYOUT = [
 								"label": "Y Accessor: ",
 								"size": 60,
 								"hint": "function, optional",
-								"help": "Enter a javascript expression giving a function f to read the Y value from the above data array: yValueArray = dataArray.map( f ); ",
+								"help": "Enter a javascript expression or the name of a cell giving a function f to read the Y value from the above data array: yValueArray = dataArray.map( f ); ",
 								"key": "yAccessor",
 								"meta": {
 									"expression": "simple",
@@ -988,8 +988,8 @@ const FORM_LAYOUT = [
 								"type": "textField",
 								"label": "Data Array: ",
 								"size": 60,
-								"hint": "expression",
-								"help": "Enter a javascript expression, such as the name of a cell, giving the data array. The array can hold Y values or more complex structs. If it holds structs, use the 'Y Accessor' field to provide a function to read the y value from the struct.",
+								"hint": "reference",
+								"help": "Enter the name of a cell or a javascript expression giving the data array. The array can hold Y values or more complex structs. If it holds structs, use the 'Y Accessor' field to provide a function to read the y value from the struct.",
 								"key": "dataArray",
 								"selector": {
 									"parentKey": "dataType",
@@ -1004,8 +1004,8 @@ const FORM_LAYOUT = [
 								"type": "textField",
 								"label": "Data Map: ",
 								"size": 60,
-								"hint": "expression",
-								"help": "Enter a javascript expression, such as the name of a cell, giving the data map (JSON Object). The keys are the category. The values can either be Y values or more complex structs. If it holds structs, use the 'Y Accessor' field to provide a function to read the y value from the struct.",
+								"hint": "reference",
+								"help": "Enter the name of a cell or a javascript expression giving the data map (JSON Object). The keys are the category. The values can either be Y values or more complex structs. If it holds structs, use the 'Y Accessor' field to provide a function to read the y value from the struct.",
 								"key": "dataMap",
 								"selector": {
 									"parentKey": "dataType",
@@ -1021,7 +1021,7 @@ const FORM_LAYOUT = [
 								"label": "Y Accessor: ",
 								"size": 60,
 								"hint": "function, optional",
-								"help": "<em>Optional</em> Enter a javascript expression giving a function f to read the Y value from entries in the array or map entries. This is not needed if the entries are the y values to be graphed.",
+								"help": "<em>Optional</em> Enter a javascript expression or the name of a cell giving a function f to read the Y value from entries in the array or map entries. This is not needed if the entries are the y values to be graphed.",
 								"key": "yAccessor",
 								"meta": {
 									"expression": "simple",
