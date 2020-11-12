@@ -273,7 +273,7 @@ export default class CodeableMember extends DependentMember {
             if(initialData.errorList) {
                 this.setErrors(model,initialData.errorList);
             }
-            else if(initialData.invalidError) {
+            else if(initialData.invalidValue) {
                 this.setResultInvalid(model);
             }
             else {

@@ -310,7 +310,7 @@ export default class Member extends FieldObject {
      * The data value will be applied regardless of the state. The error list is applied only if the state is ERROR. */
     setStateAndData(model,state,data,errorList) {
         //set data as specified
-        if(data == undefined) {
+        if(data === undefined) {
             this.clearField("data");
         }
         else {
