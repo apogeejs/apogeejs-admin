@@ -139,8 +139,8 @@ ContextManager.prototype.getValueFromGlobals = function(varName) {
     //This is here because, for now, on the server require did not appear in globals, so we put it here.
     //I think this is because it is only exposed in certain places, possibly related to their es module
     //implementation.  
-    if(__apogee_globals__) {
-        let value = __apogee_globals__[varName];
+    if(__globals__.__apogee_globals__) {
+        let value = __globals__.__apogee_globals__[varName];
         if(value !== undefined) return value; 
     }
     /////////////////////////////////////

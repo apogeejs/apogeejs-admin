@@ -3,7 +3,7 @@ import {TextSelection, NodeSelection, Plugin} from "/prosemirror/dist/prosemirro
 import {Decoration, DecorationSet} from "/prosemirror/dist/prosemirror-view.es.js"
 
 import {GapSelection} from "./GapSelection.js"
-import {isLeafBlock, isInline} from "./selectionUtils.js"
+import {isLeafBlock} from "./selectionUtils.js"
 
 // :: () → Plugin
 // Create a gap cursor plugin. When enabled, this will capture clicks
@@ -175,7 +175,10 @@ function _createSelectionMovingFromGap($movingPos,$otherPos,axis,dir,shiftPresse
     let doc = $movingPos.parent;
     let pos;
     let $newHead, $newAnchor;
-    let headType, anchorType
+    let headType, anchorType;
+
+    if(dir > 0) dir = 1;
+    else if(dir < 0) dir = -1
 
     //////////////////////////////////////////////////////////////
     //do the following code differently?
@@ -184,31 +187,45 @@ function _createSelectionMovingFromGap($movingPos,$otherPos,axis,dir,shiftPresse
     //-- list (or other container) - cycle through its children from start/end to find fist text block
     //-- text block - get position at start/end fro type text position
     //-- leaf block - get position before/after for type gap position
+    ////////////////////
+    // new alg
+    // - start at current position
+    // - go one unit in specified direction
+    // - get parent node type:
+    // -- none - check position type
+    // --- this is a gap position - create gap selection here
+    // --- this is not a gap - put cursor inside next text node
+    // -- text - create a text selection here
     //////////////////////////////////////////////////////////////
+    
     //from the current gap, find the next gap or inline node, whichever comes first
-    for(pos = $movingPos.pos; !headType; pos += dir) {
+    for(pos = $movingPos.pos + dir; !headType; pos += dir) {
         if((pos > doc.content.size)||(pos < 0)) {
             //we reached the end of the doc
             //no new selection, but return this as handled
             return true;
         }
-        let node = _getNextNodeAt(doc,pos,dir);
-        if(!node) {
-            //this will happen if we back into a non-leaf
+        let $pos = doc.resolve(pos);
+        let parentNode = $pos.parent;
+        if(parentNode == doc) {
+            if(GapSelection.isGapLocation($pos)) {
+                //we are at a gap location
+                //put gap selection here
+                $newHead = $pos;
+                headType = "gap"
+            }
+            //we are between non-leaf node - continue moving
         }
-        else if(isLeafBlock(node)) {
-            //the next gap follows this
-            $newHead = doc.resolve(pos + dir);
-            headType = "gap"
-        }
-        else if(isInline(node)) {
+        else if(parentNode.isTextblock) {
+            //we are in a text node
             //this is the next position for text
             $newHead = doc.resolve(pos);
             headType = "text"
         }
+        //if we get here - continue moving
+        //maybe in a parent non-text node or maybe fall through from parent node null
     }
-    /////////////////////////////////////////////////////////////////
-    
+
     //get the new anchor
     if(shiftPressed) {
         $newAnchor = $otherPos;
@@ -280,18 +297,6 @@ function _createSelectionMovingFromText($movingPos,$otherPos,axis,dir,shiftPress
         //next is text or we leav document
         //use default selection handling
         return false;
-    }
-}
-
-function _getNextNodeAt(doc,pos,dir) {
-    if(dir == 1) {
-        return doc.nodeAt(pos)
-    }
-    else if(dir == -1) {
-        return doc.nodeAt(pos-1)
-    }
-    else {
-        throw new Error("Get next node should be called with 1 or -1");
     }
 }
 
