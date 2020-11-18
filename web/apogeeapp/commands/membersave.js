@@ -27,7 +27,7 @@ export function getMemberStateUndoCommand(model, memberId) {
         let state = member.getState();
         if(state == apogeeutil.STATE_ERROR) {
             //save a sngle error
-            command.data = [this.getErrorMsg()];
+            command.data = [member.getErrorMsg()];
             
         }
         else if(state == apogeeutil.STATE_INVALID) {

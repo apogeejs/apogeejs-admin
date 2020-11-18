@@ -13,8 +13,8 @@
       // Register your own application at https://apps.dev.microsoft.com
       // and set the "clientId" and "redirectUri" variables accordingly.
       var appInfo = {
-        "clientId": "d87a2f91-7064-41d0-85b2-3e0775068ac2",
-        "redirectUri": "http://localhost:8888/dev/OneDrive/test2.html",
+        "clientId": "e9a57c07-69e4-41f5-b868-0f123d2fda17",
+        "redirectUri": "http://localhost:9999/callback.html",
         "scopes": "user.read files.read files.read.all sites.read.all",
         "authServiceUri": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
       };
@@ -258,8 +258,6 @@
           //   thumbnails, return the 'large' size"
           var thumbnailSize = "large"
           var odquery = "?expand=thumbnails,children(expand=thumbnails(select=" + thumbnailSize + "))";
-
-console.log("token:" + token)
 
           $.ajax({
             url: odurl + odquery,
