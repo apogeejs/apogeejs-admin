@@ -61,10 +61,6 @@ export function showSelectComponentDialog(componentInfoList,onSelectFunction) {
     
     //show dialog
     dialogMgr.showDialog(dialog);
-    
-    //size the dialog to the content
-    dialog.fitToContent();
-    dialog.centerInParent();
 }
 
 

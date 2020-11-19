@@ -69,10 +69,6 @@ export function showLegacyConfigurableDialog(layout,onSubmitFunction,optionalOnC
     if(initialFocusElement) {
         initialFocusElement.focus();
     }
-    
-    //size the dialog to the content
-    dialog.fitToContent();
-    dialog.centerInParent();
 }
     
     

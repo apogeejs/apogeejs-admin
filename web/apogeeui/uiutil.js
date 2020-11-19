@@ -144,16 +144,6 @@ uiutil.initWindows = function(appElementId) {
     return elements;
 }
 
-uiutil.WINDOW_STATE_MINIMIZED = -1;
-uiutil.WINDOW_STATE_NORMAL = 0;
-uiutil.WINDOW_STATE_MAXIMIZED = 1;
-
-//refers to minimized, restored or maximized
-uiutil.WINDOW_STATE_CHANGED = "window state change";
-
-uiutil.MINIMIZABLE = 0x01;
-uiutil.MAXIMIZABLE = 0x02;
-uiutil.CLOSEABLE = 0x04;
 
 /** This is a handler name used to request closing the window, tab or other UI element. */
 uiutil.REQUEST_CLOSE = "request_close";

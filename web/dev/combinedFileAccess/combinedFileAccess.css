@@ -1,0 +1,61 @@
+.combinedFileAccess_mainContainer {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    padding: 5px;
+}
+
+.combinedFileAccess_titleElement {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    padding: 5px;
+    font-size: 24px;
+}
+
+.combinedFileAccess_bodyElement {
+    display: block;
+    position: relative;
+    padding: 0px;
+}
+
+.combinedFileAccess_selectList {
+    display: inline-block;
+    position: relative;
+    overflow: auto;
+    margin: 5px;
+}
+
+.combinedFileAccess_actionElement {
+    display:inline-block;
+    position: relative;
+    overflow: hidden;
+    padding: 10px;
+    overflow: auto
+});
+
+
+.combinedFileAccess_selectionWrapper {
+    display: block;
+}
+
+.combinedFileAccess_selectionWrapperActive {
+    outline: 2px solid yellow;
+}
+
+.combinedFileAccess_selectionTitleWrapper {
+
+}
+
+.combinedFileAccess_selectionTitle {
+
+}
+
+.combinedFileAccess_selectionIcon {
+    height: 16px;
+    width: 16px;
+}
+
+.combinedFileAccess_selectionConfigWrapper {
+    display: block;
+}

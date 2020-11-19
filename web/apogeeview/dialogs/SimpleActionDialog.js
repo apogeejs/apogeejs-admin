@@ -64,10 +64,6 @@ export function showSimpleActionDialog(title,msg,buttonTextList,buttonActionList
     
     //show dialog
     dialogMgr.showDialog(dialog);
-    
-    //size the dialog to the content
-    dialog.fitToContent();
-    dialog.centerInParent();
 }
 
 

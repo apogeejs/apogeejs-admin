@@ -31,10 +31,6 @@ export function showConfigurableDialog(layout,onSubmitFunction,optionalOnCancelF
 
     //give focus to the panel
     panel.giveFocus();
-    
-    //size the dialog to the content
-    dialog.fitToContent();
-    dialog.centerInParent();
 }
     
     

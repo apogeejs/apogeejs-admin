@@ -1,3 +1,24 @@
+.visiui_dialog_main {
+  position: absolute;
+  display: inline-block;
+  padding: 4px;
+  background-color: rgb(185,185,220);
+  outline: 1px solid rgb(150,150,190);
+}
+.visiui_dialog_header {
+  display:block;
+  position:relative;
+  height: 16px;
+  background-color: rgb(185,185,220);
+  cursor: move;
+}
+.visiui_dialog_body {
+  display:block;
+  position:relative;
+  overflow:hidden;
+	background-color: rgb(240,240,240);
+}
+
 /* These are default window colors. User can set alternate colors. */
 /* The default values are ugly for now to make sure people set them for the app. */
 .visiui_win_titleBarClass {

@@ -1,48 +1,20 @@
-import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
-import uiutil from "/apogeeui/uiutil.js";
-
 /** This object is a container for window frames. The argument of the constructor should
  * be an element that will hold the window frames.  */
 export default class WindowParent {
 
-    constructor(containerElement) {
-        //mixin initialization
-        this.eventManagerMixinInit();
-        
+    constructor(containerElement) {       
         this.containerElement = containerElement;
-        
         this.windowFrameStack = [];
-        
-        this.showing = false;
-        
-        //child auto positioning variables
-        this.prevNewChildX = 0;
-        this.prevNewChildY = 0;
-        this.wrapCount = 0;
+        this.onResizeListener = () => this._onResize()
+        window.addEventListener("resize",this.onResizeListener);
     }
 
     //==============================
     // Public Instance Methods
     //==============================
 
-    /** This should be called when the window parent element is shown, if the
-     * "shown" event is to be supported.  */
-    elementIsShown() {
-        this.showing = true;
-        this.dispatchEvent(uiutil.SHOWN_EVENT,this);
-    }
-
-    /** This should be called when the window parent element is shown, if the
-     * "shown" event is to be supported.  */
-    elementIsHidden() {
-        this.showing = false;
-        this.dispatchEvent(uiutil.HIDDEN_EVENT,this);
-    }
-
-    /** This method returns true if this window parent is showing. */
-    getIsShowing() {
-        return this.showing;
+    close() {
+        window.removeEventListener("resize",this.onResizeListener);
     }
 
     getOuterElement() {
@@ -53,8 +25,6 @@ export default class WindowParent {
     addWindow(windowFrame) {
         this.containerElement.appendChild(windowFrame.getElement());
         this.windowFrameStack.push(windowFrame);
-        this.updateOrder();
-        
         windowFrame.onAddedToParent(this);
     }
 
@@ -63,17 +33,6 @@ export default class WindowParent {
         this.containerElement.removeChild(windowFrame.getElement());
         var index = this.windowFrameStack.indexOf(windowFrame);
         this.windowFrameStack.splice(index,1);
-        this.updateOrder();
-    }
-
-    /** This brings the given window to the front inside this container. */
-    bringToFront(windowFrame) {
-        //remove from array
-        var index = this.windowFrameStack.indexOf(windowFrame);
-        this.windowFrameStack.splice(index,1);
-        //readd at the end
-        this.windowFrameStack.push(windowFrame);
-        this.updateOrder();
     }
 
     /** This method centers the dialog on the page. It must be called after the conten
@@ -85,51 +44,15 @@ export default class WindowParent {
         return [x,y];
     }
 
+    //=============================
+    // Privat Methods
+    //=============================
 
-    /** This method returns the position of the next window for auto/cascade positioning. */
-    getNextWindowPosition() {
-        var x = this.prevNewChildX + WindowParent.DELTA_CHILD_X;
-        var y = this.prevNewChildY + WindowParent.DELTA_CHILD_Y;
-        
-        if( ((x > WindowParent.MAX_WRAP_WIDTH) || 
-            (y > WindowParent.MAX_WRAP_HEIGHT)) ) {
-            this.wrapCount++;
-            x = WindowParent.DELTA_CHILD_X * (this.wrapCount + 1);
-            y = WindowParent.DELTA_CHILD_Y;
-        }
-        
-        this.prevNewChildX = x;
-        this.prevNewChildY = y;
-        
-        var pos = {};
-        pos.x = x;
-        pos.y = y;
-        return pos;
-    }
-
-    //=========================
-    // Private Methods
-    //=========================
-
-    /** This updates the order for the windows.
-     * @private */
-    updateOrder() {
-        var zIndex = WindowParent.BASE_ZINDEX;
-        for(var i = 0; i < this.windowFrameStack.length; i++) {
-            var windowFrame = this.windowFrameStack[i];
-            windowFrame.setZIndex(zIndex++);
-        }
+    _onResize() {
+        let windowSize = {x: window.innerWidth, y:window.innerHeight};
+        this.windowFrameStack.forEach(childFrame => childFrame.verifyInView(windowSize))
     }
 
 }
 
-//add mixins to this class
-apogeeutil.mixin(WindowParent,EventManager);
 
-WindowParent.BASE_ZINDEX = 0;
-
-//constants for window placement
-WindowParent.DELTA_CHILD_X = 25;
-WindowParent.DELTA_CHILD_Y = 25;
-WindowParent.MAX_WRAP_WIDTH = 400; 
-WindowParent.MAX_WRAP_HEIGHT = 400;

@@ -1,5 +1,5 @@
 import uiutil from "/apogeeui/uiutil.js";
-import WindowFrame from "/apogeeui/window/WindowFrame.js";
+import DialogFrame from "/apogeeui/window/DialogFrame.js";
 import WindowParent from "/apogeeui/window/WindowParent.js";
 
 let dialogMgr = {};
@@ -12,7 +12,7 @@ export {dialogMgr as default};
  *normal options for a window frame. (Note - if there are other events with whihc to act with
  *the app they may need to be shileded too.) */
 dialogMgr.createDialog = function(options) {
-    var dialog = new WindowFrame(options);
+    var dialog = new DialogFrame();
     return dialog;
 }
 
@@ -22,6 +22,8 @@ dialogMgr.showDialog = function(dialog) {
     uiutil.dialogLayer.appendChild(shieldElement);
 
     dialogParent.addWindow(dialog);
+
+    dialog.centerInParent();
 }
 
 /** This method closes a dialog created with createDialog. It
@@ -30,4 +32,5 @@ dialogMgr.closeDialog = function(dialog) {
     var parent = dialog.getParent();
     dialog.close();
     uiutil.dialogLayer.removeChild(parent.getOuterElement());
+    parent.close();
 }
