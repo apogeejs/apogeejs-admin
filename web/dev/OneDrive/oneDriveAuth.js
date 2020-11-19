@@ -52,8 +52,10 @@ function oneDriveAuth(oneDriveAppInfo) {
     }
 }
 
-function logoutOfAuth() {
+function logoutOfAuth(oneDriveAppInfo) {
     clearCookie();
+    let url = `https://login.live.com/oauth20_logout.srf?client_id=${oneDriveAppInfo.clientId}&redirect_uri=${oneDriveAppInfo.redirectUri}`;
+    popup(url);
 }
 
 /** This method is called when the micrsoft calls us back with auth information. */
@@ -80,7 +82,7 @@ function getOneDriveToken() {
 function onAuthenticated(token, authWindow) {
     if(token) {
         if(authWindow) {
-            authWindow.close();
+            //authWindow.close();
         }
     }
     else {

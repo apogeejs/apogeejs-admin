@@ -16,15 +16,15 @@
     <script type="text/javascript">
       // Client ID and API key from the Developer Console
       var CLIENT_ID = '580013395242-jovcgn1lq20b619rvs4t145huh0g7qo7.apps.googleusercontent.com';
-      var API_KEY = 'AIzaSyDeNJN3SWaLp44LNM6J9cjFVk61KGx8bYI';
+      var API_KEY = 'AIzaSyDQki1oaj-8ti2y5S2K9XNn0QIzpHFB8A4';
 
       // Array of API discovery doc URLs for APIs used by the quickstart
       var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
 
       // Authorization scopes required by the API; multiple scopes can be
       // included, separated by spaces.
-      var SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
-
+      var SCOPES = 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.metadata.readonly';
+//DOH - This drive permission is restricted
       var authorizeButton = document.getElementById('authorize_button');
       var signoutButton = document.getElementById('signout_button');
 
@@ -102,17 +102,37 @@
       /**
        * Print files.
        */
+      // function listFiles() {
+      //   gapi.client.drive.files.list({
+      //     'pageSize': 10,
+      //     'fields': "nextPageToken, files(id, name)"
+      //   }).then(function(response) {
+      //     appendPre('Files:');
+      //     var files = response.result.files;
+      //     if (files && files.length > 0) {
+      //       for (var i = 0; i < files.length; i++) {
+      //         var file = files[i];
+      //         appendPre(file.name + ' (' + file.id + ')');
+      //       }
+      //     } else {
+      //       appendPre('No files found.');
+      //     }
+      //   }, function(error) {
+      //     appendPre(JSON.stringify(error, null, 2));
+      //   });
+      // }
+
+//this failed because the drive permission is restricted
       function listFiles() {
-        gapi.client.drive.files.list({
-          'pageSize': 10,
-          'fields': "nextPageToken, files(id, name)"
+        gapi.client.drive.drives.list({
+          'pageSize': 10
         }).then(function(response) {
-          appendPre('Files:');
-          var files = response.result.files;
-          if (files && files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-              var file = files[i];
-              appendPre(file.name + ' (' + file.id + ')');
+          appendPre('Drives:');
+          var drives = response.result.drives;
+          if (drives && drives.length > 0) {
+            for (var i = 0; i < drives.length; i++) {
+              var drive = drives[i];
+              appendPre(JSON.stringify(drive));
             }
           } else {
             appendPre('No files found.');
