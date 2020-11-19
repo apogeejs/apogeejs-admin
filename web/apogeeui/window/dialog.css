@@ -1,3 +1,24 @@
+.visiui_dialog_main {
+    position: absolute;
+    display: inline-block;
+    padding: 4px;
+    background-color: rgb(185,185,220);
+    outline: 1px solid rgb(150,150,190);
+  }
+  .visiui_dialog_header {
+    display:block;
+    position:relative;
+    height: 16px;
+    background-color: rgb(185,185,220);
+    cursor: move;
+  }
+  .visiui_dialog_body {
+    display:block;
+    position:relative;
+    overflow:hidden;
+      background-color: rgb(240,240,240);
+  }
+
 .dialogBody { 
 }
 .dialogLine {

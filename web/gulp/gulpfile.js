@@ -73,7 +73,6 @@ const CSS_FILES = [
     "../apogeeview/apogeeapp.css",
     "../apogeeview/componentdisplay/literatepage/LiteratePage.css",
     "../apogeeview/editor/toolbar/ApogeeToolbar.css",
-    "../apogeeui/window/WindowFrame.css",
     "../apogeeui/window/dialog.css",
     "../apogeeui/displayandheader/DisplayAndHeader.css",
     "../apogeeui/menu/Menu.css",
