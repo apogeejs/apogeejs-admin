@@ -45,11 +45,10 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     //otherwise, the dialog stays open and the sources are not closed.
     let onSourceFinish = (endAction) => {
         if(endAction) {
-            closeDialog();
-            sourceList.forEach(source => source.close());
+            dialog.closeDialog();
         }
     }
-    sourceList.forEach(source => source.setSourceFinishCallback(onSourceFinish));
+    sourceList.forEach(source => source.setOnDialogComplete(onSourceFinish));
 
     //prepare dialog
     dialog.setContent(content,uiutil.SIZE_WINDOW_TO_CONTENT);
@@ -68,7 +67,7 @@ function _getSelectionElement(source,sourceSelectionInfo) {
 
     let titleLabel = document.createElement("span");
     titleLabel.className = "combinedFileAccess_selectionTitle";
-    titleLabel.innerHTML = source.getName();
+    titleLabel.innerHTML = source.getDisplayName();
     titleElement.appendChild(titleLabel);
 
     let iconUrl = source.getIconUrl();
@@ -81,10 +80,13 @@ function _getSelectionElement(source,sourceSelectionInfo) {
     titleElement.onclick(() => _selectSource(source,sourceSelectionInfo));
     wrapperElement.appendChild(titleElement);
 
-    let configElement = document.createElement("div");
-    configElement.className = "combinedFileAccess_selectionConfigWrapper";
-    configElement.appendChild(source.getConfigDomElement());
-    wrapperElement.appendChild(configElement);
+    let sourceConfigElement = source.getConfigDomElement();
+    if(sourceConfigElement) {
+        let configWrapperElement = document.createElement("div");
+        configWrapperElement.className = "combinedFileAccess_selectionConfigWrapper";
+        configWrapperElement.appendChild(sourceConfigElement);
+        wrapperElement.appendChild(configWrapperElement);
+    }
 
     return wrapperElement;
 }

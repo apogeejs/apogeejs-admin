@@ -1,11 +1,11 @@
-import CutNPasteFileAccess from "./CutNPasteFileAccess.js";
+import CombinedFileAccess from "./CombinedFileAccess.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 /** 
  * This is the format of the AppConfigManager. This class does not need
  * to be extended. It has not internal functionality.
  */
-export default class CutNPasteAppConfigManager {
+export default class CombinedFileAccessAppConfigManager {
     
     constructor() {
     }
@@ -31,7 +31,7 @@ export default class CutNPasteAppConfigManager {
      * if an alternate is not loaded in configuration.
      */
     getDefaultFileAccessObject(app) {
-        return new CutNPasteFileAccess();
+        return new CombinedFileAccess();
     }
     
     /** This method should return a promise for the initial workspace
