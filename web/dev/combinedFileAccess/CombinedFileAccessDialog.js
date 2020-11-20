@@ -8,7 +8,6 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     //add a scroll container
     var mainContainer = document.createElement("div");
     mainContainer.className = "combinedFileAccess_mainContainer";
-	dialog.setContent(mainContainer,uiutil.SIZE_WINDOW_TO_CONTENT);
     
     //title
     let titleElement = document.createElement("div");
@@ -32,9 +31,21 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     mainContainer.appendChild(actionElement);
 
     //create the selection entries for each element
+    //and store the elements so we can look them up later, along with other state info
     let sourceSelectionInfo = {};
     sourceSelectionInfo.sourceActionElement = actionElement; 
-    sourceSelectionInfo.selectionElements = sourceList.forEach(source => _getSelectionElement(source,sourceSelectionInfo));
+    sourceSelectionInfo.selectionElementMap = {};
+    let selectionElementData = sourceList.map(source => {
+        return {
+            name: source.getName(), 
+            element: _getSelectionElement(source,sourceSelectionInfo)
+        }
+    });
+    //add each element to our selection list and store it for later use
+    selectionElementData.forEach( entryData => {
+        selectListElement.appendChild(entryData.element);
+        sourceSelectionInfo.selectionElementMap[entryData.name] = entryData.element;
+    })
 
     //make the initial selection
     _selectSource(activeSource,sourceSelectionInfo);
@@ -45,13 +56,13 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     //otherwise, the dialog stays open and the sources are not closed.
     let onSourceFinish = (endAction) => {
         if(endAction) {
-            dialog.closeDialog();
+            dialogMgr.closeDialog(dialog);
         }
     }
     sourceList.forEach(source => source.setOnDialogComplete(onSourceFinish));
 
     //prepare dialog
-    dialog.setContent(content,uiutil.SIZE_WINDOW_TO_CONTENT);
+    dialog.setContent(mainContainer);
     
     //show dialog
     dialogMgr.showDialog(dialog);
@@ -77,7 +88,7 @@ function _getSelectionElement(source,sourceSelectionInfo) {
         titleElement.appendChild(titleIcon);
     }
 
-    titleElement.onclick(() => _selectSource(source,sourceSelectionInfo));
+    titleElement.onclick = () => _selectSource(source,sourceSelectionInfo);
     wrapperElement.appendChild(titleElement);
 
     let sourceConfigElement = source.getConfigDomElement();
@@ -97,18 +108,24 @@ function _selectSource(newActiveSource,sourceSelectInfo) {
 
     //old selection
     let oldActiveSource = sourceSelectInfo.activeSource;
-    let oldSelectionElement = _lookupSelectionElement(oldActiveSource,sourceSelectInfo);
-    oldSelectionElement.classList.remove("combinedFileAccess_selectionWrapperActive");
-    oldActiveSource.makeActive(false);
+    if(oldActiveSource) {
+        let oldSelectionElement = _lookupSelectionElement(oldActiveSource,sourceSelectInfo);
+        oldSelectionElement.classList.remove("combinedFileAccess_selectionWrapperActive");
+        oldActiveSource.makeActive(false);
+    }
 
     //new selection
     newActiveSource.makeActive(true);
     sourceSelectInfo.activeSource = newActiveSource;
-    let newSelectionElement = _lookupSelectionElement(oldActiveSource,sourceSelectInfo);
+    let newSelectionElement = _lookupSelectionElement(newActiveSource,sourceSelectInfo);
     newSelectionElement.classList.add("combinedFileAccess_selectionWrapperActive");
 
     uiutil.removeAllChildren(sourceSelectInfo.sourceActionElement);
     sourceSelectInfo.sourceActionElement.appendChild(newActiveSource.getActionElement());
+}
+
+function _lookupSelectionElement(source,sourceSelectInfo) {
+    return sourceSelectInfo.selectionElementMap[source.getName()];
 }
 
 

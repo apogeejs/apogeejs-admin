@@ -4,7 +4,8 @@ import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
 import * as apogeeui from "/apogeeui/apogeeUiLib.js";
 import * as apogeeview from "/apogeeview/apogeeViewLib.js";
 import { ApogeeView, initIncludePath } from "/apogeeview/apogeeViewLib.js";
-import CutNPasteAppConfigManager from "/applications/webapp/CutNPasteAppConfigManager.js";
+//import CutNPasteAppConfigManager from "/applications/webapp/CutNPasteAppConfigManager.js";
+import CombinedFileAccessAppConfigManager from "/dev/combinedFileAccess/CombinedFileAccessAppConfigManager.js"
 
 //expose these apogee libraries globally so plugins can use them
 window.apogeeutil = apogeeutil;
@@ -26,7 +27,8 @@ window.init = function(includeBasePathInfo) {
     initIncludePath(includeBasePathInfo);
     
     //use cutnpaste file access
-    let appConfigManager = new CutNPasteAppConfigManager();
+    //let appConfigManager = new CutNPasteAppConfigManager();
+let appConfigManager = new CombinedFileAccessAppConfigManager();
     
     //create the application
     appView = new ApogeeView("appContainer",appConfigManager);

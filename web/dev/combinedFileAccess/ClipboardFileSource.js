@@ -30,18 +30,20 @@ export class ClipboardFileSource {
     //-----------------------------
 
     saveFile(fileMetadata,data) {
-        if(action !== "save")  this.onComplete("Unknown Error in action",false,null);
+        if(this.action !== "save")  this.onComplete("Unknown Error in action",false,null);
 
         //automatic success
-        if(this.onActionComplete) this.onActionComplete(null,true,fileMetadata);     
+        if(this.onActionComplete) this.onActionComplete(null,true,fileMetadata); 
+        //close dialog
+        if(this.onDialogComplete) this.onDialogComplete(true);    
     }
 
     openFile(fileMetadata,data) {
-        if(action !== "open")  this.onComplete("Unknown Error in action",false,null);
+        if(this.action !== "open")  this.onComplete("Unknown Error in action",false,null);
 
         //automatic success
         if(this.onActionComplete) this.onActionComplete(null,data,fileMetadata);
-        //automatic close dialog
+        //close dialog
         if(this.onDialogComplete) this.onDialogComplete(true);
     }
 
@@ -54,6 +56,10 @@ export class ClipboardFileSource {
     //-----------------------------
     // UI Interface
     //-----------------------------
+
+    makeActive() {
+
+    }
 
     getIconUrl() {
         return null;
@@ -89,7 +95,7 @@ export class ClipboardFileSource {
         }
         else if(this.action == "save") {
             instructions = "Copy the data below and save it in a file to open later.";
-            initialText = data;
+            initialText = this.data;
             submitLabel = "Save";
             doSave = true;
             badAction = false;
@@ -142,7 +148,7 @@ export class ClipboardFileSource {
             }
         }
 
-        var onCancel = function() {
+        var onCancel = () => {
             this.cancelAction();
             cleanupElement();
         }
@@ -150,14 +156,14 @@ export class ClipboardFileSource {
         var onAction;
         if(!badAction) {
             if(doSave) {
-                onAction = function() {
+                onAction = () => {
                     var outputText = textEditor.getSession().getValue();
                     this.saveFile(ClipboardFileSource.NEW_FILE_METADATA,outputText);
                     cleanupElement();
                 }
             }
             else {
-                onAction = function() {
+                onAction = () => {
                     var outputText = textEditor.getSession().getValue();
                     this.openFile(ClipboardFileSource.NEW_FILE_METADATA,outputText);
                     cleanupElement();
@@ -169,6 +175,8 @@ export class ClipboardFileSource {
         
         line.appendChild(uiutil.createElement("button",{"className":"dialogButton","innerHTML":"Cancel","onclick":onCancel}));
         content.appendChild(line);
+
+        return content;
     }
 
     //===================================
@@ -188,4 +196,8 @@ ClipboardFileSource.DISPLAY_NAME = "Clipboard"
 //this is metadata for a new file. Name is blank and there is not additional data besides source name.
 ClipboardFileSource.NEW_FILE_METADATA = {
     source: ClipboardFileSource.NAME
+}
+
+ClipboardFileSource.directSaveOk = function(fileMetadata) {
+    return false;
 }
