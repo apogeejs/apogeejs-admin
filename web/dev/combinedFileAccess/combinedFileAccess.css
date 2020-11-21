@@ -20,23 +20,24 @@
 }
 
 .combinedFileAccess_selectList {
-    display: inline-block;
+    display: inline;
     position: relative;
     overflow: auto;
     margin: 5px;
 }
 
 .combinedFileAccess_actionElement {
-    display:inline-block;
+    display:inline;
     position: relative;
     overflow: hidden;
     padding: 10px;
     overflow: auto
-};
+}
 
 
 .combinedFileAccess_selectionWrapper {
-    display: block;
+    display: inline;
+    position: relative;
 }
 
 .combinedFileAccess_selectionWrapperActive {
@@ -44,7 +45,8 @@
 }
 
 .combinedFileAccess_selectionTitleWrapper {
-
+    display: inline;
+    position: relative;
 }
 
 .combinedFileAccess_selectionTitle {
@@ -57,5 +59,6 @@
 }
 
 .combinedFileAccess_selectionConfigWrapper {
-    display: block;
+    display: inline;
+    position: relative;
 }

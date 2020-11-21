@@ -30,18 +30,20 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     actionElement.className = "combinedFileAccess_actionElement";
     mainContainer.appendChild(actionElement);
 
-    //create the selection entries for each element
-    //and store the elements so we can look them up later, along with other state info
+    //create a structure to hold our working data
+    //and create the selection entries for each source.
     let sourceSelectionInfo = {};
     sourceSelectionInfo.sourceActionElement = actionElement; 
-    sourceSelectionInfo.selectionElementMap = {};
+    
     let selectionElementData = sourceList.map(source => {
         return {
             name: source.getName(), 
             element: _getSelectionElement(source,sourceSelectionInfo)
         }
     });
+
     //add each element to our selection list and store it for later use
+    sourceSelectionInfo.selectionElementMap = {};
     selectionElementData.forEach( entryData => {
         selectListElement.appendChild(entryData.element);
         sourceSelectionInfo.selectionElementMap[entryData.name] = entryData.element;
@@ -56,7 +58,13 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     //otherwise, the dialog stays open and the sources are not closed.
     let onSourceFinish = (endAction) => {
         if(endAction) {
+            //close dialog
             dialogMgr.closeDialog(dialog);
+            //clean up all sources
+            sourceList.forEach(source => source.close());
+        }
+        else {
+            //we dont' close if false is passed
         }
     }
     sourceList.forEach(source => source.setOnDialogComplete(onSourceFinish));

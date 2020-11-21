@@ -1,5 +1,6 @@
 import {BaseFileAccess} from "/apogeeapp/apogeeAppLib.js";
 import {ClipboardFileSource} from "./ClipboardFileSource.js";
+import {ClipboardFileSource2} from "./ClipboardFileSource2.js";
 import {showCombinedAccessDialog} from "./CombinedFileAccessDialog.js";
 
 /* 
@@ -16,7 +17,7 @@ export default class CombinedFileAccess extends BaseFileAccess {
     constructor() {
         super();
         this.defaultSourceName = ClipboardFileSource.NAME;
-        this.sourceConstructorList = [ClipboardFileSource];
+        this.sourceConstructorList = [ClipboardFileSource,ClipboardFileSource2];
     }
    
     /**

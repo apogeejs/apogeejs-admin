@@ -1,7 +1,7 @@
 import ace from "/ext/ace/ace_1.4.3/ace.es.js";
 import {uiutil}  from "/apogeeui/apogeeUiLib.js";
 
-export class ClipboardFileSource {
+export class ClipboardFileSource2 {
     /** constructor */
     constructor(metadata,data,action,onActionComplete) {
         this.data = data;
@@ -18,11 +18,11 @@ export class ClipboardFileSource {
     //============================
 
     getName() {
-        return ClipboardFileSource.NAME;
+        return ClipboardFileSource2.NAME;
     }
 
     getDisplayName() {
-        return ClipboardFileSource.DISPLAY_NAME;
+        return ClipboardFileSource2.DISPLAY_NAME;
     }
 
     //-----------------------------
@@ -111,14 +111,14 @@ export class ClipboardFileSource {
         let doSave, badAction;
 
         if(this.action == "open") {
-            instructions = "Paste saved workspace data in the space below.";
+            instructions = "OTHER ONE: " + "Paste saved workspace data in the space below.";
             initialText = "";
             submitLabel = "Open";
             doSave = false;
             badAction = false;
         }
         else if(this.action == "save") {
-            instructions = "Copy the data below and save it in a file to open later.";
+            instructions = "OTHER ONE: " + "Copy the data below and save it in a file to open later.";
             initialText = this.data;
             submitLabel = "Save";
             doSave = true;
@@ -126,7 +126,7 @@ export class ClipboardFileSource {
         }
         else {
             //error!
-            instructions = "Unknown error! Click button to close dialog box";
+            instructions = "OTHER ONE: " + "Unknown error! Click button to close dialog box";
             initialText = "";
             badAction = true;
             
@@ -174,13 +174,13 @@ export class ClipboardFileSource {
             if(doSave) {
                 onAction = () => {
                     var outputText = textEditor.getSession().getValue();
-                    this.saveFile(ClipboardFileSource.NEW_FILE_METADATA,outputText);
+                    this.saveFile(ClipboardFileSource2.NEW_FILE_METADATA,outputText);
                 }
             }
             else {
                 onAction = () => {
                     var outputText = textEditor.getSession().getValue();
-                    this.openFile(ClipboardFileSource.NEW_FILE_METADATA,outputText);
+                    this.openFile(ClipboardFileSource2.NEW_FILE_METADATA,outputText);
                 }
             }
 
@@ -198,16 +198,16 @@ export class ClipboardFileSource {
 }
 
 //this is the identifier name for the source
-ClipboardFileSource.NAME = "clipboard";
+ClipboardFileSource2.NAME = "clipboard2";
 
 //this is the identifier name for the source
-ClipboardFileSource.DISPLAY_NAME = "Clipboard"
+ClipboardFileSource2.DISPLAY_NAME = "Clipboard2"
 
 //this is metadata for a new file. Name is blank and there is not additional data besides source name.
-ClipboardFileSource.NEW_FILE_METADATA = {
-    source: ClipboardFileSource.NAME
+ClipboardFileSource2.NEW_FILE_METADATA = {
+    source: ClipboardFileSource2.NAME
 }
 
-ClipboardFileSource.directSaveOk = function(fileMetadata) {
+ClipboardFileSource2.directSaveOk = function(fileMetadata) {
     return false;
 }
