@@ -3,32 +3,42 @@ import {uiutil, dialogMgr}  from "/apogeeui/apogeeUiLib.js";
 /** This shows the combined file same dialog */
 export function showCombinedAccessDialog(title,activeSource,sourceList) {
     
-    var dialog = dialogMgr.createDialog({"minimizable":true,"maximizable":true,"movable":true});
+    let dialog = dialogMgr.createDialog({"minimizable":true,"maximizable":true,"movable":true});
             
     //add a scroll container
-    var mainContainer = document.createElement("div");
+    let mainContainer = document.createElement("table");
     mainContainer.className = "combinedFileAccess_mainContainer";
+
+    let titleRow = document.createElement("tr");
+    mainContainer.appendChild(titleRow);
+    let bodyRow = document.createElement("tr");
+    mainContainer.appendChild(bodyRow);
     
     //title
-    let titleElement = document.createElement("div");
+    let titleElement = document.createElement("td");
+    titleElement.colSpan = 2;
     titleElement.className = "combinedFileAccess_titleElement";
     titleElement.innerHTML = title;
-    mainContainer.appendChild(titleElement);
-
-    //body row
-    let bodyElement = document.createElement("div");
-    bodyElement.className = "combinedFileAccess_bodyElement";
-    mainContainer.appendChild(bodyElement);
+    titleRow.appendChild(titleElement);
 
     //source selection
+    let selectCell = document.createElement("td");
+    selectCell.className = "combinedFileAccess_selectCell";
+    bodyRow.appendChild(selectCell);
+
+    let selectTitleElement = document.createElement("h3");
+    selectTitleElement.className = "combinedFileAccess_selectTitle";
+    selectTitleElement.innerHTML = "File Source:"
+    selectCell.appendChild(selectTitleElement);
+
     let selectListElement = document.createElement("div");
     selectListElement.className = "combinedFileAccess_selectList";
-    mainContainer.appendChild(selectListElement);
+    selectCell.appendChild(selectListElement);
 
     //action element
-    let actionElement = document.createElement("div");
+    let actionElement = document.createElement("td");
     actionElement.className = "combinedFileAccess_actionElement";
-    mainContainer.appendChild(actionElement);
+    bodyRow.appendChild(actionElement);
 
     //create a structure to hold our working data
     //and create the selection entries for each source.
