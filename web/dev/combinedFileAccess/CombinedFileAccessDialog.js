@@ -5,15 +5,16 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     
     let dialog = dialogMgr.createDialog({"minimizable":true,"maximizable":true,"movable":true});
             
-    //add a scroll container
     let mainContainer = document.createElement("table");
     mainContainer.className = "combinedFileAccess_mainContainer";
 
     let titleRow = document.createElement("tr");
     mainContainer.appendChild(titleRow);
+    let sourceRow = document.createElement("tr");
+    mainContainer.appendChild(sourceRow);
     let bodyRow = document.createElement("tr");
     mainContainer.appendChild(bodyRow);
-    
+
     //title
     let titleElement = document.createElement("td");
     titleElement.colSpan = 2;
@@ -21,15 +22,21 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     titleElement.innerHTML = title;
     titleRow.appendChild(titleElement);
 
-    //source selection
-    let selectCell = document.createElement("td");
-    selectCell.className = "combinedFileAccess_selectCell";
-    bodyRow.appendChild(selectCell);
+    //source selection title
+    let selectTitleCell = document.createElement("td");
+    selectTitleCell.className = "combinedFileAccess_selectCell";
+    selectTitleCell.innerHTML = "File Source:"
+    sourceRow.appendChild(selectTitleCell);
 
-    let selectTitleElement = document.createElement("h3");
-    selectTitleElement.className = "combinedFileAccess_selectTitle";
-    selectTitleElement.innerHTML = "File Source:"
-    selectCell.appendChild(selectTitleElement);
+    //selected source
+    this.selectedSourceCell = document.createElement("td");
+    selectedSourceCell.className = "combinedFileAccess_sourceSelectTitle";
+    sourceRow.appendChild(selectedSourceCell);
+
+    //body
+    let selectListCell = document.createElement("td");
+    selectListCell.className = "combinedFileAccess_sourceSelectTitle";
+    bodyRow.appendChild(selectListCell);
 
     let selectListElement = document.createElement("div");
     selectListElement.className = "combinedFileAccess_selectList";
@@ -137,6 +144,8 @@ function _selectSource(newActiveSource,sourceSelectInfo) {
     sourceSelectInfo.activeSource = newActiveSource;
     let newSelectionElement = _lookupSelectionElement(newActiveSource,sourceSelectInfo);
     newSelectionElement.classList.add("combinedFileAccess_selectionWrapperActive");
+
+    this.selectedSourceCell.innerHTML = newActiveSource.getDisplayName();
 
     uiutil.removeAllChildren(sourceSelectInfo.sourceActionElement);
     sourceSelectInfo.sourceActionElement.appendChild(newActiveSource.getActionElement());

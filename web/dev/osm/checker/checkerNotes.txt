@@ -1,0 +1,20 @@
+Checker Workspace Notes
+
+1) Download some data set and compare data to existing map objects.
+2) Highlight data properties that can be added/updated
+- maybe have a desktop version where people can flag candidate changes
+- have a mobile version where people can check the changes in person.
+
+
+
+IN DB:
+- store the data sources
+- store the entries from the data sources
+- on each entry, flag the status of each parameter
+-- "present in data" - data found on map
+-- "not present in data - stage - 1" - desktop search done, data not found on map
+-- "change request, validated" - in person check of data
+- Make software to take validated changes and put them on the map (maybe a user could "submit" these changes)
+
+
+It might be hard to store all the changes. Maybe instead someone does the search and then uploads a data file with changes. They can include a 
