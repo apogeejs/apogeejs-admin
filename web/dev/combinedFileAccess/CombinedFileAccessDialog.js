@@ -16,31 +16,31 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     mainContainer.appendChild(bodyRow);
 
     //title
-    let titleElement = document.createElement("td");
-    titleElement.colSpan = 2;
-    titleElement.className = "combinedFileAccess_titleElement";
-    titleElement.innerHTML = title;
-    titleRow.appendChild(titleElement);
+    let dialogTitleElement = document.createElement("td");
+    dialogTitleElement.colSpan = 2;
+    dialogTitleElement.className = "combinedFileAccess_dialogTitleElement";
+    dialogTitleElement.innerHTML = title;
+    titleRow.appendChild(dialogTitleElement);
 
     //source selection title
     let selectTitleCell = document.createElement("td");
-    selectTitleCell.className = "combinedFileAccess_selectCell";
+    selectTitleCell.className = "combinedFileAccess_selectTitleCell";
     selectTitleCell.innerHTML = "File Source:"
     sourceRow.appendChild(selectTitleCell);
 
     //selected source
-    this.selectedSourceCell = document.createElement("td");
-    selectedSourceCell.className = "combinedFileAccess_sourceSelectTitle";
+    let selectedSourceCell = document.createElement("td");
+    selectedSourceCell.className = "combinedFileAccess_selectedSourceTitle";
     sourceRow.appendChild(selectedSourceCell);
 
     //body
     let selectListCell = document.createElement("td");
-    selectListCell.className = "combinedFileAccess_sourceSelectTitle";
+    selectListCell.className = "combinedFileAccess_sourceListCell";
     bodyRow.appendChild(selectListCell);
 
     let selectListElement = document.createElement("div");
     selectListElement.className = "combinedFileAccess_selectList";
-    selectCell.appendChild(selectListElement);
+    selectListCell.appendChild(selectListElement);
 
     //action element
     let actionElement = document.createElement("td");
@@ -51,6 +51,7 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     //and create the selection entries for each source.
     let sourceSelectionInfo = {};
     sourceSelectionInfo.sourceActionElement = actionElement; 
+    sourceSelectionInfo.selectedSourceCell = selectedSourceCell;
     
     let selectionElementData = sourceList.map(source => {
         return {
@@ -112,9 +113,9 @@ function _getSelectionElement(source,sourceSelectionInfo) {
         titleIcon.className = "combinedFileAccess_selectionIcon";
         titleElement.appendChild(titleIcon);
     }
-
-    titleElement.onclick = () => _selectSource(source,sourceSelectionInfo);
+    
     wrapperElement.appendChild(titleElement);
+    wrapperElement.onclick = () => _selectSource(source,sourceSelectionInfo);
 
     let sourceConfigElement = source.getConfigDomElement();
     if(sourceConfigElement) {
@@ -145,10 +146,9 @@ function _selectSource(newActiveSource,sourceSelectInfo) {
     let newSelectionElement = _lookupSelectionElement(newActiveSource,sourceSelectInfo);
     newSelectionElement.classList.add("combinedFileAccess_selectionWrapperActive");
 
-    this.selectedSourceCell.innerHTML = newActiveSource.getDisplayName();
-
     uiutil.removeAllChildren(sourceSelectInfo.sourceActionElement);
     sourceSelectInfo.sourceActionElement.appendChild(newActiveSource.getActionElement());
+    sourceSelectInfo.selectedSourceCell.innerHTML = newActiveSource.getDisplayName() + " File Source";
 }
 
 function _lookupSelectionElement(source,sourceSelectInfo) {

@@ -1,5 +1,4 @@
-import ace from "/ext/ace/ace_1.4.3/ace.es.js";
-import {uiutil}  from "/apogeeui/apogeeUiLib.js";
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 export class OneDriveFileSource {
     /** constructor */
@@ -58,7 +57,7 @@ export class OneDriveFileSource {
     /** This method is called externally after the dialog box using the soruce closes. */
     close() {
         if(this.configElement) {
-            this.actionElement = null;
+            this.configElement = null;
         }
         if(this.actionElement) {
             this.actionElement = null;
@@ -112,7 +111,7 @@ export class OneDriveFileSource {
 
     }
 
-    _onFileFilterChange(something) {
+    _onFilterChange() {
 
     }
 
@@ -157,52 +156,83 @@ export class OneDriveFileSource {
         let pathRow = document.createElement("tr");
         mainContainer.appendChild(pathRow);
         let commandRow = document.createElement("tr");
-        mainContainer.appendChild(commandsRow);
+        mainContainer.appendChild(commandRow);
         let fileDisplayRow = document.createElement("tr");
         mainContainer.appendChild(fileDisplayRow);
         let fileNameRow = document.createElement("tr");
         mainContainer.appendChild(fileNameRow);
         let buttonsRow = document.createElement("tr");
-        mainContainer.appendChild(bodbuttonsRowyRow);
+        mainContainer.appendChild(buttonsRow);
 
         //drive selection
+        let drivesTitleCell = document.createElement("td");
+        drivesTitleCell.className = "oneDriveFileAccess_driveTitle";
+        drivesTitleCell.innerHTML = "Drives:"
+        pathRow.appendChild(drivesTitleCell);
+
         let drivesCell = document.createElement("td");
         drivesCell.className = "oneDriveFileAccess_drivesCell";
-        drivesCell.rowSpan = 5;
-        bodyRow.appendChild(drivesCell);
-
-        let drivesTitleElement = document.createElement("h3");
-        drivesTitleElement.className = "oneDriveFileAccess_driveTitle";
-        drivesTitleElement.innerHTML = "Drives:"
-        drivesCell.appendChild(drivesTitleElement);
+        drivesCell.rowSpan = 4;
+        commandRow.appendChild(drivesCell);
 
         this.drivesListElement = document.createElement("div");
-        drivesListElement.className = "oneDriveFileAccess_driveList";
-        drivesCell.appendChild(drivesListElement);
+        this.drivesListElement.className = "oneDriveFileAccess_driveList";
+        drivesCell.appendChild(this.drivesListElement);
 
         //path display
         this.pathCell = document.createElement("td");
-        actionElement.className = "oneDriveFileAccess_pathCell";
-        pathRow.appendChild(pathCell);
+        this.pathCell.className = "oneDriveFileAccess_pathCell";
+        pathRow.appendChild(this.pathCell);
 
         //commands - parent folder, file type filter, add folder (for save only)
         let commandCell = document.createElement("td");
-        actionElement.className = "oneDriveFileAccess_pathCell";
+        commandCell.className = "oneDriveFileAccess_commandCell";
         commandRow.appendChild(commandCell);
 
         let parentFolderButton = document.createElement("button");
+        parentFolderButton.innerHTML = "^";
         parentFolderButton.onclick = () => this._onParentFolderButton();
-        commandRow.appendChild(parentFolderButton);
-        let addFolderButton = document.createElement("button");
-        addFolderButton.onclick = () => this._onCreateFolder();
-        commandRow.appendChild(addFolderButton);
-        // let fileFilterLabel = document.createElement("span");
-        // parentFolderButton.onclick = () => this._onParentFolderButton();
-        // commandRow.appendChild(parentFolderButton);
-        // let fileFilterDropdown = document.createElement("dropdown");
-        // parentFolderButton.onclick = () => this._onParentFolderButton();
-        // commandRow.appendChild(parentFolderButton);
+        commandCell.appendChild(parentFolderButton);
+        if(this.action == "save") {
+            let addFolderButton = document.createElement("button");
+            addFolderButton.innerHTML = "+"
+            addFolderButton.onclick = () => this._onCreateFolder();
+            commandCell.appendChild(addFolderButton);
+        }
 
+        let filterWrapper = document.createElement("div");
+        filterWrapper.className = "oneDriveFileAccess_filterWrapper";
+        commandCell.appendChild(filterWrapper);
+        
+        let fileFilterLabel = document.createElement("span");
+        fileFilterLabel.innerHTML = "Show Files: "
+        filterWrapper.appendChild(fileFilterLabel);
+        let radioGroupName = apogeeutil.getUniqueString();
+        let allId = apogeeutil.getUniqueString();
+        let jsonId = apogeeutil.getUniqueString();
+
+        this.allRadio = document.createElement("input");
+        this.allRadio.type = "radio";
+        this.allRadio.name = radioGroupName;
+        this.allRadio.value = "all";
+        this.allRadio.onclick = () => this._onFilterChange();
+        filterWrapper.appendChild(this.allRadio);
+        let allRadioLabel = document.createElement("label");
+        allRadioLabel.for = allId;
+        allRadioLabel.innerHTML = "All";
+        filterWrapper.appendChild(allRadioLabel);
+
+        this.jsonRadio = document.createElement("input");
+        this.jsonRadio.type = "radio";
+        this.jsonRadio.name = radioGroupName;
+        this.jsonRadio.value = "json";
+        this.jsonRadio.onChange = () => this._onFilterChange();
+        filterWrapper.appendChild(this.jsonRadio);
+        let jsonRadioLabel = document.createElement("label");
+        jsonRadioLabel.for = jsonId;
+        jsonRadioLabel.innerHTML = "JSON";
+        filterWrapper.appendChild(jsonRadioLabel);
+        
         //file display list
         let fileListCell = document.createElement("td");
         fileListCell.className = "oneDriveFileAccess_fileListCell";
@@ -210,28 +240,29 @@ export class OneDriveFileSource {
 
         this.fileListElement = document.createElement("div");
         this.fileListElement.className = "oneDriveFileAccess_fileListElement";
-        fileListCell.appendChild(fileListElement);
+        fileListCell.appendChild(this.fileListElement);
 
         //file name entry
         let fileNameCell = document.createElement("td");
-        actionElement.className = "oneDriveFileAccess_pathCell";
+        fileNameCell.className = "oneDriveFileAccess_fileNameCell";
         fileNameRow.appendChild(fileNameCell);
 
         let fileNameLabel = document.createElement("span");
-        fileNameLabel.className = "oneDriveFileAccess_fileNameLabel"
+        fileNameLabel.className = "oneDriveFileAccess_fileNameLabel";
+        fileNameLabel.innerHTML = "File Name:";
         fileNameCell.appendChild(fileNameLabel);
-        let fileNameTextField = document.createElement("input");
-        fileNameTextField.type = "text";
-        fileNameTextField.classname = "oneDriveFileAccess_fileNameTextField";
-        fileNameCell.appendChild(fileNameTextField);
+        this.fileNameTextField = document.createElement("input");
+        this.fileNameTextField.type = "text";
+        this.fileNameTextField.className = "oneDriveFileAccess_fileNameTextField";
+        fileNameCell.appendChild(this.fileNameTextField);
 
         //save/open, cancel buttons
         let buttonsCell = document.createElement("td");
-        actionElement.className = "oneDriveFileAccess_pathCell";
+        buttonsCell.className = "oneDriveFileAccess_buttonsCell";
         buttonsRow.appendChild(buttonsCell);
 
         let submitButton = document.createElement("button");
-        submitButton.innerHTML = (this.action == "open") ? "Open" : "Save";
+        submitButton.innerHTML = (this.action == "save") ? "Save": "Open";
         submitButton.className = "oneDriveFileAccess_submitButton";
         buttonsCell.appendChild(submitButton);
         let cancelButton = document.createElement("button");
@@ -242,6 +273,17 @@ export class OneDriveFileSource {
         this._populateForm();
 
         return mainContainer;
+    }
+
+    _populateForm() {
+
+        // this.drivesListElement
+        // this.pathCell
+        // this.fileListElement
+        // this.fileNameTextField
+        // this.allRadio 
+        // this.jsonRadio
+
     }
 
 

@@ -380,3 +380,8 @@ apogeeutil.textRequest = function(url,options) {
 apogeeutil.jsonRequest = function(url,options) {
     return apogeeutil.textRequest(url,options).then(JSON.parse);
 }
+
+/** This method returns a random string which should be unique. */
+apogeeutil.getUniqueString = function() {
+    return Math.random().toString(36).substring(2, 15);
+}

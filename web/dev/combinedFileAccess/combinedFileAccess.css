@@ -4,35 +4,43 @@
     padding: 5px;
 }
 
-.combinedFileAccess_titleElement {
+.combinedFileAccess_dialogTitleElement {
     position: relative;
     overflow: hidden;
     padding: 5px;
     font-size: 24px;
 }
 
-.combinedFileAccess_selectCell {
+.combinedFileAccess_selectedSourceTitle {
+    position: relative;
+    overflow: hidden;
+    padding: 5px;
+    font-size: 20px;
+}
+
+.combinedFileAccess_selectTitleCell {
+    position: relative;
+    overflow: hidden;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.combinedFileAccess_sourceListCell {
     position: relative;
     vertical-align: top;
+    padding: 5px;
 }
-
-.combinedFileAccess_selectTitle {
-}
-
-combinedFileAccess_selectTitle
 
 .combinedFileAccess_selectList {
     position: relative;
     overflow: auto;
-    margin: 5px;
     outline: 1px solid rgb(128,128,128);
 }
 
 .combinedFileAccess_actionElement {
     position: relative;
     overflow: hidden;
-    padding: 10px;
-    overflow: auto
+    overflow: hidden;
 }
 
 
@@ -65,4 +73,71 @@ combinedFileAccess_selectTitle
 
 .combinedFileAccess_selectionConfigWrapper {
     position: relative;
+}
+
+.oneDriveFileAccess_mainContainer {
+    padding: 5px;
+}
+
+.oneDriveFileAccess_driveTitle {
+    padding: 5px;
+}
+
+.oneDriveFileAccess_drivesCell {
+    padding: 5px;
+}
+
+.oneDriveFileAccess_driveList {
+    
+}
+
+.oneDriveFileAccess_pathCell {
+    padding: 5px;
+}
+
+.oneDriveFileAccess_commandCell {
+    padding: 5px;
+}
+
+.oneDriveFileAccess_filterWrapper {
+    display: inline;
+    float: right;
+}
+
+.oneDriveFileAccess_fileListCell {
+    padding: 5px;
+}
+
+
+.oneDriveFileAccess_fileListElement {
+    position: relative;
+    height: 300px;
+    min-width: 400px;
+    background-color: white;
+    border: 1px solid gray;
+}
+
+.oneDriveFileAccess_fileNameCell {
+    padding: 5px;
+}
+
+.oneDriveFileAccess_fileNameLabel {
+    margin-right: 5px
+}
+
+.oneDriveFileAccess_fileNameTextField {
+    width: 300px;
+}
+
+.oneDriveFileAccess_buttonsCell {
+    padding: 5px;
+}
+
+.oneDriveFileAccess_submitButton {
+    margin-left: 50%;
+}
+
+.oneDriveFileAccess_cancelButton {
+    float: right;
+    margin-right: 50px;
 }
