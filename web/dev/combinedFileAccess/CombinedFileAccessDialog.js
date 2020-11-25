@@ -25,7 +25,7 @@ export function showCombinedAccessDialog(title,activeSource,sourceList) {
     //source selection title
     let selectTitleCell = document.createElement("td");
     selectTitleCell.className = "combinedFileAccess_selectTitleCell";
-    selectTitleCell.innerHTML = "File Source:"
+    selectTitleCell.innerHTML = "File Source:";
     sourceRow.appendChild(selectTitleCell);
 
     //selected source
@@ -117,7 +117,7 @@ function _getSelectionElement(source,sourceSelectionInfo) {
     wrapperElement.appendChild(titleElement);
     wrapperElement.onclick = () => _selectSource(source,sourceSelectionInfo);
 
-    let sourceConfigElement = source.getConfigDomElement();
+    let sourceConfigElement = source.getConfigElement();
     if(sourceConfigElement) {
         let configWrapperElement = document.createElement("div");
         configWrapperElement.className = "combinedFileAccess_selectionConfigWrapper";

@@ -75,6 +75,27 @@
     position: relative;
 }
 
+/* remote file access config entry */
+
+.oneDriveFileAccess_configContainer {
+
+}
+.oneDriveFileAccess_loginElement {
+
+}
+.oneDriveFileAccess_userElement {
+
+}
+.oneDriveFileAccess_logoutElement {
+
+}
+
+.oneDriveFileAccess_accountMsgElement {
+
+}
+
+/* remote file access action entry */
+
 .oneDriveFileAccess_mainContainer {
     padding: 5px;
 }

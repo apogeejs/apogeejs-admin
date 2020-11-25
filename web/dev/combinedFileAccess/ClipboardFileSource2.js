@@ -76,7 +76,7 @@ export class ClipboardFileSource2 {
         return null;
     }
 
-    getConfigDomElement() {
+    getConfigElement() {
         return null;
     }
 

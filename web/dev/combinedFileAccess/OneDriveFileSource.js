@@ -1,5 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {uiutil}  from "/apogeeui/apogeeUiLib.js";
+import OneDriveFileAccess from "./OneDriveFileAccess.js";
 
 export class OneDriveFileSource {
     /** constructor */
@@ -9,16 +10,18 @@ export class OneDriveFileSource {
         this.metadata = metadata;
         //this is a callback to signify the save/open is successful/failed/canceled
         this.onActionComplete = onActionComplete;
+
+        //this object is the interface to OneDrive
+        this.fileAccess = new OneDriveFileAccess();
+
         //this is a callback to notify the dialog the action is complete
         this.onDialogComplete = null;
 
-        
-
-        // this.driveState
+        // this.drivesInfo
         // this.selectedDriveId
         this.driveSelectionElementMap = {}
 
-        // this.fileState
+        // this.filesInfo
         // this.selectedFileId
         this.fileElementMap = {};
 
@@ -32,6 +35,10 @@ export class OneDriveFileSource {
         // this.drivesListElement
         // this.allRadio
         // this.jsonRadio
+
+        // this.loginElement
+        // this.userElement
+        // this.logoutElement
     }
 
     //============================
@@ -50,24 +57,49 @@ export class OneDriveFileSource {
     // File Actions
     //-----------------------------
 
-    saveFile(fileMetadata,data) {
-        alert("implement this!");
-        if(this.action !== "save")  this.onComplete("Unknown Error in action",false,null);
+    updateFile(fileMetadata,data) {
+        let saveFilePromise = this.fileAccess.updateFile(fileMetadata.driveId,fileMetadata.fileId,data);
 
-        //automatic success
-        if(this.onActionComplete) this.onActionComplete(null,true,fileMetadata); 
-        //close dialog
-        if(this.onDialogComplete) this.onDialogComplete(true);    
+        saveFilePromise.then( result => {
+            //success
+            if(this.onActionComplete) this.onActionComplete(null,true,result.fileMetadata); 
+            if(this.onDialogComplete) this.onDialogComplete(true);
+        }).catch(errorMsg => {
+            //error
+            if(this.onActionComplete) this.onActionComplete(errorMsg,false,null);
+            //decide is we want to keep the dialog opened or closed...
+            if(this.onDialogComplete) this.onDialogComplete(true);
+        }) ;
     }
 
-    openFile(fileMetadata,data) {
-        alert("implement this!");
-        if(this.action !== "open")  this.onComplete("Unknown Error in action",false,null);
+    createFile(driveId,folderId,fileName,data) {
+        let saveFilePromise = this.fileAccess.createFile(driveId,folderId,fileName,data);
 
-        //automatic success
-        if(this.onActionComplete) this.onActionComplete(null,data,fileMetadata);
-        //close dialog
-        if(this.onDialogComplete) this.onDialogComplete(true);
+        saveFilePromise.then( result => {
+            //success
+            if(this.onActionComplete) this.onActionComplete(null,true,result.fileMetadata); 
+            if(this.onDialogComplete) this.onDialogComplete(true);
+        }).catch(errorMsg => {
+            //error
+            if(this.onActionComplete) this.onActionComplete(errorMsg,false,null);
+            //decide is we want to keep the dialog opened or closed...
+            if(this.onDialogComplete) this.onDialogComplete(true);
+        }) ;
+    }
+
+    openFile(fileId) {
+        let openFilePromise = this.fileAccess.openFile(fileId);
+
+        openFilePromise.then( result => {
+            //success
+            if(this.onActionComplete) this.onActionComplete(null,result.data,result.fileMetadata); 
+            if(this.onDialogComplete) this.onDialogComplete(true);
+        }).catch(errorMsg => {
+            //error
+            if(this.onActionComplete) this.onActionComplete(errorMsg,false,null);
+            //decide is we want to keep the dialog opened or closed...
+            if(this.onDialogComplete) this.onDialogComplete(true);
+        }) ;
     }
 
     cancelAction() {
@@ -78,6 +110,7 @@ export class OneDriveFileSource {
 
     /** This method is called externally after the dialog box using the soruce closes. */
     close() {
+        //FILL THIS IN!!!
         if(this.configElement) {
             this.configElement = null;
         }
@@ -111,9 +144,21 @@ export class OneDriveFileSource {
 
     getActionElement() {
         if(!this.actionElement) {
-            this.actionElement = this._createActionElement();
+            this._createActionElement();
+            //populate initial data
+            this._populateActionForm();
         }
         return this.actionElement;
+    }
+
+    getConfigElement() {
+        if(!this.configElement) {
+            this._createConfigElement();
+            //set initial login state
+            let loginState = this.fileAccess.getLoginState();
+            this._setLoginState(loginState);
+        }
+        return this.configElement;
     }
 
 
@@ -122,11 +167,29 @@ export class OneDriveFileSource {
     //===================================
 
     //--------------------
-    // event handler
+    // command handlers
     //--------------------
 
-    _onParentFolder(parentFileId) {
-        __loadFileList(this.selectedDriveId,parentFileId,(fileState) => this._fileStateCallback(fileState));
+    _onLoginCommand() {
+        let loginPromise = this.fileAccess.login();
+        loginPromise.then(loginState => {
+            this._setLoginState(loginState);
+        }).catch(errorMsg => {
+            alert("Error logging in: " + errorMsg);
+        });
+    }
+
+    _onLogoutCommand() {
+        let logoutPromise = this.fileAccess.logout();
+        logoutPromise.then(loginState => {
+            this._setLoginState(loginState);
+        }).catch(errorMsg => {
+            alert("Error logging out: " + errorMsg);
+        });
+    }
+
+    _onParentFolderSelect(parentFileId) {
+        this._loadFolder(this.selectedDriveId, parentFileId);
     }
 
     _onFilterChange() {
@@ -157,7 +220,7 @@ export class OneDriveFileSource {
         //take any needed action
         if(fileInfo.type == "__folder__") {
             //open the folder
-            __loadFileList(this.selectedDriveId,fileInfo.id,(fileState) => this._fileStateCallback(fileState));
+            this._loadFolder(this.selectedDriveId, fileInfo.id);
         }
         else {
             //put the name in the file name field
@@ -174,8 +237,38 @@ export class OneDriveFileSource {
 
     }
 
-    _onSavePress() {
+    _onOpenPress() {
+        if(!this.selectedDriveId) {
+            alert("There is no selected drive!");
+            return;
+        }
+        if((!this.filesInfo)||(!this.fileInfo.folder)) {
+            alert("There is no selected folder!");
+            return;
+        }
+        if(!this.selectedFileId) {
+            alert("There is no file selected");
+            return
+        }
+        this.createFile(this.selectedDriveId,this.fileInfo.folder.fileId,this.selectedFileId);
+    }
 
+    _onSavePress() {
+        if(!this.selectedDriveId) {
+            alert("There is no selected drive!");
+            return;
+        }
+        if((!this.filesInfo)||(!this.fileInfo.folder)) {
+            alert("There is no selected folder!");
+            return;
+        }
+        let folderId = this.fileInfo.folder.fileId;
+        let fileName = this.fileNameTextField.value.trim();
+        if(fileName.length === 0) {
+            alert("No file name is entered");
+        }
+
+        this.createFile(this.selectedDriveId,folderId,fileName,this.data);
     }
 
     _onCancelPress() {
@@ -197,31 +290,66 @@ export class OneDriveFileSource {
             newElement.classList.add("oneDriveFileAccess_driveElementActive");
 
             //load the default folder
-            __loadFileList(this.selectedDriveId,null,(fileState) => this._fileStateCallback(fileState));
+            this._loadFolder(this.selectedDriveId,null);
         }
   
     }
 
     //---------------------
-    //internal callbacks
+    //internal methods
     //----------------------
 
-    _drivesStateCallback(driveState) {
-        this.driveState = driveState;
+    _setLoginState(loginState) {
+        this.loginState = loginState;
+        if(this.configElement) {
+            if(loginState.state == "logged in") {
+                this.loginElement.style.display = "none";
+                if(loginState.accountName) {
+                    this.userElement.innerHTML = loginState.accountName;
+                    this.userElement.style.display = "";
+                }
+                else {
+                    this.userElement.style.display = "none";
+                }
+                this.logoutElement.style.display = "";
+                this.accountMsgElement.style.display = "none";
+            }
+            else if(loginState.state == "logged out") {
+                this.loginElement.style.display = "";
+                this.userElement.style.display = "none";
+                this.userElement.innerHTML = "";
+                this.logoutElement.style.display = "none";
+                this.accountMsgElement.style.display = "none";
+            }
+            else {
+                //for now we will leave it to this...
+                this.accountMsgElement.display = "";
+                this.accountMsgEement.innerHTML = "OTHER STATE!!!"
+
+                this.loginElement.style.display = "none";
+                this.userElement.style.display = "none";
+                this.userElement.innerHTML = "";
+                this.logoutElement.style.display = "none";
+            }
+        }
+    }
+
+    _setDrivesInfo(drivesInfo) {
+        this.drivesInfo = drivesInfo;
 
         this.selectedDriveId = undefined;
         this.driveSelectionElementMap = {};
         uiutil.removeAllChildren(this.drivesListElement);
 
-        if(this.driveState) {
+        if(this.drivesInfo) {
             let selectedDriveId; 
-            if(driveState.defaultDriveId) selectedDriveId = driveState.defaultDriveId;
+            if(drivesInfo.defaultDriveId) selectedDriveId = drivesInfo.defaultDriveId;
 
-            if((this.driveState.drives)&&(this.driveState.drives.length > 0)) {
-                this.driveState.drives.forEach( driveInfo => this._addDriveElement(driveInfo))
+            if((this.drivesInfo.drives)&&(this.drivesInfo.drives.length > 0)) {
+                this.drivesInfo.drives.forEach( driveInfo => this._addDriveElement(driveInfo))
 
                 if(selectedDriveId === undefined) {
-                    selectedDriveId = this.driveState.drives[0].id;
+                    selectedDriveId = this.drivesInfo.drives[0].id;
                 }
             }
 
@@ -233,9 +361,19 @@ export class OneDriveFileSource {
         
     }
 
+    _loadFolder(driveId, folderId) {
+        let filesInfoPromise = this.fileAccess.loadFolder(driveId,folderId);
+        filesInfoPromise.then(filesInfo => {
+            this._setFilesInfo(filesInfo);
+        }).catch(errorMsg => {
+            this._setFilesInfo(null);
+            alert("Error opening folder");
+        })
+    }
 
-    _fileStateCallback(fileState) {
-        this.fileState = fileState;
+
+    _setFilesInfo(filesInfo) {
+        this.filesInfo = filesInfo;
         this.fileElementMap = {};
         this.selectedFileId = undefined;
 
@@ -252,9 +390,9 @@ export class OneDriveFileSource {
         if(selectedDriveInfo) {
             this.pathCell.appendChild(this._getPathDriveElement(selectedDriveInfo));
         }
-        if(this.fileState) {
-            if(this.fileState.path) {
-                this.fileState.path.forEach( (pathEntry,index) => {
+        if(this.filesInfo) {
+            if(this.filesInfo.path) {
+                this.filesInfo.path.forEach( (pathEntry,index) => {
                     if(index >= 1) {
                         this.pathCell.appendChild(this._getPathDelimiterElement());
                     }
@@ -265,73 +403,63 @@ export class OneDriveFileSource {
         
     }
 
-    _populateFileList() {
-        uiutil.removeAllChildren(this.fileListElement);
-        if((this.fileState)&&(this.fileState.files)) {
-            this.fileState.files.forEach(fileInfo => this._addFileListEntry(fileInfo));
-        }
-    }
-
     _getSelectedDriveInfo() {
-        if((this.driveState)&&(this.driveState.drives)&&(this.selectedDriveId)) {
-            return this.driveState.drives.find( driveEntry => driveEntry.id == this.selectedDriveId);
+        if((this.drivesInfo)&&(this.drivesInfo.drives)&&(this.selectedDriveId)) {
+            return this.drivesInfo.drives.find( driveEntry => driveEntry.id == this.selectedDriveId);
         }
         else return undefined;
     }
 
-    
-    /** This function sets of the source selection items */
-    _addDriveElement(driveInfo) {
-        let driveElement = document.createElement("div");
-        driveElement.className = "oneDriveFileAccess_driveElement";
-        driveElement.innerHTML = driveInfo.name;
-        driveElement.onclick = () => this._onSelectDrive(driveInfo.id);
-
-        this.driveSelectionElementMap[driveInfo.id] = driveElement;
-        this.drivesListElement.appendChild(driveElement);
+    _populateFileList() {
+        uiutil.removeAllChildren(this.fileListElement);
+        if((this.filesInfo)&&(this.filesInfo.files)) {
+            this.filesInfo.files.forEach(filesInfo => this._addFileListEntry(filesInfo));
+        }
     }
 
-
-    _getPathDriveElement(driveEntry) {
-        let driveElement = document.createElement("span");
-        driveElement.className = "oneDriveFileAccess_pathDriveElement";
-        driveElement.innerHTML = driveEntry.name + ":";
-        return driveElement;
-    }
-
-    _getPathDelimiterElement() {
-        let delimiterElement = document.createElement("span");
-        delimiterElement.className = "oneDriveFileAccess_pathDelimiterElement";
-        delimiterElement.innerHTML = ">";
-        return delimiterElement;
-    }
-
-    _getPathElement(pathEntry) {
-        let folderElement = document.createElement("span");
-        folderElement.className = "oneDriveFileAccess_pathFileElement";
-        folderElement.innerHTML = pathEntry.name;
-        return folderElement;
-    }
-
-    _addFileListEntry(fileInfo) {
-        let fileElement = document.createElement("div");
-        fileElement.className = "oneDriveFileAccess_fileListEntryElement";
-        fileElement.innerHTML = fileInfo.name;
-        this.fileListElement.appendChild(fileElement);
-
-        fileElement.onclick = () => this._onFileClick(fileInfo);
-        this.fileElementMap[fileInfo.id] = fileElement;
+    _populateActionForm() {
+        let drivesInfoPromise = this.fileAccess.getDrivesInfo();
+        drivesInfoPromise.then(drivesInfo => {
+            this._setDrivesInfo(drivesInfo);
+        }).catch(errorMsg => {
+            //figure out what to do here
+            alert("Get better drive info error handling!")
+        })
     }
 
     //--------------------
     // create elements
     //--------------------
+
     _createConfigElement() {
-        //not logged in: login button
-        //logged in: display name, log out button (on next line)
+        let container = document.createElement("div");
+        container.className = "oneDriveFileAccess_configContainer";
+
+        this.loginElement = document.createElement("div");
+        this.loginElement.className = "oneDriveFileAccess_loginElement";
+        this.loginElement.innerHTML = "Login"
+        this.loginElement.onclick = () => this._onLoginCommand();
+        container.appendChild(this.loginElement);
+
+        this.userElement = document.createElement("div");
+        this.userElement.className = "oneDriveFileAccess_userElement";
+        container.appendChild(this.userElement);
+
+        this.logoutElement = document.createElement("div");
+        this.logoutElement.className = "oneDriveFileAccess_logoutElement";
+        this.logoutElement.innerHTML = "Logout"
+        this.logoutElement.onclick = () => this._onLogoutCommand();
+        container.appendChild(this.logoutElement);
+
+        this.accountMsgElement = document.createElement("div");
+        this.accountMsgElement.className = "oneDriveFileAccess_accountMsgElement";
+        container.appendChild(this.accountMsgElement);
+
+
+        this.configElement = container;
     }
 
-    
+
     _createActionElement() {
         //action element
         let mainContainer = document.createElement("table");
@@ -454,94 +582,61 @@ export class OneDriveFileSource {
         cancelButton.className = "oneDriveFileAccess_cancelButton";
         buttonsCell.appendChild(cancelButton);
 
-        this._populateForm();
-
-        return mainContainer;
+        this.actionElement = mainContainer;
     }
 
-    _populateForm() {
-        __loadDriveList((driveList) => this._drivesStateCallback(driveList));
+    /** This function sets of the source selection items */
+    _addDriveElement(driveInfo) {
+        let driveElement = document.createElement("div");
+        driveElement.className = "oneDriveFileAccess_driveElement";
+        driveElement.innerHTML = driveInfo.name;
+        driveElement.onclick = () => this._onSelectDrive(driveInfo.id);
+
+        this.driveSelectionElementMap[driveInfo.id] = driveElement;
+        this.drivesListElement.appendChild(driveElement);
     }
 
 
+    _getPathDriveElement(driveEntry) {
+        let driveElement = document.createElement("span");
+        driveElement.className = "oneDriveFileAccess_pathDriveElement";
+        driveElement.innerHTML = driveEntry.name + ":";
+        return driveElement;
+    }
+
+    _getPathDelimiterElement() {
+        let delimiterElement = document.createElement("span");
+        delimiterElement.className = "oneDriveFileAccess_pathDelimiterElement";
+        delimiterElement.innerHTML = ">";
+        return delimiterElement;
+    }
+
+    _getPathElement(pathEntry) {
+        let folderElement = document.createElement("span");
+        folderElement.className = "oneDriveFileAccess_pathFileElement";
+        folderElement.innerHTML = pathEntry.name;
+        return folderElement;
+    }
+
+    _addFileListEntry(fileInfo) {
+        let fileElement = document.createElement("div");
+        fileElement.className = "oneDriveFileAccess_fileListEntryElement";
+        fileElement.innerHTML = fileInfo.name;
+        this.fileListElement.appendChild(fileElement);
+
+        fileElement.onclick = () => this._onFileClick(fileInfo);
+        this.fileElementMap[fileInfo.id] = fileElement;
+    }
 
 }
 
 //this is the identifier name for the source
-OneDriveFileSource.NAME = "oneDrive";
+OneDriveFileSource.NAME = OneDriveFileAccess.NAME
 
 //this is the identifier name for the source
-OneDriveFileSource.DISPLAY_NAME = "Microsoft OneDrive"
+OneDriveFileSource.DISPLAY_NAME = OneDriveFileAccess.DISPLAY_NAME
 
 //this is metadata for a new file. Name is blank and there is not additional data besides source name.
-OneDriveFileSource.NEW_FILE_METADATA = {
-    source: OneDriveFileSource.NAME
-    //displayName:
-    //metadata: { ??? }
-}
+OneDriveFileSource.NEW_FILE_METADATA = OneDriveFileAccess.NEW_FILE_METADATA
 
-OneDriveFileSource.directSaveOk = function(fileMetadata) {
-    //fix this
-    return false;
-}
-
-////////////////////////////////
-//DEV
-function __loadDriveList(drivesStateCallback) {
-    drivesStateCallback(TEST_DRIVE_LIST);
-}
-
-function __loadFileList(driveId,folderId,fileStateCallback) {
-    fileStateCallback(TEST_FILE_STATE_1);
-}
-
-const TEST_DRIVE_LIST = {
-    defaultDriveId: "drive1",
-    drives: [
-        {
-            name: "Personal Drive",
-            id: "drive1"
-        },
-        {
-            name: "Work Drive",
-            id: "drive2"
-        }
-    ]
-}
-
-const TEST_FILE_STATE_1 = {
-    path: [
-        {
-            name: "test",
-            type: "__folder__",
-            id: "folder1"
-        },
-        {
-            name: "workspaces",
-            type: "__folder__",
-            id: "folder2"
-        }
-    ],
-    files: [
-        {
-            name: "workspace1.json",
-            type: "application/json",
-            id: "file1"
-        },
-        {
-            name: "workspace2.json",
-            type: "application/json",
-            id: "file2"
-        },
-        {
-            name: "workspace3.json",
-            type: "application/json",
-            id: "file3"
-        },
-        {
-            name: "chidlFolder",
-            type: "__folder__",
-            id: "folder3"
-        }
-    ]
-}
+OneDriveFileSource.directSaveOk = OneDriveFileAccess.directSaveOk
