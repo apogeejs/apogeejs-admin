@@ -46,7 +46,7 @@
 
 .combinedFileAccess_selectionWrapper {
     position: relative;
-    padding: 15px;
+    padding: 5px;
     outline: 1px solid rgb(128,128,128);
 }
 
@@ -84,11 +84,29 @@
 }
 
 .oneDriveFileAccess_drivesCell {
+    position: relative;
+    vertical-align: top;
     padding: 5px;
 }
 
 .oneDriveFileAccess_driveList {
-    
+    position: relative;
+    overflow: auto;
+    outline: 1px solid rgb(128,128,128);
+}
+
+.oneDriveFileAccess_driveElement {
+    position: relative;
+    padding: 5px;
+    outline: 1px solid rgb(128,128,128);
+}
+
+.oneDriveFileAccess_driveElement:hover {
+    background-color: rgb(200,200,200);
+}
+
+.oneDriveFileAccess_driveElementActive {
+    background-color: white;
 }
 
 .oneDriveFileAccess_pathCell {
@@ -140,4 +158,40 @@
 .oneDriveFileAccess_cancelButton {
     float: right;
     margin-right: 50px;
+}
+
+.oneDriveFileAccess_pathFileElement {
+    padding: 5px;
+    font-size: 14px;
+    color: black;
+}
+
+.oneDriveFileAccess_pathDelimiterElement {
+    padding: 5px;
+    font-size: 14px;
+    color: gray;
+    font-weight: bold;
+}
+
+.oneDriveFileAccess_pathDriveElement {
+    padding: 5px;
+    font-size: 14px;
+    color: gray;
+    font-weight: bold;
+}
+
+.oneDriveFileAccess_fileListEntryElement {
+    padding: 2px;
+}
+
+.oneDriveFileAccess_fileListEntryElement:hover {
+    background-color: rgb(240,240,256);
+}
+
+.oneDriveFileAccess_fileListEntryElementActive {
+    background-color: rgb(220,220,256);
+}
+
+.oneDriveFileAccess_fileListEntryElementActive:hover {
+    background-color: rgb(220,220,256);
 }

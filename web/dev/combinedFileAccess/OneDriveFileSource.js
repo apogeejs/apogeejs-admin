@@ -1,4 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+import {uiutil}  from "/apogeeui/apogeeUiLib.js";
 
 export class OneDriveFileSource {
     /** constructor */
@@ -10,6 +11,27 @@ export class OneDriveFileSource {
         this.onActionComplete = onActionComplete;
         //this is a callback to notify the dialog the action is complete
         this.onDialogComplete = null;
+
+        
+
+        // this.driveState
+        // this.selectedDriveId
+        this.driveSelectionElementMap = {}
+
+        // this.fileState
+        // this.selectedFileId
+        this.fileElementMap = {};
+
+
+        // this.actionElement
+        // this.configElement
+
+        // this.fileNameTextField
+        // this.pathCell
+        // this.fileListElement
+        // this.drivesListElement
+        // this.allRadio
+        // this.jsonRadio
     }
 
     //============================
@@ -103,12 +125,8 @@ export class OneDriveFileSource {
     // event handler
     //--------------------
 
-    _onParentFolderLink(something) {
-
-    }
-
-    _onParentFolderButton(something) {
-
+    _onParentFolder(parentFileId) {
+        __loadFileList(this.selectedDriveId,parentFileId,(fileState) => this._fileStateCallback(fileState));
     }
 
     _onFilterChange() {
@@ -119,7 +137,32 @@ export class OneDriveFileSource {
 
     }
 
-    _onFileClick(something) {
+    _onFileClick(fileInfo) {
+        //select element
+        let oldSelectedFileId = this.selectedFileId;
+        if(oldSelectedFileId) {
+            let oldSelectedFileElement = this.fileElementMap[oldSelectedFileId];
+            if(oldSelectedFileElement) {
+                oldSelectedFileElement.classList.remove("oneDriveFileAccess_fileListEntryElementActive");
+            }
+        }
+        this.selectedFileId = fileInfo.id;
+        if(this.selectedFileId) {
+            let newSelectedFileElement = this.fileElementMap[this.selectedFileId];
+            if(newSelectedFileElement) {
+                newSelectedFileElement.classList.add("oneDriveFileAccess_fileListEntryElementActive");
+            }
+        }
+
+        //take any needed action
+        if(fileInfo.type == "__folder__") {
+            //open the folder
+            __loadFileList(this.selectedDriveId,fileInfo.id,(fileState) => this._fileStateCallback(fileState));
+        }
+        else {
+            //put the name in the file name field
+            this.fileNameTextField.value = fileInfo.name;
+        }
 
     }
 
@@ -137,6 +180,147 @@ export class OneDriveFileSource {
 
     _onCancelPress() {
 
+    }
+
+    /** This function changes the active source */
+    _onSelectDrive(driveId) {
+
+        let oldSelectedDriveId = this.selectedDriveId;
+        this.selectedDriveId = driveId;
+
+        if(oldSelectedDriveId !== undefined) {
+            let oldElement = this.driveSelectionElementMap[oldSelectedDriveId];
+            oldElement.classList.remove("oneDriveFileAccess_driveElementActive");
+        }
+        if(this.selectedDriveId !== undefined) {
+            let newElement = this.driveSelectionElementMap[this.selectedDriveId];
+            newElement.classList.add("oneDriveFileAccess_driveElementActive");
+
+            //load the default folder
+            __loadFileList(this.selectedDriveId,null,(fileState) => this._fileStateCallback(fileState));
+        }
+  
+    }
+
+    //---------------------
+    //internal callbacks
+    //----------------------
+
+    _drivesStateCallback(driveState) {
+        this.driveState = driveState;
+
+        this.selectedDriveId = undefined;
+        this.driveSelectionElementMap = {};
+        uiutil.removeAllChildren(this.drivesListElement);
+
+        if(this.driveState) {
+            let selectedDriveId; 
+            if(driveState.defaultDriveId) selectedDriveId = driveState.defaultDriveId;
+
+            if((this.driveState.drives)&&(this.driveState.drives.length > 0)) {
+                this.driveState.drives.forEach( driveInfo => this._addDriveElement(driveInfo))
+
+                if(selectedDriveId === undefined) {
+                    selectedDriveId = this.driveState.drives[0].id;
+                }
+            }
+
+            //set initial drive state
+            if(selectedDriveId !== undefined) {
+                this._onSelectDrive(selectedDriveId);
+            }
+        }
+        
+    }
+
+
+    _fileStateCallback(fileState) {
+        this.fileState = fileState;
+        this.fileElementMap = {};
+        this.selectedFileId = undefined;
+
+        this._populatePathCell();
+        this._populateFileList();
+
+    }
+
+    _populatePathCell() {
+        uiutil.removeAllChildren(this.pathCell);
+        uiutil.removeAllChildren(this.fileListElement);
+
+        let selectedDriveInfo = this._getSelectedDriveInfo();
+        if(selectedDriveInfo) {
+            this.pathCell.appendChild(this._getPathDriveElement(selectedDriveInfo));
+        }
+        if(this.fileState) {
+            if(this.fileState.path) {
+                this.fileState.path.forEach( (pathEntry,index) => {
+                    if(index >= 1) {
+                        this.pathCell.appendChild(this._getPathDelimiterElement());
+                    }
+                    this.pathCell.appendChild(this._getPathElement(pathEntry));
+                })
+            }
+        }
+        
+    }
+
+    _populateFileList() {
+        uiutil.removeAllChildren(this.fileListElement);
+        if((this.fileState)&&(this.fileState.files)) {
+            this.fileState.files.forEach(fileInfo => this._addFileListEntry(fileInfo));
+        }
+    }
+
+    _getSelectedDriveInfo() {
+        if((this.driveState)&&(this.driveState.drives)&&(this.selectedDriveId)) {
+            return this.driveState.drives.find( driveEntry => driveEntry.id == this.selectedDriveId);
+        }
+        else return undefined;
+    }
+
+    
+    /** This function sets of the source selection items */
+    _addDriveElement(driveInfo) {
+        let driveElement = document.createElement("div");
+        driveElement.className = "oneDriveFileAccess_driveElement";
+        driveElement.innerHTML = driveInfo.name;
+        driveElement.onclick = () => this._onSelectDrive(driveInfo.id);
+
+        this.driveSelectionElementMap[driveInfo.id] = driveElement;
+        this.drivesListElement.appendChild(driveElement);
+    }
+
+
+    _getPathDriveElement(driveEntry) {
+        let driveElement = document.createElement("span");
+        driveElement.className = "oneDriveFileAccess_pathDriveElement";
+        driveElement.innerHTML = driveEntry.name + ":";
+        return driveElement;
+    }
+
+    _getPathDelimiterElement() {
+        let delimiterElement = document.createElement("span");
+        delimiterElement.className = "oneDriveFileAccess_pathDelimiterElement";
+        delimiterElement.innerHTML = ">";
+        return delimiterElement;
+    }
+
+    _getPathElement(pathEntry) {
+        let folderElement = document.createElement("span");
+        folderElement.className = "oneDriveFileAccess_pathFileElement";
+        folderElement.innerHTML = pathEntry.name;
+        return folderElement;
+    }
+
+    _addFileListEntry(fileInfo) {
+        let fileElement = document.createElement("div");
+        fileElement.className = "oneDriveFileAccess_fileListEntryElement";
+        fileElement.innerHTML = fileInfo.name;
+        this.fileListElement.appendChild(fileElement);
+
+        fileElement.onclick = () => this._onFileClick(fileInfo);
+        this.fileElementMap[fileInfo.id] = fileElement;
     }
 
     //--------------------
@@ -276,14 +460,7 @@ export class OneDriveFileSource {
     }
 
     _populateForm() {
-
-        // this.drivesListElement
-        // this.pathCell
-        // this.fileListElement
-        // this.fileNameTextField
-        // this.allRadio 
-        // this.jsonRadio
-
+        __loadDriveList((driveList) => this._drivesStateCallback(driveList));
     }
 
 
@@ -306,4 +483,65 @@ OneDriveFileSource.NEW_FILE_METADATA = {
 OneDriveFileSource.directSaveOk = function(fileMetadata) {
     //fix this
     return false;
+}
+
+////////////////////////////////
+//DEV
+function __loadDriveList(drivesStateCallback) {
+    drivesStateCallback(TEST_DRIVE_LIST);
+}
+
+function __loadFileList(driveId,folderId,fileStateCallback) {
+    fileStateCallback(TEST_FILE_STATE_1);
+}
+
+const TEST_DRIVE_LIST = {
+    defaultDriveId: "drive1",
+    drives: [
+        {
+            name: "Personal Drive",
+            id: "drive1"
+        },
+        {
+            name: "Work Drive",
+            id: "drive2"
+        }
+    ]
+}
+
+const TEST_FILE_STATE_1 = {
+    path: [
+        {
+            name: "test",
+            type: "__folder__",
+            id: "folder1"
+        },
+        {
+            name: "workspaces",
+            type: "__folder__",
+            id: "folder2"
+        }
+    ],
+    files: [
+        {
+            name: "workspace1.json",
+            type: "application/json",
+            id: "file1"
+        },
+        {
+            name: "workspace2.json",
+            type: "application/json",
+            id: "file2"
+        },
+        {
+            name: "workspace3.json",
+            type: "application/json",
+            id: "file3"
+        },
+        {
+            name: "chidlFolder",
+            type: "__folder__",
+            id: "folder3"
+        }
+    ]
 }
