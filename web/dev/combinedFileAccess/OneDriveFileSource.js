@@ -20,7 +20,7 @@ let OneDriveFileSourceGenerator = {
     },
 
     getInstance(action,fileMetadata,data,onComplete) {
-        return new OneDriveFileSource(action,onComplete)
+        return new OneDriveFileSource(action,fileMetadata,data,onComplete)
     },
 
 }
@@ -30,8 +30,10 @@ export {OneDriveFileSourceGenerator as default};
 /** This is the remote file system source */
 class OneDriveFileSource {
     /** constructor */
-    constructor(action,onComplete) {
+    constructor(action,fileMetadata,data,onComplete) {
         this.action = action;
+        this.initialFileMetadata = fileMetadata;
+        this.data = data;
         this.onComplete = onComplete;
 
         //this object is the interface to OneDrive
@@ -73,8 +75,8 @@ class OneDriveFileSource {
     // File Actions
     //-----------------------------
 
-    updateFile(fileMetadata,data) {
-        let saveFilePromise = this.remoteFileSystem.updateFile(fileMetadata.driveId,fileMetadata.fileId,data);
+    updateFile() {
+        let saveFilePromise = this.remoteFileSystem.updateFile(this.fileMetadata.driveId,this.fileMetadata.fileId,this.data);
 
         saveFilePromise.then( result => {
             //success
@@ -85,8 +87,8 @@ class OneDriveFileSource {
         }) ;
     }
 
-    createFile(driveId,folderId,fileName,data) {
-        let saveFilePromise = this.remoteFileSystem.createFile(driveId,folderId,fileName,data);
+    createFile(driveId,folderId,fileName) {
+        let saveFilePromise = this.remoteFileSystem.createFile(driveId,folderId,fileName,this.data);
 
         saveFilePromise.then( result => {
             //success
@@ -262,7 +264,7 @@ class OneDriveFileSource {
             alert("No file name is entered");
         }
 
-        this.createFile(this.selectedDriveId,folderId,fileName,this.data);
+        this.createFile(this.selectedDriveId,folderId,fileName);
     }
 
     _onCancelPress() {
