@@ -1,28 +1,48 @@
 import ace from "/ext/ace/ace_1.4.3/ace.es.js";
 import {uiutil}  from "/apogeeui/apogeeUiLib.js";
 
-export class ClipboardFileSource {
+let ClipboardFileSourceGenerator = {
+    getSourceId: function() {
+        return CLIPBOARD_SOURCE_ID;
+    },
+
+    getDisplayName: function() {
+        return CLIPBOARD_DISPLAY_NAME;
+    },
+
+    directSaveOk: function(fileMetadata) {
+        return false;
+    },
+
+    getNewFileMetadata() {
+        return CLIPBOARD_NEW_FILE_METADATA;
+    },
+
+    getSaveInstance(onComplete) {
+        return new ClipboardFileSource("save",onComplete)
+    },
+
+    getOpenInstance(onComplete) {
+        return new ClipboardFileSource("open",onComplete);
+    }
+
+}
+
+export {ClipboardFileSourceGenerator as default};
+
+class ClipboardFileSource {
     /** constructor */
-    constructor(metadata,data,action,onActionComplete) {
-        this.data = data;
+    constructor(action,onComplete) {
         this.action = action;
-        this.metadata = metadata;
-        //this is a callback to signify the save/open is successful/failed/canceled
-        this.onActionComplete = onActionComplete;
-        //this is a callback to notify the dialog the action is complete
-        this.onDialogComplete = null;
+        this.onComplete = onComplete;
     }
 
     //============================
     // Public Methods
     //============================
 
-    getName() {
-        return ClipboardFileSource.NAME;
-    }
-
-    getDisplayName() {
-        return ClipboardFileSource.DISPLAY_NAME;
+    getGenerator() {
+        return ClipboardFileSourceGenerator;
     }
 
     //-----------------------------
@@ -30,27 +50,15 @@ export class ClipboardFileSource {
     //-----------------------------
 
     saveFile(fileMetadata,data) {
-        if(this.action !== "save")  this.onComplete("Unknown Error in action",false,null);
-
-        //automatic success
-        if(this.onActionComplete) this.onActionComplete(null,true,fileMetadata); 
-        //close dialog
-        if(this.onDialogComplete) this.onDialogComplete(true);    
+        if(this.onComplete) this.onComplete(null,true,fileMetadata);    
     }
 
     openFile(fileMetadata,data) {
-        if(this.action !== "open")  this.onComplete("Unknown Error in action",false,null);
-
-        //automatic success
-        if(this.onActionComplete) this.onActionComplete(null,data,fileMetadata);
-        //close dialog
-        if(this.onDialogComplete) this.onDialogComplete(true);
+        if(this.onComplete) this.onComplete(null,data,fileMetadata);
     }
 
     cancelAction() {
-        if(this.onActionComplete) this.onActionComplete(null,false,null);
-        //close dialog
-        if(this.onDialogComplete) this.onDialogComplete(true);
+        if(this.onComplete) this.onComplete(null,false,null);
     }
 
     /** This method is called externally after the dialog box using the soruce closes. */
@@ -78,10 +86,6 @@ export class ClipboardFileSource {
 
     getConfigElement() {
         return null;
-    }
-
-    setOnDialogComplete(onDialogComplete) {
-        this.onDialogComplete = onDialogComplete
     }
 
     getActionElement() {
@@ -198,16 +202,11 @@ export class ClipboardFileSource {
 }
 
 //this is the identifier name for the source
-ClipboardFileSource.NAME = "clipboard";
+const CLIPBOARD_SOURCE_ID = "clipboard";
 
 //this is the identifier name for the source
-ClipboardFileSource.DISPLAY_NAME = "Clipboard"
+const CLIPBOARD_DISPLAY_NAME = "Clipboard"
 
-//this is metadata for a new file. Name is blank and there is not additional data besides source name.
-ClipboardFileSource.NEW_FILE_METADATA = {
-    source: ClipboardFileSource.NAME
-}
-
-ClipboardFileSource.directSaveOk = function(fileMetadata) {
-    return false;
+const CLIPBOARD_NEW_FILE_METADATA = {
+    sourceId: CLIPBOARD_SOURCE_ID
 }

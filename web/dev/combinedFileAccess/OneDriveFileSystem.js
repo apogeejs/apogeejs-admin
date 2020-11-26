@@ -1,7 +1,7 @@
 //This class will manage access to microsoft one drive
 
 
-export default class OneDriveFileAccess {
+export default class OneDriveFileSystem {
 
     constructor() {
         //for dev...
@@ -46,7 +46,7 @@ export default class OneDriveFileAccess {
         return Promise.resolve({
             data: TEST_WORKSPACE,
             fileMetadata: {
-                source: OneDriveFileSource.NAME,
+                source: OneDriveFileSystem.NAME,
                 driveId: "???",
                 parentFolderId: ["???"],
                 fileId: fileId,
@@ -57,19 +57,19 @@ export default class OneDriveFileAccess {
 }
 
 //this is the identifier name for the source
-OneDriveFileAccess.NAME = "oneDrive";
+OneDriveFileSystem.SOURCE_ID = "oneDrive";
 
 //this is the identifier name for the source
-OneDriveFileAccess.DISPLAY_NAME = "Microsoft OneDrive"
+OneDriveFileSystem.DISPLAY_NAME = "Microsoft OneDrive"
 
 //this is metadata for a new file. Name is blank and there is not additional data besides source name.
-OneDriveFileAccess.NEW_FILE_METADATA = {
-    source: OneDriveFileSource.NAME
+OneDriveFileSystem.NEW_FILE_METADATA = {
+    source: OneDriveFileSystem.NAME
     //displayName:
     //fileId: { ??? }
 }
 
-OneDriveFileAccess.directSaveOk = function(fileMetadata) {
+OneDriveFileSystem.directSaveOk = function(fileMetadata) {
     //fix this
     return false;
 }

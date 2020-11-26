@@ -1,7 +1,6 @@
 import {BaseFileAccess} from "/apogeeapp/apogeeAppLib.js";
-import {ClipboardFileSource} from "./ClipboardFileSource.js";
-import {ClipboardFileSource2} from "./ClipboardFileSource2.js";
-import {OneDriveFileSource} from "./OneDriveFileSource.js";
+import ClipboardFileSourceGenerator from "./ClipboardFileSource.js";
+import OneDriveFileSourceGenerator from "./OneDriveFileSource.js";
 import {showCombinedAccessDialog} from "./CombinedFileAccessDialog.js";
 
 /* 
@@ -18,15 +17,15 @@ export default class CombinedFileAccess extends BaseFileAccess {
     constructor() {
         super();
         this.defaultSourceName = ClipboardFileSource.NAME;
-        this.sourceConstructorList = [ClipboardFileSource,OneDriveFileSource,ClipboardFileSource2];
+        this.sourceGeneratorList = [ClipboardFileSourceGenerator,OneDriveFileSourceGenerator];
     }
    
     /**
      * This method returns fileMetadata appropriate for a new workspace.
      */
     getNewFileMetadata() {
-        let sourceConstructor = this._getSourceConstructor(null,this.sourceConstructorList);
-        return sourceConstructor.NEW_FILE_METADATA;
+        let sourceGenerator = this._getSourceGenerator(null,this.sourceGeneratorList);
+        return sourceGenerator.getNewFileMetadata();
     }
     
     /**
@@ -34,8 +33,8 @@ export default class CombinedFileAccess extends BaseFileAccess {
      * is can be saved without opening a save dialog. 
      */
     directSaveOk(fileMetadata) {
-        let sourceConstructor = this._getSourceConstructor(fileMetadata,this.sourceConstructorList)
-        return ((sourceConstructor)&&(sourceConstructor.directSaveOk(fileMetadata))); 
+        let sourceGenerator = this._getSourceGenerator(fileMetadata,this.sourceGeneratorList)
+        return ((sourceGenerator)&&(sourceGenerator.directSaveOk(fileMetadata))); 
     }
     
     /**
@@ -43,32 +42,45 @@ export default class CombinedFileAccess extends BaseFileAccess {
      * to select the file.
      */
     openFile(onOpen) {
-        let title = "Open Workspace";
-        let sourceList = this.sourceConstructorList.map( sourceConstructor => new sourceConstructor(null,null,"open",onOpen) );
-        let activeSource = this._getSourceFromMetadata(null,sourceList);
+        //add the close dialog action to on complete
+        let closeDialog;
+        let onComplete = (errorMsg,data,fileMetadata) => {
+            closeDialog();
+            onOpen(errorMsg,data,fileMetadata);
+        };
 
-        showCombinedAccessDialog(title,activeSource,sourceList);
+        let dialogObject = CombinedAccessDialog("open",null,null,this.sourceGeneratorList,onComplete);
+        dialogObject.showDialog();
+
+        closeDialog = () => dialogObject.showDialog();
     }
 
     /** This  method shows a save dialog and saves the file. */
     saveFileAs(fileMetadata,data,onSave) {
-        let title = "Save Workspace";
-        let sourceList = this.sourceConstructorList.map( sourceConstructor => new sourceConstructor(fileMetadata,data,"save",onSave) );
-        let activeSource = this._getSourceFromMetadata(fileMetadata,sourceList);
+        //add the close dialog action to on complete
+        let closeDialog;
+        let onComplete = (errorMsg,success,fileMetadata) => {
+            closeDialog();
+            onSave(errorMsg,success,fileMetadata);
+        };
 
-        showCombinedAccessDialog(title,activeSource,sourceList);
+        //show the dialog
+        let dialogObject = CombinedAccessDialog("save",fileMetadata,data,this.sourceGeneratorList,onComplete);
+        dialogObject.showDialog();
+
+        closeDialog = () => dialogObject.showDialog();
     }
 
     /** 
      * This method saves a file to the give location. 
      */
     saveFile(fileMetadata,data,onSave) {
-        let sourceConstructor = this._getSourceConstructor(fileMetadata,this.sourceConstructorList)
+        let sourceGenerator = this._getSourceGenerator(fileMetadata,this.sourceGeneratorList)
         
         //make sure we can save
-        if(sourceConstructor.directSaveOk(fileMetadata)) {
-            let source = new sourceConstructor(fileMetadata,data,"save",onSave);
-            source.saveFile(fileMetadata,data,onSave);
+        if(sourceGenerator.directSaveOk(fileMetadata)) {
+            let source = souceGenerator.getSaveInstace(onSave);
+            source.updateFile(fileMetadata,data);
         }
         else {
             //if we can't save, revert to save as
@@ -79,19 +91,8 @@ export default class CombinedFileAccess extends BaseFileAccess {
     //============================
     // Private Functions
     //============================
-
-    _getSourceFromMetadata(fileMetadata,sourceList) {
-        let sourceName;
-        if((fileMetadata)&&(fileMetadata.source)) {
-            sourceName = fileMetadata.source;
-        }
-        else {
-            sourceName = this.defaultSourceName; 
-        }
-        return sourceList.find( source => source.getName() == sourceName );
-    }
     
-    _getSourceConstructor(fileMetadata,constructorList) {
+    _getSourceGenerator(fileMetadata,generatorList) {
         let sourceName;
         if((fileMetadata)&&(fileMetadata.source)) {
             sourceName = fileMetadata.source;
@@ -99,7 +100,7 @@ export default class CombinedFileAccess extends BaseFileAccess {
         else {
             sourceName = this.defaultSourceName; 
         }
-        return constructorList.find( sourceConstructor => sourceConstructor.NAME == sourceName );
+        return generatorList.find( sourceGenerator => sourceGenerator.getName() == sourceName );
     }
 
 

@@ -1,159 +1,183 @@
 import {uiutil, dialogMgr}  from "/apogeeui/apogeeUiLib.js";
 
-/** This shows the combined file same dialog */
-export function showCombinedAccessDialog(title,activeSource,sourceList) {
+export default class CombinedAccessDialog {
+    constructor(action,fileMetadata,fileData,sourceGeneratorList,onComplete) {
+        this.action = action;
+        this.initialFileMetadata = fileMetadata;
+        this.fileData = fileData;
+        this.souceGeneratorList = sourceGeneratorList;
+        this.onComplete = (errorMsg,result,fileMetadata) => {
+            //close this dialog
+            this.closeDialog();
+            //call the base on complete
+            onComplete(errorMsg,result,fileMetadata);
+        }
+
+
+        this.mainContainer = null;
+        this.actionElement = null;
+        this.selectListElement = null;
+        this.selectedSourceCell = null;
+
+        this.selectionElementMap = {};
+        this.sourceList = [];
+    }
+
+    showDialog() {
+
+        //consruct
+        //populate
+
+        let dialog = dialogMgr.createDialog();
+        dialog.setContent(this.mainContainer);
+        dialogMgr.showDialog(dialog);
+    }
+
+    closeDialog() {
+        //close dialog
+        dialogMgr.closeDialog(dialog);
+        //clean up all sources
+        this.sourceList.forEach(source => source.close());
+    }
+
+    //===========================
+    // Private Functions
+    //===========================
+
+    /** This method creates the main dom elements. */
+    _createLayout() {
+        this.mainContainer = document.createElement("table");
+        mainContainer.className = "combinedFileAccess_mainContainer";
     
-    let dialog = dialogMgr.createDialog({"minimizable":true,"maximizable":true,"movable":true});
+        let titleRow = document.createElement("tr");
+        mainContainer.appendChild(titleRow);
+        let sourceRow = document.createElement("tr");
+        mainContainer.appendChild(sourceRow);
+        let bodyRow = document.createElement("tr");
+        mainContainer.appendChild(bodyRow);
+    
+        //title
+        let title = (action == "save") ? "Save Workspace" : "Open Workspace";
+        let dialogTitleElement = document.createElement("td");
+        dialogTitleElement.colSpan = 2;
+        dialogTitleElement.className = "combinedFileAccess_dialogTitleElement";
+        dialogTitleElement.innerHTML = title;
+        titleRow.appendChild(dialogTitleElement);
+    
+        //source selection title
+        let selectTitleCell = document.createElement("td");
+        selectTitleCell.className = "combinedFileAccess_selectTitleCell";
+        selectTitleCell.innerHTML = "File Source:";
+        sourceRow.appendChild(selectTitleCell);
+    
+        //selected source
+        this.selectedSourceCell = document.createElement("td");
+        selectedSourceCell.className = "combinedFileAccess_selectedSourceTitle";
+        sourceRow.appendChild(selectedSourceCell);
+    
+        //body
+        let selectListCell = document.createElement("td");
+        selectListCell.className = "combinedFileAccess_sourceListCell";
+        bodyRow.appendChild(selectListCell);
+    
+        this.selectListElement = document.createElement("div");
+        selectListElement.className = "combinedFileAccess_selectList";
+        selectListCell.appendChild(selectListElement);
+    
+        //action element
+        this.actionElement = document.createElement("td");
+        actionElement.className = "combinedFileAccess_actionElement";
+        bodyRow.appendChild(actionElement);
+    
+    }
+
+    /** This method populates the layout with the source specific data. */
+    _populateLayout() {
+        let initialActiveSource;
+
+        //create the sources and elements
+        sourceGeneratorList.forEach(sourceGenerator => {
+            let source = sourceGenerator.getInstance(this.action,this.initialFileMetadata,this.fileData,this.onComplete);
             
-    let mainContainer = document.createElement("table");
-    mainContainer.className = "combinedFileAccess_mainContainer";
+            let sourceElement = this._getSelectionElement(source);
+            this.selectListElement.appendChild(sourceElement);
 
-    let titleRow = document.createElement("tr");
-    mainContainer.appendChild(titleRow);
-    let sourceRow = document.createElement("tr");
-    mainContainer.appendChild(sourceRow);
-    let bodyRow = document.createElement("tr");
-    mainContainer.appendChild(bodyRow);
+            //save these objects for future use
+            this.sourceList.push(source);
+            this.selectionElementMap[sourceGenerator.getSourceId()] = sourceElement;
+            if((this.initialFileMetadata)&&(this.initialFileMetadata.sourceId == sourceGenerator.getSourceId()) {
+                initialActiveSource = source;
+            }
+        });
 
-    //title
-    let dialogTitleElement = document.createElement("td");
-    dialogTitleElement.colSpan = 2;
-    dialogTitleElement.className = "combinedFileAccess_dialogTitleElement";
-    dialogTitleElement.innerHTML = title;
-    titleRow.appendChild(dialogTitleElement);
+        //set an initial source
+        if((!initialActiveSource)&&(sourceList.length > 0)) initialActiveSource = sourceList[0];
+        if(initialActiveSource) this._selectSource(initialActiveSource);
+    }
 
-    //source selection title
-    let selectTitleCell = document.createElement("td");
-    selectTitleCell.className = "combinedFileAccess_selectTitleCell";
-    selectTitleCell.innerHTML = "File Source:";
-    sourceRow.appendChild(selectTitleCell);
+    /** This function sets of the source selection items */
+    _getSelectionElement(source) {
+        let wrapperElement = document.createElement("div");
+        wrapperElement.className = "combinedFileAccess_selectionWrapper";
 
-    //selected source
-    let selectedSourceCell = document.createElement("td");
-    selectedSourceCell.className = "combinedFileAccess_selectedSourceTitle";
-    sourceRow.appendChild(selectedSourceCell);
+        let titleElement = document.createElement("div");
+        titleElement.className = "combinedFileAccess_selectionTitleWrapper";
 
-    //body
-    let selectListCell = document.createElement("td");
-    selectListCell.className = "combinedFileAccess_sourceListCell";
-    bodyRow.appendChild(selectListCell);
+        let titleLabel = document.createElement("span");
+        titleLabel.className = "combinedFileAccess_selectionTitle";
+        titleLabel.innerHTML = source.getDisplayName();
+        titleElement.appendChild(titleLabel);
 
-    let selectListElement = document.createElement("div");
-    selectListElement.className = "combinedFileAccess_selectList";
-    selectListCell.appendChild(selectListElement);
-
-    //action element
-    let actionElement = document.createElement("td");
-    actionElement.className = "combinedFileAccess_actionElement";
-    bodyRow.appendChild(actionElement);
-
-    //create a structure to hold our working data
-    //and create the selection entries for each source.
-    let sourceSelectionInfo = {};
-    sourceSelectionInfo.sourceActionElement = actionElement; 
-    sourceSelectionInfo.selectedSourceCell = selectedSourceCell;
-    
-    let selectionElementData = sourceList.map(source => {
-        return {
-            name: source.getName(), 
-            element: _getSelectionElement(source,sourceSelectionInfo)
+        let iconUrl = source.getIconUrl();
+        if(iconUrl) {
+            let titleIcon = document.createElement("img");
+            titleIcon.className = "combinedFileAccess_selectionIcon";
+            titleElement.appendChild(titleIcon);
         }
-    });
+        
+        wrapperElement.appendChild(titleElement);
+        wrapperElement.onclick = () => _selectSource(source,sourceSelectionInfo);
 
-    //add each element to our selection list and store it for later use
-    sourceSelectionInfo.selectionElementMap = {};
-    selectionElementData.forEach( entryData => {
-        selectListElement.appendChild(entryData.element);
-        sourceSelectionInfo.selectionElementMap[entryData.name] = entryData.element;
-    })
-
-    //make the initial selection
-    _selectSource(activeSource,sourceSelectionInfo);
-    
-    //pass the source finished callback
-    //if the dialog should close, the "endAction" argument should be true
-    //in this case all sources will have their "close" function called.
-    //otherwise, the dialog stays open and the sources are not closed.
-    let onSourceFinish = (endAction) => {
-        if(endAction) {
-            //close dialog
-            dialogMgr.closeDialog(dialog);
-            //clean up all sources
-            sourceList.forEach(source => source.close());
+        let sourceConfigElement = source.getConfigElement();
+        if(sourceConfigElement) {
+            let configWrapperElement = document.createElement("div");
+            configWrapperElement.className = "combinedFileAccess_selectionConfigWrapper";
+            configWrapperElement.appendChild(sourceConfigElement);
+            wrapperElement.appendChild(configWrapperElement);
         }
-        else {
-            //we dont' close if false is passed
+
+        return wrapperElement;
+    }
+
+    /** This function changes the active source */
+    _selectSource(newActiveSource) {
+        if(this.activeSource == newActiveSource) return;
+
+        //old selection
+        let oldActiveSource = this.activeSource;
+        if(oldActiveSource) {
+            let oldSelectionElement = this.selectionElementMap[oldActiveSource.getSourceGenerator().getSourceId()];
+            oldSelectionElement.classList.remove("combinedFileAccess_selectionWrapperActive");
+            oldActiveSource.makeActive(false);
         }
-    }
-    sourceList.forEach(source => source.setOnDialogComplete(onSourceFinish));
 
-    //prepare dialog
-    dialog.setContent(mainContainer);
-    
-    //show dialog
-    dialogMgr.showDialog(dialog);
-}
+        //new selection
+        newActiveSource.makeActive(true);
+        this.activeSource = newActiveSource;
+        let newSelectionElement = this.selectionElementMap[newActiveSource.getSourceGenerator().getSourceId()];
+        newSelectionElement.classList.add("combinedFileAccess_selectionWrapperActive");
 
-/** This function sets of the source selection items */
-function _getSelectionElement(source,sourceSelectionInfo) {
-    let wrapperElement = document.createElement("div");
-    wrapperElement.className = "combinedFileAccess_selectionWrapper";
-
-    let titleElement = document.createElement("div");
-    titleElement.className = "combinedFileAccess_selectionTitleWrapper";
-
-    let titleLabel = document.createElement("span");
-    titleLabel.className = "combinedFileAccess_selectionTitle";
-    titleLabel.innerHTML = source.getDisplayName();
-    titleElement.appendChild(titleLabel);
-
-    let iconUrl = source.getIconUrl();
-    if(iconUrl) {
-        let titleIcon = document.createElement("img");
-        titleIcon.className = "combinedFileAccess_selectionIcon";
-        titleElement.appendChild(titleIcon);
-    }
-    
-    wrapperElement.appendChild(titleElement);
-    wrapperElement.onclick = () => _selectSource(source,sourceSelectionInfo);
-
-    let sourceConfigElement = source.getConfigElement();
-    if(sourceConfigElement) {
-        let configWrapperElement = document.createElement("div");
-        configWrapperElement.className = "combinedFileAccess_selectionConfigWrapper";
-        configWrapperElement.appendChild(sourceConfigElement);
-        wrapperElement.appendChild(configWrapperElement);
+        uiutil.removeAllChildren(this.actionElement);
+        this.actionElement.appendChild(newActiveSource.getActionElement());
+        this.selectedSourceCell.innerHTML = newActiveSource.getDisplayName() + " File Source";
     }
 
-    return wrapperElement;
 }
 
-/** This function changes the active source */
-function _selectSource(newActiveSource,sourceSelectInfo) {
-    if(sourceSelectInfo.activeSource == newActiveSource) return;
 
-    //old selection
-    let oldActiveSource = sourceSelectInfo.activeSource;
-    if(oldActiveSource) {
-        let oldSelectionElement = _lookupSelectionElement(oldActiveSource,sourceSelectInfo);
-        oldSelectionElement.classList.remove("combinedFileAccess_selectionWrapperActive");
-        oldActiveSource.makeActive(false);
-    }
 
-    //new selection
-    newActiveSource.makeActive(true);
-    sourceSelectInfo.activeSource = newActiveSource;
-    let newSelectionElement = _lookupSelectionElement(newActiveSource,sourceSelectInfo);
-    newSelectionElement.classList.add("combinedFileAccess_selectionWrapperActive");
 
-    uiutil.removeAllChildren(sourceSelectInfo.sourceActionElement);
-    sourceSelectInfo.sourceActionElement.appendChild(newActiveSource.getActionElement());
-    sourceSelectInfo.selectedSourceCell.innerHTML = newActiveSource.getDisplayName() + " File Source";
-}
 
-function _lookupSelectionElement(source,sourceSelectInfo) {
-    return sourceSelectInfo.selectionElementMap[source.getName()];
-}
 
 
 

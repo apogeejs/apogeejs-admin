@@ -1,21 +1,41 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {uiutil}  from "/apogeeui/apogeeUiLib.js";
-import OneDriveFileAccess from "./OneDriveFileAccess.js";
+import OneDriveFileSystem from "./OneDriveFileSystem.js";
 
-export class OneDriveFileSource {
+let OneDriveFileSourceGenerator = {
+    getSourceId: function() {
+        return OneDriveFileSystem.SOURCE_ID;
+    },
+
+    getDisplayName: function() {
+        return OneDriveFileSystem.DISPLAY_NAME;
+    },
+
+    directSaveOk: function(fileMetadata) {
+        return OneDriveFileSystem.directSaveOk(fileMetadata);
+    },
+
+    getNewFileMetadata() {
+        return OneDriveFileSystem.NEW_FILE_METADATA;
+    },
+
+    getInstance(action,fileMetadata,data,onComplete) {
+        return new OneDriveFileSource(action,onComplete)
+    },
+
+}
+
+export {OneDriveFileSourceGenerator as default};
+
+/** This is the remote file system source */
+class OneDriveFileSource {
     /** constructor */
-    constructor(metadata,data,action,onActionComplete) {
-        this.data = data;
+    constructor(action,onComplete) {
         this.action = action;
-        this.metadata = metadata;
-        //this is a callback to signify the save/open is successful/failed/canceled
-        this.onActionComplete = onActionComplete;
+        this.onComplete = onComplete;
 
         //this object is the interface to OneDrive
-        this.fileAccess = new OneDriveFileAccess();
-
-        //this is a callback to notify the dialog the action is complete
-        this.onDialogComplete = null;
+        this.remoteFileSystem = new OneDriveFileAccess();
 
         // this.drivesInfo
         // this.selectedDriveId
@@ -45,12 +65,8 @@ export class OneDriveFileSource {
     // Public Methods
     //============================
 
-    getName() {
-        return OneDriveFileSource.NAME;
-    }
-
-    getDisplayName() {
-        return OneDriveFileSource.DISPLAY_NAME;
+    getGenerator() {
+        return OneDriveFileSourceGenerator;
     }
 
     //-----------------------------
@@ -58,54 +74,43 @@ export class OneDriveFileSource {
     //-----------------------------
 
     updateFile(fileMetadata,data) {
-        let saveFilePromise = this.fileAccess.updateFile(fileMetadata.driveId,fileMetadata.fileId,data);
+        let saveFilePromise = this.remoteFileSystem.updateFile(fileMetadata.driveId,fileMetadata.fileId,data);
 
         saveFilePromise.then( result => {
             //success
-            if(this.onActionComplete) this.onActionComplete(null,true,result.fileMetadata); 
-            if(this.onDialogComplete) this.onDialogComplete(true);
+            if(this.onComplete) this.onComplete(null,true,result.fileMetadata); 
         }).catch(errorMsg => {
             //error
-            if(this.onActionComplete) this.onActionComplete(errorMsg,false,null);
-            //decide is we want to keep the dialog opened or closed...
-            if(this.onDialogComplete) this.onDialogComplete(true);
+            if(this.onComplete) this.onComplete(errorMsg,false,null);
         }) ;
     }
 
     createFile(driveId,folderId,fileName,data) {
-        let saveFilePromise = this.fileAccess.createFile(driveId,folderId,fileName,data);
+        let saveFilePromise = this.remoteFileSystem.createFile(driveId,folderId,fileName,data);
 
         saveFilePromise.then( result => {
             //success
-            if(this.onActionComplete) this.onActionComplete(null,true,result.fileMetadata); 
-            if(this.onDialogComplete) this.onDialogComplete(true);
+            if(this.onComplete) this.onComplete(null,true,result.fileMetadata); 
         }).catch(errorMsg => {
             //error
-            if(this.onActionComplete) this.onActionComplete(errorMsg,false,null);
-            //decide is we want to keep the dialog opened or closed...
-            if(this.onDialogComplete) this.onDialogComplete(true);
+            if(this.onComplete) this.onComplete(errorMsg,false,null);
         }) ;
     }
 
-    openFile(fileId) {
-        let openFilePromise = this.fileAccess.openFile(fileId);
+    openFile(driveId,fileId) {
+        let openFilePromise = this.remoteFileSystem.openFile(driveId,fileId);
 
         openFilePromise.then( result => {
             //success
-            if(this.onActionComplete) this.onActionComplete(null,result.data,result.fileMetadata); 
-            if(this.onDialogComplete) this.onDialogComplete(true);
+            if(this.onComplete) this.onComplete(null,result.data,result.fileMetadata); 
         }).catch(errorMsg => {
             //error
-            if(this.onActionComplete) this.onActionComplete(errorMsg,false,null);
-            //decide is we want to keep the dialog opened or closed...
-            if(this.onDialogComplete) this.onDialogComplete(true);
+            if(this.onComplete) this.onComplete(errorMsg,false,null);
         }) ;
     }
 
     cancelAction() {
-        if(this.onActionComplete) this.onActionComplete(null,false,null);
-        //close dialog
-        if(this.onDialogComplete) this.onDialogComplete(true);
+        if(this.onComplete) this.onComplete(null,false,null);
     }
 
     /** This method is called externally after the dialog box using the soruce closes. */
@@ -131,17 +136,6 @@ export class OneDriveFileSource {
         return null;
     }
 
-    getConfigDomElement() {
-        if(!this.configElement) {
-            this.configElement = this._createConfigElement();
-        }
-        return this.configElement;
-    }
-
-    setOnDialogComplete(onDialogComplete) {
-        this.onDialogComplete = onDialogComplete
-    }
-
     getActionElement() {
         if(!this.actionElement) {
             this._createActionElement();
@@ -155,7 +149,7 @@ export class OneDriveFileSource {
         if(!this.configElement) {
             this._createConfigElement();
             //set initial login state
-            let loginState = this.fileAccess.getLoginState();
+            let loginState = this.remoteFileSystem.getLoginState();
             this._setLoginState(loginState);
         }
         return this.configElement;
@@ -171,7 +165,7 @@ export class OneDriveFileSource {
     //--------------------
 
     _onLoginCommand() {
-        let loginPromise = this.fileAccess.login();
+        let loginPromise = this.remoteFileSystem.login();
         loginPromise.then(loginState => {
             this._setLoginState(loginState);
         }).catch(errorMsg => {
@@ -180,7 +174,7 @@ export class OneDriveFileSource {
     }
 
     _onLogoutCommand() {
-        let logoutPromise = this.fileAccess.logout();
+        let logoutPromise = this.remoteFileSystem.logout();
         logoutPromise.then(loginState => {
             this._setLoginState(loginState);
         }).catch(errorMsg => {
@@ -196,7 +190,7 @@ export class OneDriveFileSource {
 
     }
 
-    _onCreateFolder(something) {
+    _onCreateFolder() {
 
     }
 
@@ -229,11 +223,11 @@ export class OneDriveFileSource {
 
     }
 
-    _onFileDelete(something) {
+    _onFileDelete(fileInfo) {
 
     }
 
-    _onFileRename(something) {
+    _onFileRename(fileInfo,newFileName) {
 
     }
 
@@ -250,7 +244,7 @@ export class OneDriveFileSource {
             alert("There is no file selected");
             return
         }
-        this.createFile(this.selectedDriveId,this.fileInfo.folder.fileId,this.selectedFileId);
+        this.openFile(this.selectedDriveId,this.selectedFileId);
     }
 
     _onSavePress() {
@@ -272,7 +266,7 @@ export class OneDriveFileSource {
     }
 
     _onCancelPress() {
-
+        cancelAction();
     }
 
     /** This function changes the active source */
@@ -362,7 +356,7 @@ export class OneDriveFileSource {
     }
 
     _loadFolder(driveId, folderId) {
-        let filesInfoPromise = this.fileAccess.loadFolder(driveId,folderId);
+        let filesInfoPromise = this.remoteFileSystem.loadFolder(driveId,folderId);
         filesInfoPromise.then(filesInfo => {
             this._setFilesInfo(filesInfo);
         }).catch(errorMsg => {
@@ -418,7 +412,7 @@ export class OneDriveFileSource {
     }
 
     _populateActionForm() {
-        let drivesInfoPromise = this.fileAccess.getDrivesInfo();
+        let drivesInfoPromise = this.remoteFileSystem.getDrivesInfo();
         drivesInfoPromise.then(drivesInfo => {
             this._setDrivesInfo(drivesInfo);
         }).catch(errorMsg => {
