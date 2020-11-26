@@ -1,7 +1,7 @@
 import {BaseFileAccess} from "/apogeeapp/apogeeAppLib.js";
 import ClipboardFileSourceGenerator from "./ClipboardFileSource.js";
 import OneDriveFileSourceGenerator from "./OneDriveFileSource.js";
-import {showCombinedAccessDialog} from "./CombinedFileAccessDialog.js";
+import CombinedAccessDialog from "./CombinedFileAccessDialog.js";
 
 /* 
  * To change this license header, choose License Headers in Project Properties.
@@ -16,7 +16,7 @@ export default class CombinedFileAccess extends BaseFileAccess {
     
     constructor() {
         super();
-        this.defaultSourceName = ClipboardFileSource.NAME;
+        this.defaultSourceId = ClipboardFileSourceGenerator.getSourceId();
         this.sourceGeneratorList = [ClipboardFileSourceGenerator,OneDriveFileSourceGenerator];
     }
    
@@ -25,7 +25,7 @@ export default class CombinedFileAccess extends BaseFileAccess {
      */
     getNewFileMetadata() {
         let sourceGenerator = this._getSourceGenerator(null,this.sourceGeneratorList);
-        return sourceGenerator.getNewFileMetadata();
+        return sourceGenerator ? sourceGenerator.getNewFileMetadata() : null;
     }
     
     /**
@@ -42,33 +42,14 @@ export default class CombinedFileAccess extends BaseFileAccess {
      * to select the file.
      */
     openFile(onOpen) {
-        //add the close dialog action to on complete
-        let closeDialog;
-        let onComplete = (errorMsg,data,fileMetadata) => {
-            closeDialog();
-            onOpen(errorMsg,data,fileMetadata);
-        };
-
-        let dialogObject = CombinedAccessDialog("open",null,null,this.sourceGeneratorList,onComplete);
+        let dialogObject = new CombinedAccessDialog("open",null,null,this.sourceGeneratorList,onOpen);
         dialogObject.showDialog();
-
-        closeDialog = () => dialogObject.showDialog();
     }
 
     /** This  method shows a save dialog and saves the file. */
     saveFileAs(fileMetadata,data,onSave) {
-        //add the close dialog action to on complete
-        let closeDialog;
-        let onComplete = (errorMsg,success,fileMetadata) => {
-            closeDialog();
-            onSave(errorMsg,success,fileMetadata);
-        };
-
-        //show the dialog
-        let dialogObject = CombinedAccessDialog("save",fileMetadata,data,this.sourceGeneratorList,onComplete);
-        dialogObject.showDialog();
-
-        closeDialog = () => dialogObject.showDialog();
+        let dialogObject = new CombinedAccessDialog("save",fileMetadata,data,this.sourceGeneratorList,onSave);
+        dialogObject.showDialog();     
     }
 
     /** 
@@ -93,14 +74,14 @@ export default class CombinedFileAccess extends BaseFileAccess {
     //============================
     
     _getSourceGenerator(fileMetadata,generatorList) {
-        let sourceName;
+        let sourceId;
         if((fileMetadata)&&(fileMetadata.source)) {
-            sourceName = fileMetadata.source;
+            sourceId = fileMetadata.source;
         }
         else {
-            sourceName = this.defaultSourceName; 
+            sourceId = this.defaultSourceId; 
         }
-        return generatorList.find( sourceGenerator => sourceGenerator.getName() == sourceName );
+        return generatorList.find( sourceGenerator => sourceGenerator.getSourceId() == sourceId );
     }
 
 

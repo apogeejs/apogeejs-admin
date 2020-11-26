@@ -19,10 +19,9 @@ let OneDriveFileSourceGenerator = {
         return OneDriveFileSystem.NEW_FILE_METADATA;
     },
 
-    getInstance(action,fileMetadata,data,onComplete) {
-        return new OneDriveFileSource(action,fileMetadata,data,onComplete)
-    },
-
+    getInstance(action,fileMetadata,fileData,onComplete) {
+        return new OneDriveFileSource(action,fileMetadata,fileData,onComplete)
+    }
 }
 
 export {OneDriveFileSourceGenerator as default};
@@ -30,14 +29,14 @@ export {OneDriveFileSourceGenerator as default};
 /** This is the remote file system source */
 class OneDriveFileSource {
     /** constructor */
-    constructor(action,fileMetadata,data,onComplete) {
+    constructor(action,fileMetadata,fileData,onComplete) {
         this.action = action;
         this.initialFileMetadata = fileMetadata;
-        this.data = data;
+        this.fileData = fileData;
         this.onComplete = onComplete;
 
         //this object is the interface to OneDrive
-        this.remoteFileSystem = new OneDriveFileAccess();
+        this.remoteFileSystem = new OneDriveFileSystem();
 
         // this.drivesInfo
         // this.selectedDriveId
@@ -76,7 +75,7 @@ class OneDriveFileSource {
     //-----------------------------
 
     updateFile() {
-        let saveFilePromise = this.remoteFileSystem.updateFile(this.fileMetadata.driveId,this.fileMetadata.fileId,this.data);
+        let saveFilePromise = this.remoteFileSystem.updateFile(this.fileMetadata.driveId,this.fileMetadata.fileId,this.fileData);
 
         saveFilePromise.then( result => {
             //success
@@ -88,7 +87,7 @@ class OneDriveFileSource {
     }
 
     createFile(driveId,folderId,fileName) {
-        let saveFilePromise = this.remoteFileSystem.createFile(driveId,folderId,fileName,this.data);
+        let saveFilePromise = this.remoteFileSystem.createFile(driveId,folderId,fileName,this.fileData);
 
         saveFilePromise.then( result => {
             //success
@@ -238,7 +237,7 @@ class OneDriveFileSource {
             alert("There is no selected drive!");
             return;
         }
-        if((!this.filesInfo)||(!this.fileInfo.folder)) {
+        if((!this.filesInfo)||(!this.filesInfo.folder)) {
             alert("There is no selected folder!");
             return;
         }
@@ -254,11 +253,11 @@ class OneDriveFileSource {
             alert("There is no selected drive!");
             return;
         }
-        if((!this.filesInfo)||(!this.fileInfo.folder)) {
+        if((!this.filesInfo)||(!this.filesInfo.folder)) {
             alert("There is no selected folder!");
             return;
         }
-        let folderId = this.fileInfo.folder.fileId;
+        let folderId = this.filesInfo.folder.fileId;
         let fileName = this.fileNameTextField.value.trim();
         if(fileName.length === 0) {
             alert("No file name is entered");
@@ -268,7 +267,7 @@ class OneDriveFileSource {
     }
 
     _onCancelPress() {
-        cancelAction();
+        this.cancelAction();
     }
 
     /** This function changes the active source */
@@ -572,10 +571,12 @@ class OneDriveFileSource {
         let submitButton = document.createElement("button");
         submitButton.innerHTML = (this.action == "save") ? "Save": "Open";
         submitButton.className = "oneDriveFileAccess_submitButton";
+        submitButton.onclick = (this.action == "save") ? () => this._onSavePress() : () => this._onOpenPress();
         buttonsCell.appendChild(submitButton);
         let cancelButton = document.createElement("button");
         cancelButton.innerHTML = "Cancel";
         cancelButton.className = "oneDriveFileAccess_cancelButton";
+        cancelButton.onclick = () => this._onCancelPress();
         buttonsCell.appendChild(cancelButton);
 
         this.actionElement = mainContainer;
@@ -625,14 +626,3 @@ class OneDriveFileSource {
     }
 
 }
-
-//this is the identifier name for the source
-OneDriveFileSource.NAME = OneDriveFileAccess.NAME
-
-//this is the identifier name for the source
-OneDriveFileSource.DISPLAY_NAME = OneDriveFileAccess.DISPLAY_NAME
-
-//this is metadata for a new file. Name is blank and there is not additional data besides source name.
-OneDriveFileSource.NEW_FILE_METADATA = OneDriveFileAccess.NEW_FILE_METADATA
-
-OneDriveFileSource.directSaveOk = OneDriveFileAccess.directSaveOk

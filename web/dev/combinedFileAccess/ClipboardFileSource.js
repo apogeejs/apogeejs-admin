@@ -18,12 +18,8 @@ let ClipboardFileSourceGenerator = {
         return CLIPBOARD_NEW_FILE_METADATA;
     },
 
-    getSaveInstance(onComplete) {
-        return new ClipboardFileSource("save",onComplete)
-    },
-
-    getOpenInstance(onComplete) {
-        return new ClipboardFileSource("open",onComplete);
+    getInstance(action,initialFileMetadata,fileData,onComplete) {
+        return new ClipboardFileSource(action,initialFileMetadata,fileData,onComplete)
     }
 
 }
@@ -32,8 +28,10 @@ export {ClipboardFileSourceGenerator as default};
 
 class ClipboardFileSource {
     /** constructor */
-    constructor(action,onComplete) {
+    constructor(action,initialFileMetadata,fileData,onComplete) {
         this.action = action;
+        this.initialFileMetadata = initialFileMetadata;
+        this.fileData = fileData;
         this.onComplete = onComplete;
     }
 
@@ -48,6 +46,11 @@ class ClipboardFileSource {
     //-----------------------------
     // File Actions
     //-----------------------------
+
+    /** This should not be called */
+    updateFile() {
+        if(this.onComplete) this.onComplete("Illegal save call",false,null);    
+    }
 
     saveFile(fileMetadata,data) {
         if(this.onComplete) this.onComplete(null,true,fileMetadata);    
@@ -123,7 +126,7 @@ class ClipboardFileSource {
         }
         else if(this.action == "save") {
             instructions = "Copy the data below and save it in a file to open later.";
-            initialText = this.data;
+            initialText = ((this.fileData !== undefined)&&(this.fileData !== null)) ? this.fileData : "";
             submitLabel = "Save";
             doSave = true;
             badAction = false;

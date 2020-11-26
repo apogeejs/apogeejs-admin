@@ -32,19 +32,19 @@ export default class OneDriveFileSystem {
 
     createFile(driveId,folderId,fileName,data) {
         return Promise.resolve({
-            fileMetadata: fileMetadata
+            fileMetadata: OneDriveFileSystem.NEW_FILE_METADATA
         })
     }
 
     updateFile(fileId,data) {
         return Promise.resolve({
-            fileMetadata: fileMetadata
+            fileMetadata: OneDriveFileSystem.NEW_FILE_METADATA
         })
     }
 
     openFile(fileId) {
         return Promise.resolve({
-            data: TEST_WORKSPACE,
+            data: JSON.stringify(TEST_WORKSPACE_JSON),
             fileMetadata: {
                 source: OneDriveFileSystem.NAME,
                 driveId: "???",
@@ -142,7 +142,7 @@ const TEST_FOLDER_INFO = {
 }
 
 
-const TEST_WORKSPACE = {
+const TEST_WORKSPACE_JSON = {
 	"fileType": "apogee app js workspace",
 	"version": "0.60",
 	"references": {

@@ -66,7 +66,7 @@ export default class Apogee {
         //----------------------------------
         var appConfigPromise = this.appConfigManager.getConfigPromise(this);
         
-        appConfigPromise.then(() => this.initApp()).catch(errorMsg => apogeeUserAlert("Fatal error configuring application!"));
+        appConfigPromise.then(() => this.initApp()).catch(errorMsg => apogeeUserAlert("Fatal error configuring application: " + errorMsg));
         
     }
 
