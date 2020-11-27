@@ -4,6 +4,12 @@
 export default class OneDriveFileSystem {
 
     constructor() {
+		//this contains basic info for files and folders
+		this.fileInfoMap = {};
+		//this contains path and child info for folders
+		this.addedFolderInfoMap = {};
+		//this contains drive info
+		this.drivesInfo = null;
     }
 
     getLoginState() {
@@ -25,11 +31,40 @@ export default class OneDriveFileSystem {
     }
 
     getDrivesInfo() {
-        return Promise.resolve(TEST_DRIVES_INFO);
+		//check if the data is cached
+		if(this.drivesInfo) return this.drivesInfo;
+
+		//otherwise download data
+        return _getUserDrivesPromise().then( driveResponse => {
+			let drives = driveResponse.value.map(odDriveInfo => this._parseDriveInfo(odDriveInfo));
+			
+			//need to choose default drive!
+			//let defaultDriveId
+			let drivesInfo = {drives};
+			this.drivesInfo = drivesInfo;
+				
+			return drivesInfo;
+		})
     }
 
     loadFolder(driveId,folderId) {
-        return Promise.resolve(TEST_FOLDER_INFO);
+		//check for valid cached info
+		let key = this._getCacheKey(driveId,folderId);
+		let cachedFileInfo = this.fileInfoMap[key];
+		let cachedAddedFolderInfo = this.addedFolderInfoMap[key];
+
+		if((cachedFileInfo)&&(cachedAddedFolderInfo)) {
+			let folderInfo = this._packageFolderInfo(cachedFileInfo,cachedAddedFolderInfo);
+			return Promise.resolve(folderInfo);
+		}
+
+		//otherwise download the data
+        return _getFolderInfoPromise(driveId,folderId).then(odFileInfo => {
+			let fileInfo = this._parseFileInfo(odFileInfo);
+			let addedFolderInfo = this._parseAddedFolderInfo(odFileInfo);
+
+			return this._packageFolderInfo(fileInfo,addedFolderInfo); 
+		});
     }
 
     createFile(driveId,folderId,fileName,data) {
@@ -38,24 +73,123 @@ export default class OneDriveFileSystem {
         })
     }
 
-    updateFile(fileId,data) {
+    updateFile(driveId,fileId,data) {
         return Promise.resolve({
             fileMetadata: OneDriveFileSystem.NEW_FILE_METADATA
         })
     }
 
-    openFile(fileId) {
-        return Promise.resolve({
-            data: JSON.stringify(TEST_WORKSPACE_JSON),
-            fileMetadata: {
-                source: OneDriveFileSystem.NAME,
-                driveId: "???",
-                parentFolderId: ["???"],
-                fileId: fileId,
-                name: "testWorkspace.json"
-            }
-        });
-    }
+    openFile(driveId,fileId) {
+		let key = this._getCacheKey(driveId,fileId);
+		let fileInfo = this.fileInfoMap[key];
+		if(!fileInfo) {
+			return Promise.reject("Unknown error: file not found");
+		}
+
+		return apogeeutil.textRequest(fileInfo.downloadUrl).then(response => {
+			return {
+				data: response,
+				fileMetadata: fileInfo
+			}
+		})  
+	}
+	
+	//===============================
+	// private methods
+	//===============================
+
+	_getCacheKey(driveId,fileId) {
+		return driveId + "|" + fileId;
+	}
+	
+	_packageFolderInfo(fileInfo,addedFolderInfo) {
+		return {
+			folder: fileInfo,
+			path: addedFolderInfo.path,
+			children: addedFolderInfo.children
+		}
+	}
+
+	_parseFileInfo(odFileInfo) {
+		//check if we should used a saved copy of this data
+		let driveId = odFileInfo.parentReference.driveId;
+		let fileId = odFileInfo.id;
+		let key = this._getCacheKey(driveId,fileId);
+
+		let fileInfo = this.fileInfoMap[key];
+
+		if(!fileInfo) {
+			//parse the file info
+			fileInfo = {};
+			fileInfo.fileId = fileId;
+			fileInfo.name = odFileInfo.name;
+			fileInfo.driveId = driveId;
+			if(odFileInfo.file) {
+				fileInfo.type = odFileInfo.mimeType;
+				fileInfo.downloadUrl = odFileInfo["@microsoft.graph.downloadUrl"];
+			}
+			else if(odFileInfo.folder) {
+				fileInfo.type = FOLDER_TYPE;
+			}
+
+			//load this data into the cache
+			this.fileInfoMap[key] = fileInfo;
+		}
+
+		return fileInfo;
+	}
+
+	_parseAddedFolderInfo(odFileInfo) {
+		//check id we can use a saved copy
+		let driveId = odFileInfo.parentReference.driveId;
+		let fileId = odFileInfo.id;
+		let key = this._getCacheKey(driveId,fileId);
+
+		let addedFolderInfo = this.addedFolderInfoMap[key];
+		if(!addedFolderInfo) {
+			addedFolderInfo = {};
+			//get the child file infos
+			if(odFileInfo.children) {
+				addedFolderInfo.children = odFileInfo.children.map(childFileInfo => this._parseFileInfo(childFileInfo));
+			}
+			else {
+				//I am not sure this is correct. Investigate if possible
+				addedFolderInfo.children = [];
+			}
+
+			//get the path file infos, excluding the current file info
+			addedFolderInfo.path = this._getPath(driveId,fileId,true);
+			
+			//add to cache
+			this.addedFolderInfoMap[key] = addedFolderInfo;
+		}
+
+		return addedFolderInfo;
+	}
+
+	/** This method gets an array of file infos up to the root direction. The current directory can be excluded 
+	 * using the excludeThisEntry flag.	 */
+	_getPath(driveId,fileId,excludeThisEntry) {
+		let fileInfo = this.fileInfoMap[this._getCacheKey(driveId,fileId)];
+		let parentPath = (fileInfo.parentId) ? this._getPath(driveId,fileInfo.parentId) : []; 
+		return excludeThisEntry ? parentPath : parentPath.concat[fileInfo];
+	}
+
+	_parseDriveInfo(odDriveInfo) {
+		let driveId = odDriveInfo.id;
+		let name;
+		if(odDriveInfo.name) {
+			name = odDriveInfo.name;
+		}
+		else if((odDriveInfo.owner)&&(odDriveInfo.owner.user)) {
+			name = odDriveInfo.owner.user.displayName;
+		}
+		else {
+			name = driveId;
+		}
+		
+		return {driveId, name};
+	}
 }
 
 //this is the identifier name for the source
@@ -85,6 +219,12 @@ const oneDriveAppInfo = {
 }
 
 const baseUrl = "https://graph.microsoft.com/v1.0/me";
+
+//===================================
+// Utilities
+//===================================
+
+const FOLDER_TYPE = "__folder__";
 
 //====================================
 // Login and Logout Workflows
@@ -353,7 +493,9 @@ function _getUserDrivesPromise() {
 	return apogeeutil.jsonRequest(requestUrl,options);
 }
 
-function _getFolderInfoPromise(fileId) {
+/** This gets folder info for the given drive id and file id. 
+ * If no file id is provided, it returns the root folder for the specified drive. */
+function _getFolderInfoPromise(driveId,fileId) {
 	let token = _getToken();
 
 	let options = {
@@ -363,7 +505,17 @@ function _getFolderInfoPromise(fileId) {
 		}
 	};
 	
-	let requestUrl = baseUrl + "drive/items/" + fileId + "?expand=children";
+
+	let requestUrl;
+	if(fileId) {
+		//request by file id
+		requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${fileId}?expand=children`;
+	}
+	else {
+		//request for root of drive
+		requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/root?expand=children`
+	}
+
 	return apogeeutil.jsonRequest(requestUrl,options);
 
 }

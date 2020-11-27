@@ -42,7 +42,7 @@ class OneDriveFileSource {
         // this.selectedDriveId
         this.driveSelectionElementMap = {}
 
-        // this.filesInfo
+        // this.folderInfo
         // this.selectedFileId
         this.fileElementMap = {};
 
@@ -204,7 +204,7 @@ class OneDriveFileSource {
                 oldSelectedFileElement.classList.remove("oneDriveFileAccess_fileListEntryElementActive");
             }
         }
-        this.selectedFileId = fileInfo.id;
+        this.selectedFileId = fileInfo.fileId;
         if(this.selectedFileId) {
             let newSelectedFileElement = this.fileElementMap[this.selectedFileId];
             if(newSelectedFileElement) {
@@ -215,7 +215,7 @@ class OneDriveFileSource {
         //take any needed action
         if(fileInfo.type == "__folder__") {
             //open the folder
-            this._loadFolder(this.selectedDriveId, fileInfo.id);
+            this._loadFolder(this.selectedDriveId, fileInfo.fileId);
         }
         else {
             //put the name in the file name field
@@ -237,7 +237,7 @@ class OneDriveFileSource {
             alert("There is no selected drive!");
             return;
         }
-        if((!this.filesInfo)||(!this.filesInfo.folder)) {
+        if((!this.folderInfo)||(!this.folderInfo.folder)) {
             alert("There is no selected folder!");
             return;
         }
@@ -253,11 +253,11 @@ class OneDriveFileSource {
             alert("There is no selected drive!");
             return;
         }
-        if((!this.filesInfo)||(!this.filesInfo.folder)) {
+        if((!this.folderInfo)||(!this.folderInfo.folder)) {
             alert("There is no selected folder!");
             return;
         }
-        let folderId = this.filesInfo.folder.fileId;
+        let folderId = this.folderInfo.folder.fileId;
         let fileName = this.fileNameTextField.value.trim();
         if(fileName.length === 0) {
             alert("No file name is entered");
@@ -344,7 +344,7 @@ class OneDriveFileSource {
                 this.drivesInfo.drives.forEach( driveInfo => this._addDriveElement(driveInfo))
 
                 if(selectedDriveId === undefined) {
-                    selectedDriveId = this.drivesInfo.drives[0].id;
+                    selectedDriveId = this.drivesInfo.drives[0].driveId;
                 }
             }
 
@@ -358,8 +358,8 @@ class OneDriveFileSource {
 
     _loadFolder(driveId, folderId) {
         let filesInfoPromise = this.remoteFileSystem.loadFolder(driveId,folderId);
-        filesInfoPromise.then(filesInfo => {
-            this._setFilesInfo(filesInfo);
+        filesInfoPromise.then(folderInfo => {
+            this._setFilesInfo(folderInfo);
         }).catch(errorMsg => {
             this._setFilesInfo(null);
             alert("Error opening folder");
@@ -367,8 +367,8 @@ class OneDriveFileSource {
     }
 
 
-    _setFilesInfo(filesInfo) {
-        this.filesInfo = filesInfo;
+    _setFilesInfo(folderInfo) {
+        this.folderInfo = folderInfo;
         this.fileElementMap = {};
         this.selectedFileId = undefined;
 
@@ -385,9 +385,9 @@ class OneDriveFileSource {
         if(selectedDriveInfo) {
             this.pathCell.appendChild(this._getPathDriveElement(selectedDriveInfo));
         }
-        if(this.filesInfo) {
-            if(this.filesInfo.path) {
-                this.filesInfo.path.forEach( (pathEntry,index) => {
+        if(this.folderInfo) {
+            if(this.folderInfo.path) {
+                this.folderInfo.path.forEach( (pathEntry,index) => {
                     if(index >= 1) {
                         this.pathCell.appendChild(this._getPathDelimiterElement());
                     }
@@ -400,15 +400,15 @@ class OneDriveFileSource {
 
     _getSelectedDriveInfo() {
         if((this.drivesInfo)&&(this.drivesInfo.drives)&&(this.selectedDriveId)) {
-            return this.drivesInfo.drives.find( driveEntry => driveEntry.id == this.selectedDriveId);
+            return this.drivesInfo.drives.find( driveEntry => driveEntry.driveId == this.selectedDriveId);
         }
         else return undefined;
     }
 
     _populateFileList() {
         uiutil.removeAllChildren(this.fileListElement);
-        if((this.filesInfo)&&(this.filesInfo.files)) {
-            this.filesInfo.files.forEach(filesInfo => this._addFileListEntry(filesInfo));
+        if((this.folderInfo)&&(this.folderInfo.children)) {
+            this.folderInfo.children.forEach(folderInfo => this._addFileListEntry(folderInfo));
         }
     }
 
@@ -587,9 +587,9 @@ class OneDriveFileSource {
         let driveElement = document.createElement("div");
         driveElement.className = "oneDriveFileAccess_driveElement";
         driveElement.innerHTML = driveInfo.name;
-        driveElement.onclick = () => this._onSelectDrive(driveInfo.id);
+        driveElement.onclick = () => this._onSelectDrive(driveInfo.driveId);
 
-        this.driveSelectionElementMap[driveInfo.id] = driveElement;
+        this.driveSelectionElementMap[driveInfo.driveId] = driveElement;
         this.drivesListElement.appendChild(driveElement);
     }
 
@@ -622,7 +622,7 @@ class OneDriveFileSource {
         this.fileListElement.appendChild(fileElement);
 
         fileElement.onclick = () => this._onFileClick(fileInfo);
-        this.fileElementMap[fileInfo.id] = fileElement;
+        this.fileElementMap[fileInfo.fileId] = fileElement;
     }
 
 }
