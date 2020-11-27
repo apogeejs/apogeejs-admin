@@ -113,8 +113,9 @@ function _setAuthData(authResponse) {
 		let credentials = {};
 		paramArray.forEach( pair => credentials[pair[0]] = decodeURIComponent(pair[1]));
 
-		authData.credentials = authCredentials;
-		authData.expiryInfo = _getExpiryInfo(authCredentials);
+		authData = {};
+		authData.credentials = credentials;
+		authData.expiryInfo = _getExpiryInfo(credentials);
 	}
 	else {
 		authData = null;
@@ -154,6 +155,16 @@ function _getExpiryInfo(authCredentials) {
 		}
 	}
 }
+
+const STATE_INFO_LOGGED_OUT = {
+    state: "logged out"
+}
+
+const STATE_INFO_LOGGED_IN = {
+    state: "logged in",
+    accountName: "unknown user"
+}
+
 
 let _authData_ = null;
 let _loginState_ = STATE_INFO_LOGGED_OUT;
@@ -225,7 +236,7 @@ function _openPopup(url,isLogin) {
 
 	popup.focus();
 
-	_popupCheckTimer = setInterval(_checkForChildPopupClose, POPUP_CHECK_INTERVAL);
+	_popupCheckTimer = setInterval(() => _checkForChildPopupClose(popup), POPUP_CHECK_INTERVAL);
 
 	return _popupResultPromise;
 
@@ -243,12 +254,12 @@ function _checkForChildPopupClose(popup) {
     }
 
     if (popup.closed) {
-		console.log("Child window closed! " + counter); 
+		console.log("Child window closed! " + _popupCheckCounter_); 
 		_resetChildPopupTimer();  
 		_popupFailed();
     }
     else {
-        console.log("Child not yet closed! " + counter)
+        console.log("Child not yet closed! " + _popupCheckCounter_)
     }
 }
 
@@ -257,7 +268,7 @@ function _resetChildPopupTimer() {
 		clearInterval(_popupCheckTimer);
 		_popupCheckTimer = null;
 	}
-	_popupCheckCounter = 0
+	_popupCheckCounter_ = 0
 }
 
 //----------------------------
@@ -360,14 +371,6 @@ function _getFolderInfoPromise(fileId) {
 /////////////////////////////////////////////////////////////////////////
 //for dev
 
-const STATE_INFO_LOGGED_OUT = {
-    state: "logged out"
-}
-
-const STATE_INFO_LOGGED_IN = {
-    state: "logged in",
-    accountName: "unknown user"
-}
 
 const TEST_DRIVES_INFO = {
     defaultDriveId: "drive1",
