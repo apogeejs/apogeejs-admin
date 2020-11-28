@@ -68,15 +68,25 @@ export default class OneDriveFileSystem {
     }
 
     createFile(driveId,folderId,fileName,data) {
-        return Promise.resolve({
-            fileMetadata: OneDriveFileSystem.NEW_FILE_METADATA
-        })
+        return _createFileUpload(driveId,folderId,fileName,data).then(response => {
+			let fileInfo = this._parseFileInfo(response);
+			return {
+				source: OneDriveFileSystem.SOURCE_ID,
+				name: fileInfo.name,
+				fileInfo: fileInfo
+			}
+		});
     }
 
     updateFile(driveId,fileId,data) {
-        return Promise.resolve({
-            fileMetadata: OneDriveFileSystem.NEW_FILE_METADATA
-        })
+        return _updateFileUpload(driveId,fileId,data).then(response => {
+			let fileInfo = this._parseFileInfo(response);
+			return {
+				source: OneDriveFileSystem.SOURCE_ID,
+				name: fileInfo.name,
+				fileInfo: fileInfo
+			}
+		});
     }
 
     openFile(driveId,fileId) {
@@ -86,10 +96,16 @@ export default class OneDriveFileSystem {
 			return Promise.reject("Unknown error: file not found");
 		}
 
+		let fileMetadata = {
+			source: OneDriveFileSystem.SOURCE_ID,
+			name: fileInfo.name,
+			fileInfo: fileInfo
+		}
+
 		return apogeeutil.textRequest(fileInfo.downloadUrl).then(response => {
 			return {
 				data: response,
-				fileMetadata: fileInfo
+				fileMetadata: fileMetadata
 			}
 		})  
 	}
@@ -206,8 +222,7 @@ OneDriveFileSystem.NEW_FILE_METADATA = {
 }
 
 OneDriveFileSystem.directSaveOk = function(fileMetadata) {
-    //fix this
-    return false;
+    return ((fileMetadata)&&(fileMetadata.fileInfo)&&(fileMetadata.fileInfo.fileId));
 }
 
 //
@@ -518,6 +533,42 @@ function _getFolderInfoPromise(driveId,fileId) {
 
 	return apogeeutil.jsonRequest(requestUrl,options);
 
+}
+
+function _createFileUpload(driveId,parentFileId,fileName,data) {
+	let token = _getToken();
+
+	let options = {
+		header: { 
+			"Authorization": "Bearer " + token,
+			"Accept": "application/json;odata.metadata=none",
+			"Content-Type": "application/json"
+		},
+		method: "PUT",
+		body: data
+	};
+	
+	
+	let requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${parentFileId}:/${fileName}:/content`;
+	return apogeeutil.jsonRequest(requestUrl,options);
+}
+
+function _updateFileUpload(driveId,fileId,data) {
+	let token = _getToken();
+
+	let options = {
+		header: { 
+			"Authorization": "Bearer " + token,
+			"Accept": "application/json;odata.metadata=none",
+			"Content-Type": "application/json"
+		},
+		method: "PUT",
+		body: data
+	};
+	
+	
+	let requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${fileId}/content`;
+	return apogeeutil.jsonRequest(requestUrl,options);
 }
 
 /////////////////////////////////////////////////////////////////////////

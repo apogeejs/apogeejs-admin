@@ -60,7 +60,7 @@ export default class CombinedFileAccess extends BaseFileAccess {
         
         //make sure we can save
         if(sourceGenerator.directSaveOk(fileMetadata)) {
-            let source = souceGenerator.getInstance("save",fileMetadata,data,onSave);
+            let source = sourceGenerator.getInstance("save",fileMetadata,data,onSave);
             source.updateFile();
         }
         else {

@@ -75,11 +75,12 @@ class OneDriveFileSource {
     //-----------------------------
 
     updateFile() {
-        let saveFilePromise = this.remoteFileSystem.updateFile(this.fileMetadata.driveId,this.fileMetadata.fileId,this.fileData);
+        let fileInfo = this.initialFileMetadata.fileInfo;
+        let saveFilePromise = this.remoteFileSystem.updateFile(fileInfo.driveId,fileInfo.fileId,this.fileData);
 
-        saveFilePromise.then( result => {
+        saveFilePromise.then( fileMetadata => {
             //success
-            if(this.onComplete) this.onComplete(null,true,result.fileMetadata); 
+            if(this.onComplete) this.onComplete(null,true,fileMetadata); 
         }).catch(errorMsg => {
             //error
             if(this.onComplete) this.onComplete(errorMsg,false,null);
@@ -89,9 +90,9 @@ class OneDriveFileSource {
     createFile(driveId,folderId,fileName) {
         let saveFilePromise = this.remoteFileSystem.createFile(driveId,folderId,fileName,this.fileData);
 
-        saveFilePromise.then( result => {
+        saveFilePromise.then( fileMetadata => {
             //success
-            if(this.onComplete) this.onComplete(null,true,result.fileMetadata); 
+            if(this.onComplete) this.onComplete(null,true,fileMetadata); 
         }).catch(errorMsg => {
             //error
             if(this.onComplete) this.onComplete(errorMsg,false,null);
