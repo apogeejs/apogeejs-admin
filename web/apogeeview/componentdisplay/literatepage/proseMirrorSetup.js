@@ -17,7 +17,7 @@ import { Plugin } from "/prosemirror/dist/prosemirror-state.es.js";
 import { EditorView } from "/prosemirror/dist/prosemirror-view.es.js";
 import { keymap } from "/prosemirror/dist/prosemirror-keymap.es.js";
 //import { gapCursor } from "/prosemirror/dist/prosemirror-gapcursor.es.js";
-import { apogeeSelectionPlugin } from "/apogeeView/editor/selection/ApogeeSelectionPlugin.js";
+import { apogeeSelectionPlugin } from "/apogeeview/editor/selection/ApogeeSelectionPlugin.js";
 
 import ApogeeComponentView from "/apogeeview/editor/ApogeeComponentView.js";
 
