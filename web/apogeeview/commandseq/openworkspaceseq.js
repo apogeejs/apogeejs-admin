@@ -1,3 +1,4 @@
+import {closeWorkspace} from "/apogeeview/commandseq/closeworkspaceseq.js";
 
 //=====================================
 // UI Entry Point
@@ -5,16 +6,17 @@
 
 /** This is the UI sequence to open a workspace */
 export function openWorkspace(app,fileAccessObject) {
-    
-    //make sure there is not an open workspace
-    if(app.getWorkspaceManager()) {
-        apogeeUserAlert("There is an open workspace. You must close the workspace first.");
-        return;
-    }    
-
     let onOpen = (err,workspaceData,fileMetadata) => onWorkspaceOpen(err,app,workspaceData,fileMetadata);
 
-    fileAccessObject.openFile(onOpen);
+    let doOpen = () => fileAccessObject.openFile(onOpen);
+
+    //If there is an open workspace, close first
+    if(app.getWorkspaceManager()) {
+        closeWorkspace(app,doOpen);
+    }    
+    else {
+        doOpen();
+    }
 }
 
 //=====================================

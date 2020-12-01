@@ -1,10 +1,11 @@
-import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 //=====================================
 // UI Entry Point
 //=====================================
 
-export function closeWorkspace(app) {
+/** This closes the workspace. The postCloseAction is optional. If this is included it will be executed if and after the
+ * workspace is closed. */
+export function closeWorkspace(app,postCloseAction) {
     
     var activeWorkspaceManager = app.getWorkspaceManager();
     if(activeWorkspaceManager === null) {
@@ -15,22 +16,23 @@ export function closeWorkspace(app) {
     var commandData = {};
     commandData.type = "closeWorkspace";
 
-    let doAction = () => app.executeCommand(commandData);
+    let doClose = () => {
+        let success = app.executeCommand(commandData);
+        //add an optional action for after close - this is meant for opening a workspace, for one
+        if((success)&&(postCloseAction)) {
+            postCloseAction();
+        }
+    }
 
     //if the workspace is not saved give the user a warning and chance to cancel
     if(activeWorkspaceManager.getIsDirty()) {
         let cancelAction = () => true;
         let deleteMsg = "There is unsaved data. Are you sure you want to close the workspace?";
-        apogeeUserConfirm(deleteMsg,"Close","Cancel",doAction,cancelAction);
+        apogeeUserConfirm(deleteMsg,"Close","Cancel",doClose,cancelAction);
     }
     else {
-        doAction();
+        doClose();
     }
 }
 
-
-// //give focus back to editor
-// if(parentComponentView) {
-//     parentComponentView.giveEditorFocusIfShowing();
-// }
 

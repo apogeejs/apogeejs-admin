@@ -559,9 +559,13 @@ export default class ModelManager extends FieldObject {
 
 }
 
-//this is the json for an empty model
+//this is the json for an empty model, with the page opened
 ModelManager.EMPTY_MODEL_COMPONENT_JSON = {
     "main": {
-        "type":"apogeeapp.PageComponent"
+        "type":"apogeeapp.PageComponent",
+        "viewState": {
+            "tabOpened": true,
+            "tabShowing": true
+          }
     }
 };

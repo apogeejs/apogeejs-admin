@@ -93,11 +93,10 @@ export default class ApogeeView {
         //I clear them all here
         //I haven't decided the best way to do this. In the app? Here? I see problems
         //with all of them.
-        //The most obvious is that in clearing them here it could clear listeners from within
-        //the app layer. (There is one now but it is in the workspace anyway)
-        //The only reason I'm doing it here no is that the app doesn't know who all is listening
-        //to it so clearing all that is risky.
+        //for now I clear all here and then resubscribe to events here and in the app, since those
+        //objects live on.
         this.app.clearListenersAndHandlers();
+        this.app.subscribeToAppEvents();
         this.subscribeToAppEvents();
     }
 

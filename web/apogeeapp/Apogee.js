@@ -58,8 +58,8 @@ export default class Apogee {
         //command manager
         this.commandManager = new CommandManager(this);
 
-        //listen to the workspace dirty event from the app
-        this.addListener("workspaceDirty",() => this._setWorkspaceIsDirty());
+        //subscribe to app events
+        this.subscribeToAppEvents()
         
         //----------------------------------
         //configure the application
@@ -68,6 +68,13 @@ export default class Apogee {
         
         appConfigPromise.then(() => this.initApp()).catch(errorMsg => apogeeUserAlert("Fatal error configuring application: " + errorMsg));
         
+    }
+
+    /** This subscribes to all events needed by this class. On close, all listeners will be removed. This will 
+     * be called to add back the need app events. */
+    subscribeToAppEvents() {
+        //subscribe to events
+        this.addListener("workspaceDirty",() => this._setWorkspaceIsDirty());
     }
 
     //======================================
@@ -252,7 +259,7 @@ export default class Apogee {
             this.fileAccessObject = this.appConfigManager.getDefaultFileAccessObject(this);
         }
         
-        //open the initial workspace
+        //open the initial workspace or create a new workspace
         var workspaceFilePromise = this.appConfigManager.getInitialWorkspaceFilePromise(this);
         if(workspaceFilePromise) {
             var workspaceFileMetadata = this.appConfigManager.getInitialWorkspaceFileMetadata(this);
@@ -270,6 +277,12 @@ export default class Apogee {
             };
             
             workspaceFilePromise.then(openInitialWorkspace).catch(errorMsg => apogeeUserAlert("Error downloading initial workspace: " + errorMsg));
+        }
+        else {
+            var commandData = {};
+            commandData.type = "openWorkspace";
+            
+            this.executeCommand(commandData);
         }
         
     }
