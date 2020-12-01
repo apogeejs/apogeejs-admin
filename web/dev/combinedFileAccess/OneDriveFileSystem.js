@@ -1,4 +1,4 @@
-import fileAccessConstants from "./fileAccessConstants.js";
+import * as fileAccessConstants from "./fileAccessConstants.js";
 
 //This class will manage access to microsoft one drive
 
@@ -240,6 +240,9 @@ export default class OneDriveFileSystem {
 			else if(odFileInfo.folder) {
 				fileInfo.type = fileAccessConstants.FOLDER_TYPE;
 			}
+			if(odFileInfo.parentReference.id) {
+				fileInfo.parentId = odFileInfo.parentReference.id;
+			}
 
 			//load this data into the cache
 			this.fileInfoMap[key] = fileInfo;
@@ -280,7 +283,7 @@ export default class OneDriveFileSystem {
 	 * using the excludeThisEntry flag.	 */
 	_getPath(driveId,fileId,excludeThisEntry) {
 		let fileInfo = this.fileInfoMap[this._getCacheKey(driveId,fileId)];
-		let parentPath = (fileInfo.parentId) ? this._getPath(driveId,fileInfo.parentId) : []; 
+		let parentPath = ((fileInfo)&&(fileInfo.parentId)) ? this._getPath(driveId,fileInfo.parentId) : []; 
 		return excludeThisEntry ? parentPath : parentPath.concat[fileInfo];
 	}
 
@@ -333,25 +336,6 @@ const oneDriveAppInfo = {
 
 const baseUrl = "https://graph.microsoft.com/v1.0/me";
 
-const STATE_INFO_LOGGED_OUT = {
-    state: fileAccessConstants.LOGGED_OUT
-}
-
-const STATE_INFO_LOGGED_IN = {
-    state: fileAccessConstants.LOGGED_IN,
-    accountName: "unknown user"
-}
-
-const STATE_INFO_LOGIN_PENDING = {
-    state: fileAccessConstants.LOGIN_PENDING,
-    message: "login pending"
-}
-
-const STATE_INFO_LOGOUT_PENDING = {
-    state: fileAccessConstants.LOGIN_PENDING,
-    message: "logout pending"
-}
-
 //interval in MS before actual logout that we consider logout to occur.
 const MIN_REMAINING_LOGGED_IN_TIME = 100;
 //this is the polling interval for checking if the login popup is closed.
@@ -360,7 +344,7 @@ const POPUP_CHECK_INTERVAL = 100;
 const POPUP_CHECK_MAX_COUNTER = 5*60*1000/POPUP_CHECK_INTERVAL;
 
 let _authData_ = null;
-let _loginInfo_ = STATE_INFO_LOGGED_OUT;
+let _loginInfo_ = fileAccessConstants.STATE_INFO_LOGGED_OUT;
 let _loginStateListeners_ = [];
 
 //for now, a single popup result promise
@@ -380,7 +364,12 @@ function _removeLoginStateListener(callback) {
 }
 
 function _notifyLoginStateListeners() {
-	_loginStateListeners_.forEach(callback => callback(_loginInfo_))
+	try {
+		_loginStateListeners_.forEach(callback => callback(_loginInfo_));
+	}
+	catch(error) {
+		if(error.stack) console.error(error.stack);
+	}
 }
 
 //====================================
@@ -399,7 +388,7 @@ __globals__.oneDriveAuthCallback = (childWindow) => {
 	}
 	else {
 		//TODO! Verify this is correct, what are the conditions where this happens?
-		_loginInfo_ = STATE_INFO_LOGGED_OUT;
+		_loginInfo_ = fileAccessConstants.STATE_INFO_LOGGED_OUT;
 	}
 	_notifyLoginStateListeners()
 } 
@@ -424,22 +413,26 @@ function _setAuthData(authResponse) {
 	_authData_ = authData;
 
 	if((_authData_)&&(_authData_.credentials)) {
-		//fix this - user not known yet?
-		_loginInfo_ = STATE_INFO_LOGGED_IN;
+		//set the login state without user name
+		_loginInfo_ = {
+			state: fileAccessConstants.LOGGED_IN
+		}
+		//lookup user name
+		_lookupUserAccount();
 	}
 	else {
-		_loginInfo_ = STATE_INFO_LOGGED_OUT;
+		_loginInfo_ = fileAccessConstants.STATE_INFO_LOGGED_OUT;
 	}
 }
 
 function _clearLoginData() {
 	_authData_ = null;
-	_loginInfo_ = STATE_INFO_LOGGED_OUT;
+	_loginInfo_ = fileAccessConstants.STATE_INFO_LOGGED_OUT;
 }
 
 function _setStatePending(isLogin) {
 	_authData_ = null;
-	_loginInfo_ = isLogin ? STATE_INFO_LOGIN_PENDING : STATE_INFO_LOGOUT_PENDING;
+	_loginInfo_ = isLogin ? fileAccessConstants.STATE_INFO_LOGIN_PENDING : fileAccessConstants.STATE_INFO_LOGOUT_PENDING;
 }
 
 //this gets the expiration data for our credentials
@@ -501,7 +494,6 @@ function _openPopup(url,isLogin) {
 
 	_popupWindow_ = window.open(url, "oauth", features.join(","));
 	if (!_popupWindow_) {
-		//TODO! FIGURE OUT WHAT TO DO HERE!!!
 		alert("failed to pop up auth window");
 		_clearLoginData();
 		_notifyLoginStateListeners();
@@ -550,6 +542,15 @@ function _cancelPopup() {
 	}
 	_clearPopup();
 	_clearLoginData();
+}
+
+function _lookupUserAccount() {
+	let userInfoPromise = _getUserInfoPromise();
+	userInfoPromise.then(userInfo => {
+		console.log(JSON.stringify(userInfo));
+	}).catch(errorMsg => {
+		console.log("Error loading user info: " + errorMsg);
+	})
 }
 
 //====================================

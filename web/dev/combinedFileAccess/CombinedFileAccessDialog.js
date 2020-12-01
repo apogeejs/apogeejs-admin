@@ -1,4 +1,5 @@
 import {uiutil, dialogMgr}  from "/apogeeui/apogeeUiLib.js";
+import * as fileAccessConstants from "./fileAccessConstants.js";
 
 export default class CombinedAccessDialog {
     constructor(action,fileMetadata,fileData,sourceGeneratorList,onComplete) {
@@ -12,7 +13,6 @@ export default class CombinedAccessDialog {
             //call the base on complete
             onComplete(errorMsg,result,fileMetadata);
         }
-
 
         this.mainContainer = null;
         this.actionElement = null;
@@ -66,7 +66,7 @@ export default class CombinedAccessDialog {
         this.mainContainer.appendChild(bodyRow);
     
         //title
-        let title = (this.action == "save") ? "Save Workspace" : "Open Workspace";
+        let title = (this.action == fileAccessConstants.SAVE_ACTION) ? "Save Workspace" : "Open Workspace";
         let dialogTitleElement = document.createElement("td");
         dialogTitleElement.colSpan = 2;
         dialogTitleElement.className = "combinedFileAccess_dialogTitleElement";
@@ -102,7 +102,17 @@ export default class CombinedAccessDialog {
 
     /** This method populates the layout with the source specific data. */
     _populateLayout() {
+        //get the initial source
         let initialActiveSource;
+        let initialSourceId;
+        if((this.initialFileMetadata)&&(this.initialFileMetadata.source)) {
+            //use the passed in value
+            initialSourceId = this.initialFileMetadata.source;
+        }
+        else {
+            //use the previous selected source
+            initialSourceId = _cachedSourceId;
+        }
 
         //create the sources and elements
         this.sourceGeneratorList.forEach(sourceGenerator => {
@@ -114,12 +124,12 @@ export default class CombinedAccessDialog {
             //save these objects for future use
             this.sourceList.push(source);
             this.selectionElementMap[sourceGenerator.getSourceId()] = sourceElement;
-            if((this.initialFileMetadata)&&(this.initialFileMetadata.sourceId == sourceGenerator.getSourceId())) {
+            if(initialSourceId == sourceGenerator.getSourceId()) {
                 initialActiveSource = source;
             }
         });
 
-        //set an initial source
+        //set an initial source. Find one if we don't have on
         if((!initialActiveSource)&&(this.sourceList.length > 0)) initialActiveSource = this.sourceList[0];
         if(initialActiveSource) this._selectSource(initialActiveSource);
     }
@@ -173,16 +183,22 @@ export default class CombinedAccessDialog {
         //new selection
         newActiveSource.makeActive(true);
         this.activeSource = newActiveSource;
-        let newSelectionElement = this.selectionElementMap[newActiveSource.getGenerator().getSourceId()];
+        let newSourceId = newActiveSource.getGenerator().getSourceId();
+        let newSelectionElement = this.selectionElementMap[newSourceId];
         newSelectionElement.classList.add("combinedFileAccess_selectionWrapperActive");
 
         uiutil.removeAllChildren(this.actionElement);
         this.actionElement.appendChild(newActiveSource.getActionElement());
         this.selectedSourceCell.innerHTML = newActiveSource.getGenerator().getDisplayName() + " File Source";
+
+        //store this to be the default next time the dialog is opened
+        _cachedSourceId = newSourceId;
     }
 
 }
 
+//stored values
+let _cachedSourceId = null;
 
 
 

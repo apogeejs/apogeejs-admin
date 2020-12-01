@@ -20,13 +20,6 @@ export default class BaseFileAccess {
     getWorkspaceOpenSaveMenuOptions(app) {
         
     }
-    
-    /**
-     * This method returns fileMetadata appropriate for a new workspace.
-     */
-    getNewFileMetadata() {
-        
-    }
 
     //===============================
     // The following methods must be implmented by the extending class

@@ -1,7 +1,7 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {uiutil}  from "/apogeeui/apogeeUiLib.js";
 import OneDriveFileSystem from "./OneDriveFileSystem.js";
-import fileAccessConstants from "./fileAccessConstants.js";
+import * as fileAccessConstants from "./fileAccessConstants.js";
 
 let OneDriveFileSourceGenerator = {
     getSourceId: function() {
@@ -14,10 +14,6 @@ let OneDriveFileSourceGenerator = {
 
     directSaveOk: function(fileMetadata) {
         return OneDriveFileSystem.directSaveOk(fileMetadata);
-    },
-
-    getNewFileMetadata() {
-        return OneDriveFileSystem.NEW_FILE_METADATA;
     },
 
     getInstance(action,fileMetadata,fileData,onComplete) {
@@ -47,13 +43,14 @@ class OneDriveFileSource {
         // this.selectedFileId
         this.fileElementMap = {};
 
-        this.loginState = "__logged out__"
+        this.loginState = null
 
 
         // this.actionElement
         // this.configElement
 
-        // this.fileNameTextField
+        // this.saveFileNameField
+        // this.openFileNameField
         // this.pathCell
         // this.fileListElement
         // this.drivesListElement
@@ -216,11 +213,12 @@ class OneDriveFileSource {
         //take any needed action
         if(fileInfo.type == fileAccessConstants.FOLDER_TYPE) {
             //open the folder
-            this._loadFolder(this.selectedDriveId, fileInfo.fileId);
+            this._loadFolder(this.selectedDriveId, this.selectedFileId);
         }
         else {
             //put the name in the file name field
-            this.fileNameTextField.value = fileInfo.name;
+            if(this.action == fileAccessConstants.SAVE_ACTION) this.saveFileNameField.value = fileInfo.name;
+            else if(this.action == fileAccessConstants.OPEN_ACTION) this.openFileNameField.innerHTML = fileInfo.name;
         }
 
     }
@@ -259,7 +257,7 @@ class OneDriveFileSource {
             return;
         }
         let folderId = this.folderInfo.folder.fileId;
-        let fileName = this.fileNameTextField.value.trim();
+        let fileName = this.saveFileNameField.value.trim();
         if(fileName.length === 0) {
             alert("No file name is entered");
         }
@@ -285,10 +283,19 @@ class OneDriveFileSource {
             let newElement = this.driveSelectionElementMap[this.selectedDriveId];
             newElement.classList.add("oneDriveFileAccess_driveElementActive");
 
-            //load the default folder
-            this._loadFolder(this.selectedDriveId,null);
+            //store this as default for future use
+            _cachedDriveId = driveId;
+
+            //load the initial
+            let initialFolderId;
+            if((this.initialFileMetadata)&&(this.initialFileMetadata.parentId)) {
+                initialFolderId = this.initialFileMetadata.parentId;
+            }
+            else {
+                initialFolderId = _cachedFolderId;
+            }
+            this._loadFolder(this.selectedDriveId,initialFolderId);
         }
-  
     }
 
     //---------------------
@@ -364,25 +371,37 @@ class OneDriveFileSource {
     _setDrivesInfo(drivesInfo) {
         this.drivesInfo = drivesInfo;
 
+        //pick an initial drive
+        let atttemptedSelectedDriveId, initialSelectedDriveId;
+        if((this.initialFileMetadata)&&(this.initialFileMetadata.fileInfo.driveId)) {
+            atttemptedSelectedDriveId = this.initialFileMetadata.fileInfo.driveId;
+        }
+        else {
+            atttemptedSelectedDriveId = _cachedDriveId;
+        }
+
         this.selectedDriveId = undefined;
         this.driveSelectionElementMap = {};
         uiutil.removeAllChildren(this.drivesListElement);
 
         if(this.drivesInfo) {
             let selectedDriveId; 
-            if(drivesInfo.defaultDriveId) selectedDriveId = drivesInfo.defaultDriveId;
-
             if((this.drivesInfo.drives)&&(this.drivesInfo.drives.length > 0)) {
-                this.drivesInfo.drives.forEach( driveInfo => this._addDriveElement(driveInfo))
+                this.drivesInfo.drives.forEach( driveInfo => {
+                    this._addDriveElement(driveInfo)
+                    if(driveInfo.driveId == atttemptedSelectedDriveId) {
+                        initialSelectedDriveId = driveInfo.driveId;
+                    }
+                })
 
-                if(selectedDriveId === undefined) {
-                    selectedDriveId = this.drivesInfo.drives[0].driveId;
+                if((!initialSelectedDriveId)&&(this.drivesInfo.drives.length > 0)) {
+                    initialSelectedDriveId = this.drivesInfo.drives[0].driveId;
                 }
             }
 
             //set initial drive state
-            if(selectedDriveId !== undefined) {
-                this._onSelectDrive(selectedDriveId);
+            if(initialSelectedDriveId) {
+                this._onSelectDrive(initialSelectedDriveId);
             }
         }
         
@@ -393,8 +412,12 @@ class OneDriveFileSource {
         filesInfoPromise.then(folderInfo => {
             this._setFilesInfo(folderInfo);
         }).catch(errorMsg => {
+            alert("Error opening folder: " + errorMsg);
             this._setFilesInfo(null);
-            alert("Error opening folder");
+            //if we failed to find the folder, try to open the root of the given drive
+            if(folderId) {
+                this._loadFolder(driveId);
+            }
         })
     }
 
@@ -406,6 +429,11 @@ class OneDriveFileSource {
 
         this._populatePathCell();
         this._populateFileList();
+
+        //save this folder
+        if((folderInfo)&&(folderInfo.folder)&&(folderInfo.folder.fileId)) {
+            _cachedFolderId = folderInfo.folder.fileId;
+        }
 
     }
 
@@ -450,7 +478,7 @@ class OneDriveFileSource {
             this._setDrivesInfo(drivesInfo);
         }).catch(errorMsg => {
             //figure out what to do here
-            alert("Get better drive info error handling!")
+            alert("Error loading drive info: " + errorMsg)
         })
     }
 
@@ -542,7 +570,7 @@ class OneDriveFileSource {
         parentFolderButton.innerHTML = "^";
         parentFolderButton.onclick = () => this._onParentFolderButton();
         commandCell.appendChild(parentFolderButton);
-        if(this.action == "save") {
+        if(this.action == fileAccessConstants.SAVE_ACTION) {
             let addFolderButton = document.createElement("button");
             addFolderButton.innerHTML = "+"
             addFolderButton.onclick = () => this._onCreateFolder();
@@ -600,10 +628,20 @@ class OneDriveFileSource {
         fileNameLabel.className = "oneDriveFileAccess_fileNameLabel";
         fileNameLabel.innerHTML = "File Name:";
         fileNameCell.appendChild(fileNameLabel);
-        this.fileNameTextField = document.createElement("input");
-        this.fileNameTextField.type = "text";
-        this.fileNameTextField.className = "oneDriveFileAccess_fileNameTextField";
-        fileNameCell.appendChild(this.fileNameTextField);
+
+        if(this.action == fileAccessConstants.SAVE_ACTION) {
+            //save has a text field to enter file name
+            this.saveFileNameField = document.createElement("input");
+            this.saveFileNameField.type = "text";
+            this.saveFileNameField.className = "oneDriveFileAccess_saveFileNameField";
+            fileNameCell.appendChild(this.saveFileNameField);
+        }
+        else {
+            //on open file, we do not allow name edit, but we display then selected field
+            this.openFileNameField = document.createElement("span");
+            this.openFileNameField.className = "oneDriveFileAccess_openFileNameField";
+            fileNameCell.appendChild(this.openFileNameField);
+        }
 
         //save/open, cancel buttons
         let buttonsCell = document.createElement("td");
@@ -611,9 +649,9 @@ class OneDriveFileSource {
         buttonsRow.appendChild(buttonsCell);
 
         let submitButton = document.createElement("button");
-        submitButton.innerHTML = (this.action == "save") ? "Save": "Open";
+        submitButton.innerHTML = (this.action == fileAccessConstants.SAVE_ACTION) ? "Save": "Open";
         submitButton.className = "oneDriveFileAccess_submitButton";
-        submitButton.onclick = (this.action == "save") ? () => this._onSavePress() : () => this._onOpenPress();
+        submitButton.onclick = (this.action == fileAccessConstants.SAVE_ACTION) ? () => this._onSavePress() : () => this._onOpenPress();
         buttonsCell.appendChild(submitButton);
         let cancelButton = document.createElement("button");
         cancelButton.innerHTML = "Cancel";
@@ -676,3 +714,7 @@ class OneDriveFileSource {
     }
 
 }
+
+//These values are saved as defaults for the next time the dialog is used.
+let _cachedDriveId = null;
+let _cachedFolderId = null;

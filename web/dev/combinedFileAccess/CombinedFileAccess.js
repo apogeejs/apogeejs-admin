@@ -2,6 +2,7 @@ import {BaseFileAccess} from "/apogeeapp/apogeeAppLib.js";
 import ClipboardFileSourceGenerator from "./ClipboardFileSource.js";
 import OneDriveFileSourceGenerator from "./OneDriveFileSource.js";
 import CombinedAccessDialog from "./CombinedFileAccessDialog.js";
+import * as fileAccessConstants from "./fileAccessConstants.js";
 
 /* 
  * To change this license header, choose License Headers in Project Properties.
@@ -19,14 +20,6 @@ export default class CombinedFileAccess extends BaseFileAccess {
         this.defaultSourceId = ClipboardFileSourceGenerator.getSourceId();
         this.sourceGeneratorList = [ClipboardFileSourceGenerator,OneDriveFileSourceGenerator];
     }
-   
-    /**
-     * This method returns fileMetadata appropriate for a new workspace.
-     */
-    getNewFileMetadata() {
-        let sourceGenerator = this._getSourceGenerator(null,this.sourceGeneratorList);
-        return sourceGenerator ? sourceGenerator.getNewFileMetadata() : null;
-    }
     
     /**
      * This method returns true if the workspace has an existing file to which 
@@ -42,13 +35,13 @@ export default class CombinedFileAccess extends BaseFileAccess {
      * to select the file.
      */
     openFile(onOpen) {
-        let dialogObject = new CombinedAccessDialog("open",null,null,this.sourceGeneratorList,onOpen);
+        let dialogObject = new CombinedAccessDialog(fileAccessConstants.OPEN_ACTION,null,null,this.sourceGeneratorList,onOpen);
         dialogObject.showDialog();
     }
 
     /** This  method shows a save dialog and saves the file. */
     saveFileAs(fileMetadata,data,onSave) {
-        let dialogObject = new CombinedAccessDialog("save",fileMetadata,data,this.sourceGeneratorList,onSave);
+        let dialogObject = new CombinedAccessDialog(fileAccessConstants.SAVE_ACTION,fileMetadata,data,this.sourceGeneratorList,onSave);
         dialogObject.showDialog();     
     }
 
@@ -56,11 +49,10 @@ export default class CombinedFileAccess extends BaseFileAccess {
      * This method saves a file to the give location. 
      */
     saveFile(fileMetadata,data,onSave) {
-        let sourceGenerator = this._getSourceGenerator(fileMetadata,this.sourceGeneratorList)
-        
         //make sure we can save
-        if(sourceGenerator.directSaveOk(fileMetadata)) {
-            let source = sourceGenerator.getInstance("save",fileMetadata,data,onSave);
+        let sourceGenerator = this._getSourceGenerator(fileMetadata,this.sourceGeneratorList)
+        if((sourceGenerator)&&(sourceGenerator.directSaveOk(fileMetadata))) {
+            let source = sourceGenerator.getInstance(fileAccessConstants.SAVE_ACTION,fileMetadata,data,onSave);
             source.updateFile();
         }
         else {
@@ -79,13 +71,12 @@ export default class CombinedFileAccess extends BaseFileAccess {
             sourceId = fileMetadata.source;
         }
         else {
-            sourceId = this.defaultSourceId; 
+            return null;
         }
         return generatorList.find( sourceGenerator => sourceGenerator.getSourceId() == sourceId );
     }
 
 
 }
-
 
 

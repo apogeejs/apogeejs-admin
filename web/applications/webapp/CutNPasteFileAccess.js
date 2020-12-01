@@ -15,13 +15,6 @@ export default class CutNPasteFileAccess extends BaseFileAccess {
     constructor() {
         super();
     }
-   
-    /**
-     * This method returns fileMetadata appropriate for a new workspace.
-     */
-    getNewFileMetadata() {
-        return null;
-    }
     
     /**
      * This method returns true if the workspace has an existing file to which 

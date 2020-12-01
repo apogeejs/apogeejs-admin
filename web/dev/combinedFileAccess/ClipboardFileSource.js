@@ -1,5 +1,6 @@
 import ace from "/ext/ace/ace_1.4.3/ace.es.js";
 import {uiutil}  from "/apogeeui/apogeeUiLib.js";
+import * as fileAccessConstants from "./fileAccessConstants.js";
 
 let ClipboardFileSourceGenerator = {
     getSourceId: function() {
@@ -12,10 +13,6 @@ let ClipboardFileSourceGenerator = {
 
     directSaveOk: function(fileMetadata) {
         return false;
-    },
-
-    getNewFileMetadata() {
-        return CLIPBOARD_NEW_FILE_METADATA;
     },
 
     getInstance(action,initialFileMetadata,fileData,onComplete) {
@@ -117,14 +114,14 @@ class ClipboardFileSource {
         let instructions, initialText, submitLabel;
         let doSave, badAction;
 
-        if(this.action == "open") {
+        if(this.action == fileAccessConstants.OPEN_ACTION) {
             instructions = "Paste saved workspace data in the space below.";
             initialText = "";
             submitLabel = "Open";
             doSave = false;
             badAction = false;
         }
-        else if(this.action == "save") {
+        else if(this.action == fileAccessConstants.SAVE_ACTION) {
             instructions = "Copy the data below and save it in a file to open later.";
             initialText = ((this.fileData !== undefined)&&(this.fileData !== null)) ? this.fileData : "";
             submitLabel = "Save";

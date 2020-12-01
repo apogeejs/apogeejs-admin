@@ -1,10 +1,27 @@
+export const LOGIN_PENDING = "pending";
+export const LOGGED_IN = "logged in";
+export const LOGGED_OUT = "logged out";
+export const FOLDER_TYPE = "__folder__";
 
-
-const fileAccessConstants = {
-    LOGIN_PENDING: "pending",
-    LOGGED_IN: "logged in",
-    LOGGED_OUT: "logged out",
-    FOLDER_TYPE: "__folder__"
+export const STATE_INFO_LOGGED_OUT = {
+    state: LOGGED_OUT
 }
 
-export {fileAccessConstants as default};
+// const STATE_INFO_LOGGED_IN = {
+//     state: fileAccessConstants.LOGGED_IN,
+//     accountName: (LOGIN NAME GOES HERE)
+// }
+
+export const STATE_INFO_LOGIN_PENDING = {
+    state: LOGIN_PENDING,
+    message: "login pending"
+}
+
+export const STATE_INFO_LOGOUT_PENDING = {
+    state: LOGIN_PENDING,
+    message: "logout pending"
+}
+
+export const SAVE_ACTION = "save";
+
+export const OPEN_ACTION = "open";

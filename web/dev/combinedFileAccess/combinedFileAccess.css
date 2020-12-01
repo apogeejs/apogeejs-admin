@@ -155,6 +155,7 @@
     min-width: 400px;
     background-color: white;
     border: 1px solid gray;
+    overflow: auto;
 }
 
 .oneDriveFileAccess_fileNameCell {
@@ -165,8 +166,12 @@
     margin-right: 5px
 }
 
-.oneDriveFileAccess_fileNameTextField {
+.oneDriveFileAccess_saveFileNameField {
     width: 300px;
+}
+
+.oneDriveFileAccess_openFileNameField {
+
 }
 
 .oneDriveFileAccess_buttonsCell {
