@@ -321,7 +321,7 @@ apogeeutil.callbackRequest = function(url,onSuccess,onError,options) {
     xmlhttp.onreadystatechange=function() {
         var msg;
         if(xmlhttp.readyState==4) {
-            if(xmlhttp.status==200) {
+            if((xmlhttp.status>=200)&&(xmlhttp.status<=399)) {
                 try {
                     onSuccess(xmlhttp.responseText);
                 }

@@ -1,3 +1,5 @@
+import fileAccessConstants from "./fileAccessConstants.js";
+
 //This class will manage access to microsoft one drive
 
 
@@ -10,29 +12,76 @@ export default class OneDriveFileSystem {
 		this.addedFolderInfoMap = {};
 		//this contains drive info
 		this.drivesInfo = null;
+		//this is the callback for changes to the login state
+		this.loginStateCallback = null;
+	}
+	
+	/** This sets the callback for login status */
+	setLoginStateCallback(loginStateCallback) {
+		this.loginStateCallback = loginStateCallback;
+		_addLoginStateListener(this.loginStateCallback)
+	}
+
+	/** This returns the current login state. */
+    getLoginInfo() {
+		if(_loginInfo_.state == fileAccessConstants.LOGGED_IN) {
+			//check for timeout. If so clear login data
+			let loginValid =  ( (_authData_.expiryInfo.expireInt - Date.now()) > MIN_REMAINING_LOGGED_IN_TIME);
+			if(!loginValid) {
+				_clearLoginData();
+			}
+		}
+        return _loginInfo_;
     }
 
-    getLoginState() {
-        return _loginState_;
-    }
-
+	/** This method logs in. The login state callback is used for the login status change. This can be canceld with
+	 * cancelAction(). */
     login() {
+		//check if we are already logged in
+		let loginInfo = this.getLoginInfo();
+		if(loginInfo.state == fileAccessConstants.LOGGED_IN) {
+			//just re-notify this listener
+			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
+			return;
+		}
+
         //should we verify requesting page is https/file/localhost?
 		let url = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${oneDriveAppInfo.clientId}&redirect_uri=${oneDriveAppInfo.redirectUri}&scope=${oneDriveAppInfo.scopes}&response_type=token`;
-		let loginPromise = _openPopup(url,true);
-		return loginPromise;
+		_openPopup(url,true);
     }
 
+	/** This method logs out. The login state callback is used for the login status change. This can be canceled with
+	 * cancelAction(). */
     logout() {
+		//check if we are already logged out
+		let loginInfo = this.getLoginInfo();
+		if(loginInfo.state == fileAccessConstants.LOGGED_OUT) {
+			//just re-notify this listener
+			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
+		}
+
         //should we verify requesting page is https/file/localhost?
 		let url = `https://login.live.com/oauth20_logout.srf?client_id=${oneDriveAppInfo.clientId}&redirect_uri=${oneDriveAppInfo.redirectUri}`;
-		let logoutPromise = _openPopup(url,false);
-		return logoutPromise;
-    }
+		_openPopup(url,false);
+	}
+	
+	/** This can be used to cancel the active login or log out. It leaves the state as logged out.*/
+	cancelAction() {
+		_cancelPopup();
+	}
 
+	/** This method returns a promise containing the drives available to the user. */
     getDrivesInfo() {
 		//check if the data is cached
-		if(this.drivesInfo) return this.drivesInfo;
+		if(this.drivesInfo) return Promise.resolve(this.drivesInfo);
+
+		//check if we are not logged in
+		let loginInfo = this.getLoginInfo();
+		if(loginInfo.state == fileAccessConstants.LOGGED_OUT) {
+			//just re-notify this listener
+			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
+			return Promise.reject("User is not currently logged in");
+		}
 
 		//otherwise download data
         return _getUserDrivesPromise().then( driveResponse => {
@@ -44,10 +93,19 @@ export default class OneDriveFileSystem {
 			this.drivesInfo = drivesInfo;
 				
 			return drivesInfo;
-		})
+		});
     }
 
+	/** This method returns a promise containing the contents of the given folder. */
     loadFolder(driveId,folderId) {
+		//check if we are not logged in
+		let loginInfo = this.getLoginInfo();
+		if(loginInfo.state == fileAccessConstants.LOGGED_OUT) {
+			//just re-notify this listener
+			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
+			return Promise.reject("User is not currently logged in");
+		}
+
 		//check for valid cached info
 		let key = this._getCacheKey(driveId,folderId);
 		let cachedFileInfo = this.fileInfoMap[key];
@@ -65,9 +123,18 @@ export default class OneDriveFileSystem {
 
 			return this._packageFolderInfo(fileInfo,addedFolderInfo); 
 		});
-    }
+	}
 
+	/** This method creates a file. It returns a promise with the fileInfo for the new file. */
     createFile(driveId,folderId,fileName,data) {
+		//check if we are not logged in
+		let loginInfo = this.getLoginInfo();
+		if(loginInfo.state == fileAccessConstants.LOGGED_OUT) {
+			//just re-notify this listener
+			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
+			return Promise.reject("User is not currently logged in");
+		}
+
         return _createFileUpload(driveId,folderId,fileName,data).then(response => {
 			let fileInfo = this._parseFileInfo(response);
 			return {
@@ -78,7 +145,16 @@ export default class OneDriveFileSystem {
 		});
     }
 
+	/** This method creates a file. It returns a promise with the fileInfo for the updated file. */
     updateFile(driveId,fileId,data) {
+		//check if we are not logged in
+		let loginInfo = this.getLoginInfo();
+		if(loginInfo.state == fileAccessConstants.LOGGED_OUT) {
+			//just re-notify this listener
+			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
+			return Promise.reject("User is not currently logged in");
+		}
+
         return _updateFileUpload(driveId,fileId,data).then(response => {
 			let fileInfo = this._parseFileInfo(response);
 			return {
@@ -89,7 +165,16 @@ export default class OneDriveFileSystem {
 		});
     }
 
+	/** This method creates a file. It returns a promise with an object giving the file data and the fileInfo for the new file. */
     openFile(driveId,fileId) {
+		//check if we are not logged in
+		let loginInfo = this.getLoginInfo();
+		if(loginInfo.state == fileAccessConstants.LOGGED_OUT) {
+			//just re-notify this listener
+			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
+			return Promise.reject("User is Not currently logged in");
+		}
+		
 		let key = this._getCacheKey(driveId,fileId);
 		let fileInfo = this.fileInfoMap[key];
 		if(!fileInfo) {
@@ -107,7 +192,15 @@ export default class OneDriveFileSystem {
 				data: response,
 				fileMetadata: fileMetadata
 			}
-		})  
+		});
+	}
+
+	/** This should be called when this instance is no longer in use. */
+	close() {
+		if(this.loginStateListener) {
+			_removeLoginStateListener(this.loginStateListener);
+			this.loginStateListener = null;
+		}
 	}
 	
 	//===============================
@@ -145,7 +238,7 @@ export default class OneDriveFileSystem {
 				fileInfo.downloadUrl = odFileInfo["@microsoft.graph.downloadUrl"];
 			}
 			else if(odFileInfo.folder) {
-				fileInfo.type = FOLDER_TYPE;
+				fileInfo.type = fileAccessConstants.FOLDER_TYPE;
 			}
 
 			//load this data into the cache
@@ -208,6 +301,13 @@ export default class OneDriveFileSystem {
 	}
 }
 
+//===================================
+// Static 
+//===================================
+//We manage a single user identity here in the static code.
+//We allow multiple instances of the object to interface externall
+//but we expect there will only be one.
+
 //this is the identifier name for the source
 OneDriveFileSystem.SOURCE_ID = "oneDrive";
 
@@ -217,8 +317,6 @@ OneDriveFileSystem.DISPLAY_NAME = "Microsoft OneDrive"
 //this is metadata for a new file. Name is blank and there is not additional data besides source name.
 OneDriveFileSystem.NEW_FILE_METADATA = {
     source: OneDriveFileSystem.NAME
-    //displayName:
-    //fileId: { ??? }
 }
 
 OneDriveFileSystem.directSaveOk = function(fileMetadata) {
@@ -235,19 +333,63 @@ const oneDriveAppInfo = {
 
 const baseUrl = "https://graph.microsoft.com/v1.0/me";
 
-//===================================
-// Utilities
-//===================================
+const STATE_INFO_LOGGED_OUT = {
+    state: fileAccessConstants.LOGGED_OUT
+}
 
-const FOLDER_TYPE = "__folder__";
+const STATE_INFO_LOGGED_IN = {
+    state: fileAccessConstants.LOGGED_IN,
+    accountName: "unknown user"
+}
+
+const STATE_INFO_LOGIN_PENDING = {
+    state: fileAccessConstants.LOGIN_PENDING,
+    message: "login pending"
+}
+
+const STATE_INFO_LOGOUT_PENDING = {
+    state: fileAccessConstants.LOGIN_PENDING,
+    message: "logout pending"
+}
+
+//interval in MS before actual logout that we consider logout to occur.
+const MIN_REMAINING_LOGGED_IN_TIME = 100;
+//this is the polling interval for checking if the login popup is closed.
+const POPUP_CHECK_INTERVAL = 100;
+//This is the timeout for a login attempt
+const POPUP_CHECK_MAX_COUNTER = 5*60*1000/POPUP_CHECK_INTERVAL;
+
+let _authData_ = null;
+let _loginInfo_ = STATE_INFO_LOGGED_OUT;
+let _loginStateListeners_ = [];
+
+//for now, a single popup result promise
+let _popupWindow_ = null;
+let _popupCheckTimer_ = null;
+let _popupCheckCounter_ = 0;
+
+function _addLoginStateListener(callback) {
+	if(_loginStateListeners_.indexOf(callback) < 0) {
+		_loginStateListeners_.push(callback);
+	}
+}
+
+function _removeLoginStateListener(callback) {
+	let index = _loginStateListeners_.indexOf(callback);
+	_loginStateListeners_.splice(index,1);
+}
+
+function _notifyLoginStateListeners() {
+	_loginStateListeners_.forEach(callback => callback(_loginInfo_))
+}
 
 //====================================
 // Login and Logout Workflows
 //====================================
 
-//create a external callback to receive the response
+//create a external callback to receive the response from the external login/logout popup window
 __globals__.oneDriveAuthCallback = (childWindow) => {
-	_resetChildPopupTimer();
+	_clearPopup();
     if(childWindow) {
         let authResponse = {};
         authResponse.hash = childWindow.location.hash;
@@ -257,10 +399,12 @@ __globals__.oneDriveAuthCallback = (childWindow) => {
 	}
 	else {
 		//TODO! Verify this is correct, what are the conditions where this happens?
-		_loginDataBad();
+		_loginInfo_ = STATE_INFO_LOGGED_OUT;
 	}
+	_notifyLoginStateListeners()
 } 
 
+/** This method sets the auth data. */
 function _setAuthData(authResponse) {
 	let authData;
 	if(authResponse.hash) {
@@ -281,20 +425,21 @@ function _setAuthData(authResponse) {
 
 	if((_authData_)&&(_authData_.credentials)) {
 		//fix this - user not known yet?
-		_loginState_ = STATE_INFO_LOGGED_IN
-		//this completes the login/logout workflow
-		_loginDataGood();
+		_loginInfo_ = STATE_INFO_LOGGED_IN;
 	}
 	else {
-		_loginState_ = STATE_INFO_LOGGED_OUT
-		//this completes the login/logout workflow
-		_loginDataBad();
+		_loginInfo_ = STATE_INFO_LOGGED_OUT;
 	}
 }
 
-function _clearAuthData() {
+function _clearLoginData() {
 	_authData_ = null;
-	_loginState_ = STATE_INFO_LOGGED_OUT;
+	_loginInfo_ = STATE_INFO_LOGGED_OUT;
+}
+
+function _setStatePending(isLogin) {
+	_authData_ = null;
+	_loginInfo_ = isLogin ? STATE_INFO_LOGIN_PENDING : STATE_INFO_LOGOUT_PENDING;
 }
 
 //this gets the expiration data for our credentials
@@ -311,19 +456,6 @@ function _getExpiryInfo(authCredentials) {
 	}
 }
 
-const STATE_INFO_LOGGED_OUT = {
-    state: "logged out"
-}
-
-const STATE_INFO_LOGGED_IN = {
-    state: "logged in",
-    accountName: "unknown user"
-}
-
-
-let _authData_ = null;
-let _loginState_ = STATE_INFO_LOGGED_OUT;
-
 
 function _getToken() {
 	if((_authData_)&&(_authData_.credentials)) {
@@ -334,25 +466,17 @@ function _getToken() {
 	}
 }
 
-//for now, a single popup result promise
-let _popupResultPromise = null;
-let _popupIsLogin = true; //true = login, false = logout
-let _popupResultResolve = null;
-let _popupResultReject = null;
-let _popupCheckTimer = null;
-let _popupCheckCounter_ = 0;
-
-const POPUP_CHECK_INTERVAL = 100;
-const POPUP_CHECK_MAX_COUNTER = 5*60*1000/POPUP_CHECK_INTERVAL;
-
 /** This opens a popup to carry out the login or log out. */
 function _openPopup(url,isLogin) {
-	if(_popupResultPromise) {
-		//TODO! FIGURE OUT WHAT TO DO HERE!!!
-		alert("Popup in process!");
-		return null;
-	}
 
+	//login is in process
+	if(_popupWindow_ != null) return;
+
+	//set state pending
+	_setStatePending(isLogin);
+	_notifyLoginStateListeners();
+
+	//create popup
 	let width = 525;
 	let height = 525;
 	let screenX = window.screenX;
@@ -375,105 +499,58 @@ function _openPopup(url,isLogin) {
 		"scrollbars=yes"
 	];
 
-	//create the popup promise
-	_popupResultPromise = new Promise((resolve,reject) => {
-		_popupResultResolve = resolve;
-		_popupResultReject = reject;
-	})
-	_popupIsLogin = isLogin;
-
-	var popup = window.open(url, "oauth", features.join(","));
-	if (!popup) {
+	_popupWindow_ = window.open(url, "oauth", features.join(","));
+	if (!_popupWindow_) {
 		//TODO! FIGURE OUT WHAT TO DO HERE!!!
 		alert("failed to pop up auth window");
-		return null;
+		_clearLoginData();
+		_notifyLoginStateListeners();
+		return;
 	}
 
-	popup.focus();
-
-	_popupCheckTimer = setInterval(() => _checkForChildPopupClose(popup), POPUP_CHECK_INTERVAL);
-
-	return _popupResultPromise;
-
+	_popupWindow_.focus();
+	_popupCheckTimer_ = setInterval(() => _checkForChildPopupClose(), POPUP_CHECK_INTERVAL);
 }
 
 /** This starts a timer to check for the popup closing, for when the
  * user closes it rather than logging in. */
-function _checkForChildPopupClose(popup) {
+function _checkForChildPopupClose() {
+	if(!_popupWindow_) {
+		_clearPopup()
+		return
+	}
+
     _popupCheckCounter_++;
     if(_popupCheckCounter_ > POPUP_CHECK_MAX_COUNTER) {
-		console.log("Max interval reached, giving up");
-		_resetChildPopupTimer();
-		_popupFailed();
-        return;
+		//timeout
+		_clearPopup();
+		_clearLoginData();
     }
-
-    if (popup.closed) {
-		console.log("Child window closed! " + _popupCheckCounter_); 
-		_resetChildPopupTimer();  
-		_popupFailed();
-    }
-    else {
-        console.log("Child not yet closed! " + _popupCheckCounter_)
+    else if(_popupWindow_.closed) {
+		_clearPopup();  
+		//treat this as a logout if the window is closed without us getting the login callback from the window
+		_clearLoginData();
     }
 }
 
-function _resetChildPopupTimer() {
-	if(_popupCheckTimer) {
-		clearInterval(_popupCheckTimer);
-		_popupCheckTimer = null;
+function _clearPopup() {
+	if(_popupWindow_) {
+		_popupWindow_ = null;
+	}
+	if(_popupCheckTimer_) {
+		clearInterval(_popupCheckTimer_);
+		_popupCheckTimer_ = null;
 	}
 	_popupCheckCounter_ = 0
 }
 
-//----------------------------
-// popup results
-//----------------------------
-function _loginDataGood() {
-	if(_popupIsLogin) {
-		_resolvePopupPromise();
+function _cancelPopup() {
+	if(!_popupWindow_.closed) {
+		_popupWindow_.close();
 	}
-	else {
-		//wtf? This shouldn't happen
-	}
-	_cleanupPopup();
+	_clearPopup();
+	_clearLoginData();
 }
-function _loginDataBad() {
-	if(_popupIsLogin) {
-		_rejectPopupPromise("Login failed");
-	}
-	else {
-		_resolvePopupPromise();
-	}
-	_cleanupPopup();
-}
-function _popupFailed() {
-	_clearAuthData();
-	if(_popupIsLogin) {
-		_rejectPopupPromise("Login failed");
-	}
-	else {
-		_resolvePopupPromise();
-	}
-	_cleanupPopup();
-}
-
-//end popup results
-
-function _resolvePopupPromise() {
-	_popupResultResolve(_loginState_);
-}
-
-function _rejectPopupPromise() {
-	_popupResultReject(errorMsg);
-}
-
-function _cleanupPopup() {
-	_popupResultPromise = null;
-	_popupResultResolve = null;
-	_popupResultReject = null;
-}
-
 
 //====================================
 // Drive Requests
@@ -569,212 +646,4 @@ function _updateFileUpload(driveId,fileId,data) {
 	
 	let requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${fileId}/content`;
 	return apogeeutil.jsonRequest(requestUrl,options);
-}
-
-/////////////////////////////////////////////////////////////////////////
-//for dev
-
-
-const TEST_DRIVES_INFO = {
-    defaultDriveId: "drive1",
-    drives: [
-        {
-            name: "Personal Drive",
-            id: "drive1"
-        },
-        {
-            name: "Work Drive",
-            id: "drive2"
-        }
-    ]
-}
-
-const TEST_FOLDER_INFO = {
-    folder: {
-        name: "workspaces",
-        type: "__folder__",
-        id: "folder2"
-    },
-    path: [
-        {
-            name: "test",
-            type: "__folder__",
-            id: "folder1"
-        },
-        {
-            name: "workspaces",
-            type: "__folder__",
-            id: "folder2"
-        }
-    ],
-    files: [
-        {
-            name: "workspace1.json",
-            type: "application/json",
-            id: "file1"
-        },
-        {
-            name: "workspace2.json",
-            type: "application/json",
-            id: "file2"
-        },
-        {
-            name: "workspace3.json",
-            type: "application/json",
-            id: "file3"
-        },
-        {
-            name: "chidlFolder",
-            type: "__folder__",
-            id: "folder3"
-        }
-    ]
-}
-
-
-const TEST_WORKSPACE_JSON = {
-	"fileType": "apogee app js workspace",
-	"version": "0.60",
-	"references": {
-		"viewState": {
-			"treeState": 1,
-			"lists": {
-				"es module": {
-					"treeState": 0
-				},
-				"js link": {
-					"treeState": 0
-				},
-				"css link": {
-					"treeState": 0
-				}
-			}
-		}
-	},
-	"code": {
-		"model": {
-			"fileType": "apogee model",
-			"version": 0.3,
-			"name": "Workspace",
-			"children": {
-				"main": {
-					"name": "main",
-					"type": "apogee.Folder",
-					"children": {
-						"a": {
-							"name": "a",
-							"type": "apogee.JsonMember",
-							"updateData": {
-								"data": 78
-							}
-						},
-						"b": {
-							"name": "b",
-							"type": "apogee.JsonMember",
-							"updateData": {
-								"argList": [],
-								"functionBody": "return 2*a;",
-								"supplementalCode": ""
-							}
-						}
-					}
-				}
-			}
-		},
-		"components": {
-			"main": {
-				"type": "apogeeapp.PageComponent",
-				"data": {
-					"doc": {
-						"type": "doc",
-						"content": [
-							{
-								"type": "heading1",
-								"content": [
-									{
-										"type": "text",
-										"text": "Test"
-									}
-								]
-							},
-							{
-								"type": "apogeeComponent",
-								"attrs": {
-									"name": "a",
-									"id": 0,
-									"state": ""
-								}
-							},
-							{
-								"type": "paragraph"
-							},
-							{
-								"type": "apogeeComponent",
-								"attrs": {
-									"name": "b",
-									"id": 0,
-									"state": ""
-								}
-							}
-						]
-					}
-				},
-				"children": {
-					"a": {
-						"type": "apogeeapp.JsonCell",
-						"dataView": "Colorized",
-						"viewState": {
-							"childDisplayState": {
-								"views": {
-									"Data": {
-										"isViewActive": true,
-										"height": 280
-									},
-									"Formula": {
-										"isViewActive": false
-									},
-									"Private": {
-										"isViewActive": false
-									}
-								}
-							}
-						}
-					},
-					"b": {
-						"type": "apogeeapp.JsonCell",
-						"dataView": "Colorized",
-						"viewState": {
-							"childDisplayState": {
-								"views": {
-									"Data": {
-										"isViewActive": true,
-										"height": 280
-									},
-									"Formula": {
-										"isViewActive": true,
-										"height": 7000
-									},
-									"Private": {
-										"isViewActive": false
-									}
-								}
-							}
-						}
-					}
-				},
-				"viewState": {
-					"childDisplayState": null,
-					"treeState": 1,
-					"tabOpened": true,
-					"tabShowing": true
-				}
-			},
-			"viewState": {
-				"treeState": 1
-			}
-		}
-	},
-	"viewState": {
-		"treeState": 1
-	}
 }

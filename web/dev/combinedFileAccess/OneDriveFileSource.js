@@ -1,6 +1,7 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {uiutil}  from "/apogeeui/apogeeUiLib.js";
 import OneDriveFileSystem from "./OneDriveFileSystem.js";
+import fileAccessConstants from "./fileAccessConstants.js";
 
 let OneDriveFileSourceGenerator = {
     getSourceId: function() {
@@ -46,6 +47,8 @@ class OneDriveFileSource {
         // this.selectedFileId
         this.fileElementMap = {};
 
+        this.loginState = "__logged out__"
+
 
         // this.actionElement
         // this.configElement
@@ -56,6 +59,7 @@ class OneDriveFileSource {
         // this.drivesListElement
         // this.allRadio
         // this.jsonRadio
+        // this.loggedOutShield
 
         // this.loginElement
         // this.userElement
@@ -117,6 +121,8 @@ class OneDriveFileSource {
 
     /** This method is called externally after the dialog box using the soruce closes. */
     close() {
+        this.remoteFileSystem.close();
+
         //FILL THIS IN!!!
         if(this.configElement) {
             this.configElement = null;
@@ -141,8 +147,11 @@ class OneDriveFileSource {
     getActionElement() {
         if(!this.actionElement) {
             this._createActionElement();
-            //populate initial data
-            this._populateActionForm();
+            //populate initial data if we are logged in
+            let loginState = this.remoteFileSystem.getLoginInfo();
+            if(loginState.state == fileAccessConstants.LOGGED_IN) {
+                this._populateActionForm();
+            }
         }
         return this.actionElement;
     }
@@ -151,7 +160,8 @@ class OneDriveFileSource {
         if(!this.configElement) {
             this._createConfigElement();
             //set initial login state
-            let loginState = this.remoteFileSystem.getLoginState();
+            this.remoteFileSystem.setLoginStateCallback(loginState => this._setLoginState(loginState));
+            let loginState = this.remoteFileSystem.getLoginInfo();
             this._setLoginState(loginState);
         }
         return this.configElement;
@@ -167,21 +177,11 @@ class OneDriveFileSource {
     //--------------------
 
     _onLoginCommand() {
-        let loginPromise = this.remoteFileSystem.login();
-        loginPromise.then(loginState => {
-            this._setLoginState(loginState);
-        }).catch(errorMsg => {
-            alert("Error logging in: " + errorMsg);
-        });
+        this.remoteFileSystem.login();
     }
 
     _onLogoutCommand() {
-        let logoutPromise = this.remoteFileSystem.logout();
-        logoutPromise.then(loginState => {
-            this._setLoginState(loginState);
-        }).catch(errorMsg => {
-            alert("Error logging out: " + errorMsg);
-        });
+        this.remoteFileSystem.logout();
     }
 
     _onParentFolderSelect(parentFileId) {
@@ -214,7 +214,7 @@ class OneDriveFileSource {
         }
 
         //take any needed action
-        if(fileInfo.type == "__folder__") {
+        if(fileInfo.type == fileAccessConstants.FOLDER_TYPE) {
             //open the folder
             this._loadFolder(this.selectedDriveId, fileInfo.fileId);
         }
@@ -296,9 +296,10 @@ class OneDriveFileSource {
     //----------------------
 
     _setLoginState(loginState) {
+        let oldLoginState = this.loginState;
         this.loginState = loginState;
         if(this.configElement) {
-            if(loginState.state == "logged in") {
+            if(loginState.state == fileAccessConstants.LOGGED_IN) {
                 this.loginElement.style.display = "none";
                 if(loginState.accountName) {
                     this.userElement.innerHTML = loginState.accountName;
@@ -308,25 +309,55 @@ class OneDriveFileSource {
                     this.userElement.style.display = "none";
                 }
                 this.logoutElement.style.display = "";
-                this.accountMsgElement.style.display = "none";
+                if(loginState.message) {
+                    this.accountMsgElement.style.display = "";
+                    this.accountMsgElement.innerHTML = loginState.message;
+                }
+                else {
+                    this.accountMsgElement.style.display = "none";
+                    this.accountMsgElement.innerHTML = "";
+                }
+
+                this.loggedOutShield.style.display = "none";
             }
-            else if(loginState.state == "logged out") {
+            else if(loginState.state == fileAccessConstants.LOGGED_OUT) {
                 this.loginElement.style.display = "";
                 this.userElement.style.display = "none";
                 this.userElement.innerHTML = "";
                 this.logoutElement.style.display = "none";
-                this.accountMsgElement.style.display = "none";
+                if(loginState.message) {
+                    this.accountMsgElement.style.display = "";
+                    this.accountMsgElement.innerHTML = loginState.message;
+                }
+                else {
+                    this.accountMsgElement.style.display = "none";
+                    this.accountMsgElement.innerHTML = "";
+                }
+                
+                this.loggedOutShield.style.display = "";
             }
-            else {
+            else if(loginState.state == fileAccessConstants.LOGIN_PENDING) {
                 //for now we will leave it to this...
-                this.accountMsgElement.display = "";
-                this.accountMsgEement.innerHTML = "OTHER STATE!!!"
+                this.accountMsgElement.style.display = "";
+                this.accountMsgElement.innerHTML = loginState.message ? loginState.message : "pending";
 
                 this.loginElement.style.display = "none";
                 this.userElement.style.display = "none";
                 this.userElement.innerHTML = "";
                 this.logoutElement.style.display = "none";
+
+                this.loggedOutShield.style.display = "";
             }
+            else {
+                //handle this
+            }
+        }
+
+        if((this.loginState.state == fileAccessConstants.LOGGED_IN)&&
+            !((oldLoginState)&&(oldLoginState.state == this.loginState.state))&&
+            (this.actionElement) ) {
+            //populate the action form if we are newly logged in
+            this._populateActionForm();
         }
     }
 
@@ -451,6 +482,16 @@ class OneDriveFileSource {
         this.accountMsgElement.className = "oneDriveFileAccess_accountMsgElement";
         container.appendChild(this.accountMsgElement);
 
+        //this element is used in the action element, but we will modify it with the login data
+        this.loggedOutShield = document.createElement("div");
+        this.loggedOutShield.className = "oneDriveFileAccess_loggedOutShield";
+        this.loggedOutShield.innerHTML = "<em>User not logged in</em>"
+
+        let loggedOutCancelButton = document.createElement("button");
+        loggedOutCancelButton.innerHTML = "Cancel";
+        loggedOutCancelButton.className = "oneDriveFileAccess_loggedOutCancelButton";
+        loggedOutCancelButton.onclick = () => this._onCancelPress();
+        this.loggedOutShield.appendChild(loggedOutCancelButton);
 
         this.configElement = container;
     }
@@ -579,6 +620,14 @@ class OneDriveFileSource {
         cancelButton.className = "oneDriveFileAccess_cancelButton";
         cancelButton.onclick = () => this._onCancelPress();
         buttonsCell.appendChild(cancelButton);
+
+        //add the logged out shield - made earlier
+        //we are putting it in like this so we can place it beblow the cancle button, but above everything else.
+        let shieldParent = document.createElement("div");
+        shieldParent.className = "oneDriveFileAccess_shieldParent";
+        mainContainer.appendChild(shieldParent);
+
+        shieldParent.appendChild(this.loggedOutShield);
 
         this.actionElement = mainContainer;
     }

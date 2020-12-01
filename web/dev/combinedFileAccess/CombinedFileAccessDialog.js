@@ -28,7 +28,7 @@ export default class CombinedAccessDialog {
     showDialog() {
 
         if(this.dialog) {
-            alert("Show dialog shoudl only be called once on a given instance");
+            alert("Show dialog should only be called once on a given instance");
             return;
         }
 

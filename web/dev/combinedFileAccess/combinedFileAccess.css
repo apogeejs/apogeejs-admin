@@ -114,6 +114,7 @@
     position: relative;
     overflow: auto;
     outline: 1px solid rgb(128,128,128);
+    min-height: 10px;
 }
 
 .oneDriveFileAccess_driveElement {
@@ -215,4 +216,19 @@
 
 .oneDriveFileAccess_fileListEntryElementActive:hover {
     background-color: rgb(220,220,256);
+}
+
+.oneDriveFileAccess_loggedOutShield {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(200,200,200,.5);
+    text-align: center;
+    padding: 45% 0;
+}
+
+.oneDriveFileAccess_loggedOutCancelButton {
+    margin: 10px;
 }
