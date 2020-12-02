@@ -25,3 +25,6 @@ export const STATE_INFO_LOGOUT_PENDING = {
 export const SAVE_ACTION = "save";
 
 export const OPEN_ACTION = "open";
+
+/** This will be used as the file info for the path when the data is not available. */
+export const BROKEN_PATH_ENTRY = {};

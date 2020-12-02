@@ -112,6 +112,9 @@ export default class OneDriveFileSystem {
 		let cachedAddedFolderInfo = this.addedFolderInfoMap[key];
 
 		if((cachedFileInfo)&&(cachedAddedFolderInfo)) {
+			//there are cases where we might not have complete path info. Check to fix that here.
+			this._testForPathUpdate(driveId,folderId,cachedAddedFolderInfo);
+
 			let folderInfo = this._packageFolderInfo(cachedFileInfo,cachedAddedFolderInfo);
 			return Promise.resolve(folderInfo);
 		}
@@ -207,8 +210,9 @@ export default class OneDriveFileSystem {
 	// private methods
 	//===============================
 
+	/** The fileId may be left undefined (of falsey) if it is not available. */
 	_getCacheKey(driveId,fileId) {
-		return driveId + "|" + fileId;
+		return fileId ? (driveId + "|" + fileId) : driveId;
 	}
 	
 	_packageFolderInfo(fileInfo,addedFolderInfo) {
@@ -243,9 +247,18 @@ export default class OneDriveFileSystem {
 			if(odFileInfo.parentReference.id) {
 				fileInfo.parentId = odFileInfo.parentReference.id;
 			}
+			else {
+				fileInfo.isRoot = true;
+			}
 
 			//load this data into the cache
 			this.fileInfoMap[key] = fileInfo;
+
+			//add a second time if this is the root
+			if(fileInfo.isRoot) {
+				let altRootKey = this._getCacheKey(driveId);
+				this.fileInfoMap[altRootKey] = fileInfo;
+			}
 		}
 
 		return fileInfo;
@@ -270,21 +283,48 @@ export default class OneDriveFileSystem {
 			}
 
 			//get the path file infos, excluding the current file info
-			addedFolderInfo.path = this._getPath(driveId,fileId,true);
+			addedFolderInfo.path = this._getPath(driveId,fileId);
 			
 			//add to cache
 			this.addedFolderInfoMap[key] = addedFolderInfo;
+
+			//add a second time if this is the root
+			if(odFileInfo.parentReference.id === undefined) {
+				let altRootKey = this._getCacheKey(driveId);
+				this.addedFolderInfoMap[altRootKey] = addedFolderInfo;
+			}
+		}
+		else {
+			//it is possible we didn't have complete path into when this was made. If so check here.
+			this._testForPathUpdate(driveId,fileId,addedFolderInfo);
 		}
 
 		return addedFolderInfo;
 	}
 
+	/* If we initially open a folder that is not root, we will not have all the path info.
+	 * recalculate path if it is not complete
+	 * in which case the first entry is fileAccessConstants.BROKEN_PATH_ENTRY */
+	_testForPathUpdate(driveId,fileId,addedFolderInfo) {
+		if((addedFolderInfo.path)&&(addedFolderInfo.path.length > 0)&&(addedFolderInfo.path[0] == fileAccessConstants.BROKEN_PATH_ENTRY)) {
+			addedFolderInfo.path = this._getPath(driveId,fileId);
+		}
+	}
+
 	/** This method gets an array of file infos up to the root direction. The current directory can be excluded 
 	 * using the excludeThisEntry flag.	 */
-	_getPath(driveId,fileId,excludeThisEntry) {
+	_getPath(driveId,fileId) {
 		let fileInfo = this.fileInfoMap[this._getCacheKey(driveId,fileId)];
-		let parentPath = ((fileInfo)&&(fileInfo.parentId)) ? this._getPath(driveId,fileInfo.parentId) : []; 
-		return excludeThisEntry ? parentPath : parentPath.concat[fileInfo];
+		if(fileInfo === undefined) { 
+			//if file info is undefined there is no data. This value signifies the data is not available..
+			return [fileAccessConstants.BROKEN_PATH_ENTRY];
+		}
+		else if(!fileInfo.parentId) {
+			return [fileInfo];
+		}
+		else {
+			return this._getPath(driveId,fileInfo.parentId).concat([fileInfo]); 
+		}
 	}
 
 	_parseDriveInfo(odDriveInfo) {

@@ -181,8 +181,12 @@ class OneDriveFileSource {
         this.remoteFileSystem.logout();
     }
 
-    _onParentFolderSelect(parentFileId) {
-        this._loadFolder(this.selectedDriveId, parentFileId);
+    _onParentFolderSelect() {
+        if(this.folderInfo) {
+            //get parent id. For root this is not defined, but our load foler method handles that.
+            let parentId = this.folderInfo.folder.parentId;
+            this._loadFolder(this.selectedDriveId, parentId);
+        }
     }
 
     _onFilterChange() {
@@ -447,11 +451,18 @@ class OneDriveFileSource {
         }
         if(this.folderInfo) {
             if(this.folderInfo.path) {
-                this.folderInfo.path.forEach( (pathEntry,index) => {
-                    if(index >= 1) {
+                let isFirstEntry = true;
+                this.folderInfo.path.forEach( fileInfo => {
+                    //don't add the root name. Just use the drive name.
+                    if(fileInfo.isRoot) return;
+                    //add a delimiter between entries
+                    if(isFirstEntry) {
+                        isFirstEntry = false;
+                    }
+                    else {
                         this.pathCell.appendChild(this._getPathDelimiterElement());
                     }
-                    this.pathCell.appendChild(this._getPathElement(pathEntry));
+                    this.pathCell.appendChild(this._getPathElement(fileInfo));
                 })
             }
         }
@@ -568,7 +579,7 @@ class OneDriveFileSource {
 
         let parentFolderButton = document.createElement("button");
         parentFolderButton.innerHTML = "^";
-        parentFolderButton.onclick = () => this._onParentFolderButton();
+        parentFolderButton.onclick = () => this._onParentFolderSelect();
         commandCell.appendChild(parentFolderButton);
         if(this.action == fileAccessConstants.SAVE_ACTION) {
             let addFolderButton = document.createElement("button");
@@ -696,10 +707,18 @@ class OneDriveFileSource {
         return delimiterElement;
     }
 
-    _getPathElement(pathEntry) {
+    _getPathElement(fileInfo) {
+        let folderName;
+        if(fileInfo === fileAccessConstants.BROKEN_PATH_ENTRY) {
+            folderName = "...";
+        }
+        else {
+            folderName = fileInfo.name;
+        }
+
         let folderElement = document.createElement("span");
         folderElement.className = "oneDriveFileAccess_pathFileElement";
-        folderElement.innerHTML = pathEntry.name;
+        folderElement.innerHTML = folderName;
         return folderElement;
     }
 
