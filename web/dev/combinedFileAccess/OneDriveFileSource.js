@@ -52,7 +52,7 @@ class OneDriveFileSource {
         // this.saveFileNameField
         // this.openFileNameField
         // this.pathCell
-        // this.fileListElement
+        // this.fileListTable
         // this.drivesListElement
         // this.allRadio
         // this.jsonRadio
@@ -203,14 +203,14 @@ class OneDriveFileSource {
         if(oldSelectedFileId) {
             let oldSelectedFileElement = this.fileElementMap[oldSelectedFileId];
             if(oldSelectedFileElement) {
-                oldSelectedFileElement.classList.remove("oneDriveFileAccess_fileListEntryElementActive");
+                oldSelectedFileElement.classList.remove("oneDriveFileAccess_fileRowActive");
             }
         }
         this.selectedFileId = fileInfo.fileId;
         if(this.selectedFileId) {
             let newSelectedFileElement = this.fileElementMap[this.selectedFileId];
             if(newSelectedFileElement) {
-                newSelectedFileElement.classList.add("oneDriveFileAccess_fileListEntryElementActive");
+                newSelectedFileElement.classList.add("oneDriveFileAccess_fileRowActive");
             }
         }
 
@@ -443,7 +443,7 @@ class OneDriveFileSource {
 
     _populatePathCell() {
         uiutil.removeAllChildren(this.pathCell);
-        uiutil.removeAllChildren(this.fileListElement);
+        uiutil.removeAllChildren(this.fileListTable);
 
         let selectedDriveInfo = this._getSelectedDriveInfo();
         if(selectedDriveInfo) {
@@ -477,7 +477,7 @@ class OneDriveFileSource {
     }
 
     _populateFileList() {
-        uiutil.removeAllChildren(this.fileListElement);
+        uiutil.removeAllChildren(this.fileListTable);
         if((this.folderInfo)&&(this.folderInfo.children)) {
             this.folderInfo.children.forEach(folderInfo => this._addFileListEntry(folderInfo));
         }
@@ -626,9 +626,9 @@ class OneDriveFileSource {
         fileListCell.className = "oneDriveFileAccess_fileListCell";
         fileDisplayRow.appendChild(fileListCell);
 
-        this.fileListElement = document.createElement("div");
-        this.fileListElement.className = "oneDriveFileAccess_fileListElement";
-        fileListCell.appendChild(this.fileListElement);
+        this.fileListTable = document.createElement("table");
+        this.fileListTable.className = "oneDriveFileAccess_fileListTable";
+        fileListCell.appendChild(this.fileListTable);
 
         //file name entry
         let fileNameCell = document.createElement("td");
@@ -723,13 +723,55 @@ class OneDriveFileSource {
     }
 
     _addFileListEntry(fileInfo) {
-        let fileElement = document.createElement("div");
-        fileElement.className = "oneDriveFileAccess_fileListEntryElement";
-        fileElement.innerHTML = fileInfo.name;
-        this.fileListElement.appendChild(fileElement);
+        let fileRow = document.createElement("tr");
+        fileRow.className = "oneDriveFileAccess_fileRow";
+        let fileIconCell = document.createElement("td");
+        fileIconCell.className = "oneDriveFileAccess_fileIconCell";
+        fileRow.appendChild(fileIconCell);
+        let fileIcon = document.createElement("img");
+        fileIcon.src = this._getIconUrl(fileInfo.type);
+        fileIconCell.appendChild(fileIcon);
 
-        fileElement.onclick = () => this._onFileClick(fileInfo);
-        this.fileElementMap[fileInfo.fileId] = fileElement;
+        let fileNameCell = document.createElement("td");
+        fileNameCell.className = "oneDriveFileAccess_fileNameCell";
+        fileRow.appendChild(fileNameCell);
+
+        let fileLink = document.createElement("a");
+        fileLink.className = "oneDriveFileAcess_fileLink";
+        fileLink.innerHTML = fileInfo.name;
+        fileLink.onclick = () => this._onFileClick(fileInfo);
+        fileNameCell.appendChild(fileLink);
+
+        let fileMimeCell = document.createElement("td");
+        fileMimeCell.className = "oneDriveFileAccess_fileMimeCell";
+        if(fileInfo.type != fileAccessConstants.FOLDER_TYPE) fileMimeCell.innerHTML = fileInfo.type;
+        fileRow.appendChild(fileMimeCell);
+
+        let fileCmdCell = document.createElement("td");
+        fileCmdCell.className = "oneDriveFileAccess_fileCmdCell";
+        fileRow.appendChild(fileCmdCell);
+        /////////////////////////
+        let renameButton = document.createElement("button");
+        renameButton.className = "oneDriveFileAccess_renameButton";
+        renameButton.innerHTML = "Rename";
+        fileCmdCell.appendChild(renameButton);
+        let deleteButton = document.createElement("button");
+        deleteButton.className = "oneDriveFileAccess_deleteButton";
+        deleteButton.innerHTML = "Delete";
+        fileCmdCell.appendChild(deleteButton);
+        /////////////////////////
+        
+        this.fileElementMap[fileInfo.fileId] = fileRow;
+
+        this.fileListTable.appendChild(fileRow);
+    }
+
+    _getIconUrl(mimeType) {
+        let resourceName = fileAccessConstants.ICON_MAP[mimeType];
+        if(resourceName === undefined) {
+            resourceName = fileAccessConstants.DEFAULT_MIME_ICON;
+        }
+        return uiutil.getResourcePath(resourceName);
     }
 
 }

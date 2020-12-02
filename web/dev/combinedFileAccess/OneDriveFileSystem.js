@@ -238,7 +238,7 @@ export default class OneDriveFileSystem {
 			fileInfo.name = odFileInfo.name;
 			fileInfo.driveId = driveId;
 			if(odFileInfo.file) {
-				fileInfo.type = odFileInfo.mimeType;
+				fileInfo.type = odFileInfo.file.mimeType;
 				fileInfo.downloadUrl = odFileInfo["@microsoft.graph.downloadUrl"];
 			}
 			else if(odFileInfo.folder) {

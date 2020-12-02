@@ -58,13 +58,60 @@ export default class CombinedAccessDialog {
         this.mainContainer = document.createElement("table");
         this.mainContainer.className = "combinedFileAccess_mainContainer";
     
+        ////////////////////////////////////////
         let titleRow = document.createElement("tr");
         this.mainContainer.appendChild(titleRow);
-        let sourceRow = document.createElement("tr");
-        this.mainContainer.appendChild(sourceRow);
         let bodyRow = document.createElement("tr");
         this.mainContainer.appendChild(bodyRow);
+
+        let driveCell = document.createElement("td");
+        driveCell.className = "combinedFileAccess_sourceListCell";
+        driveCell.rowSpan = 3;
+        titleRow.appendChild(driveCell);
+
+        //selected source
+        this.selectedSourceCell = document.createElement("div");
+        this.selectedSourceCell.className = "combinedFileAccess_selectedSourceTitle";
+        driveCell.appendChild(this.selectedSourceCell);
+        
+        let selectTitleElement = document.createElement("div");
+        selectTitleElement.className = "combinedFileAccess_selectTitleCell";
+        selectTitleElement.innerHTML = "Options:";
+        driveCell.appendChild(selectTitleElement);
+
+        this.selectListElement = document.createElement("div");
+        this.selectListElement.className = "combinedFileAccess_selectList";
+        driveCell.appendChild(this.selectListElement);
+        ///////////////////////////////////
+
+        // let sourceRow = document.createElement("tr");
+        // this.mainContainer.appendChild(sourceRow);
+        // let titleRow = document.createElement("tr");
+        // this.mainContainer.appendChild(titleRow);
+        // let bodyRow = document.createElement("tr");
+        // this.mainContainer.appendChild(bodyRow);
     
+        // //source selection title
+        // let selectTitleCell = document.createElement("td");
+        // selectTitleCell.className = "combinedFileAccess_selectTitleCell";
+        // selectTitleCell.innerHTML = "File Source:";
+        // sourceRow.appendChild(selectTitleCell);
+    
+        // //selected source
+        // this.selectedSourceCell = document.createElement("td");
+        // this.selectedSourceCell.className = "combinedFileAccess_selectedSourceTitle";
+        // sourceRow.appendChild(this.selectedSourceCell);
+
+        // //source selection list
+        // let selectListCell = document.createElement("td");
+        // selectListCell.className = "combinedFileAccess_sourceListCell";
+        // selectListCell.rowSpan = 2;
+        // titleRow.appendChild(selectListCell);
+    
+        // this.selectListElement = document.createElement("div");
+        // this.selectListElement.className = "combinedFileAccess_selectList";
+        // selectListCell.appendChild(this.selectListElement);
+
         //title
         let title = (this.action == fileAccessConstants.SAVE_ACTION) ? "Save Workspace" : "Open Workspace";
         let dialogTitleElement = document.createElement("td");
@@ -72,26 +119,6 @@ export default class CombinedAccessDialog {
         dialogTitleElement.className = "combinedFileAccess_dialogTitleElement";
         dialogTitleElement.innerHTML = title;
         titleRow.appendChild(dialogTitleElement);
-    
-        //source selection title
-        let selectTitleCell = document.createElement("td");
-        selectTitleCell.className = "combinedFileAccess_selectTitleCell";
-        selectTitleCell.innerHTML = "File Source:";
-        sourceRow.appendChild(selectTitleCell);
-    
-        //selected source
-        this.selectedSourceCell = document.createElement("td");
-        this.selectedSourceCell.className = "combinedFileAccess_selectedSourceTitle";
-        sourceRow.appendChild(this.selectedSourceCell);
-    
-        //body
-        let selectListCell = document.createElement("td");
-        selectListCell.className = "combinedFileAccess_sourceListCell";
-        bodyRow.appendChild(selectListCell);
-    
-        this.selectListElement = document.createElement("div");
-        this.selectListElement.className = "combinedFileAccess_selectList";
-        selectListCell.appendChild(this.selectListElement);
     
         //action element
         this.actionElement = document.createElement("td");
@@ -189,7 +216,7 @@ export default class CombinedAccessDialog {
 
         uiutil.removeAllChildren(this.actionElement);
         this.actionElement.appendChild(newActiveSource.getActionElement());
-        this.selectedSourceCell.innerHTML = newActiveSource.getGenerator().getDisplayName() + " File Source";
+        this.selectedSourceCell.innerHTML = newActiveSource.getGenerator().getDisplayName();
 
         //store this to be the default next time the dialog is opened
         _cachedSourceId = newSourceId;

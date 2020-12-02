@@ -28,3 +28,16 @@ export const OPEN_ACTION = "open";
 
 /** This will be used as the file info for the path when the data is not available. */
 export const BROKEN_PATH_ENTRY = {};
+
+//===================
+// file icons
+//===================
+
+export const ICON_MAP = {
+    "__folder__": "/icons3/folderIcon.png",
+    "application/json": "/icons3/jsonFileIcon.png",
+    "application/javascript": "/icons3/jsFileIcon.png",
+    "text/plain": "/icons3/textFileIcon.png"
+};
+
+export const DEFAULT_MIME_ICON = "/oldIcons/genericIcon.png"; 

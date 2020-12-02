@@ -1,34 +1,36 @@
 .combinedFileAccess_mainContainer {
     position: relative;
     overflow: hidden;
-    padding: 5px;
-}
-
-.combinedFileAccess_dialogTitleElement {
-    position: relative;
-    overflow: hidden;
-    padding: 5px;
-    font-size: 24px;
+    padding: 10px;
+    border-collapse: collapse;
 }
 
 .combinedFileAccess_selectedSourceTitle {
     position: relative;
     overflow: hidden;
-    padding: 5px;
     font-size: 20px;
 }
 
 .combinedFileAccess_selectTitleCell {
     position: relative;
     overflow: hidden;
-    padding: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     font-size: 14px;
+}
+
+.combinedFileAccess_dialogTitleElement {
+    position: relative;
+    overflow: hidden;
+    padding: 10px;
+    font-size: 24px;
 }
 
 .combinedFileAccess_sourceListCell {
     position: relative;
     vertical-align: top;
-    padding: 5px;
+    padding: 10px;
+    border-right: 1px solid gray;
 }
 
 .combinedFileAccess_selectList {
@@ -98,6 +100,7 @@
 
 .oneDriveFileAccess_mainContainer {
     padding: 5px;
+    max-width: 650px;
 }
 
 .oneDriveFileAccess_driveTitle {
@@ -133,6 +136,7 @@
 
 .oneDriveFileAccess_pathCell {
     padding: 5px;
+    word-break: break-all;
 }
 
 .oneDriveFileAccess_commandCell {
@@ -146,15 +150,11 @@
 
 .oneDriveFileAccess_fileListCell {
     padding: 5px;
-}
-
-
-.oneDriveFileAccess_fileListElement {
-    position: relative;
     height: 300px;
-    min-width: 400px;
+    width: 500px;
     background-color: white;
     border: 1px solid gray;
+    vertical-align: top;
     overflow: auto;
 }
 
@@ -191,6 +191,7 @@
     padding: 5px;
     font-size: 14px;
     color: black;
+    word-break: keep-all;
 }
 
 .oneDriveFileAccess_pathDelimiterElement {
@@ -205,22 +206,60 @@
     font-size: 14px;
     color: gray;
     font-weight: bold;
+    word-break: keep-all;
 }
 
-.oneDriveFileAccess_fileListEntryElement {
+.oneDriveFileAccess_fileListTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.oneDriveFileAccess_fileRow {
     padding: 2px;
 }
 
-.oneDriveFileAccess_fileListEntryElement:hover {
+.oneDriveFileAccess_fileRow:hover {
     background-color: rgb(240,240,256);
 }
 
-.oneDriveFileAccess_fileListEntryElementActive {
+.oneDriveFileAccess_fileRowActive {
     background-color: rgb(220,220,256);
 }
 
-.oneDriveFileAccess_fileListEntryElementActive:hover {
+.oneDriveFileAccess_fileRowActive:hover {
     background-color: rgb(220,220,256);
+}
+
+.oneDriveFileAccess_fileIconCell {
+
+}
+.oneDriveFileAccess_fileNameCell {
+    min-width: 100px;
+}
+.oneDriveFileAcess_fileLink {
+    padding: 2px;
+    text-decoration: underline;
+}
+.oneDriveFileAcess_fileLink:hover {
+    background-color:lightgray;
+}
+.oneDriveFileAccess_fileMimeCell {
+    min-width: 100px;
+}
+.oneDriveFileAccess_fileCmdCell {
+}
+.oneDriveFileAccess_renameButton {
+    font-size: smaller;
+    background-color: white;
+    border: 1px solid lightgray;
+    margin: 2px;
+}
+.oneDriveFileAccess_deleteButton {
+    font-size: smaller;
+    background-color: white;
+    color: red;
+    border: 1px solid lightgray;
+    margin: 2px;
 }
 
 .oneDriveFileAccess_loggedOutShield {
