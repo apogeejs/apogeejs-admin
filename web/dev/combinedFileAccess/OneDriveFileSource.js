@@ -40,7 +40,6 @@ class OneDriveFileSource {
         this.driveSelectionElementMap = {}
 
         // this.folderInfo
-        // this.selectedFileId
         this.fileElementMap = {};
 
         this.loginState = null
@@ -51,16 +50,19 @@ class OneDriveFileSource {
 
         // this.saveFileNameField
         // this.openFileNameField
-        // this.pathCell
+        // this.pathElement
         // this.fileListTable
         // this.drivesListElement
-        // this.allRadio
-        // this.jsonRadio
+        // this.allCheckbox
+        // this.jsonCheckbox
+        // this.textCheckbox
         // this.loggedOutShield
 
         // this.loginElement
         // this.userElement
         // this.logoutElement
+
+        this.filter = _allFilter;
     }
 
     //============================
@@ -190,7 +192,21 @@ class OneDriveFileSource {
     }
 
     _onFilterChange() {
+        if(this.allRadio.checked) {
+           if(this.filter == _allFilter) return; 
+           this.filter = _allFilter;
+        }
+        else if(this.jsonRadio.checked) {
+            if(this.filter == _jsonFilter) return;
+            this.filter = _jsonFilter;
+        }
+        else if(this.jsonTextRadio.checked) {
+            if(this.filter == _jsonTextFilter) return;
+            this.filter = _jsonTextFilter;
+        }
 
+        //repopulate the file list
+        this._populateFileList();    
     }
 
     _onCreateFolder() {
@@ -199,30 +215,21 @@ class OneDriveFileSource {
 
     _onFileClick(fileInfo) {
         //select element
-        let oldSelectedFileId = this.selectedFileId;
-        if(oldSelectedFileId) {
-            let oldSelectedFileElement = this.fileElementMap[oldSelectedFileId];
-            if(oldSelectedFileElement) {
-                oldSelectedFileElement.classList.remove("oneDriveFileAccess_fileRowActive");
-            }
-        }
-        this.selectedFileId = fileInfo.fileId;
-        if(this.selectedFileId) {
-            let newSelectedFileElement = this.fileElementMap[this.selectedFileId];
-            if(newSelectedFileElement) {
-                newSelectedFileElement.classList.add("oneDriveFileAccess_fileRowActive");
-            }
-        }
+        let selectedFileId = fileInfo.fileId;
 
         //take any needed action
         if(fileInfo.type == fileAccessConstants.FOLDER_TYPE) {
             //open the folder
-            this._loadFolder(this.selectedDriveId, this.selectedFileId);
+            this._loadFolder(this.selectedDriveId, selectedFileId);
         }
         else {
             //put the name in the file name field
-            if(this.action == fileAccessConstants.SAVE_ACTION) this.saveFileNameField.value = fileInfo.name;
-            else if(this.action == fileAccessConstants.OPEN_ACTION) this.openFileNameField.innerHTML = fileInfo.name;
+            if(this.action == fileAccessConstants.SAVE_ACTION) {
+                this.saveFileNameField.value = fileInfo.name;
+            }
+            else if(this.action == fileAccessConstants.OPEN_ACTION) {
+                this.openFile(this.selectedDriveId, selectedFileId);
+            }
         }
 
     }
@@ -233,22 +240,6 @@ class OneDriveFileSource {
 
     _onFileRename(fileInfo,newFileName) {
 
-    }
-
-    _onOpenPress() {
-        if(!this.selectedDriveId) {
-            alert("There is no selected drive!");
-            return;
-        }
-        if((!this.folderInfo)||(!this.folderInfo.folder)) {
-            alert("There is no selected folder!");
-            return;
-        }
-        if(!this.selectedFileId) {
-            alert("There is no file selected");
-            return
-        }
-        this.openFile(this.selectedDriveId,this.selectedFileId);
     }
 
     _onSavePress() {
@@ -429,7 +420,6 @@ class OneDriveFileSource {
     _setFilesInfo(folderInfo) {
         this.folderInfo = folderInfo;
         this.fileElementMap = {};
-        this.selectedFileId = undefined;
 
         this._populatePathCell();
         this._populateFileList();
@@ -442,12 +432,12 @@ class OneDriveFileSource {
     }
 
     _populatePathCell() {
-        uiutil.removeAllChildren(this.pathCell);
+        uiutil.removeAllChildren(this.pathElement);
         uiutil.removeAllChildren(this.fileListTable);
 
         let selectedDriveInfo = this._getSelectedDriveInfo();
         if(selectedDriveInfo) {
-            this.pathCell.appendChild(this._getPathDriveElement(selectedDriveInfo));
+            this.pathElement.appendChild(this._getPathDriveElement(selectedDriveInfo));
         }
         if(this.folderInfo) {
             if(this.folderInfo.path) {
@@ -460,9 +450,9 @@ class OneDriveFileSource {
                         isFirstEntry = false;
                     }
                     else {
-                        this.pathCell.appendChild(this._getPathDelimiterElement());
+                        this.pathElement.appendChild(this._getPathDelimiterElement());
                     }
-                    this.pathCell.appendChild(this._getPathElement(fileInfo));
+                    this.pathElement.appendChild(this._getPathElement(fileInfo));
                 })
             }
         }
@@ -479,7 +469,7 @@ class OneDriveFileSource {
     _populateFileList() {
         uiutil.removeAllChildren(this.fileListTable);
         if((this.folderInfo)&&(this.folderInfo.children)) {
-            this.folderInfo.children.forEach(folderInfo => this._addFileListEntry(folderInfo));
+            this.folderInfo.children.filter(this.filter).forEach(folderInfo => this._addFileListEntry(folderInfo));
         }
     }
 
@@ -543,83 +533,54 @@ class OneDriveFileSource {
 
         let pathRow = document.createElement("tr");
         mainContainer.appendChild(pathRow);
-        let commandRow = document.createElement("tr");
-        mainContainer.appendChild(commandRow);
         let fileDisplayRow = document.createElement("tr");
         mainContainer.appendChild(fileDisplayRow);
+        let filterRow = document.createElement("tr");
+        mainContainer.appendChild(filterRow);
         let fileNameRow = document.createElement("tr");
         mainContainer.appendChild(fileNameRow);
         let buttonsRow = document.createElement("tr");
         mainContainer.appendChild(buttonsRow);
 
         //drive selection
-        let drivesTitleCell = document.createElement("td");
-        drivesTitleCell.className = "oneDriveFileAccess_driveTitle";
-        drivesTitleCell.innerHTML = "Drives:"
-        pathRow.appendChild(drivesTitleCell);
-
         let drivesCell = document.createElement("td");
         drivesCell.className = "oneDriveFileAccess_drivesCell";
-        drivesCell.rowSpan = 4;
-        commandRow.appendChild(drivesCell);
+        drivesCell.rowSpan = 5;
+        pathRow.appendChild(drivesCell);
+
+        let drivesTitleElement = document.createElement("div");
+        drivesTitleElement.className = "oneDriveFileAccess_driveTitle";
+        drivesTitleElement.innerHTML = "Drives:"
+        drivesCell.appendChild(drivesTitleElement);
 
         this.drivesListElement = document.createElement("div");
         this.drivesListElement.className = "oneDriveFileAccess_driveList";
         drivesCell.appendChild(this.drivesListElement);
 
-        //path display
-        this.pathCell = document.createElement("td");
-        this.pathCell.className = "oneDriveFileAccess_pathCell";
-        pathRow.appendChild(this.pathCell);
+        //path display and folder commands
+        let pathCell = document.createElement("td");
+        pathCell.className = "oneDriveFileAccess_pathCell";
+        pathRow.appendChild(pathCell);
+
+        this.pathElement = document.createElement("div");
+        this.pathElement.className = "oneDriveFileAccess_pathElement";
+        pathCell.appendChild(this.pathElement);
 
         //commands - parent folder, file type filter, add folder (for save only)
-        let commandCell = document.createElement("td");
-        commandCell.className = "oneDriveFileAccess_commandCell";
-        commandRow.appendChild(commandCell);
+        let commandElement = document.createElement("div");
+        commandElement.className = "oneDriveFileAccess_commandElement";
+        pathCell.appendChild(commandElement);
 
         let parentFolderButton = document.createElement("button");
         parentFolderButton.innerHTML = "^";
         parentFolderButton.onclick = () => this._onParentFolderSelect();
-        commandCell.appendChild(parentFolderButton);
+        commandElement.appendChild(parentFolderButton);
         if(this.action == fileAccessConstants.SAVE_ACTION) {
             let addFolderButton = document.createElement("button");
             addFolderButton.innerHTML = "+"
             addFolderButton.onclick = () => this._onCreateFolder();
-            commandCell.appendChild(addFolderButton);
+            commandElement.appendChild(addFolderButton);
         }
-
-        let filterWrapper = document.createElement("div");
-        filterWrapper.className = "oneDriveFileAccess_filterWrapper";
-        commandCell.appendChild(filterWrapper);
-        
-        let fileFilterLabel = document.createElement("span");
-        fileFilterLabel.innerHTML = "Show Files: "
-        filterWrapper.appendChild(fileFilterLabel);
-        let radioGroupName = apogeeutil.getUniqueString();
-        let allId = apogeeutil.getUniqueString();
-        let jsonId = apogeeutil.getUniqueString();
-
-        this.allRadio = document.createElement("input");
-        this.allRadio.type = "radio";
-        this.allRadio.name = radioGroupName;
-        this.allRadio.value = "all";
-        this.allRadio.onclick = () => this._onFilterChange();
-        filterWrapper.appendChild(this.allRadio);
-        let allRadioLabel = document.createElement("label");
-        allRadioLabel.for = allId;
-        allRadioLabel.innerHTML = "All";
-        filterWrapper.appendChild(allRadioLabel);
-
-        this.jsonRadio = document.createElement("input");
-        this.jsonRadio.type = "radio";
-        this.jsonRadio.name = radioGroupName;
-        this.jsonRadio.value = "json";
-        this.jsonRadio.onChange = () => this._onFilterChange();
-        filterWrapper.appendChild(this.jsonRadio);
-        let jsonRadioLabel = document.createElement("label");
-        jsonRadioLabel.for = jsonId;
-        jsonRadioLabel.innerHTML = "JSON";
-        filterWrapper.appendChild(jsonRadioLabel);
         
         //file display list
         let fileListCell = document.createElement("td");
@@ -630,28 +591,77 @@ class OneDriveFileSource {
         this.fileListTable.className = "oneDriveFileAccess_fileListTable";
         fileListCell.appendChild(this.fileListTable);
 
+        //file filter row
+        let filterCell = document.createElement("div");
+        filterCell.className = "oneDriveFileAccess_filterCell";
+        filterRow.appendChild(filterCell);
+        
+        let fileFilterLabel = document.createElement("span");
+        fileFilterLabel.innerHTML = "Show Files: "
+        filterCell.appendChild(fileFilterLabel);
+        let radioGroupName = apogeeutil.getUniqueString();
+        let allId = apogeeutil.getUniqueString();
+        let jsonId = apogeeutil.getUniqueString();
+        let jsonTextId = apogeeutil.getUniqueString();
+
+        this.allRadio = document.createElement("input");
+        this.allRadio.id = allId;
+        this.allRadio.type = "radio";
+        this.allRadio.name = radioGroupName;
+        this.allRadio.value = "all";
+        this.allRadio.checked = (this.filter == _allFilter);
+        this.allRadio.onclick = () => this._onFilterChange();
+        filterCell.appendChild(this.allRadio);
+        let allRadioLabel = document.createElement("label");
+        allRadioLabel.for = allId;
+        allRadioLabel.innerHTML = "All";
+        allRadioLabel.className = "oneDriveFileAccess_filterCheckboxLabel";
+        filterCell.appendChild(allRadioLabel);
+
+        this.jsonRadio = document.createElement("input");
+        this.jsonRadio.id = jsonId;
+        this.jsonRadio.type = "radio";
+        this.jsonRadio.name = radioGroupName;
+        this.jsonRadio.value = "json";
+        this.jsonRadio.checked = (this.filter == _jsonFilter);
+        this.jsonRadio.onclick = () => this._onFilterChange();
+        filterCell.appendChild(this.jsonRadio);
+        let jsonRadioLabel = document.createElement("label");
+        jsonRadioLabel.for = jsonId;
+        jsonRadioLabel.innerHTML = "JSON Only";
+        jsonRadioLabel.className = "oneDriveFileAccess_filterCheckboxLabel";
+        filterCell.appendChild(jsonRadioLabel);
+
+        this.jsonTextRadio = document.createElement("input");
+        this.jsonTextRadio.id = jsonTextId;
+        this.jsonTextRadio.type = "radio";
+        this.jsonTextRadio.name = radioGroupName;
+        this.jsonTextRadio.value = "jsontext";
+        this.jsonTextRadio.checked = (this.filter == _jsonTextFilter);
+        this.jsonTextRadio.onclick = () => this._onFilterChange();
+        filterCell.appendChild(this.jsonTextRadio);
+        let jsonTextRadioLabel = document.createElement("label");
+        jsonTextRadioLabel.for = jsonTextId;
+        jsonTextRadioLabel.innerHTML = "JSON & Text Only";
+        jsonTextRadioLabel.className = "oneDriveFileAccess_filterCheckboxLabel";
+        filterCell.appendChild(jsonTextRadioLabel);
+
         //file name entry
         let fileNameCell = document.createElement("td");
         fileNameCell.className = "oneDriveFileAccess_fileNameCell";
         fileNameRow.appendChild(fileNameCell);
 
-        let fileNameLabel = document.createElement("span");
-        fileNameLabel.className = "oneDriveFileAccess_fileNameLabel";
-        fileNameLabel.innerHTML = "File Name:";
-        fileNameCell.appendChild(fileNameLabel);
-
         if(this.action == fileAccessConstants.SAVE_ACTION) {
+            let fileNameLabel = document.createElement("span");
+            fileNameLabel.className = "oneDriveFileAccess_fileNameLabel";
+            fileNameLabel.innerHTML = "File Name:";
+            fileNameCell.appendChild(fileNameLabel);
+
             //save has a text field to enter file name
             this.saveFileNameField = document.createElement("input");
             this.saveFileNameField.type = "text";
             this.saveFileNameField.className = "oneDriveFileAccess_saveFileNameField";
             fileNameCell.appendChild(this.saveFileNameField);
-        }
-        else {
-            //on open file, we do not allow name edit, but we display then selected field
-            this.openFileNameField = document.createElement("span");
-            this.openFileNameField.className = "oneDriveFileAccess_openFileNameField";
-            fileNameCell.appendChild(this.openFileNameField);
         }
 
         //save/open, cancel buttons
@@ -659,11 +669,14 @@ class OneDriveFileSource {
         buttonsCell.className = "oneDriveFileAccess_buttonsCell";
         buttonsRow.appendChild(buttonsCell);
 
-        let submitButton = document.createElement("button");
-        submitButton.innerHTML = (this.action == fileAccessConstants.SAVE_ACTION) ? "Save": "Open";
-        submitButton.className = "oneDriveFileAccess_submitButton";
-        submitButton.onclick = (this.action == fileAccessConstants.SAVE_ACTION) ? () => this._onSavePress() : () => this._onOpenPress();
-        buttonsCell.appendChild(submitButton);
+        if(this.action == fileAccessConstants.SAVE_ACTION) {
+            let submitButton = document.createElement("button");
+            submitButton.innerHTML = "Save";
+            submitButton.className = "oneDriveFileAccess_submitButton";
+            submitButton.onclick = () => this._onSavePress();
+            buttonsCell.appendChild(submitButton);
+        }
+        
         let cancelButton = document.createElement("button");
         cancelButton.innerHTML = "Cancel";
         cancelButton.className = "oneDriveFileAccess_cancelButton";
@@ -737,10 +750,19 @@ class OneDriveFileSource {
         fileRow.appendChild(fileNameCell);
 
         let fileLink = document.createElement("a");
-        fileLink.className = "oneDriveFileAcess_fileLink";
         fileLink.innerHTML = fileInfo.name;
         fileLink.onclick = () => this._onFileClick(fileInfo);
         fileNameCell.appendChild(fileLink);
+
+        if(fileInfo.type == fileAccessConstants.FOLDER_TYPE) {
+            fileLink.className = "oneDriveFileAcess_fileLinkFolder";
+        }
+        else if(this.action == fileAccessConstants.OPEN_ACTION) {
+            fileLink.className = "oneDriveFileAcess_fileLinkFileOpen";
+        }
+        else if(this.action == fileAccessConstants.SAVE_ACTION) {
+            fileLink.className = "oneDriveFileAcess_fileLinkFileSave";
+        }
 
         let fileMimeCell = document.createElement("td");
         fileMimeCell.className = "oneDriveFileAccess_fileMimeCell";
@@ -779,3 +801,11 @@ class OneDriveFileSource {
 //These values are saved as defaults for the next time the dialog is used.
 let _cachedDriveId = null;
 let _cachedFolderId = null;
+
+//filters
+const JSON_MIME_TYPE = "application/json";
+const TEXT_MIME_TYPE = "text/plain";
+
+let _allFilter = fileInfo => true;
+let _jsonFilter = fileInfo => ((fileInfo.type == fileAccessConstants.FOLDER_TYPE)||(fileInfo.type == JSON_MIME_TYPE));
+let _jsonTextFilter = fileInfo => ((fileInfo.type == fileAccessConstants.FOLDER_TYPE)||(fileInfo.type == JSON_MIME_TYPE)||(fileInfo.type == TEXT_MIME_TYPE));

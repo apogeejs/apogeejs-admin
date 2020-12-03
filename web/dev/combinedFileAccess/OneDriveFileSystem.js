@@ -557,11 +557,13 @@ function _checkForChildPopupClose() {
 		//timeout
 		_clearPopup();
 		_clearLoginData();
+		_notifyLoginStateListeners();
     }
     else if(_popupWindow_.closed) {
 		_clearPopup();  
 		//treat this as a logout if the window is closed without us getting the login callback from the window
 		_clearLoginData();
+		_notifyLoginStateListeners();
     }
 }
 

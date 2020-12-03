@@ -17,7 +17,7 @@ export default class CombinedAccessDialog {
         this.mainContainer = null;
         this.actionElement = null;
         this.selectListElement = null;
-        this.selectedSourceCell = null;
+        this.selectedSourceElement = null;
         this.dialog = null;
 
         this.selectionElementMap = {};
@@ -58,59 +58,29 @@ export default class CombinedAccessDialog {
         this.mainContainer = document.createElement("table");
         this.mainContainer.className = "combinedFileAccess_mainContainer";
     
-        ////////////////////////////////////////
         let titleRow = document.createElement("tr");
         this.mainContainer.appendChild(titleRow);
         let bodyRow = document.createElement("tr");
         this.mainContainer.appendChild(bodyRow);
 
-        let driveCell = document.createElement("td");
-        driveCell.className = "combinedFileAccess_sourceListCell";
-        driveCell.rowSpan = 3;
-        titleRow.appendChild(driveCell);
+        let sourceCell = document.createElement("td");
+        sourceCell.className = "combinedFileAccess_sourceCell";
+        sourceCell.rowSpan = 3;
+        titleRow.appendChild(sourceCell);
 
         //selected source
-        this.selectedSourceCell = document.createElement("div");
-        this.selectedSourceCell.className = "combinedFileAccess_selectedSourceTitle";
-        driveCell.appendChild(this.selectedSourceCell);
+        this.selectedSourceElement = document.createElement("div");
+        this.selectedSourceElement.className = "combinedFileAccess_selectedSource";
+        sourceCell.appendChild(this.selectedSourceElement);
         
         let selectTitleElement = document.createElement("div");
-        selectTitleElement.className = "combinedFileAccess_selectTitleCell";
+        selectTitleElement.className = "combinedFileAccess_selectHeading";
         selectTitleElement.innerHTML = "Options:";
-        driveCell.appendChild(selectTitleElement);
+        sourceCell.appendChild(selectTitleElement);
 
         this.selectListElement = document.createElement("div");
         this.selectListElement.className = "combinedFileAccess_selectList";
-        driveCell.appendChild(this.selectListElement);
-        ///////////////////////////////////
-
-        // let sourceRow = document.createElement("tr");
-        // this.mainContainer.appendChild(sourceRow);
-        // let titleRow = document.createElement("tr");
-        // this.mainContainer.appendChild(titleRow);
-        // let bodyRow = document.createElement("tr");
-        // this.mainContainer.appendChild(bodyRow);
-    
-        // //source selection title
-        // let selectTitleCell = document.createElement("td");
-        // selectTitleCell.className = "combinedFileAccess_selectTitleCell";
-        // selectTitleCell.innerHTML = "File Source:";
-        // sourceRow.appendChild(selectTitleCell);
-    
-        // //selected source
-        // this.selectedSourceCell = document.createElement("td");
-        // this.selectedSourceCell.className = "combinedFileAccess_selectedSourceTitle";
-        // sourceRow.appendChild(this.selectedSourceCell);
-
-        // //source selection list
-        // let selectListCell = document.createElement("td");
-        // selectListCell.className = "combinedFileAccess_sourceListCell";
-        // selectListCell.rowSpan = 2;
-        // titleRow.appendChild(selectListCell);
-    
-        // this.selectListElement = document.createElement("div");
-        // this.selectListElement.className = "combinedFileAccess_selectList";
-        // selectListCell.appendChild(this.selectListElement);
+        sourceCell.appendChild(this.selectListElement);
 
         //title
         let title = (this.action == fileAccessConstants.SAVE_ACTION) ? "Save Workspace" : "Open Workspace";
@@ -216,7 +186,7 @@ export default class CombinedAccessDialog {
 
         uiutil.removeAllChildren(this.actionElement);
         this.actionElement.appendChild(newActiveSource.getActionElement());
-        this.selectedSourceCell.innerHTML = newActiveSource.getGenerator().getDisplayName();
+        this.selectedSourceElement.innerHTML = newActiveSource.getGenerator().getDisplayName();
 
         //store this to be the default next time the dialog is opened
         _cachedSourceId = newSourceId;
