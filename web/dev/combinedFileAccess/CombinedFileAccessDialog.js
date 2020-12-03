@@ -28,7 +28,7 @@ export default class CombinedAccessDialog {
     showDialog() {
 
         if(this.dialog) {
-            alert("Show dialog should only be called once on a given instance");
+            apogeeUserAlert("Show dialog should only be called once on a given instance");
             return;
         }
 

@@ -96,8 +96,10 @@ export default class OneDriveFileSystem {
 		});
     }
 
-	/** This method returns a promise containing the contents of the given folder. */
-    loadFolder(driveId,folderId) {
+	/** This method returns a promise containing the contents of the given folder. 
+	 * If the data is cached, it will return the cached data rather than requesting and parsing
+	 * it, unless force argument is set to true. */
+    loadFolder(driveId,folderId,forceReload) {
 		//check if we are not logged in
 		let loginInfo = this.getLoginInfo();
 		if(loginInfo.state == fileAccessConstants.LOGGED_OUT) {
@@ -107,22 +109,24 @@ export default class OneDriveFileSystem {
 		}
 
 		//check for valid cached info
-		let key = this._getCacheKey(driveId,folderId);
-		let cachedFileInfo = this.fileInfoMap[key];
-		let cachedAddedFolderInfo = this.addedFolderInfoMap[key];
+		if(!forceReload) {
+			let key = this._getCacheKey(driveId,folderId);
+			let cachedFileInfo = this.fileInfoMap[key];
+			let cachedAddedFolderInfo = this.addedFolderInfoMap[key];
 
-		if((cachedFileInfo)&&(cachedAddedFolderInfo)) {
-			//there are cases where we might not have complete path info. Check to fix that here.
-			this._testForPathUpdate(driveId,folderId,cachedAddedFolderInfo);
+			if((cachedFileInfo)&&(cachedAddedFolderInfo)) {
+				//there are cases where we might not have complete path info. Check to fix that here.
+				this._testForPathUpdate(driveId,folderId,cachedAddedFolderInfo);
 
-			let folderInfo = this._packageFolderInfo(cachedFileInfo,cachedAddedFolderInfo);
-			return Promise.resolve(folderInfo);
+				let folderInfo = this._packageFolderInfo(cachedFileInfo,cachedAddedFolderInfo);
+				return Promise.resolve(folderInfo);
+			}
 		}
 
 		//otherwise download the data
         return _getFolderInfoPromise(driveId,folderId).then(odFileInfo => {
-			let fileInfo = this._parseFileInfo(odFileInfo);
-			let addedFolderInfo = this._parseAddedFolderInfo(odFileInfo);
+			let fileInfo = this._parseFileInfo(odFileInfo,forceReload);
+			let addedFolderInfo = this._parseAddedFolderInfo(odFileInfo,forceReload);
 
 			return this._packageFolderInfo(fileInfo,addedFolderInfo); 
 		});
@@ -139,13 +143,17 @@ export default class OneDriveFileSystem {
 		}
 
         return _createFileUpload(driveId,folderId,fileName,data).then(response => {
-			let fileInfo = this._parseFileInfo(response);
+			let fileInfo = this._parseFileInfo(response,true);
 			return {
 				source: OneDriveFileSystem.SOURCE_ID,
 				name: fileInfo.name,
 				fileInfo: fileInfo
 			}
 		});
+
+		//TODO handle case of a collision
+		//we will check for a collision based on local information. If we find a collision we will query the user and then will allow overwrite.
+		//if we did not detect a collision locally then we want to get an error rather than overwrite (at which point the ui will handle it)
     }
 
 	/** This method creates a file. It returns a promise with the fileInfo for the updated file. */
@@ -159,7 +167,7 @@ export default class OneDriveFileSystem {
 		}
 
         return _updateFileUpload(driveId,fileId,data).then(response => {
-			let fileInfo = this._parseFileInfo(response);
+			let fileInfo = this._parseFileInfo(response,true);
 			return {
 				source: OneDriveFileSystem.SOURCE_ID,
 				name: fileInfo.name,
@@ -198,6 +206,18 @@ export default class OneDriveFileSystem {
 		});
 	}
 
+	createFolder(driveId,parentFileId,fileName) {
+		//implement this - it should not allow if there is a file with this name
+	}
+
+	renameFile(driveId,fileId,fileName) {
+		//implement - it should not allow if there is a file of this name
+	}
+
+	deleteFile(driveId,fileId) {
+
+	}
+
 	/** This should be called when this instance is no longer in use. */
 	close() {
 		if(this.loginStateListener) {
@@ -223,13 +243,18 @@ export default class OneDriveFileSystem {
 		}
 	}
 
-	_parseFileInfo(odFileInfo) {
+	/** This method parses the file info. If the file info is already present it will not reparse unless
+	 * the forceReparse flag is set. */
+	_parseFileInfo(odFileInfo,forceReparse) {
 		//check if we should used a saved copy of this data
 		let driveId = odFileInfo.parentReference.driveId;
 		let fileId = odFileInfo.id;
 		let key = this._getCacheKey(driveId,fileId);
 
-		let fileInfo = this.fileInfoMap[key];
+		let fileInfo;
+		if(!forceReparse) {
+			fileInfo = this.fileInfoMap[key];
+		}
 
 		if(!fileInfo) {
 			//parse the file info
@@ -264,18 +289,24 @@ export default class OneDriveFileSystem {
 		return fileInfo;
 	}
 
-	_parseAddedFolderInfo(odFileInfo) {
+	/** This method parses the added folder info. If the file info is already present it will not reparse unless
+	 * the forceReparse flag is set. */
+	_parseAddedFolderInfo(odFileInfo,forceReparse) {
 		//check id we can use a saved copy
 		let driveId = odFileInfo.parentReference.driveId;
 		let fileId = odFileInfo.id;
 		let key = this._getCacheKey(driveId,fileId);
 
-		let addedFolderInfo = this.addedFolderInfoMap[key];
+		let addedFolderInfo;
+		if(!forceReparse) {
+			addedFolderInfo = this.addedFolderInfoMap[key];
+		}
+
 		if(!addedFolderInfo) {
 			addedFolderInfo = {};
 			//get the child file infos
 			if(odFileInfo.children) {
-				addedFolderInfo.children = odFileInfo.children.map(childFileInfo => this._parseFileInfo(childFileInfo));
+				addedFolderInfo.children = odFileInfo.children.map(childFileInfo => this._parseFileInfo(childFileInfo,forceReparse));
 			}
 			else {
 				//I am not sure this is correct. Investigate if possible
@@ -534,7 +565,7 @@ function _openPopup(url,isLogin) {
 
 	_popupWindow_ = window.open(url, "oauth", features.join(","));
 	if (!_popupWindow_) {
-		alert("failed to pop up auth window");
+		apogeeUserAlert("failed to pop up auth window");
 		_clearLoginData();
 		_notifyLoginStateListeners();
 		return;

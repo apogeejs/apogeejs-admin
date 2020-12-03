@@ -209,10 +209,6 @@ class OneDriveFileSource {
         this._populateFileList();    
     }
 
-    _onCreateFolder() {
-
-    }
-
     _onFileClick(fileInfo) {
         //select element
         let selectedFileId = fileInfo.fileId;
@@ -235,26 +231,72 @@ class OneDriveFileSource {
     }
 
     _onFileDelete(fileInfo) {
-
+        apogeeUserAlert("Not implemented!");
+    //     let objectType = (fileInfo.type == fileAccessConstants.FOLDER_TYPE) ? "folder" : "file";
+    //     let okAction = () =>{
+    //         let deletePromise = this.remoteFileSystem.deleteFile(this.selectedDriveId,fileInfo.fileId);
+    //         deletePromise.then( response => {
+    //             //reload folder
+    //             this._loadFolder(this.selectedDriveId,this.folderInfo.folder.fileId);
+    //         }).catch(errorMsg => {
+    //             apogeeUserAlert("There was an error deleting the " + objectType + ": " + errorMsg);
+    //         })
+    //     }
+    //     apogeeUserConfirm("Are you sure you want to delete the " + objectType + ": " + fileInfo.name + "?","Delete","Cancel",okAction,null,true);
     }
 
-    _onFileRename(fileInfo,newFileName) {
+    _onFileRename(fileInfo) {
+        apogeeUserAlert("Not implemented!");
+    //     let objectType = (fileInfo.type == fileAccessConstants.FOLDER_TYPE) ? "folder" : "file";
+    //     let okAction = fileName =>{
+    //         if(?_fileExists(fileName,this.folderInfo)) {
+    //             apogeeUserAlert("That name is already in use: " + fileName);
+    //         }
+    //         else {
+    //             let renamePromise = this.remoteFileSystem.renameFile(this.selectedDriveId,fileInfo.fileId,fileName);
+    //             renamePromise.then( response => {
+    //                 //reload folder
+    //                 this._loadFolder(this.selectedDriveId,this.folderInfo.folder.fileId);
+    //             }).catch(errorMsg => {
+    //                 apogeeUserAlert("There was an error renaming the " + objectType + ": " + errorMsg);
+    //             })
+    //         }
+    //     }
+    //     ?_getUserInput("What is the new name for the " + objectType + ": " + fileInfo.name + "?","Rename","Cancel",okAction,null,true);
+    }
 
+    _onCreateFolder() {
+        apogeeUserAlert("Not implemented!");
+    //     let okAction = fileName =>{
+    //         if(?_fileExists(fileName,this.folderInfo)) {
+    //             apogeeUserAlert("That name is already in use: " + fileName);
+    //         }
+    //         else {
+    //             let createFolderPromise = this.remoteFileSystem.createFolder(this.selectedDriveId,this.folderInfo.folder.fileId,fileName);
+    //             renamePromise.then( response => {
+    //                 //reload folder
+    //                 this._loadFolder(this.selectedDriveId,this.folderInfo.folder.fileId);
+    //             }).catch(errorMsg => {
+    //                 apogeeUserAlert("There was an error creating the folder: " + errorMsg);
+    //             })
+    //         }
+    //     }
+    //     ?_getUserInput("What is the name for the folder?","Create","Cancel",okAction,null,true);
     }
 
     _onSavePress() {
         if(!this.selectedDriveId) {
-            alert("There is no selected drive!");
+            apogeeUserAlert("There is no selected drive!");
             return;
         }
         if((!this.folderInfo)||(!this.folderInfo.folder)) {
-            alert("There is no selected folder!");
+            apogeeUserAlert("There is no selected folder!");
             return;
         }
         let folderId = this.folderInfo.folder.fileId;
         let fileName = this.saveFileNameField.value.trim();
         if(fileName.length === 0) {
-            alert("No file name is entered");
+            apogeeUserAlert("No file name is entered");
         }
 
         this.createFile(this.selectedDriveId,folderId,fileName);
@@ -402,12 +444,12 @@ class OneDriveFileSource {
         
     }
 
-    _loadFolder(driveId, folderId) {
-        let filesInfoPromise = this.remoteFileSystem.loadFolder(driveId,folderId);
+    _loadFolder(driveId, folderId, forceReload) {
+        let filesInfoPromise = this.remoteFileSystem.loadFolder(driveId,folderId,forceReload);
         filesInfoPromise.then(folderInfo => {
             this._setFilesInfo(folderInfo);
         }).catch(errorMsg => {
-            alert("Error opening folder: " + errorMsg);
+            apogeeUserAlert("Error opening folder: " + errorMsg);
             this._setFilesInfo(null);
             //if we failed to find the folder, try to open the root of the given drive
             if(folderId) {
@@ -479,7 +521,7 @@ class OneDriveFileSource {
             this._setDrivesInfo(drivesInfo);
         }).catch(errorMsg => {
             //figure out what to do here
-            alert("Error loading drive info: " + errorMsg)
+            apogeeUserAlert("Error loading drive info: " + errorMsg)
         })
     }
 
@@ -662,6 +704,11 @@ class OneDriveFileSource {
             this.saveFileNameField.type = "text";
             this.saveFileNameField.className = "oneDriveFileAccess_saveFileNameField";
             fileNameCell.appendChild(this.saveFileNameField);
+
+            if((this.initialFileMetadata)&&(this.initialFileMetadata.name)) {
+                //initialize name if it is available
+                this.saveFileNameField.value = this.initialFileMetadata.name
+            }
         }
 
         //save/open, cancel buttons
@@ -776,10 +823,12 @@ class OneDriveFileSource {
         let renameButton = document.createElement("button");
         renameButton.className = "oneDriveFileAccess_renameButton";
         renameButton.innerHTML = "Rename";
+        renameButton.onclick = () => this._onFileRename(fileInfo);
         fileCmdCell.appendChild(renameButton);
         let deleteButton = document.createElement("button");
         deleteButton.className = "oneDriveFileAccess_deleteButton";
         deleteButton.innerHTML = "Delete";
+        deleteButton.onclick = () => this._onFileDelete(fileInfo);
         fileCmdCell.appendChild(deleteButton);
         /////////////////////////
         
