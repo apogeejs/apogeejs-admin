@@ -54,7 +54,7 @@ export function showSimpleActionDialog(title,msg,buttonTextList,buttonActionList
         let buttonLabel = buttonTextList[i];
         let buttonAction = () => {
             //include the action if one is specified
-            if((buttonActionList)&&(buttonActionList.length > 1)) buttonActionList[i]();
+            if((buttonActionList)&&(buttonActionList.length > i)&&(buttonActionList[i])) buttonActionList[i]();
             dialogMgr.closeDialog(dialog);
         }
         line.appendChild(uiutil.createElement("button",{"className":"dialogButton","innerHTML":buttonLabel,"onclick":buttonAction}));

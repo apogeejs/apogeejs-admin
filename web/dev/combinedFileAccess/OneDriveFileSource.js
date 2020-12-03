@@ -2,6 +2,7 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {uiutil}  from "/apogeeui/apogeeUiLib.js";
 import OneDriveFileSystem from "./OneDriveFileSystem.js";
 import * as fileAccessConstants from "./fileAccessConstants.js";
+import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 
 let OneDriveFileSourceGenerator = {
     getSourceId: function() {
@@ -231,57 +232,80 @@ class OneDriveFileSource {
     }
 
     _onFileDelete(fileInfo) {
-        apogeeUserAlert("Not implemented!");
-    //     let objectType = (fileInfo.type == fileAccessConstants.FOLDER_TYPE) ? "folder" : "file";
-    //     let okAction = () =>{
-    //         let deletePromise = this.remoteFileSystem.deleteFile(this.selectedDriveId,fileInfo.fileId);
-    //         deletePromise.then( response => {
-    //             //reload folder
-    //             this._loadFolder(this.selectedDriveId,this.folderInfo.folder.fileId);
-    //         }).catch(errorMsg => {
-    //             apogeeUserAlert("There was an error deleting the " + objectType + ": " + errorMsg);
-    //         })
-    //     }
-    //     apogeeUserConfirm("Are you sure you want to delete the " + objectType + ": " + fileInfo.name + "?","Delete","Cancel",okAction,null,true);
+        let objectType = (fileInfo.type == fileAccessConstants.FOLDER_TYPE) ? "folder" : "file";
+        let okAction = () =>{
+            let deletePromise = this.remoteFileSystem.deleteFile(this.selectedDriveId,fileInfo.fileId);
+            deletePromise.then( response => {
+                //reload folder
+                this._loadFolder(this.selectedDriveId,this.folderInfo.folder.fileId,true);
+            }).catch(errorMsg => {
+                apogeeUserAlert("There was an error deleting the " + objectType + ": " + errorMsg);
+            })
+        }
+        apogeeUserConfirm("Are you sure you want to delete the " + objectType + ": " + fileInfo.name + "?","Delete","Cancel",okAction,null,true);
     }
 
     _onFileRename(fileInfo) {
-        apogeeUserAlert("Not implemented!");
-    //     let objectType = (fileInfo.type == fileAccessConstants.FOLDER_TYPE) ? "folder" : "file";
-    //     let okAction = fileName =>{
-    //         if(?_fileExists(fileName,this.folderInfo)) {
-    //             apogeeUserAlert("That name is already in use: " + fileName);
-    //         }
-    //         else {
-    //             let renamePromise = this.remoteFileSystem.renameFile(this.selectedDriveId,fileInfo.fileId,fileName);
-    //             renamePromise.then( response => {
-    //                 //reload folder
-    //                 this._loadFolder(this.selectedDriveId,this.folderInfo.folder.fileId);
-    //             }).catch(errorMsg => {
-    //                 apogeeUserAlert("There was an error renaming the " + objectType + ": " + errorMsg);
-    //             })
-    //         }
-    //     }
-    //     ?_getUserInput("What is the new name for the " + objectType + ": " + fileInfo.name + "?","Rename","Cancel",okAction,null,true);
+        let objectType = (fileInfo.type == fileAccessConstants.FOLDER_TYPE) ? "folder" : "file";
+        let oldName = fileInfo.name;
+
+        let okAction = formResult =>{
+            let fileName = formResult.name;
+            if(!fileName) {
+                apogeeUserAlert("A name must be entered");
+                return false;
+            }
+            if(fileName == oldName) {
+                //no name change
+                return true;
+            }
+            if(this._fileExists(fileName,this.folderInfo)) {
+                //notify user and keep dialog opened
+                apogeeUserAlert("That name is already in use: " + fileName);
+                return false;
+            }
+            else {
+                let renameFilePromise = this.remoteFileSystem.renameFile(this.selectedDriveId,fileInfo.fileId,fileName);
+                renameFilePromise.then( response => {
+                    //reload folder
+                    this._loadFolder(this.selectedDriveId,this.folderInfo.folder.fileId,true);
+                }).catch(errorMsg => {
+                    apogeeUserAlert("There was an error renaming the file: " + errorMsg);
+                })
+                //close dialog
+                return true;
+            }
+        }
+        let title = `What is the name for the ${objectType}?`;
+        _showTextQueryDialog(title,"Name",oldName,okAction);
     }
 
     _onCreateFolder() {
-        apogeeUserAlert("Not implemented!");
-    //     let okAction = fileName =>{
-    //         if(?_fileExists(fileName,this.folderInfo)) {
-    //             apogeeUserAlert("That name is already in use: " + fileName);
-    //         }
-    //         else {
-    //             let createFolderPromise = this.remoteFileSystem.createFolder(this.selectedDriveId,this.folderInfo.folder.fileId,fileName);
-    //             renamePromise.then( response => {
-    //                 //reload folder
-    //                 this._loadFolder(this.selectedDriveId,this.folderInfo.folder.fileId);
-    //             }).catch(errorMsg => {
-    //                 apogeeUserAlert("There was an error creating the folder: " + errorMsg);
-    //             })
-    //         }
-    //     }
-    //     ?_getUserInput("What is the name for the folder?","Create","Cancel",okAction,null,true);
+        let okAction = formResult =>{
+            let fileName = formResult.name;
+            if(!fileName) {
+                apogeeUserAlert("A folder name must be entered");
+                return false;
+            }
+            if(this._fileExists(fileName,this.folderInfo)) {
+                //notify user and keep dialog opened
+                apogeeUserAlert("That name is already in use: " + fileName);
+                return false;
+            }
+            else {
+                let createFolderPromise = this.remoteFileSystem.createFolder(this.selectedDriveId,this.folderInfo.folder.fileId,fileName);
+                createFolderPromise.then( response => {
+                    //reload folder
+                    this._loadFolder(this.selectedDriveId,this.folderInfo.folder.fileId,true);
+                }).catch(errorMsg => {
+                    apogeeUserAlert("There was an error creating the folder: " + errorMsg);
+                })
+                //close dialog
+                return true;
+            }
+        }
+        let title = "What is the name for the folder?";
+        _showTextQueryDialog(title,"Folder Name","",okAction);
     }
 
     _onSavePress() {
@@ -299,7 +323,15 @@ class OneDriveFileSource {
             apogeeUserAlert("No file name is entered");
         }
 
-        this.createFile(this.selectedDriveId,folderId,fileName);
+        let doAction = () => this.createFile(this.selectedDriveId,folderId,fileName);
+
+        if(this._fileExists(fileName,this.folderInfo)) {
+            let msg = "There is already a file with that name. Replace it?";
+            apogeeUserConfirm(msg,"Replace","Cancel",doAction);
+        }
+        else {
+            doAction();
+        }
     }
 
     _onCancelPress() {
@@ -523,6 +555,15 @@ class OneDriveFileSource {
             //figure out what to do here
             apogeeUserAlert("Error loading drive info: " + errorMsg)
         })
+    }
+
+    _fileExists(fileName,folderInfo) {
+        if(folderInfo.children) {
+            return folderInfo.children.some(childInfo => (childInfo.name == fileName));
+        }
+        else {
+            return false;
+        }
     }
 
     //--------------------
@@ -819,7 +860,7 @@ class OneDriveFileSource {
         let fileCmdCell = document.createElement("td");
         fileCmdCell.className = "oneDriveFileAccess_fileCmdCell";
         fileRow.appendChild(fileCmdCell);
-        /////////////////////////
+
         let renameButton = document.createElement("button");
         renameButton.className = "oneDriveFileAccess_renameButton";
         renameButton.innerHTML = "Rename";
@@ -830,7 +871,7 @@ class OneDriveFileSource {
         deleteButton.innerHTML = "Delete";
         deleteButton.onclick = () => this._onFileDelete(fileInfo);
         fileCmdCell.appendChild(deleteButton);
-        /////////////////////////
+
         
         this.fileElementMap[fileInfo.fileId] = fileRow;
 
@@ -858,3 +899,27 @@ const TEXT_MIME_TYPE = "text/plain";
 let _allFilter = fileInfo => true;
 let _jsonFilter = fileInfo => ((fileInfo.type == fileAccessConstants.FOLDER_TYPE)||(fileInfo.type == JSON_MIME_TYPE));
 let _jsonTextFilter = fileInfo => ((fileInfo.type == fileAccessConstants.FOLDER_TYPE)||(fileInfo.type == JSON_MIME_TYPE)||(fileInfo.type == TEXT_MIME_TYPE));
+
+
+/** This  function shows a dialog with a title and an input text field. It has a submit button
+ * and a cancel button. The submit button action should be specified. By default the cancel button
+ * just closes the dialog but an additional action can optionally be specified.
+ */
+function _showTextQueryDialog(title,textFieldLabel,initialValue,onSubmit,optionalOnCancel) {
+    let layout = [
+        {
+            type: "heading",
+            text: title,
+            level: 3
+        },
+        {
+            type: "textField",
+            label: textFieldLabel + ": ",
+            size: 40,
+            key: "name",
+            value: initialValue,
+            focus: true
+        }
+    ]
+    showConfigurableDialog(layout,onSubmit,optionalOnCancel);
+}

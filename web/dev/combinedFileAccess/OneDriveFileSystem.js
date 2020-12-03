@@ -142,7 +142,7 @@ export default class OneDriveFileSystem {
 			return Promise.reject("User is not currently logged in");
 		}
 
-        return _createFileUpload(driveId,folderId,fileName,data).then(response => {
+        return _createFileRequest(driveId,folderId,fileName,data).then(response => {
 			let fileInfo = this._parseFileInfo(response,true);
 			return {
 				source: OneDriveFileSystem.SOURCE_ID,
@@ -156,7 +156,11 @@ export default class OneDriveFileSystem {
 		//if we did not detect a collision locally then we want to get an error rather than overwrite (at which point the ui will handle it)
     }
 
-	/** This method creates a file. It returns a promise with the fileInfo for the updated file. */
+	/** This method creates a file. It returns a promise with the fileInfo for the updated file. This will overwrite an existing file.
+	 * Possible future change: allow the user to specify if the user "OK'd" the overwrite of an existing file, for example based on a check of 
+	 * file names with local information. In this case a flag can be set to allow an overwrite. If the user did not ok the overwrite (such as
+	 * because there was no local information specifying a collision) then we shoul dhave the request fail if there is a collision with
+	 * files on the server.	*/
     updateFile(driveId,fileId,data) {
 		//check if we are not logged in
 		let loginInfo = this.getLoginInfo();
@@ -166,7 +170,7 @@ export default class OneDriveFileSystem {
 			return Promise.reject("User is not currently logged in");
 		}
 
-        return _updateFileUpload(driveId,fileId,data).then(response => {
+        return _updateFileRequest(driveId,fileId,data).then(response => {
 			let fileInfo = this._parseFileInfo(response,true);
 			return {
 				source: OneDriveFileSystem.SOURCE_ID,
@@ -206,16 +210,52 @@ export default class OneDriveFileSystem {
 		});
 	}
 
+	/** This createsa folder with the given name. It will fail if that name is already in use. */
 	createFolder(driveId,parentFileId,fileName) {
-		//implement this - it should not allow if there is a file with this name
+		//check if we are not logged in
+		let loginInfo = this.getLoginInfo();
+		if(loginInfo.state == fileAccessConstants.LOGGED_OUT) {
+			//just re-notify this listener
+			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
+			return Promise.reject("User is not currently logged in");
+		}
+
+        return _createFolderRequest(driveId,parentFileId,fileName).then(response => {
+			//check out response!!!
+			return true;
+		});
 	}
 
+	/** This renames the given file. It will fail if there is an existing file with the given name. */
 	renameFile(driveId,fileId,fileName) {
-		//implement - it should not allow if there is a file of this name
+		//check if we are not logged in
+		let loginInfo = this.getLoginInfo();
+		if(loginInfo.state == fileAccessConstants.LOGGED_OUT) {
+			//just re-notify this listener
+			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
+			return Promise.reject("User is not currently logged in");
+		}
+
+        return _renameFileRequest(driveId,fileId,fileName).then(response => {
+			//check out response!!!
+			return true;
+		});
 	}
 
+	/** This deletes the given file. */
 	deleteFile(driveId,fileId) {
+		//check if we are not logged in
+		let loginInfo = this.getLoginInfo();
+		if(loginInfo.state == fileAccessConstants.LOGGED_OUT) {
+			//just re-notify this listener
+			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
+			return Promise.reject("User is not currently logged in");
+		}
 
+        return _deleteFileRequest(driveId,fileId).then(response => {
+			//check out response!!!
+			return true;
+		});
 	}
 
 	/** This should be called when this instance is no longer in use. */
@@ -620,7 +660,13 @@ function _cancelPopup() {
 function _lookupUserAccount() {
 	let userInfoPromise = _getUserInfoPromise();
 	userInfoPromise.then(userInfo => {
-		console.log(JSON.stringify(userInfo));
+		let accountName = userInfo.userPrincipalName;
+		//if we have an account name and the user is still logged in, update the login
+		//info with the user name.
+		if((accountName)&&(_loginInfo_.state == fileAccessConstants.LOGGED_IN)) {
+			_loginInfo_.accountName = accountName;
+			_notifyLoginStateListeners();
+		}
 	}).catch(errorMsg => {
 		console.log("Error loading user info: " + errorMsg);
 	})
@@ -686,7 +732,7 @@ function _getFolderInfoPromise(driveId,fileId) {
 
 }
 
-function _createFileUpload(driveId,parentFileId,fileName,data) {
+function _createFileRequest(driveId,parentFileId,fileName,data) {
 	let token = _getToken();
 
 	let options = {
@@ -704,7 +750,7 @@ function _createFileUpload(driveId,parentFileId,fileName,data) {
 	return apogeeutil.jsonRequest(requestUrl,options);
 }
 
-function _updateFileUpload(driveId,fileId,data) {
+function _updateFileRequest(driveId,fileId,data) {
 	let token = _getToken();
 
 	let options = {
@@ -720,4 +766,65 @@ function _updateFileUpload(driveId,fileId,data) {
 	
 	let requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${fileId}/content`;
 	return apogeeutil.jsonRequest(requestUrl,options);
+}
+
+function _renameFileRequest(driveId,fileId,fileName) {
+	let token = _getToken();
+
+	let newFileInfo = {
+		"name": fileName
+	}
+
+	//"@microsoft.graph.conflictBehavior": "fail"
+
+	let options = {
+		header: { 
+			"Authorization": "Bearer " + token,
+			"Content-Type": "application/json"
+		},
+		method: "PATCH",
+		body: JSON.stringify(newFileInfo)
+	};
+	
+	let requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${fileId}?@microsoft.graph.conflictBehavior=fail`;
+	return apogeeutil.textRequest(requestUrl,options);
+}
+
+function _createFolderRequest(driveId,parentFileId,fileName) {
+	let token = _getToken();
+
+	let newFileInfo = {
+		"name": fileName,
+		"folder": { },
+		"@microsoft.graph.conflictBehavior": "fail"
+	}
+
+	let options = {
+		header: { 
+			"Authorization": "Bearer " + token,
+			"Content-Type": "application/json"
+		},
+		method: "POST",
+		body: JSON.stringify(newFileInfo)
+	};
+	
+	
+	let requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${parentFileId}/children`;
+	return apogeeutil.textRequest(requestUrl,options);
+}
+
+function _deleteFileRequest(driveId,fileId) {
+	let token = _getToken();
+
+	let options = {
+		header: { 
+			"Authorization": "Bearer " + token,
+			"Accept": "application/json;odata.metadata=none"
+		},
+		method: "DELETE",
+	};
+	
+	
+	let requestUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${fileId}`;
+	return apogeeutil.textRequest(requestUrl,options);
 }
