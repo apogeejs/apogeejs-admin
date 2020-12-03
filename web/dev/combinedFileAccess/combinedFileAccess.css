@@ -48,7 +48,7 @@
 
 .combinedFileAccess_selectionWrapper {
     position: relative;
-    padding: 5px;
+    padding: 10px 5px;
     outline: 1px solid rgb(128,128,128);
 }
 
@@ -65,7 +65,8 @@
 }
 
 .combinedFileAccess_selectionTitle {
-
+    font-weight: bold;
+    color: rgb(96,96,96);
 }
 
 .combinedFileAccess_selectionIcon {
@@ -82,14 +83,28 @@
 .oneDriveFileAccess_configContainer {
 
 }
-.oneDriveFileAccess_loginElement {
-
-}
 .oneDriveFileAccess_userElement {
 
 }
-.oneDriveFileAccess_logoutElement {
+.oneDriveFileAccess_loginoutContainer {
+    text-align: right;
+}
+.oneDriveFileAccess_loginElement {
+    font-size: smaller;
+    color: rgb(64,64,64);
+    text-decoration: underline;
+}
+.oneDriveFileAccess_loginElement:hover {
+    background-color: rgba(128,128,144,.35);
 
+}
+.oneDriveFileAccess_logoutElement {
+    font-size: smaller;
+    color: rgb(64,64,64);
+    text-decoration: underline;
+}
+.oneDriveFileAccess_logoutElement:hover {
+    background-color: rgba(128,128,144,.35);
 }
 
 .oneDriveFileAccess_accountMsgElement {
@@ -124,7 +139,7 @@
 .oneDriveFileAccess_driveElement {
     position: relative;
     outline: 1px solid rgb(128,128,128);
-    padding: 5px;
+    padding: 10px 5px;
 }
 
 .oneDriveFileAccess_driveElement:hover {
@@ -209,6 +224,17 @@
     color: gray;
     font-weight: bold;
     word-break: keep-all;
+}
+
+.oneDriveFileAccess_folderCommandButton {
+    padding: 2px;
+    border: none;
+    margin: 2px;
+    border: 1px solid rgba(128,128,144,0);
+}
+.oneDriveFileAccess_folderCommandButton:hover {
+    background-color: rgba(128,128,144,.35);
+    border: 1px solid rgb(64,64,64);
 }
 
 .oneDriveFileAccess_fileListTable {

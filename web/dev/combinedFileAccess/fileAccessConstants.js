@@ -41,3 +41,6 @@ export const ICON_MAP = {
 };
 
 export const DEFAULT_MIME_ICON = "/oldIcons/genericIcon.png"; 
+
+export const PARENT_FOLDER_IMAGE = "/icons3/parentfolder.png";
+export const ADD_FOLDER_IMAGE = "/icons3/addfolder.png";

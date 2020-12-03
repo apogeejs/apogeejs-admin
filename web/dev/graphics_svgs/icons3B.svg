@@ -62,16 +62,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.24501716"
-     inkscape:cx="-339.44313"
-     inkscape:cy="-327.64226"
+     inkscape:zoom="1.5105694"
+     inkscape:cx="-2123.698"
+     inkscape:cy="255.05965"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g4671"
      showgrid="false"
      inkscape:snap-grids="true"
      inkscape:snap-to-guides="false"
      inkscape:snap-nodes="true"
-     inkscape:snap-global="true"
+     inkscape:snap-global="false"
      inkscape:object-paths="true"
      inkscape:object-nodes="true"
      inkscape:snap-smooth-nodes="true"
@@ -82,7 +82,8 @@
      inkscape:window-maximized="1"
      inkscape:snap-bbox="true"
      inkscape:snap-text-baseline="false"
-     inkscape:snap-object-midpoints="true" />
+     inkscape:snap-object-midpoints="true"
+     inkscape:snap-intersection-paths="true" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -145,34 +146,20 @@
            y="1878.737060547"
            style="-inkscape-font-specification:Arial;font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal" /></flowRegion><flowPara
          id="flowPara8045" /></flowRoot>    <g
-       id="g4743"
-       transform="translate(-917.22989,-1698.8649)"
-       inkscape:export-filename="C:\Dave\dev\github\hax_code\master\ApogeeJS\web\resources\icons3\folderIcon.png"
-       inkscape:export-xdpi="7.2642584"
-       inkscape:export-ydpi="7.2642584">
-      <g
-         transform="matrix(1.6656319,0,0,1.2891667,-2479.5398,-431.39893)"
-         id="g8084">
-        <path
-           style="fill:#ffeeaa;fill-opacity:1;stroke:#b0b0b0;stroke-width:5.45941305;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           d="m 1590.9041,2100.0743 0,-81.145 59.6513,-0.306 6.529,-14.549 33.8197,0 4,14.549 0,81.451 z"
-           id="path4865-1"
-           inkscape:connector-curvature="0"
-           sodipodi:nodetypes="cccccccc" />
-        <path
-           style="fill:none;stroke:#b0b0b0;stroke-width:5.45941305;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           d="m 1650.5554,2018.6233 44.3487,0"
-           id="path7918"
-           inkscape:connector-curvature="0"
-           sodipodi:nodetypes="cc" />
-      </g>
-      <rect
-         y="2120.7856"
-         x="159.07008"
-         height="198.13081"
-         width="196.65059"
-         id="rect4357"
-         style="opacity:0.753;fill:none;fill-opacity:0.25287356;stroke:#000000;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       id="g8084"
+       transform="matrix(1.6656319,0,0,1.2891667,-4510.9774,-1469.0856)">
+      <path
+         sodipodi:nodetypes="cccccccc"
+         inkscape:connector-curvature="0"
+         id="path4865-1"
+         d="m 1590.9041,2100.0743 0,-81.145 59.6513,-0.306 6.529,-14.549 33.8197,0 4,14.549 0,81.451 z"
+         style="fill:#ffeeaa;fill-opacity:1;stroke:#b0b0b0;stroke-width:5.45941305;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path7918"
+         d="m 1650.5554,2018.6233 44.3487,0"
+         style="fill:none;stroke:#b0b0b0;stroke-width:5.45941305;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     </g>
     <g
        id="g4739"
@@ -1756,5 +1743,197 @@
          id="tspan4545"
          x="113.25738"
          y="851.35583">error page</tspan></text>
-  </g>
+    <g
+       transform="translate(-3445.5157,-633.19192)"
+       id="g8084-6">
+      <path
+         sodipodi:nodetypes="cccccccc"
+         inkscape:connector-curvature="0"
+         id="path4865-1-3"
+         d="m 1590.9041,2100.0743 0,-81.145 59.6513,-0.306 6.529,-14.549 33.8197,0 4,14.549 0,81.451 z"
+         style="fill:#ffeeaa;fill-opacity:1;stroke:#b0b0b0;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path7918-4"
+         d="m 1650.5554,2018.6233 44.3487,0"
+         style="fill:none;stroke:#b0b0b0;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <rect
+       inkscape:export-ydpi="9.0000019"
+       inkscape:export-xdpi="9.0000019"
+       inkscape:export-filename="C:\Dave\dev\github\ApogeeJS\web\resources\icons3\folderIcon.png"
+       style="opacity:0.753;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4357"
+       width="159.89999"
+       height="159.89999"
+       x="-1783.2854"
+       y="603.40936" />
+    <g
+       style="fill:#ffeeaa;fill-opacity:1;stroke:#808080;stroke-width:1.07345045;stroke-opacity:1"
+       transform="matrix(1.4615385,0,0,1.2707551,-4104.503,-1924.3244)"
+       id="g8084-6-4">
+      <path
+         sodipodi:nodetypes="cccccccc"
+         inkscape:connector-curvature="0"
+         id="path4865-1-3-0"
+         d="m 1590.9041,2100.0743 0,-81.145 59.6513,-0.306 6.529,-14.549 33.8197,0 4,14.549 0,81.451 z"
+         style="fill:#ffeeaa;fill-opacity:1;stroke:#808080;stroke-width:5.87021399;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path7918-4-1"
+         d="m 1650.5554,2018.6233 44.3487,0"
+         style="fill:#ffeeaa;fill-opacity:1;stroke:#808080;stroke-width:5.87021399;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:30px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="-1833.1407"
+       y="1195.1323"
+       id="text4492"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4494"
+         x="-1833.1407"
+         y="1195.1323">old</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:30px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="-1823.4379"
+       y="1420.3765"
+       id="text4496"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4498"
+         x="-1823.4379"
+         y="1420.3765">old</tspan></text>
+    <g
+       id="g4671"
+       inkscape:export-filename="C:\Dave\dev\github\ApogeeJS\web\resources\icons3\parentFolder.png"
+       inkscape:export-xdpi="9.0380926"
+       inkscape:export-ydpi="9.0380926">
+      <g
+         id="g8084-6-4-17"
+         transform="matrix(1.4615385,0,0,1.2707551,-4617.5503,-1971.7208)"
+         style="fill:#ffeeaa;fill-opacity:1;stroke:#808080;stroke-width:1.07345045;stroke-opacity:1"
+         inkscape:export-filename="C:\Dave\dev\github\ApogeeJS\web\resources\icons3\parentFolder.png"
+         inkscape:export-xdpi="9.0380926"
+         inkscape:export-ydpi="9.0380926">
+        <path
+           style="fill:#ffeeaa;fill-opacity:1;stroke:#808080;stroke-width:5.87021399;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 1590.9041,2100.0743 0,-81.145 59.6513,-0.306 6.529,-14.549 33.8197,0 4,14.549 0,81.451 z"
+           id="path4865-1-3-0-3"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cccccccc" />
+        <path
+           style="fill:#ffeeaa;fill-opacity:1;stroke:#808080;stroke-width:5.87021399;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 1650.5554,2018.6233 44.3487,0"
+           id="path7918-4-1-6"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc" />
+      </g>
+      <path
+         sodipodi:nodetypes="ccccccccc"
+         inkscape:connector-curvature="0"
+         d="m -2262.3426,612.41038 -0.662,57.65174 34.9877,0 0.662,-57.65174 m 0,0 22.5061,0 -40,-41.8262 -40,41.8262 22.5062,0"
+         style="fill:#2f54ff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         id="path4555" />
+    </g>
+    <g
+       id="g4677"
+       inkscape:export-filename="C:\Dave\dev\github\ApogeeJS\web\resources\icons3\addFolder.png"
+       inkscape:export-xdpi="9.0380926"
+       inkscape:export-ydpi="9.0380926">
+      <g
+         id="g8084-6-4-9"
+         transform="matrix(1.4615385,0,0,1.2707551,-4391.8077,-1961.1287)"
+         style="fill:#ffeeaa;fill-opacity:1;stroke:#808080;stroke-width:1.07345045;stroke-opacity:1">
+        <path
+           style="fill:#ffeeaa;fill-opacity:1;stroke:#808080;stroke-width:5.87021399;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 1590.9041,2100.0743 0,-81.145 59.6513,-0.306 6.529,-14.549 33.8197,0 4,14.549 0,81.451 z"
+           id="path4865-1-3-0-6"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cccccccc" />
+        <path
+           style="fill:#ffeeaa;fill-opacity:1;stroke:#808080;stroke-width:5.87021399;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 1650.5554,2018.6233 44.3487,0"
+           id="path7918-4-1-4"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc" />
+      </g>
+      <g
+         transform="translate(-195.29059,-263.4768)"
+         id="g4575">
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:#2f54ff;stroke-width:20;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m -1770.1933,875.37594 0,79.24164"
+           id="path4558"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc" />
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:#2f54ff;stroke-width:20;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m -1809.8142,914.99677 79.2418,0"
+           id="path4558-3"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="cc" />
+      </g>
+    </g>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4685"
+       style="font-style:normal;font-weight:normal;font-size:15px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"><flowRegion
+         id="flowRegion4687"><rect
+           id="rect4689"
+           width="225.08069"
+           height="58.918179"
+           x="-2208.4387"
+           y="747.17926"
+           style="font-size:15px;" /></flowRegion><flowPara
+         id="flowPara4691" /></flowRoot>    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:15px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
+       x="-2203.8047"
+       y="759.75732"
+       id="text4693"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4695"
+         x="-2203.8047"
+         y="759.75732" /></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4697"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:sans-serif;font-style:normal;font-weight:normal;font-size:15px;line-height:125%;letter-spacing:0px;word-spacing:0px;"><flowRegion
+         id="flowRegion4699"><rect
+           id="rect4701"
+           width="331.66299"
+           height="115.85035"
+           x="-2257.4268"
+           y="738.57324"
+           style="font-size:15px;" /></flowRegion><flowPara
+         id="flowPara4703" /></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4705"
+       style="font-style:normal;font-weight:normal;font-size:30px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
+         id="flowRegion4707"><rect
+           id="rect4709"
+           width="306.50693"
+           height="150.93646"
+           x="-2255.4409"
+           y="727.31921" /></flowRegion><flowPara
+         id="flowPara4711"><flowSpan
+           style="font-size:15px"
+           id="flowSpan4713"> These folder button icons should be 13 high and 16 wide</flowSpan></flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot4715"
+       style="font-style:normal;font-weight:normal;font-size:30px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"><flowRegion
+         id="flowRegion4717"><rect
+           id="rect4719"
+           width="301.87292"
+           height="144.31644"
+           x="-1876.1136"
+           y="781.60333" /></flowRegion><flowPara
+         id="flowPara4721"
+         style="font-size:15px">Icons 16x16</flowPara></flowRoot>  </g>
 </svg>

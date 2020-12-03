@@ -574,25 +574,28 @@ class OneDriveFileSource {
         let container = document.createElement("div");
         container.className = "oneDriveFileAccess_configContainer";
 
-        this.loginElement = document.createElement("div");
-        this.loginElement.className = "oneDriveFileAccess_loginElement";
-        this.loginElement.innerHTML = "Login"
-        this.loginElement.onclick = () => this._onLoginCommand();
-        container.appendChild(this.loginElement);
-
         this.userElement = document.createElement("div");
         this.userElement.className = "oneDriveFileAccess_userElement";
         container.appendChild(this.userElement);
 
-        this.logoutElement = document.createElement("div");
+        this.accountMsgElement = document.createElement("span");
+        this.accountMsgElement.className = "oneDriveFileAccess_accountMsgElement";
+        container.appendChild(this.accountMsgElement);
+
+        let linkContainer = document.createElement("div");
+        linkContainer.className = "oneDriveFileAccess_loginoutContainer";
+        container.appendChild(linkContainer);
+        this.loginElement = document.createElement("a");
+        this.loginElement.className = "oneDriveFileAccess_loginElement";
+        this.loginElement.innerHTML = "Login"
+        this.loginElement.onclick = () => this._onLoginCommand();
+        linkContainer.appendChild(this.loginElement);
+
+        this.logoutElement = document.createElement("a");
         this.logoutElement.className = "oneDriveFileAccess_logoutElement";
         this.logoutElement.innerHTML = "Logout"
         this.logoutElement.onclick = () => this._onLogoutCommand();
-        container.appendChild(this.logoutElement);
-
-        this.accountMsgElement = document.createElement("div");
-        this.accountMsgElement.className = "oneDriveFileAccess_accountMsgElement";
-        container.appendChild(this.accountMsgElement);
+        linkContainer.appendChild(this.logoutElement);
 
         //this element is used in the action element, but we will modify it with the login data
         this.loggedOutShield = document.createElement("div");
@@ -655,12 +658,20 @@ class OneDriveFileSource {
         pathCell.appendChild(commandElement);
 
         let parentFolderButton = document.createElement("button");
-        parentFolderButton.innerHTML = "^";
+        parentFolderButton.className = "oneDriveFileAccess_folderCommandButton";
+        let parentFolderImage = document.createElement("img");
+        parentFolderImage.src = uiutil.getResourcePath(fileAccessConstants.PARENT_FOLDER_IMAGE);
+        parentFolderButton.appendChild(parentFolderImage);
+        parentFolderButton.title = "Go To Parent Folder";
         parentFolderButton.onclick = () => this._onParentFolderSelect();
         commandElement.appendChild(parentFolderButton);
         if(this.action == fileAccessConstants.SAVE_ACTION) {
             let addFolderButton = document.createElement("button");
-            addFolderButton.innerHTML = "+"
+            addFolderButton.className = "oneDriveFileAccess_folderCommandButton";
+            let addFolderImage = document.createElement("img");
+            addFolderImage.src = uiutil.getResourcePath(fileAccessConstants.ADD_FOLDER_IMAGE);
+            addFolderButton.appendChild(addFolderImage);
+            addFolderButton.title = "Add New Folder";
             addFolderButton.onclick = () => this._onCreateFolder();
             commandElement.appendChild(addFolderButton);
         }
