@@ -45,7 +45,6 @@ export default class OneDriveFileSystem {
 			return;
 		}
 
-        //should we verify requesting page is https/file/localhost?
 		let url = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${oneDriveAppInfo.clientId}&redirect_uri=${oneDriveAppInfo.redirectUri}&scope=${oneDriveAppInfo.scopes}&response_type=token`;
 		_openPopup(url,true);
     }
@@ -60,7 +59,6 @@ export default class OneDriveFileSystem {
 			if(this.loginStateCallback) this.loginStateCallback(loginInfo);
 		}
 
-        //should we verify requesting page is https/file/localhost?
 		let url = `https://login.live.com/oauth20_logout.srf?client_id=${oneDriveAppInfo.clientId}&redirect_uri=${oneDriveAppInfo.redirectUri}`;
 		_openPopup(url,false);
 	}
@@ -437,11 +435,13 @@ OneDriveFileSystem.directSaveOk = function(fileMetadata) {
     return ((fileMetadata)&&(fileMetadata.fileInfo)&&(fileMetadata.fileInfo.fileId));
 }
 
+const IS_LOCALHOST = window.location.host.startsWith("localhost");
+
 //
 const oneDriveAppInfo = {
 	"authServiceUri": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
 	"clientId": "d87a2f91-7064-41d0-85b2-3e0775068ac2",
-	"redirectUri": "http://localhost:8888/dev/OneDrive/oneDriveAuthCallback.html",
+	"redirectUri": IS_LOCALHOST ? "http://localhost:8888/dev/OneDrive/oneDriveAuthCallback.html" : "https://www.apogeejs.com/web/onedrive/oneDriveAuthCallback.html",
 	"scopes": "user.read files.read files.read.all sites.read.all"
 }
 
