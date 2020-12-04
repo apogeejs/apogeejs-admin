@@ -1,8 +1,8 @@
 import {BaseFileAccess} from "/apogeeapp/apogeeAppLib.js";
-import ClipboardFileSourceGenerator from "./ClipboardFileSource.js";
-import OneDriveFileSourceGenerator from "./OneDriveFileSource.js";
-import CombinedAccessDialog from "./CombinedFileAccessDialog.js";
-import * as fileAccessConstants from "./fileAccessConstants.js";
+import ClipboardFileSourceGenerator from "/apogeeview/fileaccess/clipboard/ClipboardFileSource.js";
+import OneDriveFileSourceGenerator from "/apogeeview/fileaccess/onedrive/OneDriveFileSource.js";
+import CombinedAccessDialog from "/apogeeview/fileaccess/CombinedFileAccessDialog.js";
+import * as fileAccessConstants from "/apogeeview/fileaccess/fileAccessConstants.js";
 
 /* 
  * To change this license header, choose License Headers in Project Properties.

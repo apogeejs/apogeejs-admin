@@ -82,7 +82,7 @@ const CSS_FILES = [
     "../apogeeui/configurablepanel/ConfigurablePanel.css",
     "../apogeeui/configurablepanel/elements/listElement.css",
     "../apogeeui/tooltip/tooltip.css",  
-    "../dev/combinedFileAccess/combinedFileAccess.css",
+    "../apogeeview/fileaccess/combinedFileAccess.css",
     "../prosemirror/compiledCss/editor.css",    
     "../ext/handsontable/handsontable_6.2.0/handsontable.full.min.css"
 ]

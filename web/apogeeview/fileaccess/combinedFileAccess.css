@@ -80,55 +80,55 @@
 
 /* remote file access config entry */
 
-.oneDriveFileAccess_configContainer {
+.remoteFileAccess_configContainer {
 
 }
-.oneDriveFileAccess_userElement {
+.remoteFileAccess_userElement {
 
 }
-.oneDriveFileAccess_loginoutContainer {
+.remoteFileAccess_loginoutContainer {
     text-align: right;
 }
-.oneDriveFileAccess_loginElement {
+.remoteFileAccess_loginElement {
     font-size: smaller;
     color: rgb(64,64,64);
     text-decoration: underline;
 }
-.oneDriveFileAccess_loginElement:hover {
+.remoteFileAccess_loginElement:hover {
     background-color: rgba(128,128,144,.35);
 
 }
-.oneDriveFileAccess_logoutElement {
+.remoteFileAccess_logoutElement {
     font-size: smaller;
     color: rgb(64,64,64);
     text-decoration: underline;
 }
-.oneDriveFileAccess_logoutElement:hover {
+.remoteFileAccess_logoutElement:hover {
     background-color: rgba(128,128,144,.35);
 }
 
-.oneDriveFileAccess_accountMsgElement {
+.remoteFileAccess_accountMsgElement {
 
 }
 
 /* remote file access action entry */
 
-.oneDriveFileAccess_mainContainer {
+.remoteFileAccess_mainContainer {
     padding: 5px;
     max-width: 650px;
 }
 
-.oneDriveFileAccess_drivesCell {
+.remoteFileAccess_drivesCell {
     position: relative;
     vertical-align: top;
     padding: 5px;
 }
 
-.oneDriveFileAccess_driveTitle {
+.remoteFileAccess_driveTitle {
     padding: 5px;
 }
 
-.oneDriveFileAccess_driveList {
+.remoteFileAccess_driveList {
     position: relative;
     overflow: auto;
     outline: 1px solid rgb(128,128,128);
@@ -136,35 +136,35 @@
     margin: 5px;
 }
 
-.oneDriveFileAccess_driveElement {
+.remoteFileAccess_driveElement {
     position: relative;
     outline: 1px solid rgb(128,128,128);
     padding: 10px 5px;
 }
 
-.oneDriveFileAccess_driveElement:hover {
+.remoteFileAccess_driveElement:hover {
     background-color: rgb(200,200,200);
 }
 
-.oneDriveFileAccess_driveElementActive {
+.remoteFileAccess_driveElementActive {
     background-color: white;
 }
 
-.oneDriveFileAccess_pathCell {
+.remoteFileAccess_pathCell {
     padding: 5px;
 }
 
-.oneDriveFileAccess_pathElement {
+.remoteFileAccess_pathElement {
     display: inline;
     word-break: break-all;
 }
 
-.oneDriveFileAccess_commandElement {
+.remoteFileAccess_commandElement {
     display: inline;
     padding-left: 15px;
 }
 
-.oneDriveFileAccess_fileListCell {
+.remoteFileAccess_fileListCell {
     padding: 5px;
     margin: 5px;
     vertical-align: top;
@@ -175,50 +175,50 @@
     border: 1px solid gray;
 }
 
-.oneDriveFileAccess_filterCell {
+.remoteFileAccess_filterCell {
     padding: 5px;
 }
 
-.oneDriveFileAccess_fileNameCell {
+.remoteFileAccess_fileNameCell {
     padding: 5px;
 }
 
-.oneDriveFileAccess_fileNameLabel {
+.remoteFileAccess_fileNameLabel {
     margin-right: 5px
 }
 
-.oneDriveFileAccess_saveFileNameField {
+.remoteFileAccess_saveFileNameField {
     width: 300px;
 }
 
-.oneDriveFileAccess_buttonsCell {
+.remoteFileAccess_buttonsCell {
     padding: 5px;
 }
 
-.oneDriveFileAccess_submitButton {
+.remoteFileAccess_submitButton {
     margin-left: 50%;
 }
 
-.oneDriveFileAccess_cancelButton {
+.remoteFileAccess_cancelButton {
     float: right;
     margin-right: 50px;
 }
 
-.oneDriveFileAccess_pathFileElement {
+.remoteFileAccess_pathFileElement {
     padding: 5px;
     font-size: 14px;
     color: black;
     word-break: keep-all;
 }
 
-.oneDriveFileAccess_pathDelimiterElement {
+.remoteFileAccess_pathDelimiterElement {
     padding: 5px;
     font-size: 14px;
     color: gray;
     font-weight: bold;
 }
 
-.oneDriveFileAccess_pathDriveElement {
+.remoteFileAccess_pathDriveElement {
     padding: 5px;
     font-size: 14px;
     color: gray;
@@ -226,87 +226,87 @@
     word-break: keep-all;
 }
 
-.oneDriveFileAccess_folderCommandButton {
+.remoteFileAccess_folderCommandButton {
     padding: 2px;
     border: none;
     margin: 2px;
     border: 1px solid rgba(128,128,144,0);
 }
-.oneDriveFileAccess_folderCommandButton:hover {
+.remoteFileAccess_folderCommandButton:hover {
     background-color: rgba(128,128,144,.35);
     border: 1px solid rgb(64,64,64);
 }
 
-.oneDriveFileAccess_fileListTable {
+.remoteFileAccess_fileListTable {
     border-collapse: collapse;
     width: 100%;
 }
 
-.oneDriveFileAccess_fileRow {
+.remoteFileAccess_fileRow {
     padding: 2px;
 }
 
-.oneDriveFileAccess_fileRow:hover {
+.remoteFileAccess_fileRow:hover {
     background-color: rgb(240,240,256);
 }
 
-.oneDriveFileAccess_fileRowActive {
+.remoteFileAccess_fileRowActive {
     background-color: rgb(220,220,256);
 }
 
-.oneDriveFileAccess_fileRowActive:hover {
+.remoteFileAccess_fileRowActive:hover {
     background-color: rgb(220,220,256);
 }
 
-.oneDriveFileAccess_fileIconCell {
+.remoteFileAccess_fileIconCell {
 
 }
-.oneDriveFileAccess_fileNameCell {
+.remoteFileAccess_fileNameCell {
     min-width: 100px;
 }
-.oneDriveFileAcess_fileLinkFolder {
+.remoteFileAccess_fileLinkFolder {
     padding: 2px;
     text-decoration: underline;
 }
-.oneDriveFileAcess_fileLinkFolder:hover {
+.remoteFileAccess_fileLinkFolder:hover {
     background-color: rgba(128,128,144,.35);
 }
-.oneDriveFileAcess_fileLinkFileOpen {
+.remoteFileAccess_fileLinkFileOpen {
     padding: 2px;
     text-decoration: underline;
 }
-.oneDriveFileAcess_fileLinkFileOpen:hover {
+.remoteFileAccess_fileLinkFileOpen:hover {
     background-color: rgba(128,128,144,.35);
 }
-.oneDriveFileAcess_fileLinkFileSave {
+.remoteFileAccess_fileLinkFileSave {
     padding: 2px;
 }
-.oneDriveFileAcess_fileLinkFileSave:hover {
+.remoteFileAccess_fileLinkFileSave:hover {
     background-color: rgba(128,128,144,.35);
 }
-.oneDriveFileAccess_fileMimeCell {
+.remoteFileAccess_fileMimeCell {
     min-width: 100px;
 }
-.oneDriveFileAccess_fileCmdCell {
+.remoteFileAccess_fileCmdCell {
 }
-.oneDriveFileAccess_renameButton {
+.remoteFileAccess_renameButton {
     font-size: smaller;
     background-color: white;
     border: 1px solid lightgray;
     margin: 2px;
 }
-.oneDriveFileAccess_deleteButton {
+.remoteFileAccess_deleteButton {
     font-size: smaller;
     background-color: white;
     color: red;
     border: 1px solid lightgray;
     margin: 2px;
 }
-.oneDriveFileAccess_filterCheckboxLabel {
+.remoteFileAccess_filterCheckboxLabel {
     padding-right: 7px;
 }
 
-.oneDriveFileAccess_loggedOutShield {
+.remoteFileAccess_loggedOutShield {
     position: absolute;
     top: 0;
     left: 0;
@@ -317,6 +317,6 @@
     padding: 45% 0;
 }
 
-.oneDriveFileAccess_loggedOutCancelButton {
+.remoteFileAccess_loggedOutCancelButton {
     margin: 10px;
 }

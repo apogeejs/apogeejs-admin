@@ -1,40 +1,25 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {uiutil}  from "/apogeeui/apogeeUiLib.js";
-import OneDriveFileSystem from "./OneDriveFileSystem.js";
-import * as fileAccessConstants from "./fileAccessConstants.js";
+import * as fileAccessConstants from "/apogeeview/fileaccess/fileAccessConstants.js";
 import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 
-let OneDriveFileSourceGenerator = {
-    getSourceId: function() {
-        return OneDriveFileSystem.SOURCE_ID;
-    },
-
-    getDisplayName: function() {
-        return OneDriveFileSystem.DISPLAY_NAME;
-    },
-
-    directSaveOk: function(fileMetadata) {
-        return OneDriveFileSystem.directSaveOk(fileMetadata);
-    },
-
-    getInstance(action,fileMetadata,fileData,onComplete) {
-        return new OneDriveFileSource(action,fileMetadata,fileData,onComplete)
-    }
-}
-
-export {OneDriveFileSourceGenerator as default};
-
-/** This is the remote file system source */
-class OneDriveFileSource {
+/** This is generic remote file source to be used with CombinedFileAccess.
+ * To create a specific instance, pass in the source generator and a file system instance object.
+ * NOTE - for the time being there is one remote file system, OneDrive. It should be expanded into a
+ * base class and implementation class. */
+export default class RemoteFileSource {
     /** constructor */
-    constructor(action,fileMetadata,fileData,onComplete) {
+    constructor(sourceGenerator,fileSystemInstance,action,fileMetadata,fileData,onComplete) {
         this.action = action;
         this.initialFileMetadata = fileMetadata;
         this.fileData = fileData;
         this.onComplete = onComplete;
 
-        //this object is the interface to OneDrive
-        this.remoteFileSystem = new OneDriveFileSystem();
+        //this is the generator to get some 
+        this.sourceGenerator = sourceGenerator;
+
+        //this object is the interface to the file system
+        this.remoteFileSystem = fileSystemInstance;
 
         // this.drivesInfo
         // this.selectedDriveId
@@ -71,7 +56,7 @@ class OneDriveFileSource {
     //============================
 
     getGenerator() {
-        return OneDriveFileSourceGenerator;
+        return this.sourceGenerator;
     }
 
     //-----------------------------
@@ -346,11 +331,11 @@ class OneDriveFileSource {
 
         if(oldSelectedDriveId !== undefined) {
             let oldElement = this.driveSelectionElementMap[oldSelectedDriveId];
-            oldElement.classList.remove("oneDriveFileAccess_driveElementActive");
+            oldElement.classList.remove("remoteFileAccess_driveElementActive");
         }
         if(this.selectedDriveId !== undefined) {
             let newElement = this.driveSelectionElementMap[this.selectedDriveId];
-            newElement.classList.add("oneDriveFileAccess_driveElementActive");
+            newElement.classList.add("remoteFileAccess_driveElementActive");
 
             //store this as default for future use
             _cachedDriveId = driveId;
@@ -572,39 +557,39 @@ class OneDriveFileSource {
 
     _createConfigElement() {
         let container = document.createElement("div");
-        container.className = "oneDriveFileAccess_configContainer";
+        container.className = "remoteFileAccess_configContainer";
 
         this.userElement = document.createElement("div");
-        this.userElement.className = "oneDriveFileAccess_userElement";
+        this.userElement.className = "remoteFileAccess_userElement";
         container.appendChild(this.userElement);
 
         this.accountMsgElement = document.createElement("span");
-        this.accountMsgElement.className = "oneDriveFileAccess_accountMsgElement";
+        this.accountMsgElement.className = "remoteFileAccess_accountMsgElement";
         container.appendChild(this.accountMsgElement);
 
         let linkContainer = document.createElement("div");
-        linkContainer.className = "oneDriveFileAccess_loginoutContainer";
+        linkContainer.className = "remoteFileAccess_loginoutContainer";
         container.appendChild(linkContainer);
         this.loginElement = document.createElement("a");
-        this.loginElement.className = "oneDriveFileAccess_loginElement";
+        this.loginElement.className = "remoteFileAccess_loginElement";
         this.loginElement.innerHTML = "Login"
         this.loginElement.onclick = () => this._onLoginCommand();
         linkContainer.appendChild(this.loginElement);
 
         this.logoutElement = document.createElement("a");
-        this.logoutElement.className = "oneDriveFileAccess_logoutElement";
+        this.logoutElement.className = "remoteFileAccess_logoutElement";
         this.logoutElement.innerHTML = "Logout"
         this.logoutElement.onclick = () => this._onLogoutCommand();
         linkContainer.appendChild(this.logoutElement);
 
         //this element is used in the action element, but we will modify it with the login data
         this.loggedOutShield = document.createElement("div");
-        this.loggedOutShield.className = "oneDriveFileAccess_loggedOutShield";
+        this.loggedOutShield.className = "remoteFileAccess_loggedOutShield";
         this.loggedOutShield.innerHTML = "<em>User not logged in</em>"
 
         let loggedOutCancelButton = document.createElement("button");
         loggedOutCancelButton.innerHTML = "Cancel";
-        loggedOutCancelButton.className = "oneDriveFileAccess_loggedOutCancelButton";
+        loggedOutCancelButton.className = "remoteFileAccess_loggedOutCancelButton";
         loggedOutCancelButton.onclick = () => this._onCancelPress();
         this.loggedOutShield.appendChild(loggedOutCancelButton);
 
@@ -615,7 +600,7 @@ class OneDriveFileSource {
     _createActionElement() {
         //action element
         let mainContainer = document.createElement("table");
-        mainContainer.className = "oneDriveFileAccess_mainContainer";
+        mainContainer.className = "remoteFileAccess_mainContainer";
 
         let pathRow = document.createElement("tr");
         mainContainer.appendChild(pathRow);
@@ -630,35 +615,35 @@ class OneDriveFileSource {
 
         //drive selection
         let drivesCell = document.createElement("td");
-        drivesCell.className = "oneDriveFileAccess_drivesCell";
+        drivesCell.className = "remoteFileAccess_drivesCell";
         drivesCell.rowSpan = 5;
         pathRow.appendChild(drivesCell);
 
         let drivesTitleElement = document.createElement("div");
-        drivesTitleElement.className = "oneDriveFileAccess_driveTitle";
+        drivesTitleElement.className = "remoteFileAccess_driveTitle";
         drivesTitleElement.innerHTML = "Drives:"
         drivesCell.appendChild(drivesTitleElement);
 
         this.drivesListElement = document.createElement("div");
-        this.drivesListElement.className = "oneDriveFileAccess_driveList";
+        this.drivesListElement.className = "remoteFileAccess_driveList";
         drivesCell.appendChild(this.drivesListElement);
 
         //path display and folder commands
         let pathCell = document.createElement("td");
-        pathCell.className = "oneDriveFileAccess_pathCell";
+        pathCell.className = "remoteFileAccess_pathCell";
         pathRow.appendChild(pathCell);
 
         this.pathElement = document.createElement("div");
-        this.pathElement.className = "oneDriveFileAccess_pathElement";
+        this.pathElement.className = "remoteFileAccess_pathElement";
         pathCell.appendChild(this.pathElement);
 
         //commands - parent folder, file type filter, add folder (for save only)
         let commandElement = document.createElement("div");
-        commandElement.className = "oneDriveFileAccess_commandElement";
+        commandElement.className = "remoteFileAccess_commandElement";
         pathCell.appendChild(commandElement);
 
         let parentFolderButton = document.createElement("button");
-        parentFolderButton.className = "oneDriveFileAccess_folderCommandButton";
+        parentFolderButton.className = "remoteFileAccess_folderCommandButton";
         let parentFolderImage = document.createElement("img");
         parentFolderImage.src = uiutil.getResourcePath(fileAccessConstants.PARENT_FOLDER_IMAGE);
         parentFolderButton.appendChild(parentFolderImage);
@@ -667,7 +652,7 @@ class OneDriveFileSource {
         commandElement.appendChild(parentFolderButton);
         if(this.action == fileAccessConstants.SAVE_ACTION) {
             let addFolderButton = document.createElement("button");
-            addFolderButton.className = "oneDriveFileAccess_folderCommandButton";
+            addFolderButton.className = "remoteFileAccess_folderCommandButton";
             let addFolderImage = document.createElement("img");
             addFolderImage.src = uiutil.getResourcePath(fileAccessConstants.ADD_FOLDER_IMAGE);
             addFolderButton.appendChild(addFolderImage);
@@ -678,16 +663,16 @@ class OneDriveFileSource {
         
         //file display list
         let fileListCell = document.createElement("td");
-        fileListCell.className = "oneDriveFileAccess_fileListCell";
+        fileListCell.className = "remoteFileAccess_fileListCell";
         fileDisplayRow.appendChild(fileListCell);
 
         this.fileListTable = document.createElement("table");
-        this.fileListTable.className = "oneDriveFileAccess_fileListTable";
+        this.fileListTable.className = "remoteFileAccess_fileListTable";
         fileListCell.appendChild(this.fileListTable);
 
         //file filter row
         let filterCell = document.createElement("div");
-        filterCell.className = "oneDriveFileAccess_filterCell";
+        filterCell.className = "remoteFileAccess_filterCell";
         filterRow.appendChild(filterCell);
         
         let fileFilterLabel = document.createElement("span");
@@ -709,7 +694,7 @@ class OneDriveFileSource {
         let allRadioLabel = document.createElement("label");
         allRadioLabel.for = allId;
         allRadioLabel.innerHTML = "All";
-        allRadioLabel.className = "oneDriveFileAccess_filterCheckboxLabel";
+        allRadioLabel.className = "remoteFileAccess_filterCheckboxLabel";
         filterCell.appendChild(allRadioLabel);
 
         this.jsonRadio = document.createElement("input");
@@ -723,7 +708,7 @@ class OneDriveFileSource {
         let jsonRadioLabel = document.createElement("label");
         jsonRadioLabel.for = jsonId;
         jsonRadioLabel.innerHTML = "JSON Only";
-        jsonRadioLabel.className = "oneDriveFileAccess_filterCheckboxLabel";
+        jsonRadioLabel.className = "remoteFileAccess_filterCheckboxLabel";
         filterCell.appendChild(jsonRadioLabel);
 
         this.jsonTextRadio = document.createElement("input");
@@ -737,24 +722,24 @@ class OneDriveFileSource {
         let jsonTextRadioLabel = document.createElement("label");
         jsonTextRadioLabel.for = jsonTextId;
         jsonTextRadioLabel.innerHTML = "JSON & Text Only";
-        jsonTextRadioLabel.className = "oneDriveFileAccess_filterCheckboxLabel";
+        jsonTextRadioLabel.className = "remoteFileAccess_filterCheckboxLabel";
         filterCell.appendChild(jsonTextRadioLabel);
 
         //file name entry
         let fileNameCell = document.createElement("td");
-        fileNameCell.className = "oneDriveFileAccess_fileNameCell";
+        fileNameCell.className = "remoteFileAccess_fileNameCell";
         fileNameRow.appendChild(fileNameCell);
 
         if(this.action == fileAccessConstants.SAVE_ACTION) {
             let fileNameLabel = document.createElement("span");
-            fileNameLabel.className = "oneDriveFileAccess_fileNameLabel";
+            fileNameLabel.className = "remoteFileAccess_fileNameLabel";
             fileNameLabel.innerHTML = "File Name:";
             fileNameCell.appendChild(fileNameLabel);
 
             //save has a text field to enter file name
             this.saveFileNameField = document.createElement("input");
             this.saveFileNameField.type = "text";
-            this.saveFileNameField.className = "oneDriveFileAccess_saveFileNameField";
+            this.saveFileNameField.className = "remoteFileAccess_saveFileNameField";
             fileNameCell.appendChild(this.saveFileNameField);
 
             if((this.initialFileMetadata)&&(this.initialFileMetadata.name)) {
@@ -765,27 +750,27 @@ class OneDriveFileSource {
 
         //save/open, cancel buttons
         let buttonsCell = document.createElement("td");
-        buttonsCell.className = "oneDriveFileAccess_buttonsCell";
+        buttonsCell.className = "remoteFileAccess_buttonsCell";
         buttonsRow.appendChild(buttonsCell);
 
         if(this.action == fileAccessConstants.SAVE_ACTION) {
             let submitButton = document.createElement("button");
             submitButton.innerHTML = "Save";
-            submitButton.className = "oneDriveFileAccess_submitButton";
+            submitButton.className = "remoteFileAccess_submitButton";
             submitButton.onclick = () => this._onSavePress();
             buttonsCell.appendChild(submitButton);
         }
         
         let cancelButton = document.createElement("button");
         cancelButton.innerHTML = "Cancel";
-        cancelButton.className = "oneDriveFileAccess_cancelButton";
+        cancelButton.className = "remoteFileAccess_cancelButton";
         cancelButton.onclick = () => this._onCancelPress();
         buttonsCell.appendChild(cancelButton);
 
         //add the logged out shield - made earlier
         //we are putting it in like this so we can place it beblow the cancle button, but above everything else.
         let shieldParent = document.createElement("div");
-        shieldParent.className = "oneDriveFileAccess_shieldParent";
+        shieldParent.className = "remoteFileAccess_shieldParent";
         mainContainer.appendChild(shieldParent);
 
         shieldParent.appendChild(this.loggedOutShield);
@@ -796,7 +781,7 @@ class OneDriveFileSource {
     /** This function sets of the source selection items */
     _addDriveElement(driveInfo) {
         let driveElement = document.createElement("div");
-        driveElement.className = "oneDriveFileAccess_driveElement";
+        driveElement.className = "remoteFileAccess_driveElement";
         driveElement.innerHTML = driveInfo.name;
         driveElement.onclick = () => this._onSelectDrive(driveInfo.driveId);
 
@@ -807,14 +792,14 @@ class OneDriveFileSource {
 
     _getPathDriveElement(driveEntry) {
         let driveElement = document.createElement("span");
-        driveElement.className = "oneDriveFileAccess_pathDriveElement";
+        driveElement.className = "remoteFileAccess_pathDriveElement";
         driveElement.innerHTML = driveEntry.name + ":";
         return driveElement;
     }
 
     _getPathDelimiterElement() {
         let delimiterElement = document.createElement("span");
-        delimiterElement.className = "oneDriveFileAccess_pathDelimiterElement";
+        delimiterElement.className = "remoteFileAccess_pathDelimiterElement";
         delimiterElement.innerHTML = ">";
         return delimiterElement;
     }
@@ -829,23 +814,23 @@ class OneDriveFileSource {
         }
 
         let folderElement = document.createElement("span");
-        folderElement.className = "oneDriveFileAccess_pathFileElement";
+        folderElement.className = "remoteFileAccess_pathFileElement";
         folderElement.innerHTML = folderName;
         return folderElement;
     }
 
     _addFileListEntry(fileInfo) {
         let fileRow = document.createElement("tr");
-        fileRow.className = "oneDriveFileAccess_fileRow";
+        fileRow.className = "remoteFileAccess_fileRow";
         let fileIconCell = document.createElement("td");
-        fileIconCell.className = "oneDriveFileAccess_fileIconCell";
+        fileIconCell.className = "remoteFileAccess_fileIconCell";
         fileRow.appendChild(fileIconCell);
         let fileIcon = document.createElement("img");
         fileIcon.src = this._getIconUrl(fileInfo.type);
         fileIconCell.appendChild(fileIcon);
 
         let fileNameCell = document.createElement("td");
-        fileNameCell.className = "oneDriveFileAccess_fileNameCell";
+        fileNameCell.className = "remoteFileAccess_fileNameCell";
         fileRow.appendChild(fileNameCell);
 
         let fileLink = document.createElement("a");
@@ -854,31 +839,31 @@ class OneDriveFileSource {
         fileNameCell.appendChild(fileLink);
 
         if(fileInfo.type == fileAccessConstants.FOLDER_TYPE) {
-            fileLink.className = "oneDriveFileAcess_fileLinkFolder";
+            fileLink.className = "remoteFileAccess_fileLinkFolder";
         }
         else if(this.action == fileAccessConstants.OPEN_ACTION) {
-            fileLink.className = "oneDriveFileAcess_fileLinkFileOpen";
+            fileLink.className = "remoteFileAccess_fileLinkFileOpen";
         }
         else if(this.action == fileAccessConstants.SAVE_ACTION) {
-            fileLink.className = "oneDriveFileAcess_fileLinkFileSave";
+            fileLink.className = "remoteFileAccess_fileLinkFileSave";
         }
 
         let fileMimeCell = document.createElement("td");
-        fileMimeCell.className = "oneDriveFileAccess_fileMimeCell";
+        fileMimeCell.className = "remoteFileAccess_fileMimeCell";
         if(fileInfo.type != fileAccessConstants.FOLDER_TYPE) fileMimeCell.innerHTML = fileInfo.type;
         fileRow.appendChild(fileMimeCell);
 
         let fileCmdCell = document.createElement("td");
-        fileCmdCell.className = "oneDriveFileAccess_fileCmdCell";
+        fileCmdCell.className = "remoteFileAccess_fileCmdCell";
         fileRow.appendChild(fileCmdCell);
 
         let renameButton = document.createElement("button");
-        renameButton.className = "oneDriveFileAccess_renameButton";
+        renameButton.className = "remoteFileAccess_renameButton";
         renameButton.innerHTML = "Rename";
         renameButton.onclick = () => this._onFileRename(fileInfo);
         fileCmdCell.appendChild(renameButton);
         let deleteButton = document.createElement("button");
-        deleteButton.className = "oneDriveFileAccess_deleteButton";
+        deleteButton.className = "remoteFileAccess_deleteButton";
         deleteButton.innerHTML = "Delete";
         deleteButton.onclick = () => this._onFileDelete(fileInfo);
         fileCmdCell.appendChild(deleteButton);

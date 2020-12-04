@@ -4,7 +4,7 @@ import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
 import * as apogeeui from "/apogeeui/apogeeUiLib.js";
 import * as apogeeview from "/apogeeview/apogeeViewLib.js";
 import { ApogeeView, initIncludePath } from "/apogeeview/apogeeViewLib.js";
-import CombinedFileAccessAppConfigManager from "/dev/combinedFileAccess/CombinedFileAccessAppConfigManager.js"
+import CombinedFileAccessAppConfigManager from "/apogeeview/fileAccess/CombinedFileAccessAppConfigManager.js"
 
 //expose these apogee libraries globally so plugins can use them
 window.apogeeutil = apogeeutil;

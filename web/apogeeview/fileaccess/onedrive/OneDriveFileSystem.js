@@ -1,8 +1,6 @@
-import * as fileAccessConstants from "./fileAccessConstants.js";
+import * as fileAccessConstants from "/apogeeview/fileAccess/fileAccessConstants.js";
 
-//This class will manage access to microsoft one drive
-
-
+//This class manages access to microsoft one drive
 export default class OneDriveFileSystem {
 
     constructor() {
@@ -441,7 +439,7 @@ const IS_LOCALHOST = window.location.host.startsWith("localhost");
 const oneDriveAppInfo = {
 	"authServiceUri": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
 	"clientId": "d87a2f91-7064-41d0-85b2-3e0775068ac2",
-	"redirectUri": IS_LOCALHOST ? "http://localhost:8888/dev/OneDrive/oneDriveAuthCallback.html" : "https://www.apogeejs.com/web/onedrive/oneDriveAuthCallback.html",
+	"redirectUri": IS_LOCALHOST ? "http://localhost:8888/apogeeview/fileaccess/onedrive/oneDriveAuthCallback.html" : "https://www.apogeejs.com/web/onedrive/oneDriveAuthCallback.html",
 	"scopes": "user.read files.read files.read.all sites.read.all"
 }
 
