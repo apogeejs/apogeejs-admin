@@ -79,8 +79,24 @@ function updateData(model,actionData) {
         return actionResult;
     }
     actionResult.member = member;
+
+    //if this is the resolution (or rejection) of a previously set promise
+    //make sure the source promise matches the pending promise. Otherwise
+    //we just ignore it (it is out of date)
+    let resolvedPromise = false;
+    if(actionData.sourcePromise) {
+        if(!member.pendingPromiseMatches(actionData.sourcePromise)) {
+            //no action - this is from an asynch action that has been overwritten. Ignore this command.
+            actionResult.actionDone = true;
+            return actionResult;
+        }
+        else {
+            resolvedPromise = true;
+        }
+    }
     
-    if(!member.getSetDataOk()) {
+    //check if we can set data (setting on a resolved promise is ok)
+    if((!resolvedPromise)&&(!member.getSetDataOk())) {
         actionResult.actionDone = false;
         actionResult.errorMsg = "Can not set data on member: " + member.getFullName(model);
         return actionResult;
@@ -92,19 +108,8 @@ function updateData(model,actionData) {
     //on setting data there will be none.
     let hadDependents = ((member.getDependsOn)&&(apogeeutil.jsonObjectLength(member.getDependsOn()) > 0));
     
-    //if this is the resolution (or rejection) of a previously set promise
-    //make sure the source promise matches the pending promise. Otherwise
-    //we just ignore it (it is out of date)
-    if(actionData.sourcePromise) {
-        if(!member.pendingPromiseMatches(actionData.sourcePromise)) {
-            //no action - this is from an asynch action that has been overwritten. Ignore this command.
-            actionResult.actionDone = true;
-            return actionResult;
-        }
-    }
-    
-    //some cleanup for new data
-    if((member.isCodeable)&&(actionData.sourcePromise === undefined)) {
+    //if we set data, clear code (unless this is data from a resolved promise)
+    if((member.isCodeable)&&(!resolvedPromise)) {
         //clear the code - so the data is used
         //UNLESS this is a delayed set date from a promise, in what case we want to keep the code.
         member.clearCode(model);
