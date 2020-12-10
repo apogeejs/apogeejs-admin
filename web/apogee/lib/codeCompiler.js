@@ -48,15 +48,16 @@ export function validateTableName(name) {
 
 /** This method analyzes the code and creates the object function and dependencies. 
  * The results are loaded into the passed object processedCodeData. */
-export function processCode(argList,functionBody,supplementalCode,codeLabel) {
+export function processCode(argList,functionBody,supplementalCode,memberName) {
     
     //analyze the code
-    var combinedFunctionBody = createCombinedFunctionBody(argList,functionBody,supplementalCode,codeLabel);
+    let memberFunctionName = memberName + "_mainFunction"
+    var combinedFunctionBody = createCombinedFunctionBody(memberFunctionName,argList,functionBody,supplementalCode,memberName);
         
     //get the accessed variables
     //
     //parse the code and get variable dependencies
-    var effectiveCombinedFunctionBody = MEMBER_LOCALS_TEXT + combinedFunctionBody;
+    var effectiveCombinedFunctionBody = getMemberLocalsText(memberFunctionName) + combinedFunctionBody;
     var analyzeOutput = analyzeCode(effectiveCombinedFunctionBody);
     
     var compiledInfo = {};
@@ -73,12 +74,14 @@ export function processCode(argList,functionBody,supplementalCode,codeLabel) {
     try {
         //create and execute the generator function to get the member function generator
         //and the memberFunctionContextInitializer
-        var generatorFunction = createGeneratorFunction(compiledInfo.varInfo, combinedFunctionBody);
-        //get the generated fucntion
+        var generatorBody = createGeneratorBody(memberFunctionName,compiledInfo.varInfo, combinedFunctionBody);
+        var generatorFunction = new Function(generatorBody);
+        //get the output functions
         var generatedFunctions = generatorFunction();
         compiledInfo.memberFunctionGenerator = generatedFunctions.memberGenerator;
         compiledInfo.memberFunctionContextInitializer = generatedFunctions.initializer;  
-        compiledInfo.valid = true;                     
+        compiledInfo.valid = true; 
+        compiledInfo.generatorFunction = generatorFunction;                
     }
     catch(ex) {
         compiledInfo.errors = [ex];
@@ -91,21 +94,31 @@ export function processCode(argList,functionBody,supplementalCode,codeLabel) {
 
 /** This method creates the user code object function body. 
  * @private */
-function createCombinedFunctionBody(argList,
+function createCombinedFunctionBody(memberFunctionName,
+        argList,
         functionBody, 
         supplementalCode,
-        codeLabel) {
+        memberName) {
     
     var argListString = argList.join(",");
     
     //create the code body
-    var combinedFunctionBody = apogeeutil.formatString(
-        MEMBER_FUNCTION_FORMAT_TEXT,
-		codeLabel,
-        argListString,
-        functionBody,
-        supplementalCode
-    );
+    var combinedFunctionBody = `//${memberName}
+
+//supplemental code--------------
+${supplementalCode}
+//end supplemental code----------
+
+//member function----------------
+function ${memberFunctionName}(${argListString}) {
+//overhead code
+__memberFunctionDebugHook('${memberName}');
+
+//user code
+${functionBody}
+}
+//end member function------------
+`
         
     return combinedFunctionBody;
 }
@@ -120,7 +133,7 @@ function createCombinedFunctionBody(argList,
  * The generator that makes the member function is a closure to wrap the member private
  * code and any other needed data with the member function.
  * @private */
-function createGeneratorFunction(varInfo, combinedFunctionBody) {
+function createGeneratorBody(memberFunctionName,varInfo, combinedFunctionBody) {
     
     var contextDeclarationText = "";
     var initializerBody = "";
@@ -144,75 +157,37 @@ function createGeneratorFunction(varInfo, combinedFunctionBody) {
     }
     
     //create the generator for the object function
-    var generatorBody = apogeeutil.formatString(
-        GENERATOR_FUNCTION_FORMAT_TEXT,
-		contextDeclarationText,
-        initializerBody,
-        combinedFunctionBody
-    );
-        
-    var generatorFunction = new Function(generatorBody);
-    return generatorFunction;    
+    var generatorBody = `'use strict'
+//declare context variables
+${contextDeclarationText}
+
+//context setter
+function __initializer(__model,__contextManager,__messenger) {
+    ${initializerBody}
+};
+
+//user code
+function __memberGenerator() {
+${combinedFunctionBody}
+return ${memberFunctionName}
 }
 
+return {
+    'memberGenerator': __memberGenerator,
+    'initializer': __initializer
+};
+`
+    return generatorBody;    
+}
 
-/** This is the format string to create the code body for the object function
- * Input indices:
- * 0: unique member name
- * 1: function argument list with parentheses
- * 2: member formula text
- * 3: supplemental code text
- * 
- * @private
- */
-const MEMBER_FUNCTION_FORMAT_TEXT = [
-"//{0}",
-"",
-"//supplemental code--------------",
-"{3}",
-"//end supplemental code----------",
-"",
-"//member function----------------",
-"function __memberFunction({1}) {",
-"//overhead code",
-"__memberFunctionDebugHook('{0}');",
-"",
-"//user code",
-"{2}",
-"};",
-"//end member function------------",
-   ].join("\n");
    
 /** This line is added when getting the dependencies to account for some local 
  * variables in the member function.
  * @private */
-const MEMBER_LOCALS_TEXT = "var apogeeMessenger, __memberFunction, __memberFunctionDebugHook;";
+function getMemberLocalsText(memberFunctionName) {
+    return `var apogeeMessenger, ${memberFunctionName}, __memberFunctionDebugHook;`
+}
    
-/** This is the format string to create the code body for the object function
- * Input indices:
- * 0: context declaration text
- * 1: context setter body
- * 2: object function body
- * @private
- */
-const GENERATOR_FUNCTION_FORMAT_TEXT = [
-"'use strict'",
-"//declare context variables",
-"{0}",
-"//context setter",
-"function __initializer(__model,__contextManager,__messenger) {",
-"{1}};",
-"",
-"//user code",
-"function __memberGenerator() {",
-"{2}",
-"return __memberFunction",
-"}",
-"return {",
-"'memberGenerator': __memberGenerator,",
-"'initializer': __initializer",
-"};"
-   ].join("\n");
 
 
 

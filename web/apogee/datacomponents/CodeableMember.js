@@ -100,8 +100,7 @@ export default class CodeableMember extends DependentMember {
         }
         
         //process the code text into javascript code
-        var codeLabel = this.getName();
-        var compiledInfo = processCode(argList,functionBody,supplementalCode,codeLabel);
+        var compiledInfo = processCode(argList,functionBody,supplementalCode,this.getName());
         this.setField("compiledInfo",compiledInfo);
     }
 
@@ -202,12 +201,26 @@ export default class CodeableMember extends DependentMember {
             //--------------------------------------
             else {
                 //normal error in member function execution
+//                let extendedInfo = [];
             
                 //this is an error in the code
                 if(error.stack) {
                     console.error("Error calculating member " + this.getFullName(model));
                     console.error(error.stack);
+
+//                    extendedInfo.push({label: "Stack Trace", body: error.stack});
+
+//                    if((compiledInfo)&&(compiledInfo.generatorFunction)) {
+//                        extendedInfo.push({
+//                            label: "Source Code",
+//                            body: compiledInfo.generatorFunction.toString()
+//                        });
+//                    }
                 }
+
+//                if(extendedInfo) {
+//                    error.extendedInfo = extendedInfo;
+//                }
 
                 this.setError(model,error);
             }

@@ -309,13 +309,6 @@ export default class Member extends FieldObject {
      * data and state setters should be called.
      * The data value will be applied regardless of the state. The error list is applied only if the state is ERROR. */
     setStateAndData(model,state,data,errorList) {
-        //set data as specified
-        if(data === undefined) {
-            this.clearField("data");
-        }
-        else {
-            this.setField("data",data);
-        }
 
         //set the state if it is error or if it changes
         let oldStateStruct = this.getField("state");
@@ -353,11 +346,22 @@ export default class Member extends FieldObject {
                 newStateStruct.state = apogeeutil.STATE_ERROR;
                 newStateStruct.errorList = newErrorList;
                 newStateStruct.dependsOnError = dependsOnError;
+
+                //FOR NOW OVERWRITE DATA WITH ERROR INFO
+//                data = _getErrorData(newErrorList);
             }
             else {
                 newStateStruct.state = state;
             }
             this.setField("state",newStateStruct);
+        }
+
+        //set data as specified
+        if(data === undefined) {
+            this.clearField("data");
+        }
+        else {
+            this.setField("data",data);
         }
 
         //clear the pending promise
@@ -451,4 +455,34 @@ export default class Member extends FieldObject {
 apogeeutil.mixin(Member,FieldObject);
 
 let UNKNOWN_ERROR_MSG_PREFIX = "Unknown error in member ";
+
+
+
+// function _getErrorData(errorList) {
+//     let text = "";
+//     if((errorList)&&(errorList.length > 0)) {
+//         errorList.forEach(errorElement => {
+//             if(errorElement) {
+//                 if(errorElement.extendedInfo) {
+//                     errorElement.extendedInfo.forEach(infoElement => {
+//                         if(text.length > 0) text += "\n#################################################################################\n";
+//                         if(infoElement.label) {
+//                             text += infoElement.label + "\n===================\n";
+//                         }
+//                         if(infoElement.body) {
+//                             text += infoElement.body;
+//                         }
+//                     });
+//                 }
+//             }
+//         });
+//     }
+
+//     if(text.length > 0) {
+//         return text;
+//     }
+//     else {
+//         return apogeeutil.INVALID_VALUE;
+//     }
+// }
 
