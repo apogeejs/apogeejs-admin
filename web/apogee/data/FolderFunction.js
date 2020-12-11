@@ -152,7 +152,7 @@ export default class FolderFunction extends DependentMember {
 
         let state = this.getState();
         if((state != apogeeutil.STATE_ERROR)&&(state != apogeeutil.STATE_PENDING)&&(state != apogeeutil.STATE_INVALID)) {
-            //calculate folder function is no issue in dependent
+            //calculate folder function if no issue in dependent
             try {
                 var folderFunctionFunction = this.getFolderFunctionFunction(model);
                 this.setData(model,folderFunctionFunction);

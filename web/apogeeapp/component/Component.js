@@ -112,9 +112,9 @@ export default class Component extends FieldObject {
         return this.isMemberFieldUpdated("member","name");
     }
 
-    /** This can be used to see if the component state has been updated. It checks both the state and the state msg. */
+    /** This can be used to see if the component state has been updated. */
     isStateUpdated() {
-        return ((this.isMemberFieldUpdated("member","state"))||(this.isMemberFieldUpdated("member","stateMsg")));
+        return this.isMemberFieldUpdated("member","state");
     }
 
     getParentComponent(modelManager) {

@@ -415,7 +415,10 @@ export default class CodeableMember extends DependentMember {
                 functionInitializedSuccess = true;
             }
             catch(error) {
-                //this is an error in the code
+                //LATER NOTE - I think this is an internal error if we get an error here
+                //initializeImpactor will catch errors in user code of other members.
+                //the other function calls above should not throw errors, in theory
+                //investigate this more...
                 if(error.stack) {
                     console.error(error.stack);
                 }
