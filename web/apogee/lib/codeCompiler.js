@@ -72,10 +72,11 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
         return compiledInfo;
     }
 
+    //create and execute the generator function
+    var generatorBody = createGeneratorBody(memberFunctionName,compiledInfo.varInfo, combinedFunctionBody);
     try {
-        //create and execute the generator function to get the member function generator
+        //execute the generator function to get the member function generator
         //and the memberFunctionContextInitializer
-        var generatorBody = createGeneratorBody(memberFunctionName,compiledInfo.varInfo, combinedFunctionBody);
         var generatorFunction = new Function(generatorBody);
 
         //get the output functions
@@ -86,7 +87,13 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
         compiledInfo.generatorFunction = generatorFunction;                
     }
     catch(ex) {
-        compiledInfo.error = ex;
+        //this is for parse errors not captured in esprmia
+        compiledInfo.errorMsg = ex.toString();
+        let extendedErrorInfo = {};
+        extendedErrorInfo.type = "javascriptParseError";
+        if(ex.stack) extendedErrorInfo.stack =  ex.stack;
+        extendedErrorInfo.code = generatorBody;
+        compiledInfo.extendedErrorInfo = extendedErrorInfo;
         compiledInfo.valid = false;
     }
     
@@ -188,7 +195,7 @@ return {
  * @private */
 function getEffectiveFunctionBodyHeader(memberFunctionName) {
     return `'use strict'
-var apogeeMessenger, ${memberFunctionName}, __memberFunctionDebugHook;
+var apogeeMessenger, __memberFunctionDebugHook;
 `
 }
    
