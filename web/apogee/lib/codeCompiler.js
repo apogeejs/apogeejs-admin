@@ -66,7 +66,7 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
         compiledInfo.varInfo = analyzeOutput.varInfo;
     }
     else {
-        compiledInfo.errors = analyzeOutput.errors;
+        compiledInfo.error = analyzeOutput.error;
         compiledInfo.valid = false;
         return compiledInfo;
     }
@@ -76,6 +76,7 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
         //and the memberFunctionContextInitializer
         var generatorBody = createGeneratorBody(memberFunctionName,compiledInfo.varInfo, combinedFunctionBody);
         var generatorFunction = new Function(generatorBody);
+
         //get the output functions
         var generatedFunctions = generatorFunction();
         compiledInfo.memberFunctionGenerator = generatedFunctions.memberGenerator;
@@ -84,7 +85,7 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
         compiledInfo.generatorFunction = generatorFunction;                
     }
     catch(ex) {
-        compiledInfo.errors = [ex];
+        compiledInfo.error = ex;
         compiledInfo.valid = false;
     }
     
@@ -105,19 +106,19 @@ function createCombinedFunctionBody(memberFunctionName,
     //create the code body
     var combinedFunctionBody = `//${memberName}
 
-//supplemental code--------------
+//user private code==============
 ${supplementalCode}
-//end supplemental code----------
+//end user private code==========
 
-//member function----------------
+//member main function===========
 function ${memberFunctionName}(${argListString}) {
-//overhead code
-__memberFunctionDebugHook('${memberName}');
+    __memberFunctionDebugHook('${memberName}');
 
-//user code
+//user main code-----------------
 ${functionBody}
+//end user main code-------------
 }
-//end member function------------
+//end member function============
 `
         
     return combinedFunctionBody;
@@ -139,8 +140,8 @@ function createGeneratorBody(memberFunctionName,varInfo, combinedFunctionBody) {
     var initializerBody = "";
 
     //add the messenger as a local variable
-    contextDeclarationText += "var apogeeMessenger\n";
-    initializerBody += "apogeeMessenger = __messenger\n";
+    contextDeclarationText += "var apogeeMessenger";
+    initializerBody += "apogeeMessenger = __messenger";
     
     //set the context - here we only defined the variables that are actually used.
 	for(var baseName in varInfo) {        
@@ -150,10 +151,10 @@ function createGeneratorBody(memberFunctionName,varInfo, combinedFunctionBody) {
         if((baseName === "returnValue")||(baseNameInfo.isLocal)) continue;
         
         //add a declaration
-        contextDeclarationText += "var " + baseName + ";\n";
+        contextDeclarationText += "\nvar " + baseName + ";";
         
         //add to the context setter
-        initializerBody += baseName + ' = __contextManager.getValue(__model,"' + baseName + '");\n';
+        initializerBody += '\n\t' + baseName + ' = __contextManager.getValue(__model,"' + baseName + '");';
     }
     
     //create the generator for the object function

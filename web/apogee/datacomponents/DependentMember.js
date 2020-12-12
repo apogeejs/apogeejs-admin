@@ -78,7 +78,7 @@ export default class DependentMember extends Member {
 
     /** This method calculates the contribution to the state of the member based on it dependencies. */
     calculateDependentState(model,doSetState) {
-        let errorList = [];
+        let errorImpactorList = [];
         let resultPending = false;
         let resultInvalid = false;
 
@@ -88,7 +88,7 @@ export default class DependentMember extends Member {
             
             let impactorState = impactor.getState();
             if(impactorState == apogeeutil.STATE_ERROR) {
-                errorList.push(impactor.getDependsOnError());
+                errorImpactorList.push(impactor);
             } 
             else if(impactorState == apogeeutil.STATE_PENDING) {
                 resultPending = true;
@@ -99,9 +99,12 @@ export default class DependentMember extends Member {
         }
 
         let state;
-        if(errorList.length > 0) {
+        let error;
+        let extendedErrorInfo;
+        if(errorImpactorList.length > 0) {
             state = apogeeutil.STATE_ERROR;
-            if(doSetState) this.setErrors(model,errorList);
+            error = Member.createDependsOnError(model,errorImpactorList);
+            if(doSetState) this.setError(model,error);
         }
         else if(resultPending) {
             state = apogeeutil.STATE_PENDING;
@@ -116,7 +119,7 @@ export default class DependentMember extends Member {
             //state not set in normal case - will be set when data is set
         }
 
-        return {state, errorList};
+        return {state, error, extendedErrorInfo};
     }
 
     /** This method makes sure any impactors are set. It sets a dependency 

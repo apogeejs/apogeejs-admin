@@ -43,7 +43,9 @@ export default class FunctionTable extends CodeableMember {
                 //how else to stop the calculation other than throwing an error, so 
                 //we do that here. It should be handled by anyone calling a function.
                 if(state == apogeeutil.STATE_ERROR) {
-                    issue = this.getDependsOnError();
+                    //throw a depends on error
+                    //it will be recieved by the member that triggered this init, if applicable
+                    issue = FunctionTable.createDependsOnError(model,[this]);
                 }
                 else if(state == apogeeutil.STATE_PENDING) {
                     issue = apogeeutil.MEMBER_FUNCTION_PENDING_THROWABLE;

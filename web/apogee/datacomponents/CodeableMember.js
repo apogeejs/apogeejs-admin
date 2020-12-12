@@ -176,7 +176,7 @@ export default class CodeableMember extends DependentMember {
             return;
         }
         else if(!compiledInfo.valid) {
-            this.setErrors(model,compiledInfo.errors);
+            this.setError(model,compiledInfo.error);
             this.clearCalcPending();
             return;
         }
@@ -257,7 +257,7 @@ export default class CodeableMember extends DependentMember {
             }
             else if(state == apogeeutil.STATE_ERROR) {
                 //save a single error
-                updateData.errorList = [this.getErrorMsg()];
+                updateData.error = this.getErrorMsg();
             }
             else {
                 //save the data value
@@ -283,8 +283,14 @@ export default class CodeableMember extends DependentMember {
         }
         else {
             //set initial data
-            if(initialData.errorList) {
-                this.setErrors(model,initialData.errorList);
+            if(initialData.error) {
+                this.setError(model,initialData.error);
+            }
+            else if(initialData.errorList) {
+                //depracated!!!
+                //this feature was seldom if ever used, so we will just take the first if there is more than one
+                let error = (errorList.length >= 1) ? errorList[0] : new Error("Error!");
+                this.setError(model,error);
             }
             else if(initialData.invalidValue) {
                 this.setResultInvalid(model);

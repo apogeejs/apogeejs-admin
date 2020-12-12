@@ -248,7 +248,7 @@ export function analyzeCode(functionText) {
         //check for errors in parsing
         if((ast.errors)&&(ast.errors.length > 0)) {
             returnValue.success = false;
-            returnValue.errors = ast.errors;
+            returnValue.error = createErrorFromAstErrors(ast.errors);
             return returnValue;
         }
         
@@ -261,8 +261,7 @@ export function analyzeCode(functionText) {
         return returnValue;
     }
     catch(exception) {
-        returnValue.errors = [];
-        returnValue.errors.push(exception);
+        returnValue.error = exception;
         return returnValue;
     }
 }
@@ -589,5 +588,19 @@ function createParsingError(errorMsg,location) {
         error.lineNumber = location.start.line;
         error.column = location.start.column;
     }
+    return error;
+}
+
+function createErrorFromAstErrors(astErrors) {
+    let errorTextArray = astErrors.map(errorInfo => errorInfo.Error);
+    var error = new Error("Error parsing user code: " + errorTextArray.join("; "));
+    //add extended error info!
+    //astErrors Format:
+    //[{
+    //      Error: error message
+    //      index: character number on line?
+    //      lineNumber: line number of code
+    //      description: error message description
+    //}]
     return error;
 }

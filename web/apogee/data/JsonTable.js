@@ -74,7 +74,8 @@ export default class JsonTable extends CodeableMember {
         if(
             (!initialData.functionBody) && //no function body (anything falsy is an invalid function)
             (initialData.data === undefined) && //no data value set
-            (!initialData.errorList) && //no error list (any error list will set the error state)
+            (!initialData.error) && //no error (any error will set the error state)
+            (!initialData.errorList) && //DEPRECATED! no error list (any error list will set the error state)
             (initialData.invalidValue !== true) //not invalid value
         ) initialData.data = "";
 
