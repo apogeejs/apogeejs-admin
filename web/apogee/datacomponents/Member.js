@@ -188,6 +188,25 @@ export default class Member extends FieldObject {
         }
     }
 
+    /** This returns the list of extended error info objects for this member. */
+    getExtendedErrorInfo() {
+        let errorInfoList = [];
+        let stateStruct = this.getField("state");
+        if((stateStruct)&&(stateStruct.errorList)) {
+            stateStruct.errorList.forEach(error => {
+                if(error.extendedErrorInfo) {
+                    if(error.extendedErrorInfo.type == "multi") {
+                        error.extendedErrorInfo.infos.forEach(extendedErrorInfo => errorInfoList.push(extendedErrorInfo));
+                    }
+                    else {
+                        errorInfoList.push(error.extendedErrorInfo);
+                    }
+                }
+            })
+        }
+        return errorInfoList;
+    }
+
     getDependsOnError() {
         return new Error("TEMP! Depends on member with error: " + this.getName());
     }
@@ -340,9 +359,6 @@ export default class Member extends FieldObject {
                     //add to error list
                     newStateStruct.errorList.push(error);
                 }
-
-                //FOR NOW OVERWRITE DATA WITH ERROR INFO
-//                data = _getErrorData(newErrorList);
             }
             else {
                 newStateStruct.state = state;
@@ -429,8 +445,23 @@ export default class Member extends FieldObject {
     //}
 
     //----------------------------------
-    // State setting methods
+    // Error methods
     //----------------------------------
+
+/* Some Extended Error Info formats:
+//basic format
+{
+    type: (extended error info type name),
+    (other, based on type),
+}
+
+//"multi" type
+{
+    type: "multi",
+    infos: [(child extended error infos)]
+}
+*/
+    
 
     /** This methos created a depends on error, with a dependency on all members in the passed list. */
     static createDependsOnError(model,errorImpactorList) {
@@ -444,6 +475,45 @@ export default class Member extends FieldObject {
         dependsOnError.isDependsOnError = true;
         dependsOnError.dependsOnErrorList = dependsOnErrorList;
         return dependsOnError;
+    }
+
+    /** This method adds the extended info to the error. It allows for multiple
+     * error infos to be added. */
+    static appendExtendedInfo(error,extendedErrorInfo) {
+        if(!error.extendedErrorInfo) {
+            error.extendedErrorInfo = extendedErrorInfo;
+            return;
+        }
+        //handle multiple infos added
+        if(error.extendedErrorInfo.type == "multi") {
+            error.extendedErrorInfo.infos.push(extendedErrorInfo);
+            return;
+        }
+        else {
+            let multiInfo = {
+                type: "multi",
+                infos: []
+            }
+            multiInfo.push(error.extendedErrorInfo);
+            multiInfo.push(extendedErrorInfo)
+            return;
+        }
+    }
+
+    /** This method is used to add trace of members whose code was called */
+    static appendMemberTraceInfo(model,error,member) {
+        if(!error.memberTrace) {
+            error.memberTrace = [];
+        }
+        let memberInfo = {};
+        memberInfo.id = member.getId();
+        memberInfo.name = member.getFullName(model);
+        if(member.getCodeText) memberInfo.code = member.getCodeText();
+        error.memberTrace.push(memberInfo);
+    }
+
+    static getMemberTraceInfo(error) {
+        return error.memberTrace;
     }
 
     /** This method adds depends on members to the depends on error list. */

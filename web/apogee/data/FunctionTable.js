@@ -72,6 +72,12 @@ export default class FunctionTable extends CodeableMember {
             }
         }
 
+        source.handleError = error => {
+            console.error("Error in function call to " + this.getName());
+            CodeableMember.appendMemberTraceInfo(model,error,this);
+            throw error;
+        }
+
         //create the wrapped function - we call this from the debug file to make this cleaner for the
         //user, since they will run through it from the debugger.
         let wrappedMemberFunction = __functionTableWrapper(this.getName(),source);

@@ -243,12 +243,14 @@ export function analyzeCode(functionText) {
     var returnValue = {};
     
     try {
-        var ast = esprima.parse(functionText, { tolerant: true, loc: true });
+        var ast = esprima.parse(functionText, { tolerant: true, loc: true, range: true });
     
         //check for errors in parsing
         if((ast.errors)&&(ast.errors.length > 0)) {
             returnValue.success = false;
-            returnValue.error = createErrorFromAstErrors(ast.errors);
+            let {errorMsg,extendedErrorInfo} = createErrorInfoFromAstInfo(functionText,ast.errors);
+            returnValue.errorMsg = errorMsg; 
+            returnValue.extendedErrorInfo = extendedErrorInfo;
             return returnValue;
         }
         
@@ -260,8 +262,10 @@ export function analyzeCode(functionText) {
         returnValue.varInfo = varInfo;
         return returnValue;
     }
-    catch(exception) {
-        returnValue.error = exception;
+    catch(internalError) {
+        let {errorMsg,extendedErrorInfo} = createErrorInfoFromInternalError(functionText,internalError);
+        returnValue.errorMsg = errorMsg; 
+        returnValue.extendedErrorInfo = extendedErrorInfo;
         return returnValue;
     }
 }
@@ -369,11 +373,11 @@ function processGenericNode(processInfo,node) {
     //process this list
     if(nodeInfoList === undefined) {
         //node not found
-        throw createParsingError("Syntax Tree Node not found: " + node.type,node.loc);
+        throw createInternalParsingError("Syntax Tree Node not found: " + node.type,node.loc,node.range);
     }
     else if(nodeInfoList === null) {
         //node not supported
-        throw createParsingError("Syntax node not supported: " + node.type,node.loc);
+        throw createInternalParsingError("Syntax node not supported: " + node.type,node.loc,node.range);
     }
     else {
         //this is a good node - process it
@@ -535,7 +539,7 @@ function getVariableDotPath(processInfo,node) {
     }
     else {
         //this shouldn't happen. If it does we didn't code the syntax tree right
-        throw createParsingError("Unknown application error: expected a variable identifier node.",node.loc);
+        throw createInternalParsingError("Unknown application error: expected a variable identifier node.",node.loc,node.range);
     }
 }
 
@@ -582,25 +586,41 @@ function markLocalVariables(processInfo) {
  *     column;[integer column on line number]
  * }
  * @private */
-function createParsingError(errorMsg,location) {
-    var error = new Error(errorMsg);
+function createInternalParsingError(errorMsg,location,range) {
+    let error = new Error(errorMsg);
+    error.description = errorMsg;
     if(location) {
-        error.lineNumber = location.start.line;
         error.column = location.start.column;
+        error.lineNumber = location.start.line;
+    }
+    if(range) {
+        error.index = range[0];
     }
     return error;
 }
 
-function createErrorFromAstErrors(astErrors) {
-    let errorTextArray = astErrors.map(errorInfo => errorInfo.Error);
-    var error = new Error("Error parsing user code: " + errorTextArray.join("; "));
-    //add extended error info!
-    //astErrors Format:
-    //[{
-    //      Error: error message
-    //      index: character number on line?
-    //      lineNumber: line number of code
-    //      description: error message description
-    //}]
-    return error;
+function createErrorInfoFromInternalError(functionText,internalError) {
+    let extendedErrorInfo = {};
+    extendedErrorInfo.type = "esprimaParseError";
+    extendedErrorInfo.description = "Error parsing code: " + internalError.description;
+    let errorMsg = internalError.toString();
+    let errorInfo = {};
+    if(internalError.lineNumber !== undefined) errorInfo.lineNumber = internalError.lineNumber;
+    if(internalError.index !== undefined) errorInfo.index = internalError.index;
+    if(internalError.column !== undefined) errorInfo.column = internalError.column;
+    extendedErrorInfo.errors = [errorInfo]
+    extendedErrorInfo.code = functionText;
+    return {errorMsg,extendedErrorInfo};
+}
+
+/** this converts info from code analysis to a proper error */
+function createErrorInfoFromAstInfo(functionText,astErrors) {
+    let errorTextArray = astErrors.map(errorInfo => errorInfo.description);
+    let errorMsg = "Error parsing user code: " + errorTextArray.join("; ");
+    let extendedErrorInfo = {};
+    extendedErrorInfo.type = "esprimaParseError";
+    extendedErrorInfo.description = errorMsg;
+    extendedErrorInfo.errors = astErrors;
+    extendedErrorInfo.code = functionText;
+    return {errorMsg,extendedErrorInfo};
 }

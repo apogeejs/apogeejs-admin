@@ -81,6 +81,12 @@ export default class ComponentView {
         }
     }
 
+    //DEV - we will probably change this
+    getExtendedErrorInfo() {
+        let member = this.component.getMember();
+        return member.getExtendedErrorInfo();
+    }
+
     /** This gets the banner error message for the component. It is separated so it can be overwritten 
      * for compound components. These have the member being a folder. They will just have dependency
      * errors for the child members. */

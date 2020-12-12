@@ -170,7 +170,6 @@ export default class DependentMember extends Member {
 
         if(dependenciesUpdated) {
             this.setField("dependsOnMap",newDependsOnMap);
-//            this.calcPending = true;
         }
 
         return dependenciesUpdated;

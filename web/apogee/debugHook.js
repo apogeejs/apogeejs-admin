@@ -26,8 +26,7 @@ __globals__.__functionTableWrapper = function(functionName,source) {
             return source.memberFunction.apply(null,arguments);
         }
         catch(error) {
-            console.error("Error in function call to " + functionName);
-            throw error;
+            source.handleError(error);
         }
     }
     

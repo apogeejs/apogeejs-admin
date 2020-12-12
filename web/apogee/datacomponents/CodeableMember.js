@@ -83,6 +83,14 @@ export default class CodeableMember extends DependentMember {
         return this.getField("supplementalCode");
     }
 
+    /** This method returns the actual code that is executed. It will only return a valid result when there
+     * is code that has been compiled for the member. */
+    getCodeText() {
+        let compiledInfo = this.getField("compiledInfo");
+        if((compiledInfo)&&(compiledInfo.generatorFunction)) return compiledInfo.generatorFunction.toString();
+        else return null;
+    }
+
     /** This is a helper method that compiles the code as needed for setCodeInfo.*/
     applyCode(argList,functionBody,supplementalCode) {
 
@@ -176,7 +184,9 @@ export default class CodeableMember extends DependentMember {
             return;
         }
         else if(!compiledInfo.valid) {
-            this.setError(model,compiledInfo.error);
+            let error = new Error(compiledInfo.errorMsg ? compiledInfo.errorMsg : "Unknown error parsing user code");
+            if(compiledInfo.extendedErrorInfo) CodeableMember.appendExtendedInfo(error,compiledInfo.extendedErrorInfo);
+            this.setError(model,error);
             this.clearCalcPending();
             return;
         }
@@ -198,29 +208,28 @@ export default class CodeableMember extends DependentMember {
                 //to do this. See notes where this is thrown.
                 this.setResultPending(model);
             }
+            else if(error.isDependsOnError) {
+                //this is a depends on error from a member (presumably a fucntion table) we are calling
+                this.setError(model,error);
+            }
             //--------------------------------------
-            else {
-                //normal error in member function execution
-//                let extendedInfo = [];
-            
+            else {            
                 //this is an error in the code
                 if(error.stack) {
                     console.error("Error calculating member " + this.getFullName(model));
                     console.error(error.stack);
-
-//                    extendedInfo.push({label: "Stack Trace", body: error.stack});
-
-//                    if((compiledInfo)&&(compiledInfo.generatorFunction)) {
-//                        extendedInfo.push({
-//                            label: "Source Code",
-//                            body: compiledInfo.generatorFunction.toString()
-//                        });
-//                    }
                 }
 
-//                if(extendedInfo) {
-//                    error.extendedInfo = extendedInfo;
-//                }
+                //create the extended error info
+                CodeableMember.appendMemberTraceInfo(model,error,this);
+
+                let extendedErrorInfo = {};
+                extendedErrorInfo.type = "runtimeError";
+                extendedErrorInfo.description = "Error in code evaluating member: " + this.getFullName(model);
+                if(error.stack) extendedErrorInfo.stack = error.stack;
+                extendedErrorInfo.memberTrace = CodeableMember.getMemberTraceInfo(error);
+
+                CodeableMember.appendExtendedInfo(error,extendedErrorInfo);
 
                 this.setError(model,error);
             }
@@ -258,6 +267,7 @@ export default class CodeableMember extends DependentMember {
             else if(state == apogeeutil.STATE_ERROR) {
                 //save a single error
                 updateData.error = this.getErrorMsg();
+                updateData.extendedErrorInfoList = this.getExtendedErrorInfo();
             }
             else {
                 //save the data value
@@ -284,10 +294,15 @@ export default class CodeableMember extends DependentMember {
         else {
             //set initial data
             if(initialData.error) {
-                this.setError(model,initialData.error);
+                //reconstruct the error
+                let error = new Error(initialData.error);
+                if(initialData.extendedErrorInfoList) {
+                    initialData.extendedErrorInfo.forEach(extendedErrorInfo => CodeableMember.appendExtendedInfo(extendedErrorInfo));
+                }
+                this.setError(model,error);
             }
             else if(initialData.errorList) {
-                //depracated!!!
+                //depracated!!! replaced with initialData.error and initialData.extendedErrorInfoList
                 //this feature was seldom if ever used, so we will just take the first if there is more than one
                 let error = (errorList.length >= 1) ? errorList[0] : new Error("Error!");
                 this.setError(model,error);
@@ -441,7 +456,6 @@ export default class CodeableMember extends DependentMember {
         return memberFunctionInitializer();
 
     }
-
 
 }
 

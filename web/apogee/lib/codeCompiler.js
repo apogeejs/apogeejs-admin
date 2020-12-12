@@ -57,7 +57,7 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
     //get the accessed variables
     //
     //parse the code and get variable dependencies
-    var effectiveCombinedFunctionBody = getMemberLocalsText(memberFunctionName) + combinedFunctionBody;
+    var effectiveCombinedFunctionBody = getEffectiveFunctionBodyHeader(memberFunctionName) + combinedFunctionBody;
     var analyzeOutput = analyzeCode(effectiveCombinedFunctionBody);
     
     var compiledInfo = {};
@@ -66,7 +66,8 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
         compiledInfo.varInfo = analyzeOutput.varInfo;
     }
     else {
-        compiledInfo.error = analyzeOutput.error;
+        compiledInfo.errorMsg = analyzeOutput.errorMsg;
+        if(analyzeOutput.extendedErrorInfo) compiledInfo.extendedErrorInfo = analyzeOutput.extendedErrorInfo;
         compiledInfo.valid = false;
         return compiledInfo;
     }
@@ -185,8 +186,10 @@ return {
 /** This line is added when getting the dependencies to account for some local 
  * variables in the member function.
  * @private */
-function getMemberLocalsText(memberFunctionName) {
-    return `var apogeeMessenger, ${memberFunctionName}, __memberFunctionDebugHook;`
+function getEffectiveFunctionBodyHeader(memberFunctionName) {
+    return `'use strict'
+var apogeeMessenger, ${memberFunctionName}, __memberFunctionDebugHook;
+`
 }
    
 
