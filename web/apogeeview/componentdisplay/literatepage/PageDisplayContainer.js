@@ -278,7 +278,6 @@ export default class PageDisplayContainer {
             this.showMaxButton.onclick = () => this.showMax();
             this.showMaxButton.title = "Show Max View Size";
             this.heightUiActive = true;
-            this.updateViewSizeButtons()
         }
         else {
             this.sizingElement.style.display = "none";
@@ -287,50 +286,21 @@ export default class PageDisplayContainer {
 
     showLess() {
         if((this.dataDisplay)&&(this.heightUiActive)) {
-            if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX) {
-                //if we are in display max mode, change to display some mode
-                this.dataDisplay.setResizeHeightMode(DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME);
-            }
-            else if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
-                //if we are in "some" mode, adjust size smaller if allowed
-                if((this.dataDisplay.getHeightAdjustFlags() | DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS) !== 0) {                  
-                    this.dataDisplay.adjustHeight(DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS);
-                }
-            }
-            else {
-                //unknown mode
-                return;
-            }
+            this.dataDisplay.showLess();
             this.updateViewSizeButtons();
         }
     }
 
     showMore() {
         if((this.dataDisplay)&&(this.heightUiActive)) {
-            if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
-                //if we are in "some" mode, adjust size smaller if allowed
-                if((this.dataDisplay.getHeightAdjustFlags() | DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE) !== 0) {
-                    this.dataDisplay.adjustHeight(DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE);
-                }
-            }
-            else {
-                //no action is not in some mode
-                return;
-            }
+            this.dataDisplay.showMore();
             this.updateViewSizeButtons();
         }
     }
 
     showMax() {
         if((this.dataDisplay)&&(this.heightUiActive)) {
-            if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
-                //if we are in display max mode, change to display some mode
-                this.dataDisplay.setResizeHeightMode(DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX);
-            }
-            else {
-                //no action is not in some mode
-                return;
-            }
+            this.dataDisplay.showMax();
             this.updateViewSizeButtons();
         }
     }
@@ -339,15 +309,23 @@ export default class PageDisplayContainer {
         if(this.heightUiActive) {
             let showLessVisible = false, showMoreVisible = false, showMaxVisible = false;
             if(this.dataDisplay) {
-                if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
-                    showLessVisible = true;
-                    showMoreVisible = true;
-                    showMaxVisible = true;
-                }
-                else if(this.dataDisplay.getResizeHeightMode() == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX){
-                    showLessVisible = true;
+                let resizeButtonFlags = this.dataDisplay.getHeightAdjustFlags();
+                if(resizeButtonFlags & DATA_DISPLAY_CONSTANTS.RESIZE_SHOW_FLAG) {
+                    if(resizeButtonFlags & DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX_FLAG) {
+                        showLessVisible = true;
+                    }
+                    else {
+                        showLessVisible = true;
+                        showMoreVisible = true;
+                        showMaxVisible = true;
+                    }
                 }
             }
+
+            //not currently implemented:
+            //DATA_DISPLAY_CONSTANTS.RESIZE_DISABLE_LESS
+            //DATA_DISPLAY_CONSTANTS.RESIZE_DISABLE_MORE
+            //DATA_DISPLAY_CONSTANTS.RESIZE_DISABLE_MAX
 
             this.showLessButton.style.display = (showLessVisible) ? "" : "none";
             this.showMoreButton.style.display = (showMoreVisible) ? "" : "none";
@@ -398,6 +376,7 @@ export default class PageDisplayContainer {
                 }
             }  
         }
+        this.updateViewSizeButtons();
         
             
         //fyi - this is remove code, when we need to add it

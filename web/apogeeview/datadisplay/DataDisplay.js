@@ -124,28 +124,23 @@ export default class DataDisplay {
         this.useContainerHeightUi = useContainerHeightUi;
     }
 
-    /** This method gets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
-     */
-    //getResizeHeightMode();
+    /** This is called if the show less button is pressed, if container height UI is in use */
+    //showLess();
 
-    /** This method sets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
-     */
-    //setResizeHeightMode(resizeMode);
+    /** This is called if the show more button is pressed, if container height UI is in use */
+    //showMore();
 
-    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS;
-    */
-    //adjustHeight(adjustment);
+    /** This is called if the show max button is pressed, if container height UI is in use */
+    //showMax();
 
-    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Flags:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS = 1;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE = 2;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_NONE = 0;
+    /** This method controlsthe visibility options for the resize buttons. These will only be called if 
+     * resize is enabled for this data display (if container height UI is in use)
+     * Flags:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_SHOW_FLAG = 1; (if not set this hides all buttons)
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX_FLAG = 2; (if not set the mode is SOME, if set the mode is MAX)
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_DISABLE_LESS_FLAG = 4; (disables the less button, if it is showing)
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_DISABLE_MORE_FLAG = 8; (disables the more button, if it is showing)
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_DISABLE_MAX_FLAG = 16; (disables the max button, if it is showing)
      * These flags should be or'ed togethder to give the allowed options.
     */
     //getHeightAdjustFlags();
