@@ -19,6 +19,7 @@ export default class PageDisplayContainer {
         this.headerContainer = null;
         this.viewContainer = null;
         this.viewDisplayElement = null;
+        this.errorContainer = null;
 
         this.viewSelectorContainer = null;
         this.viewActiveElement = null;
@@ -32,13 +33,16 @@ export default class PageDisplayContainer {
         
         this.inEditMode = false;
         
-        this.content = null;
-        
         this.componentDisplay = componentDisplay;
         this.componentView = componentDisplay.getComponentView();
         this.viewTypeName = viewModeInfo.name;
         this.viewTypeLabel = viewModeInfo.label;
+
         this.dataDisplay = null;
+        this.dataDisplayLoaded = false;
+
+        this.errorDisplay = null;
+        this.errorDisplayLoaded = false;
 
         this.heightUiActive = false;
         this.showLessButton = null;
@@ -74,6 +78,7 @@ export default class PageDisplayContainer {
     setIsComponentShowing(isComponentShowing) {
         this.isComponentShowing = isComponentShowing;
         this.updateDataDisplayLoadedState();
+        this.updateErrorDisplayLoadedState();
     }
 
     /** This returns the isComponentShowing status of the display. */
@@ -136,6 +141,7 @@ export default class PageDisplayContainer {
         this.isViewActive = isViewActive;
         this.updateViewSelectorState();
         this.updateDataDisplayLoadedState();
+        this.updateErrorDisplayLoadedState();
     }
 
     //---------------------------
@@ -161,6 +167,9 @@ export default class PageDisplayContainer {
         
         //add the header elment (for the save bar)
         this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
+
+        //add the view container
+        this.errorContainer = uiutil.createElementWithClass("div","visiui_displayContainer_errorContainerClass",this.mainElement);
 
         //add the view container
         this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
@@ -198,12 +207,25 @@ export default class PageDisplayContainer {
             this.viewToolbarElement = null;
             this.viewLabelElement = null;
 
+            if(this.showLessButton) {
+                this.showLessButton.onclick = null;
+                this.showLessButton = null;
+            }
+            if(this.showMoreButton) {
+                this.showMoreButton.onclick = null;
+                this.showMoreButton = null;
+            }
+            if(this.showMaxButton) {
+                this.showMaxButton.onclick = null;
+                this.showMaxButton = null;
+            }
             this.sizingElement = null;
 
             this.viewDisplayElement = null;
             this.headerContainer = null;
             this.viewContainer = null;
             this.viewSelectorContainer = null;
+            this.errorContainer = null;
 
             if(this.viewSelectorLink) {
                 this.viewSelectorLink.onclick = null;
@@ -215,35 +237,6 @@ export default class PageDisplayContainer {
 
             this.viewNameElement = null;
         }
-    }
-
-    /** This completes the UI. It should only be called when the data display has been created. */
-    completeUI() {
-        if(!this.dataDisplay) return;
-        if(this.uiDestroyed) return;
-
-        //add the view toolbar controls
-        this.populateSizingElement();
-
-        //populating the display element is initiated by the data display itself
-
-        this.uiCompleted = true;
-    }
-
-    /** This clears the data display specific parts of the container ui, so a new data display may be added. */
-    uncompleteUI() {
-        if(this.uiDestroyed) return;
-
-        if(this.showLessButton) this.showLessButton.onclick = null;
-        if(this.showMoreButton) this.showMoreButton.onclick = null;
-        if(this.showMaxButton) this.showMaxButton.onclick = null;
-        uiutil.removeAllChildren(this.sizingElement);
-        uiutil.removeAllChildren(this.viewDisplayElement);
-        uiutil.removeAllChildren(this.viewContainer);
-
-        this.heightUiActive = false;
-
-        this.uiCompleted = false;
     }
 
     updateViewSelectorState() {
@@ -261,25 +254,31 @@ export default class PageDisplayContainer {
     }
 
     /** This method configures the toolbar for the view display. */
-    populateSizingElement() {
+    configureSizingElement() {
 
         //show the height controls
         if(this.dataDisplay.getUseContainerHeightUi()) {
-            this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
-            this.showLessButton.innerHTML = "less";
-            this.showLessButton.onclick = () => this.showLess();
-            this.showLessButton.title = "Descrease View Size";
-            this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
-            this.showMoreButton.innerHTML = "more";
-            this.showMoreButton.onclick = () => this.showMore();
-            this.showMoreButton.title = "Increase View Size";
-            this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
-            this.showMaxButton.innerHTML = "max";
-            this.showMaxButton.onclick = () => this.showMax();
-            this.showMaxButton.title = "Show Max View Size";
+
+            if(!this.showLessButton) { //use this as a proxy for other two
+                this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
+                this.showLessButton.innerHTML = "less";
+                this.showLessButton.onclick = () => this.showLess();
+                this.showLessButton.title = "Descrease View Size";
+                this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
+                this.showMoreButton.innerHTML = "more";
+                this.showMoreButton.onclick = () => this.showMore();
+                this.showMoreButton.title = "Increase View Size";
+                this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
+                this.showMaxButton.innerHTML = "max";
+                this.showMaxButton.onclick = () => this.showMax();
+                this.showMaxButton.title = "Show Max View Size";
+            }
+
             this.heightUiActive = true;
+            this.sizingElement.style.display = "";
         }
         else {
+            this.heightUiActive = false;
             this.sizingElement.style.display = "none";
         }
     }
@@ -346,14 +345,16 @@ export default class PageDisplayContainer {
                     this.dataDisplay =  this.componentView.getDataDisplay(this,this.viewTypeName);
                     if(this.dataDisplay) {
                         this.dataDisplay.readUiStateData(this.savedUiState);
-                        if(!this.uiCompleted) this.completeUI();
-                        this.setContent(this.dataDisplay.getContent());
+                        this.setDataContent(this.dataDisplay.getContent());
+                        this.configureSizingElement();
                         this.dataDisplay.showData();
                     }
                 }
             
-                if((this.dataDisplay)&&(this.dataDisplay.onLoad)) this.dataDisplay.onLoad();
-                this.dataDisplayLoaded = true;
+                if((this.dataDisplay)&&(this.dataDisplay.onLoad)) {
+                    this.dataDisplay.onLoad();
+                    this.dataDisplayLoaded = true;
+                }
             }
         }
         else {
@@ -368,8 +369,8 @@ export default class PageDisplayContainer {
                     //update the saved UI state
                     this.dataDisplay.addUiStateData(this.savedUiState);
 
-                    //remove content
-                    this.safeRemoveContent();
+                    this.cleanupDataDisplayUI();
+
                     //destroy the display
                     if(this.dataDisplay.destroy) this.dataDisplay.destroy();
                     this.dataDisplay = null;
@@ -377,10 +378,52 @@ export default class PageDisplayContainer {
             }  
         }
         this.updateViewSizeButtons();
+    }
+
+    /** This method shold be called when the content loaded or frame visible state 
+     * changes to manage the error display.
+     * private */
+    updateErrorDisplayLoadedState() {
         
+        if((this.isComponentShowing)&&(this.isViewActive)) {
+            if(!this.errorDisplayLoaded) {
+                //getErrorDisplay function may not be present
+                if((!this.errorDisplay)&&( this.componentView.getErrorDisplay)) {
+                    //the display should be created only when it is made visible
+                    this.errorDisplay =  this.componentView.getErrorDisplay(this,this.viewTypeName);
+                    if(this.errorDisplay) {
+                        //(no saved UI state for error display)
+                        this.setErrorContent(this.errorDisplay.getContent());
+                        this.errorDisplay.showData();
+                    }
+                }
             
-        //fyi - this is remove code, when we need to add it
-        //[]
+                if((this.errorDisplay)&&(this.errorDisplay.onLoad)) {
+                    this.errorDisplay.onLoad();
+                    this.errorDisplayLoaded = true;
+                }
+            }
+        }
+        else {
+            if(this.errorDisplay) {
+                if(this.errorDisplayLoaded) {
+                    this.errorDisplayLoaded = false;
+                    if(this.errorDisplay.onUnload) this.errorDisplay.onUnload();
+                }
+                
+                //we will alwasy destroy the error when we are inactive
+                if(!this.isViewActive) {
+                    //(no the saved UI state for error display)
+
+                    this.cleanupErrorDisplayUI();
+
+                    //destroy the display
+                    if(this.errorDisplay.destroy) this.errorDisplay.destroy();
+                    this.errorDisplay = null;
+                }
+            }  
+        }
+        //(no size buttons for error display)
     }
 
     //------------------------------
@@ -396,24 +439,52 @@ export default class PageDisplayContainer {
 
     /** This method cleasr the data display. It should only be called when the data display is not showing. 
      * maybe allow this when the display is showing - unload and reload it*/
-    reloadDisplay() {
+    reloadDataDisplay() {
 
         //update the stored UI state json
         this.savedUiState = this.getStateJson();
 
+        //reset any data display specific parts of the ui
+        this.cleanupDataDisplayUI();
+
         //this destrpys the data display, not the container - bad name
         this.deleteDataDisplay();
-
-        //this gets rid of the data display specific parts of the ui
-        this.uncompleteUI();
 
         //reload display
         this.updateDataDisplayLoadedState();
     }
 
+    /** This method cleasr the data display. It should only be called when the data display is not showing. 
+     * maybe allow this when the display is showing - unload and reload it*/
+    reloadErrorDisplay() {
+
+        //(no saved ui state for error display)
+
+        //reset any data display specific parts of the ui
+        this.cleanupErrorDisplayUI();
+
+        //this destrpys the data display, not the container - bad name
+        this.deleteErrorDisplay();
+
+        //reload display
+        this.updateErrorDisplayLoadedState();
+    }
+
+    cleanupDataDisplayUI() {
+        //reset any data display specific parts of the ui
+        this.sizingElement.style.display = "none";
+        this.heightUiActive = false;
+        uiutil.removeAllChildren(this.viewDisplayElement);
+        uiutil.removeAllChildren(this.viewContainer);
+    }
+
+    cleanupErrorDisplayUI() {
+        //reset any error display specific parts of the ui
+        uiutil.removeAllChildren(this.errorContainer);
+    }
+
     /** This method destroys the data display. */
     destroy() {
-        this.uncompleteUI();
         this.destroyUI();
         this.deleteDataDisplay();
     }
@@ -425,6 +496,16 @@ export default class PageDisplayContainer {
             }
             this.dataDisplay = null;
             this.dataDisplayLoaded = false;
+        }
+    }
+
+    deleteErrorDisplay() {
+        if(this.errorDisplay) {
+            if(this.errorDisplay.destroy) {
+                this.errorDisplay.destroy();
+            }
+            this.errorDisplay = null;
+            this.errorDisplayLoaded = false;
         }
     }
 
@@ -454,7 +535,7 @@ export default class PageDisplayContainer {
             let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
             if(reloadDataDisplay) {
                 //this will also reload data
-                this.reloadDisplay();
+                this.reloadDataDisplay();
             }
             else if(reloadData) {
                 //don't reload data if we are in edit mode. It will reload after completion, whether through cancel or save.
@@ -462,6 +543,17 @@ export default class PageDisplayContainer {
                     this.dataDisplay.showData();
                     this.updateViewSizeButtons();
                 }
+            }
+        }
+        if(this.errorDisplay) {
+            let {reloadErrorData,reloadErrorDisplay} = this.errorDisplay.doUpdate();
+            if(reloadErrorDisplay) {
+                //this will also reload data
+                this.reloadErrorDisplay();
+            }
+            else if(reloadErrorData) {
+                //(edit mode not supported for error display)
+                this.errorDisplay.showData();
             }
         }
     }
@@ -552,25 +644,15 @@ export default class PageDisplayContainer {
     }
 
     /** This sets the content for the window. */
-    setContent(contentElement) {
-        
-        uiutil.removeAllChildren(this.viewContainer);
-        
+    setDataContent(contentElement) {
         //set the content
         this.viewContainer.appendChild(contentElement);
-        this.content = contentElement;
     }
 
-    /** This method removes the given element from the content display. If the element
-     * is not in the content display, no action is taken. */
-    safeRemoveContent() {
-        for(var i = 0; i < this.viewContainer.childNodes.length; i++) {
-            var node = this.viewContainer.childNodes[i];
-            if(node === this.content) {
-                this.viewContainer.removeChild(this.content);
-                this.content = null;
-            }
-        }
+    /** This sets the content for the window. */
+    setErrorContent(contentElement) {
+        //set the content
+        this.errorContainer.appendChild(contentElement);
     }
 
 }

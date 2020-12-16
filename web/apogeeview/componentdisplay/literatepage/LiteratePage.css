@@ -232,3 +232,9 @@
     z-index: 0;
     /*outline: .5px solid rgb(200,200,200);*/
 }
+.visiui_displayContainer_errorContainerClass {
+    position: relative;
+    margin: 3px;
+    z-index: 0;
+    /*outline: .5px solid rgb(200,200,200);*/
+}
