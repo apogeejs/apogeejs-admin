@@ -199,3 +199,41 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,m
         }
     }
 }
+
+
+/** This function creates the data display data source  for the data of the given member. The
+ * member field should be the field name used to access the data source from the associated component. */
+dataDisplayHelper.getStandardErrorDataSource = function(app,componentView,memberFieldName) {
+
+    //this is used internally to lookup the data member used here
+    let _getDataMember = function() {
+        let component = componentView.getComponent();
+        let member = component.getField(memberFieldName);
+        return member;
+    };
+    
+    return {
+        doUpdate: function() {
+            //return value is whether or not the data display needs to be udpated
+            let component = componentView.getComponent();
+            let reloadData = component.isMemberDataUpdated(memberFieldName);
+            let reloadDataDisplay = false;
+            return {reloadData,reloadDataDisplay};
+        },
+
+        showDisplay() {
+            let member = _getDataMember();
+            return (member.getState() == apogeeutil.STATE_ERROR);
+        },
+
+        getData: function() {
+            let member = _getDataMember();
+            if(member.getState() == apogeeutil.STATE_ERROR) {
+                return member.getExtendedErrorInfo();
+            }
+            else {
+                return "";
+            }
+        }
+    }
+}

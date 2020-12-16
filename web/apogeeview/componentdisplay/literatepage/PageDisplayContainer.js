@@ -487,6 +487,7 @@ export default class PageDisplayContainer {
     destroy() {
         this.destroyUI();
         this.deleteDataDisplay();
+        this.deleteErrorDisplay();
     }
 
     deleteDataDisplay() {
@@ -546,12 +547,12 @@ export default class PageDisplayContainer {
             }
         }
         if(this.errorDisplay) {
-            let {reloadErrorData,reloadErrorDisplay} = this.errorDisplay.doUpdate();
-            if(reloadErrorDisplay) {
+            let {reloadData,reloadDataDisplay} = this.errorDisplay.doUpdate();
+            if(reloadDataDisplay) {
                 //this will also reload data
                 this.reloadErrorDisplay();
             }
-            else if(reloadErrorData) {
+            else if(reloadData) {
                 //(edit mode not supported for error display)
                 this.errorDisplay.showData();
             }

@@ -1,6 +1,7 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HandsonGridEditor from "/apogeeview/datadisplay/HandsonGridEditor.js";
+import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
@@ -26,7 +27,6 @@ export default class JsonTableComponentView extends ComponentView {
         
         var dataDisplaySource;
         var app = this.getModelView().getApp();
-        
         
         //create the new view element;
         switch(viewType) {
@@ -66,6 +66,24 @@ export default class JsonTableComponentView extends ComponentView {
             default:
     //temporary error handling...
                 console.error("unrecognized view element: " + viewType);
+                return null;
+        }
+    }
+
+    /** This method retrieves an error display of the give type, where applicable. 
+     * @protected. */
+    getErrorDisplay(displayContainer,viewType) {
+        
+        var dataDisplaySource;
+        var app = this.getModelView().getApp();
+        
+        //create the new view element;
+        switch(viewType) {
+            case JsonTableComponentView.VIEW_DATA:
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
+                
+            default:
                 return null;
         }
     }

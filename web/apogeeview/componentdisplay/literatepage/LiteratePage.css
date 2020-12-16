@@ -236,5 +236,81 @@
     position: relative;
     margin: 3px;
     z-index: 0;
-    /*outline: .5px solid rgb(200,200,200);*/
+    max-height: 300px;
+    overflow: auto;
+}
+
+.errorDisplay_main {
+    position: relative;
+    background-color: rgb(255,240,240);
+    outline: rgb(255,0,0);
+}
+.errorDisplay_errorInfoDiv {
+}
+.errorDisplay_descriptionDiv {
+    padding: 5px;
+    color: red;
+    font-weight: bold;
+}
+.errorDisplay_stackTraceDiv {
+    padding: 20px 5px;
+    color: red;
+}
+.errorDisplay_memberHeadingDiv {
+    padding: 10px 5px;
+    color: rgb(96,96,96);
+}
+.errorDisplay_codeSection {
+    margin: 10px;
+    position: relative;
+    border: 1px solid gray;
+    background-color: rgb(240,240,250);
+    color: blue;
+    overflow: auto;
+    font-family: monospace;
+}
+pre.errorDisplay_codeSection {
+    white-space: pre-wrap;
+}
+pre.errorDisplay_codeSection:before {
+    counter-reset: listing;
+}
+pre.errorDisplay_codeSection code {
+    counter-increment: listing;
+}
+pre.errorDisplay_codeSection code::before {
+    background-color: white;
+    color: gray;
+    content: counter(listing);
+    display: inline-block;
+    width: 3ch;         
+    padding-left: auto; 
+    margin-left: auto; 
+    text-align: center;
+}
+pre.errorDisplay_longCode code::before {
+    width: 4ch;
+}
+pre.errorDisplay_veryLongCode code::before {
+    width: 5ch;
+}
+.errorDisplay_esprimaHeadingDiv {
+    padding: 5px 10px;
+    color: rgb(96,96,96);
+}
+.errorDisplay_simpleEntryDiv {
+    padding: 5px 10px;
+}
+.errorDisplay_simpleEntryHeadingDiv {
+    color: rgb(96,96,96);
+}
+.errorDisplay_simpleEntryLineDiv {
+    padding: 0px 5px;
+}
+.errorDisplay_simpleEntryLabelSpan {
+    color: rgb(96,96,96);
+    font-weight: bold;
+}
+.errorDisplay_simpleEntryTextSpan {
+    color: rgb(96,96,96);
 }

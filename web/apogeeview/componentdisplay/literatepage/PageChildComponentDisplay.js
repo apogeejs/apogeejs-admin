@@ -400,15 +400,6 @@ export default class PageChildComponentDisplay {
         else {
             this.clearIconOverlay();
         }
-
-        //DEV - print out the extended error info
-        let extendedErrorInfoList = this.componentView.getExtendedErrorInfo();
-        if(extendedErrorInfoList) {
-            console.error("####################################");
-            console.error("Extended Error Info from " + this.componentView.getName());
-            console.error(JSON.stringify(extendedErrorInfoList));
-            console.error("####################################");
-        }
     }
 
 }
