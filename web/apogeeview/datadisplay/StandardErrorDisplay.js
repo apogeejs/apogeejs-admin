@@ -59,72 +59,163 @@ export default class StandardErrorDisplay extends DataDisplay {
 
 }
 
-function _addEsprimseParseError(div,errorInfo) {
-    if(errorInfo.description) _addDescription(div,errorInfo.description);
-    if(errorInfo.errors) _addEsprimaErrorArray(div,errorInfo.errors);
-    if(errorInfo.code)  _addCode(div,errorInfo.code);
+//===================================
+// Error Info Elements
+//===================================
+
+function _addEsprimseParseError(errorInfoDiv,errorInfo) {
+    if(errorInfo.description) _addMainDescription(errorInfoDiv,errorInfo.description);
+    if(errorInfo.errors) _addEsprimaErrorSection(errorInfoDiv,errorInfo.errors);
+    if(errorInfo.code)  _addSimpleCodeSection(errorInfoDiv,"Parsed Code",errorInfo.code);
 }
 
-function _addJavascriptParseError(div,errorInfo) {
-    if(errorInfo.description) _addDescription(div,errorInfo.description);
-    if(errorInfo.stack) _addStackTrace(div,errorInfo.stack);
-    if(errorInfo.code) _addCode(div,errorInfo.code);
+function _addJavascriptParseError(errorInfoDiv,errorInfo) {
+    if(errorInfo.description) _addMainDescription(errorInfoDiv,errorInfo.description);
+    if(errorInfo.stack) _addStackTraceSection(errorInfoDiv,errorInfo.stack);
+    if(errorInfo.code) _addSimpleCodeSection(errorInfoDiv,"Parsed Code",errorInfo.code);
 }
 
-function _addRuntimeError(div,errorInfo) {
-    if(errorInfo.description) _addDescription(div,errorInfo.description);
-    if(errorInfo.stack) _addStackTrace(div,errorInfo.stack);
-    if((errorInfo.memberTrace)&&(Array.isArray(errorInfo.memberTrace))) {
-        errorInfo.memberTrace.forEach(memberEntry => _addMemberCodeEntry(div,memberEntry));
-    }
+function _addRuntimeError(errorInfoDiv,errorInfo) {
+    if(errorInfo.description) _addMainDescription(errorInfoDiv,errorInfo.description);
+    if(errorInfo.stack) _addStackTraceSection(errorInfoDiv,errorInfo.stack);
+    if(errorInfo.memberTrace) _addMemberCodeSection(errorInfoDiv,errorInfo.memberTrace);
 }
 
-function _addOtherError(div,errorInfo) {
+function _addOtherError(errorInfoDiv,errorInfo) {
     //this is jsut for dev, for now at least
     //so we will use inline style parameters
     let headingDiv = document.createElement("div");
     headingDiv.innerHTML = "Error info:";
-    div.appendChild(headingDiv);
+    errorInfoDiv.appendChild(headingDiv);
     let bodyDiv = document.createElement("div");
     bodyDiv.innerHTML = JSON.stringify(errorInfo);
     bodyDiv.style.color = "red";
-    div.appendChild(bodyDiv);
+    errorInfoDiv.appendChild(bodyDiv);
 }
 
 //===========================================
-// These are standard individual display elements in the display 
+// These are combination elements 
 //===========================================
 
+function _addStackTraceSection(errorInfoDiv,stackTrace) {
+    let sectionDiv = _createSectionDiv();
+    errorInfoDiv.appendChild(sectionDiv);
+
+    _addSectionHeading(sectionDiv,"Stack Trace",1);
+    let containerDiv = document.createElement("div");
+    containerDiv.innerHTML = stackTrace;
+    containerDiv.className = "errorDisplay_stackTraceDiv";
+    sectionDiv.appendChild(containerDiv);
+}
+
+function _addSimpleCodeSection(errorInfoDiv,title,code) {
+    let sectionDiv = _createSectionDiv();
+    errorInfoDiv.appendChild(sectionDiv);
+
+    _addSectionHeading(sectionDiv,title,1);
+    _addCode(sectionDiv,code);
+}
+
+function _addMemberCodeSection(errorInfoDiv,memberTrace) {
+    if(Array.isArray(memberTrace)) {
+        let sectionDiv = _createSectionDiv();
+        errorInfoDiv.appendChild(sectionDiv);
+
+        _addSectionHeading(sectionDiv,"Member Code",1)
+        memberTrace.forEach(memberEntry => _addMemberCodeEntry(sectionDiv,memberEntry));
+    }
+}
+
+function _addMemberCodeEntry(sectionDiv,memberCodeEntry) {
+    if(memberCodeEntry.name) _addSectionHeading(sectionDiv,memberCodeEntry.name,2);
+    _addCode(sectionDiv,memberCodeEntry.code);
+}
+
+function _addEsprimaErrorSection(errorInfoDiv,esprimaErrorArray) {
+    if(Array.isArray(esprimaErrorArray)) {
+        let sectionDiv = _createSectionDiv();
+        errorInfoDiv.appendChild(sectionDiv);
+
+        _addSectionHeading(sectionDiv,"Parse Errors",1)
+        esprimaErrorArray.forEach(esprimaError => _addEsprimaError(sectionDiv,esprimaError));
+    }
+}
+
+function _addEsprimaError(sectionDiv,esprimaError) {
+
+    if(esprimaError.description) _addSectionHeading(sectionDiv,esprimaError.description,2);
+
+    if(esprimaError.lineNumber) {
+        _addSectionLabelLine(sectionDiv,"Line Number: ",esprimaError.lineNumber);
+    }
+    if(esprimaError.column) {
+        _addSectionLabelLine(sectionDiv,"Column: ",esprimaError.column);
+    }
+    if(esprimaError.index) {
+        _addSectionLabelLine(sectionDiv,"Index: ",esprimaError.index);
+    }
+}
+
+
+//===========================================
+// These are standard individual elements 
+//===========================================
+
+/** This is a wrapper for a single error info object */
 function _createErrorInfoDiv() {
     let errorInfoDiv = document.createElement("div");
     errorInfoDiv.className = "errorDisplay_errorInfoDiv";
     return errorInfoDiv;
 }
 
-function _addDescription(div,description) {
+/** This is the main description for a error info. It should be 
+ * placed directly in the error info div, at the top. */
+function _addMainDescription(errorInfoDiv,description) {
     let containerDiv = document.createElement("div");
     containerDiv.innerHTML = description;
-    containerDiv.className = "errorDisplay_descriptionDiv";
-    div.appendChild(containerDiv);
+    containerDiv.className = "errorDisplay_descriptionSectionDiv";
+    errorInfoDiv.appendChild(containerDiv);
 }
 
-function _addStackTrace(div,stackTrace) {
-    let containerDiv = document.createElement("div");
-    containerDiv.innerHTML = stackTrace;
-    containerDiv.className = "errorDisplay_stackTraceDiv";
-    div.appendChild(containerDiv);
+/** This is a wrapper for a section within an error info */
+function _createSectionDiv() {
+    let sectionDiv = document.createElement("div");
+    sectionDiv.className = "errorDisplay_sectionDiv";
+    return sectionDiv;
 }
 
-function _addMemberCodeEntry(div,memberCodeEntry) {
-    let memberHeading = memberCodeEntry.name ? memberCodeEntry.name + " Code:" : "Code:"
+/** This adds a heading line to a section. See supported levels below. */
+function _addSectionHeading(sectionDiv,text,level) {
     let headingDiv = document.createElement("div");
-    headingDiv.innerHTML = memberHeading;
-    headingDiv.className = "errorDisplay_memberHeadingDiv";
-    div.appendChild(headingDiv);
-    _addCode(div,memberCodeEntry.code);
+    headingDiv.className = HEAD_CLASS_LEVEL_MAP[level];
+    headingDiv.innerHTML = text;
+    sectionDiv.appendChild(headingDiv);
 }
 
-function _addCode(div,code) {
+const HEAD_CLASS_LEVEL_MAP = {
+    1: "errorDisplay_sectionHeadingDiv1",
+    2: "errorDisplay_sectionHeadingDiv2",
+    3: "errorDisplay_sectionHeadingDiv3",
+}
+
+/** This adds single line with a label and text to an entry. 
+ * If should be placed in a section. */
+function _addSectionLabelLine(sectionDiv,label,text) {
+    let lineDiv = document.createElement("div");
+    lineDiv.className = "errorDisplay_sectionLabelLineDiv";
+    let labelSpan = document.createElement("span");
+    labelSpan.className = "errorDisplay_sectionLineLabelSpan";
+    labelSpan.innerHTML = label;
+    lineDiv.appendChild(labelSpan);
+    let textSpan = document.createElement("span");
+    textSpan.classname = "errorDisplay_sectionLineTextSpan";
+    textSpan.innerHTML = text;
+    lineDiv.appendChild(textSpan);
+    sectionDiv.appendChild(lineDiv);
+}
+
+/** This is code. It should be placed in a section. */
+function _addCode(sectionDiv,code) {
     let container = document.createElement("pre");
     container.className = "errorDisplay_codeSection";
     //split code into lines, each will be numbered
@@ -145,66 +236,9 @@ function _addCode(div,code) {
         container.classList.add("errorDisplay_veryLongCode");
     }
     //-------------------
-    div.appendChild(container);
+    sectionDiv.appendChild(container);
 }
 
-function _addEsprimaErrorArray(div,esprimaErrorArray) {
-    if(Array.isArray(esprimaErrorArray)) {
-        let headingDiv = document.createElement("div");
-        headingDiv.innerHTML = "Parse Errors:";
-        headingDiv.className = "errorDisplay_esprimaHeadingDiv";
-        div.appendChild(headingDiv);
-        esprimaErrorArray.forEach(esprimaError => _addEsprimaError(div,esprimaError));
-    }
-}
-
-function _addEsprimaError(div,esprimaError) {
-    let containerDiv = _createSimpleEntry()
-    let heading = esprimaError.description ? esprimaError.description : "Error"
-    _addSimpleEntryHeading(containerDiv,heading);
-
-    if(esprimaError.lineNumber) {
-        _addSimpleEntryLine(containerDiv,"Line Number: ",esprimaError.lineNumber);
-    }
-    if(esprimaError.column) {
-        _addSimpleEntryLine(containerDiv,"Column: ",esprimaError.column);
-    }
-    if(esprimaError.index) {
-        _addSimpleEntryLine(containerDiv,"Index: ",esprimaError.index);
-    }
-    
-    div.appendChild(containerDiv);
-}
-
-/** This makes an entry that consists of lines with a label and text */
-function _createSimpleEntry() {
-    let containerDiv = document.createElement("div");
-    containerDiv.className = "errorDisplay_simpleEntryDiv";
-    return containerDiv;
-}
-
-/** This adds a heading line to a simple entry */
-function _addSimpleEntryHeading(div,text) {
-    let headingDiv = document.createElement("div");
-    headingDiv.className = "errorDisplay_simpleEntryHeadingDiv";
-    headingDiv.innerHTML = text;
-    div.appendChild(headingDiv);
-}
-
-/** This adds an entry to a give. The entry is a single line with a label and text. */
-function _addSimpleEntryLine(div,label,text) {
-    let lineDiv = document.createElement("div");
-    lineDiv.className = "errorDisplay_simpleEntryLineDiv";
-    let labelSpan = document.createElement("span");
-    labelSpan.classname = "errorDisplay_simpleEntryLabelSpan";
-    labelSpan.innerHTML = label;
-    lineDiv.appendChild(labelSpan);
-    let textSpan = document.createElement("span");
-    textSpan.classname = "errorDisplay_simpleEntryTextSpan";
-    textSpan.innerHTML = text;
-    lineDiv.appendChild(textSpan);
-    div.appendChild(lineDiv);
-}
 
 
 

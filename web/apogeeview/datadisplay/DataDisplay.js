@@ -37,6 +37,15 @@ export default class DataDisplay {
             return false;
         }
     }
+
+    hideDisplay() {
+        if((this.dataSource)&&(this.dataSource.hideDisplay)) {
+            return this.dataSource.hideDisplay();
+        }
+        else {
+            return false;
+        }
+    }
     
     save() {
         var data = this.getData();

@@ -170,7 +170,7 @@ export default class PageDisplayContainer {
 
         //add the view container
         this.errorContainer = uiutil.createElementWithClass("div","visiui_displayContainer_errorContainerClass",this.mainElement);
-
+        this.errorContainer.style.display = "none";
         //add the view container
         this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
 
@@ -347,7 +347,7 @@ export default class PageDisplayContainer {
                         this.dataDisplay.readUiStateData(this.savedUiState);
                         this.setDataContent(this.dataDisplay.getContent());
                         this.configureSizingElement();
-                        this.dataDisplay.showData();
+                        this.updateDataDisplay();
                     }
                 }
             
@@ -394,7 +394,7 @@ export default class PageDisplayContainer {
                     if(this.errorDisplay) {
                         //(no saved UI state for error display)
                         this.setErrorContent(this.errorDisplay.getContent());
-                        this.errorDisplay.showData();
+                        this.updateErrorDisplay();
                     }
                 }
             
@@ -470,6 +470,42 @@ export default class PageDisplayContainer {
         this.updateErrorDisplayLoadedState();
     }
 
+    updateDataDisplay() {
+        //don't reload data if we are in edit mode. It will reload after completion, whether through cancel or save.
+        if(this.inEditMode) return;
+
+        if(this.dataDisplay.hideDisplay()) {
+            if(this.viewContainer.style.display != "none") {
+                this.viewContainer.style.display = "none";
+            }
+        }
+        else {
+            if(this.viewContainer.style.display != "") {
+                this.viewContainer.style.display = "";
+            }
+            
+            this.dataDisplay.showData();
+            this.updateViewSizeButtons();
+        }
+    }
+
+    updateErrorDisplay() {
+        if(this.errorDisplay.hideDisplay()) {
+            if(this.errorContainer.style.display != "none") {
+                this.errorContainer.style.display = "none";
+            }
+        }
+        else {
+            if(this.errorContainer.style.display != "") {
+                this.errorContainer.style.display = "";
+            }
+            
+            this.errorDisplay.showData();
+
+            //(edit mode not supported for error display)
+        }
+    }
+
     cleanupDataDisplayUI() {
         //reset any data display specific parts of the ui
         this.sizingElement.style.display = "none";
@@ -539,11 +575,7 @@ export default class PageDisplayContainer {
                 this.reloadDataDisplay();
             }
             else if(reloadData) {
-                //don't reload data if we are in edit mode. It will reload after completion, whether through cancel or save.
-                if(!this.inEditMode) {
-                    this.dataDisplay.showData();
-                    this.updateViewSizeButtons();
-                }
+                this.updateDataDisplay();
             }
         }
         if(this.errorDisplay) {
@@ -553,8 +585,7 @@ export default class PageDisplayContainer {
                 this.reloadErrorDisplay();
             }
             else if(reloadData) {
-                //(edit mode not supported for error display)
-                this.errorDisplay.showData();
+                this.updateErrorDisplay();
             }
         }
     }

@@ -221,9 +221,9 @@ dataDisplayHelper.getStandardErrorDataSource = function(app,componentView,member
             return {reloadData,reloadDataDisplay};
         },
 
-        showDisplay() {
+        hideDisplay() {
             let member = _getDataMember();
-            return (member.getState() == apogeeutil.STATE_ERROR);
+            return ((member.getState() != apogeeutil.STATE_ERROR)||(!member.getExtendedErrorInfo())||(member.getExtendedErrorInfo().length == 0));
         },
 
         getData: function() {
