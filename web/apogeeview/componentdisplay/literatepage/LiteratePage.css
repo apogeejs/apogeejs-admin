@@ -156,7 +156,9 @@
     font-weight: bold;
     user-select: none;
 }
-
+.visiui_displayContainer_infoLabel {
+    color: red;
+}
 
 .visiui_displayContainer_viewSelectorContainerClass {
     display: inline;
@@ -173,6 +175,10 @@
     text-decoration:none;
     display: inline;
     user-select: none;
+}
+.visiui_displayContainer_infoSelectorLink {
+    background-color: yellow;
+    border: 2px solid yellow;
 }
 .visiui_displayContainer_viewActiveElementClass {
     display: inline;

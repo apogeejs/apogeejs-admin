@@ -62,28 +62,17 @@ export default class JsonTableComponentView extends ComponentView {
             case JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member",DEFAULT_DATA_VALUE);
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
-                
-            default:
-    //temporary error handling...
-                console.error("unrecognized view element: " + viewType);
-                return null;
-        }
-    }
 
-    /** This method retrieves an error display of the give type, where applicable. 
-     * @protected. */
-    getErrorDisplay(displayContainer,viewType) {
-        
-        var dataDisplaySource;
-        var app = this.getModelView().getApp();
-        
-        //create the new view element;
-        switch(viewType) {
-            case JsonTableComponentView.VIEW_DATA:
+            case ComponentView.VIEW_INFO: 
+                //DOH! If the data view is transient then for now it must not be destroyed when it is made inactive
+                //Otherwise when there is a component update you can not query it to see if it should be made hidden/shown.
+                displayContainer.setDestroyViewOnInactive(false);
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
+    //temporary error handling...
+                console.error("unrecognized view element: " + viewType);
                 return null;
         }
     }
@@ -129,6 +118,7 @@ JsonTableComponentView.VIEW_CODE = "Formula";
 JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 JsonTableComponentView.VIEW_MODES = [
+    ComponentView.VIEW_INFO_MODE_ENTRY,
     {name: JsonTableComponentView.VIEW_DATA, label: "Data", isActive: true},
     {name: JsonTableComponentView.VIEW_CODE, label: "Formula", isActive: false},
     {name: JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false},

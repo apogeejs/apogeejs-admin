@@ -232,7 +232,7 @@ dataDisplayHelper.getStandardErrorDataSource = function(app,componentView,member
                 return member.getExtendedErrorInfo();
             }
             else {
-                return "";
+                return null;
             }
         }
     }

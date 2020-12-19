@@ -38,7 +38,7 @@ export default class DataDisplay {
         }
     }
 
-    hideDisplay() {
+    getHideDisplay() {
         if((this.dataSource)&&(this.dataSource.hideDisplay)) {
             return this.dataSource.hideDisplay();
         }

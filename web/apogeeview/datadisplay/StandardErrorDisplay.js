@@ -46,8 +46,6 @@ export default class StandardErrorDisplay extends DataDisplay {
                         _addOtherError(errorInfoDiv,errorInfo);
                 }
             });
-    
-            //this.editorDiv.innerHTML = JSON.stringify(json);
         }
     }
     
@@ -62,6 +60,10 @@ export default class StandardErrorDisplay extends DataDisplay {
 //===================================
 // Error Info Elements
 //===================================
+
+function _clearDisplay(errorInfoDiv) {
+    uiutil.removeAllChildren(errorInfoDiv);
+}
 
 function _addEsprimseParseError(errorInfoDiv,errorInfo) {
     if(errorInfo.description) _addMainDescription(errorInfoDiv,errorInfo.description);

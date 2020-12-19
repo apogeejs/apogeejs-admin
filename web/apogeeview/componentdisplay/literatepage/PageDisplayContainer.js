@@ -19,7 +19,6 @@ export default class PageDisplayContainer {
         this.headerContainer = null;
         this.viewContainer = null;
         this.viewDisplayElement = null;
-        this.errorContainer = null;
 
         this.viewSelectorContainer = null;
         this.viewActiveElement = null;
@@ -27,6 +26,7 @@ export default class PageDisplayContainer {
         
         this.isComponentShowing = false;
         this.isViewActive = viewModeInfo.isActive;
+        this.isViewHidden = viewModeInfo.isHidden;
         this.isContentLoaded = false;
         
         this.destroyViewOnInactive = true;
@@ -41,9 +41,6 @@ export default class PageDisplayContainer {
         this.dataDisplay = null;
         this.dataDisplayLoaded = false;
 
-        this.errorDisplay = null;
-        this.errorDisplayLoaded = false;
-
         this.heightUiActive = false;
         this.showLessButton = null;
         this.showMoreButton = null;
@@ -55,7 +52,7 @@ export default class PageDisplayContainer {
         this.uiDestroyed = false;
         
         //initialize
-        this.initUI();
+        this._initUI();
     }
 
     getComponentView() {
@@ -77,8 +74,7 @@ export default class PageDisplayContainer {
     /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
     setIsComponentShowing(isComponentShowing) {
         this.isComponentShowing = isComponentShowing;
-        this.updateDataDisplayLoadedState();
-        this.updateErrorDisplayLoadedState();
+        this._updateDataDisplayLoadedState();
     }
 
     /** This returns the isComponentShowing status of the display. */
@@ -105,7 +101,7 @@ export default class PageDisplayContainer {
 
         //update any relevent fields
         if(this.savedUiState.isViewActive !== undefined) {
-            this.setIsViewActive(this.savedUiState.isViewActive);
+            this._setIsViewActive(this.savedUiState.isViewActive);
         }
 
         if(this.dataDisplay) {
@@ -132,24 +128,131 @@ export default class PageDisplayContainer {
         return this.viewDisplayElement;
     }
 
+    //------------------------------
+    // standard methods
+    //------------------------------
+
+    /** The displayDestroyFlags indicate when the display for this view mode will be destroyed,
+     * refering to times it is not visible to the user. See further notes in the constructor
+     * description. */
+    setDestroyViewOnInactive(destroyViewOnInactive) {
+        this.destroyViewOnInactive = destroyViewOnInactive;
+    }   
+
+    /** This method destroys the data display. */
+    destroy() {
+        this._destroyUI();
+        this._deleteDataDisplay();
+    }
+
+    
+    /** This method should be called called before the view mode is closed. It should
+     * return true or false. NO - IT RETURNS SOMETHING ELSE! FIX THIS! */
+    isCloseOk() {
+        if(this.dataDisplay) {
+            if(this.dataDisplay.isCloseOk) {
+                return this.dataDisplay.isCloseOk();
+            }
+            
+            if(this.inEditMode) {
+                return DisplayContainer.UNSAVED_DATA;
+            }
+        }
+        
+        return DisplayContainer.CLOSE_OK;
+    }
+        
+    /** This method is called when the member is updated, to make sure the 
+    * data display is up to date. */
+    componentUpdated(component) {
+        if(this.uiDestroyed) return;
+
+        //update the data display
+        if(this.dataDisplay) {
+            let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
+            if(reloadDataDisplay) {
+                //this will also reload data
+                this._reloadDataDisplay();
+            }
+            else if(reloadData) {
+                this._updateDataDisplay();
+            }
+        }
+    }
+        
+    //------------------------------
+    // Accessed by the Editor, if applicable
+    //------------------------------
+
+    onCancel() {
+        //reload old data
+        this.dataDisplay.showData();
+        
+        return true;
+    }
+
+    startEditMode(onSave,onCancel) {
+        if(!this.inEditMode) {
+            this.inEditMode = true;
+            var saveBar = getSaveBar(onSave,onCancel);
+            this._setHeaderContent(saveBar);
+            //take additional edit mode actions
+            this.mainElement.classList.add("visiui_displayContainer_editMode");
+            this.viewSelectorContainer.classList.add("visiui_displayContainer_viewSelectorContainerClass_editMode");
+            this.componentDisplay.notifyEditMode(true,this.viewTypeName);
+
+            //save listener for display view
+            this.onKeyDown = event => this._keyDownHandler(event,onSave,onCancel);
+            this.mainElement.addEventListener("keydown",this.onKeyDown);
+        }
+    }
+
+    endEditMode() {
+        //exit edit mode
+        if(this.inEditMode) {
+            this.inEditMode = false;
+            this._setHeaderContent(null);
+            if(this.onKeyDown) {
+                this.mainElement.removeEventListener("keydown",this.onKeyDown);
+                this.onKeyDown = null;
+            }
+            this.mainElement.classList.remove("visiui_displayContainer_editMode");
+            this.viewSelectorContainer.classList.remove("visiui_displayContainer_viewSelectorContainerClass_editMode");
+            this.componentDisplay.notifyEditMode(false,this.viewTypeName);
+        }
+        //select the associated node in the document.
+        let parentComponentView = this.componentView.getParentComponentView();
+
+        //give the editor focus
+        parentComponentView.giveEditorFocusIfShowing();
+
+    }
+
+    isInEditMode() {
+        return this.inEditMode;
+    }
+
+
+
     //====================================
     // Private Methods
     //====================================
 
     /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
-    setIsViewActive(isViewActive) {
+    _setIsViewActive(isViewActive) {
         this.isViewActive = isViewActive;
-        this.updateViewSelectorState();
-        this.updateDataDisplayLoadedState();
-        this.updateErrorDisplayLoadedState();
+        this._updateViewSelectorState();
+        this._updateDataDisplayLoadedState();
     }
 
-    //---------------------------
-    // Initialization
-    //---------------------------
+    /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
+    _setIsViewHidden(isViewHidden) {
+        this.isViewHidden = isViewHidden;
+        this._updateViewSelectorState();
+    }
 
     /** @private */
-    initUI() {
+    _initUI() {
         
         //make the container
         this.mainElement = uiutil.createElementWithClass("div","visiui_displayContainer_mainClass",null);
@@ -159,7 +262,9 @@ export default class PageDisplayContainer {
 
         this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass visiui_hideSelection",this.viewToolbarElement);
         this.viewLabelElement.innerHTML = this.viewTypeLabel;
-
+        if(this.viewModeInfo.isInfoView) {
+            this.viewLabelElement.classList.add("visiui_displayContainer_infoLabel");
+        }
         this.sizingElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewSizingElementClass",this.viewToolbarElement);
 
         //create the view display
@@ -169,9 +274,6 @@ export default class PageDisplayContainer {
         this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
 
         //add the view container
-        this.errorContainer = uiutil.createElementWithClass("div","visiui_displayContainer_errorContainerClass",this.mainElement);
-        this.errorContainer.style.display = "none";
-        //add the view container
         this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
 
         //make the selector for the view, displayed in the component title bar
@@ -179,6 +281,9 @@ export default class PageDisplayContainer {
         //this is set from link to div so it can not get focus. later, we _do_ want it to get focuus, but if it does we need to make
         //sure button presses are handled properly. (as it would have been, enter does not work to leave the cell)
         this.viewSelectorLink = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorLinkClass visiui_hideSelection",this.viewSelectorContainer);
+        if(this.viewModeInfo.isInfoView) {
+            this.viewSelectorLink.classList.add("visiui_displayContainer_infoSelectorLink");
+        }
 
         this.expandImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass visiui_hideSelection",this.viewSelectorLink);
         this.expandImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_CLOSED_IMAGE_PATH);
@@ -189,13 +294,13 @@ export default class PageDisplayContainer {
         this.viewNameElement = uiutil.createElementWithClass("span","visiui_displayContainer_viewSelectorClass visiui_hideSelection",this.viewSelectorLink);
         this.viewNameElement.innerHTML = this.viewTypeLabel;
 
-        this.viewSelectorLink.onclick = () => { this.setIsViewActive(!this.isViewActive); return false; }
+        this.viewSelectorLink.onclick = () => { this._setIsViewActive(!this.isViewActive); return false; }
 
-        this.updateViewSelectorState();
+        this._updateViewSelectorState();
     }
 
     /** This tears down any elements created in UI initialization */
-    destroyUI() {
+    _destroyUI() {
         if(!this.uiDestrpoyed) {
             this.uiDestroyed = true;
 
@@ -225,7 +330,6 @@ export default class PageDisplayContainer {
             this.headerContainer = null;
             this.viewContainer = null;
             this.viewSelectorContainer = null;
-            this.errorContainer = null;
 
             if(this.viewSelectorLink) {
                 this.viewSelectorLink.onclick = null;
@@ -239,22 +343,45 @@ export default class PageDisplayContainer {
         }
     }
 
-    updateViewSelectorState() {
+    _updateViewSelectorState() {
         //show/hide ui elements
-        if(this.isViewActive) {
+        if(this.isViewHidden) {
+            this.mainElement.style.display = "none";
+            this.viewSelectorContainer.style.display = "none";
+        }
+        else if(this.isViewActive) {
             this.mainElement.style.display = ""; 
+            this.viewSelectorContainer.style.display = "";
             this.expandImage.style.display = "none";
             this.contractImage.style.display = "";
         }
         else {
             this.mainElement.style.display = "none";
+            this.viewSelectorContainer.style.display = "";
             this.expandImage.style.display = "";
             this.contractImage.style.display = "none";
         }
     }
 
+    /** This method cleasr the data display. It should only be called when the data display is not showing. 
+     * maybe allow this when the display is showing - unload and reload it*/
+    _reloadDataDisplay() {
+
+        //update the stored UI state json
+        this.savedUiState = this.getStateJson();
+
+        //reset any data display specific parts of the ui
+        this._cleanupDataDisplayUI();
+
+        //this destrpys the data display, not the container - bad name
+        this._deleteDataDisplay();
+
+        //reload display
+        this._updateDataDisplayLoadedState();
+    }
+
     /** This method configures the toolbar for the view display. */
-    configureSizingElement() {
+    _configureSizingElement() {
 
         //show the height controls
         if(this.dataDisplay.getUseContainerHeightUi()) {
@@ -262,15 +389,15 @@ export default class PageDisplayContainer {
             if(!this.showLessButton) { //use this as a proxy for other two
                 this.showLessButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
                 this.showLessButton.innerHTML = "less";
-                this.showLessButton.onclick = () => this.showLess();
+                this.showLessButton.onclick = () => this._showLess();
                 this.showLessButton.title = "Descrease View Size";
                 this.showMoreButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
                 this.showMoreButton.innerHTML = "more";
-                this.showMoreButton.onclick = () => this.showMore();
+                this.showMoreButton.onclick = () => this._showMore();
                 this.showMoreButton.title = "Increase View Size";
                 this.showMaxButton = uiutil.createElementWithClass("div","visiui_displayContainer_viewDisplaySizeButtonClass visiui_hideSelection",this.sizingElement);
                 this.showMaxButton.innerHTML = "max";
-                this.showMaxButton.onclick = () => this.showMax();
+                this.showMaxButton.onclick = () => this._showMax();
                 this.showMaxButton.title = "Show Max View Size";
             }
 
@@ -283,28 +410,28 @@ export default class PageDisplayContainer {
         }
     }
 
-    showLess() {
+    _showLess() {
         if((this.dataDisplay)&&(this.heightUiActive)) {
             this.dataDisplay.showLess();
-            this.updateViewSizeButtons();
+            this._updateViewSizeButtons();
         }
     }
 
-    showMore() {
+    _showMore() {
         if((this.dataDisplay)&&(this.heightUiActive)) {
             this.dataDisplay.showMore();
-            this.updateViewSizeButtons();
+            this._updateViewSizeButtons();
         }
     }
 
-    showMax() {
+    _showMax() {
         if((this.dataDisplay)&&(this.heightUiActive)) {
             this.dataDisplay.showMax();
-            this.updateViewSizeButtons();
+            this._updateViewSizeButtons();
         }
     }
 
-    updateViewSizeButtons() {
+    _updateViewSizeButtons() {
         if(this.heightUiActive) {
             let showLessVisible = false, showMoreVisible = false, showMaxVisible = false;
             if(this.dataDisplay) {
@@ -336,7 +463,7 @@ export default class PageDisplayContainer {
     /** This method shold be called when the content loaded or frame visible state 
      * changes to manage the data display.
      * private */
-    updateDataDisplayLoadedState() {
+    _updateDataDisplayLoadedState() {
         
         if((this.isComponentShowing)&&(this.isViewActive)) {
             if(!this.dataDisplayLoaded) {
@@ -345,9 +472,9 @@ export default class PageDisplayContainer {
                     this.dataDisplay =  this.componentView.getDataDisplay(this,this.viewTypeName);
                     if(this.dataDisplay) {
                         this.dataDisplay.readUiStateData(this.savedUiState);
-                        this.setDataContent(this.dataDisplay.getContent());
-                        this.configureSizingElement();
-                        this.updateDataDisplay();
+                        this._setDataContent(this.dataDisplay.getContent());
+                        this._configureSizingElement();
+                        this._updateDataDisplay();
                     }
                 }
             
@@ -369,7 +496,7 @@ export default class PageDisplayContainer {
                     //update the saved UI state
                     this.dataDisplay.addUiStateData(this.savedUiState);
 
-                    this.cleanupDataDisplayUI();
+                    this._cleanupDataDisplayUI();
 
                     //destroy the display
                     if(this.dataDisplay.destroy) this.dataDisplay.destroy();
@@ -377,136 +504,27 @@ export default class PageDisplayContainer {
                 }
             }  
         }
-        this.updateViewSizeButtons();
+        this._updateViewSizeButtons();
     }
 
-    /** This method shold be called when the content loaded or frame visible state 
-     * changes to manage the error display.
-     * private */
-    updateErrorDisplayLoadedState() {
-        
-        if((this.isComponentShowing)&&(this.isViewActive)) {
-            if(!this.errorDisplayLoaded) {
-                //getErrorDisplay function may not be present
-                if((!this.errorDisplay)&&( this.componentView.getErrorDisplay)) {
-                    //the display should be created only when it is made visible
-                    this.errorDisplay =  this.componentView.getErrorDisplay(this,this.viewTypeName);
-                    if(this.errorDisplay) {
-                        //(no saved UI state for error display)
-                        this.setErrorContent(this.errorDisplay.getContent());
-                        this.updateErrorDisplay();
-                    }
-                }
-            
-                if((this.errorDisplay)&&(this.errorDisplay.onLoad)) {
-                    this.errorDisplay.onLoad();
-                    this.errorDisplayLoaded = true;
-                }
-            }
-        }
-        else {
-            if(this.errorDisplay) {
-                if(this.errorDisplayLoaded) {
-                    this.errorDisplayLoaded = false;
-                    if(this.errorDisplay.onUnload) this.errorDisplay.onUnload();
-                }
-                
-                //we will alwasy destroy the error when we are inactive
-                if(!this.isViewActive) {
-                    //(no the saved UI state for error display)
+    
 
-                    this.cleanupErrorDisplayUI();
-
-                    //destroy the display
-                    if(this.errorDisplay.destroy) this.errorDisplay.destroy();
-                    this.errorDisplay = null;
-                }
-            }  
-        }
-        //(no size buttons for error display)
-    }
-
-    //------------------------------
-    // standard methods
-    //------------------------------
-
-    /** The displayDestroyFlags indicate when the display for this view mode will be destroyed,
-     * refering to times it is not visible to the user. See further notes in the constructor
-     * description. */
-    setDestroyViewOnInactive(destroyViewOnInactive) {
-        this.destroyViewOnInactive = destroyViewOnInactive;
-    }   
-
-    /** This method cleasr the data display. It should only be called when the data display is not showing. 
-     * maybe allow this when the display is showing - unload and reload it*/
-    reloadDataDisplay() {
-
-        //update the stored UI state json
-        this.savedUiState = this.getStateJson();
-
-        //reset any data display specific parts of the ui
-        this.cleanupDataDisplayUI();
-
-        //this destrpys the data display, not the container - bad name
-        this.deleteDataDisplay();
-
-        //reload display
-        this.updateDataDisplayLoadedState();
-    }
-
-    /** This method cleasr the data display. It should only be called when the data display is not showing. 
-     * maybe allow this when the display is showing - unload and reload it*/
-    reloadErrorDisplay() {
-
-        //(no saved ui state for error display)
-
-        //reset any data display specific parts of the ui
-        this.cleanupErrorDisplayUI();
-
-        //this destrpys the data display, not the container - bad name
-        this.deleteErrorDisplay();
-
-        //reload display
-        this.updateErrorDisplayLoadedState();
-    }
-
-    updateDataDisplay() {
+    _updateDataDisplay() {
         //don't reload data if we are in edit mode. It will reload after completion, whether through cancel or save.
         if(this.inEditMode) return;
 
-        if(this.dataDisplay.hideDisplay()) {
-            if(this.viewContainer.style.display != "none") {
-                this.viewContainer.style.display = "none";
-            }
+        let hideDataDisplay = this.dataDisplay.getHideDisplay();
+        if(hideDataDisplay != this.isViewHidden) {
+            this._setIsViewHidden(hideDataDisplay);
         }
-        else {
-            if(this.viewContainer.style.display != "") {
-                this.viewContainer.style.display = "";
-            }
-            
-            this.dataDisplay.showData();
-            this.updateViewSizeButtons();
+
+        this.dataDisplay.showData();
+        if(!this.isViewHidden) {
+            this._updateViewSizeButtons();
         }
     }
 
-    updateErrorDisplay() {
-        if(this.errorDisplay.hideDisplay()) {
-            if(this.errorContainer.style.display != "none") {
-                this.errorContainer.style.display = "none";
-            }
-        }
-        else {
-            if(this.errorContainer.style.display != "") {
-                this.errorContainer.style.display = "";
-            }
-            
-            this.errorDisplay.showData();
-
-            //(edit mode not supported for error display)
-        }
-    }
-
-    cleanupDataDisplayUI() {
+    _cleanupDataDisplayUI() {
         //reset any data display specific parts of the ui
         this.sizingElement.style.display = "none";
         this.heightUiActive = false;
@@ -514,19 +532,7 @@ export default class PageDisplayContainer {
         uiutil.removeAllChildren(this.viewContainer);
     }
 
-    cleanupErrorDisplayUI() {
-        //reset any error display specific parts of the ui
-        uiutil.removeAllChildren(this.errorContainer);
-    }
-
-    /** This method destroys the data display. */
-    destroy() {
-        this.destroyUI();
-        this.deleteDataDisplay();
-        this.deleteErrorDisplay();
-    }
-
-    deleteDataDisplay() {
+    _deleteDataDisplay() {
         if(this.dataDisplay) {
             if(this.dataDisplay.destroy) {
                 this.dataDisplay.destroy();
@@ -536,119 +542,12 @@ export default class PageDisplayContainer {
         }
     }
 
-    deleteErrorDisplay() {
-        if(this.errorDisplay) {
-            if(this.errorDisplay.destroy) {
-                this.errorDisplay.destroy();
-            }
-            this.errorDisplay = null;
-            this.errorDisplayLoaded = false;
-        }
-    }
-
-    /** This method should be called called before the view mode is closed. It should
-     * return true or false. NO - IT RETURNS SOMETHING ELSE! FIX THIS! */
-    isCloseOk() {
-        if(this.dataDisplay) {
-            if(this.dataDisplay.isCloseOk) {
-                return this.dataDisplay.isCloseOk();
-            }
-            
-            if(this.inEditMode) {
-                return DisplayContainer.UNSAVED_DATA;
-            }
-        }
-        
-        return DisplayContainer.CLOSE_OK;
-    }
-        
-    /** This method is called when the member is updated, to make sure the 
-    * data display is up to date. */
-    componentUpdated(component) {
-        if(this.uiDestroyed) return;
-
-        //update the data display
-        if(this.dataDisplay) {
-            let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
-            if(reloadDataDisplay) {
-                //this will also reload data
-                this.reloadDataDisplay();
-            }
-            else if(reloadData) {
-                this.updateDataDisplay();
-            }
-        }
-        if(this.errorDisplay) {
-            let {reloadData,reloadDataDisplay} = this.errorDisplay.doUpdate();
-            if(reloadDataDisplay) {
-                //this will also reload data
-                this.reloadErrorDisplay();
-            }
-            else if(reloadData) {
-                this.updateErrorDisplay();
-            }
-        }
-    }
-        
-    //------------------------------
-    // Accessed by the Editor, if applicable
-    //------------------------------
-
-    onCancel() {
-        //reload old data
-        this.dataDisplay.showData();
-        
-        return true;
-    }
-
-    startEditMode(onSave,onCancel) {
-        if(!this.inEditMode) {
-            this.inEditMode = true;
-            var saveBar = getSaveBar(onSave,onCancel);
-            this.setHeaderContent(saveBar);
-            //take additional edit mode actions
-            this.mainElement.classList.add("visiui_displayContainer_editMode");
-            this.viewSelectorContainer.classList.add("visiui_displayContainer_viewSelectorContainerClass_editMode");
-            this.componentDisplay.notifyEditMode(true,this.viewTypeName);
-
-            //save listener for display view
-            this.onKeyDown = event => this.keyDownHandler(event,onSave,onCancel);
-            this.mainElement.addEventListener("keydown",this.onKeyDown);
-        }
-    }
-
-    endEditMode() {
-        //exit edit mode
-        if(this.inEditMode) {
-            this.inEditMode = false;
-            this.setHeaderContent(null);
-            if(this.onKeyDown) {
-                this.mainElement.removeEventListener("keydown",this.onKeyDown);
-                this.onKeyDown = null;
-            }
-            this.mainElement.classList.remove("visiui_displayContainer_editMode");
-            this.viewSelectorContainer.classList.remove("visiui_displayContainer_viewSelectorContainerClass_editMode");
-            this.componentDisplay.notifyEditMode(false,this.viewTypeName);
-        }
-        //select the associated node in the document.
-        let parentComponentView = this.componentView.getParentComponentView();
-
-        //give the editor focus
-        parentComponentView.giveEditorFocusIfShowing();
-
-    }
-
-    isInEditMode() {
-        return this.inEditMode;
-    }
-
-
     //====================================
     // Internal Methods
     //====================================
 
     /** This handles key input */
-    keyDownHandler(keyEvent,onSave,onCancel) {
+    _keyDownHandler(keyEvent,onSave,onCancel) {
         if((keyEvent.keyCode == 83)&&(keyEvent.ctrlKey)&&(!__OS_IS_MAC__)) {
             if(this.inEditMode) onSave();
             keyEvent.preventDefault();
@@ -668,7 +567,7 @@ export default class PageDisplayContainer {
 
     /** This sets the content for the window. If null (or otherwise false) is passed
      * the content will be set to empty.*/
-    setHeaderContent(contentElement) {
+    _setHeaderContent(contentElement) {
         uiutil.removeAllChildren(this.headerContainer);
         if(contentElement) {
             this.headerContainer.appendChild(contentElement);
@@ -676,15 +575,9 @@ export default class PageDisplayContainer {
     }
 
     /** This sets the content for the window. */
-    setDataContent(contentElement) {
+    _setDataContent(contentElement) {
         //set the content
         this.viewContainer.appendChild(contentElement);
-    }
-
-    /** This sets the content for the window. */
-    setErrorContent(contentElement) {
-        //set the content
-        this.errorContainer.appendChild(contentElement);
     }
 
 }
