@@ -26,7 +26,7 @@ export default class PageDisplayContainer {
         
         this.isComponentShowing = false;
         this.isViewActive = viewModeInfo.isActive;
-        this.isViewHidden = viewModeInfo.isHidden;
+        this.isViewHidden = viewModeInfo.isTransient; //start this hidden. It will show if needed
         this.isContentLoaded = false;
         
         this.destroyViewOnInactive = true;
@@ -492,7 +492,8 @@ export default class PageDisplayContainer {
                 }
                 
                 //we will destroy the display is the destroyViewOnInactive flag is set, and we are inactive
-                if((this.destroyViewOnInactive)&&(!this.isViewActive)) {
+                //but don't destroy a traniesnt display. It needs to be there to decide if it should be shown or hidden
+                if((this.destroyViewOnInactive)&&(!this.isViewActive)&&(!this.viewModeInfo.isTransient)) {
                     //update the saved UI state
                     this.dataDisplay.addUiStateData(this.savedUiState);
 

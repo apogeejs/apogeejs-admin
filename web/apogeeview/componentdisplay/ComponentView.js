@@ -536,5 +536,5 @@ ComponentView.MENU_ITEM_OPEN = 0x01;
 /** this is the name for the info data view, a standard data view for components. */
 ComponentView.VIEW_INFO = "Info";
 
-ComponentView.VIEW_INFO_MODE_ENTRY = {name: ComponentView.VIEW_INFO, label: "Info", isActive: true, isHidden: true, isInfoView: true}
+ComponentView.VIEW_INFO_MODE_ENTRY = {name: ComponentView.VIEW_INFO, label: "Info", isActive: true, isTransient: true, isInfoView: true}
 
