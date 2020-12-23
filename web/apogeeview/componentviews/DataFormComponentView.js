@@ -9,7 +9,7 @@ import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-export default class ActionFormComponentView extends ComponentView {
+export default class DataFormComponentView extends ComponentView {
 
     constructor(modelView,component) {
         super(modelView,component);
@@ -22,7 +22,7 @@ export default class ActionFormComponentView extends ComponentView {
     /**  This method retrieves the table edit settings for this component instance
      * @protected */
     getTableEditSettings() {
-        return ActionFormComponentView.TABLE_EDIT_SETTINGS;
+        return DataFormComponentView.TABLE_EDIT_SETTINGS;
     }
 
     /** This method should be implemented to retrieve a data display of the give type. 
@@ -35,21 +35,33 @@ export default class ActionFormComponentView extends ComponentView {
         //create the new view element;
         switch(viewType) {
             
-            case ActionFormComponentView.VIEW_FORM:
+            case DataFormComponentView.VIEW_FORM:
                 var dataDisplaySource = this.getOutputDataDisplaySource();
                 return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
 
-            case ActionFormComponentView.VIEW_LAYOUT_CODE:
+            case DataFormComponentView.VIEW_LAYOUT_CODE:
                 dataDisplaySource = this.getFormCodeDataDisplaySource(app);
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
-            case ActionFormComponentView.VIEW_INPUT_CODE:
+            case DataFormComponentView.VIEW_INPUT_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 
-            case ActionFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE:
+            case DataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case DataFormComponentView.VIEW_VALIDATOR_CODE:
+                dataDisplaySource = dataDisplayHelper.getMemberFunctionBodyDataSource(app,this,"member");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+                
+            case DataFormComponentView.VIEW_VALIDATOR_SUPPLEMENTAL_CODE:
+                dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case FormDataComponentView.VIEW_FORM_VALUE:
+                dataDisplaySource = dataDisplayHelper.getMemberDataTextDataSource(app,this,"member.data");
+                return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/json",AceTextEditor.OPTION_SET_DISPLAY_SOME);
 
             case ComponentView.VIEW_INFO: 
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
@@ -141,33 +153,37 @@ export default class ActionFormComponentView extends ComponentView {
     }
 }
 
-ActionFormComponentView.VIEW_FORM = "form";
-ActionFormComponentView.VIEW_LAYOUT_CODE = "layout";
-ActionFormComponentView.VIEW_INPUT_CODE = "input";
-ActionFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE = "inputPrivate";
+DataFormComponentView.VIEW_FORM = "form";
+DataFormComponentView.VIEW_LAYOUT_CODE = "layout";
+DataFormComponentView.VIEW_INPUT_CODE = "input";
+DataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE = "inputPrivate";
+DataFormComponentView.VIEW_VALIDATOR_CODE = "input";
+DataFormComponentView.VIEW_VALIDATOR_SUPPLEMENTAL_CODE = "inputPrivate";
+DataFormComponentView.VIEW_FORM_VALUE = "value";
 
-
-ActionFormComponentView.VIEW_MODES = [
+DataFormComponentView.VIEW_MODES = [
     ComponentView.VIEW_INFO_MODE_ENTRY,
-    {name: ActionFormComponentView.VIEW_FORM, label: "Form", isActive: true},
-    {name: ActionFormComponentView.VIEW_LAYOUT_CODE, label: "Layout Code", isActive: false},
-    {name: ActionFormComponentView.VIEW_INPUT_CODE, label: "Input Data Code", isActive: false},
-    {name: ActionFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE, label: "Input Data Private", isActive: false}
+    {name: DataFormComponentView.VIEW_FORM, label: "Form", isActive: true},
+    {name: DataFormComponentView.VIEW_LAYOUT_CODE, label: "Layout Code(add args?)", isActive: false},
+    {name: DataFormComponentView.VIEW_INPUT_CODE, label: "Input Data Code(add args?)", isActive: false},
+    {name: DataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE, label: "Input Data Private", isActive: false},
+    {name: DataFormComponentView.VIEW_VALIDATOR_CODE, label: "Validator Code(add args?)", isActive: false},
+    {name: DataFormComponentView.VIEW_VALIDATOR_SUPPLEMENTAL_CODE, label: "Validator Private Code", isActive: false},
+    {name: DataFormComponentView.VIEW_FORM_VALUE, label: "Value", isActive: false}
 ];
 
-ActionFormComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": ActionFormComponentView.VIEW_MODES
+DataFormComponentView.TABLE_EDIT_SETTINGS = {
+    "viewModes": DataFormComponentView.VIEW_MODES
 }
-
 
 //======================================
 // This is the control generator, to register the control
 //======================================
 
-ActionFormComponentView.componentName = "apogeeapp.NewActionFormCell";
-ActionFormComponentView.hasTabEntry = false;
-ActionFormComponentView.hasChildEntry = true;
-ActionFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
+DataFormComponentView.componentName = "apogeeapp.NewActionFormCell";
+DataFormComponentView.hasTabEntry = false;
+DataFormComponentView.hasChildEntry = true;
+DataFormComponentView.ICON_RES_PATH = "/icons3/formCellIcon.png";
 
 
 

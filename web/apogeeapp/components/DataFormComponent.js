@@ -5,7 +5,7 @@ import CommandManager from "/apogeeapp/commands/CommandManager.js";
  * To implement it, the resource script must have the methods "run()" which will
  * be called when the component is updated. It also must have any methods that are
  * confugred with initialization data from the model. */
-export default class ActionFormComponent extends Component {
+export default class DataFormComponent extends Component {
 
     constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
         super(member,modelManager,instanceToCopy,keepUpdatedFixed);
@@ -16,6 +16,7 @@ export default class ActionFormComponent extends Component {
         //Initailize these if this is a new instance
         if(!instanceToCopy) {
             this.setField("layoutCode","return []");
+            this.setField("validatorCode","return true");
         }
     };
 
@@ -23,28 +24,36 @@ export default class ActionFormComponent extends Component {
     //Resource Accessors
     //==============================
 
-
-    createFormLayoutFunction() {
-        var formCodeText = this.getField("layoutCode");
-        
-        var formLayoutFunction;
-        if((formCodeText !== undefined)&&(formCodeText !== null)) {
-            try {
+    createFormFunctions() {
+        var layoutCodeText = this.getField("layoutCode");
+        var validatorCodeText = this.getField("validatorCode");
+        var layoutFunction, validatorFunction;
+        try {
+            if((layoutCodeText !== undefined)&&(layoutCodeText !== null)) {
                 //create the resource generator wrapped with its closure
-                formLayoutFunction = new Function("admin",formCodeText);
+                layoutFunction = new Function("admin",layoutCodeText);
             }
-            catch(error) {
-                if(error.stack) console.error(error.stack);
-                console.log("bad form function code");
+
+            if((validatorCodeText !== undefined)&&(validatorCodeText !== null)) {
+                //create the resource generator wrapped with its closure
+                validatorFunction = new Function("admin",validatorCodeText);
             }
+            
+        }
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+            console.log("bad form function code");
         }
             
         //create a dummy
-        if(!formLayoutFunction) {
-            formLayoutFunction = () => [];
+        if(!layoutFunction) {
+            layoutFunction = () => [];
+        }
+        if(!validatorFunction) {
+            validatorFunction = () => true;
         }
 
-        return formLayoutFunction;
+        return { layoutFunction, validatorFunction};
     }
 
 
@@ -57,7 +66,13 @@ export default class ActionFormComponent extends Component {
         if(layoutCodeText != oldLayoutCodeText) {
             this.setField("layoutCode",layoutCodeText);
         }
+    }
 
+    updateValidatorCode(validatorCodeText) { 
+        let oldValidatorCodeText = this.getField("validatorCode");
+        if(validatorCodeText != oldValidatorCodeText) {
+            this.setField("validatorCode",validatorCodeText);
+        }
     }
 
     //==============================
@@ -69,7 +84,11 @@ export default class ActionFormComponent extends Component {
         
         //load the resource
         if(json.layoutCode) { 
-            this.updateLayoutCode(json.layoutCode); 
+            this.updateFormInputCode(json.layoutCode); 
+        }
+
+        if(json.validatorCode) {
+            this.updateValidatorCode(json.validatorCode)
         }
     }
 
@@ -77,6 +96,7 @@ export default class ActionFormComponent extends Component {
     writeToJson(json,modelManager) {
         //store the for code text
         json.layoutCode = this.getField("layoutCode");
+        json.validatorCode = this.getField("validatorCode");
     }
 
 }
@@ -85,10 +105,27 @@ export default class ActionFormComponent extends Component {
 // This is the control generator, to register the control
 //======================================
 
-ActionFormComponent.displayName = "New Action Form Cell";
-ActionFormComponent.uniqueName = "apogeeapp.NewActionFormCell";
-ActionFormComponent.DEFAULT_MEMBER_JSON = {
-    "type": "apogee.JsonMember"
+DataFormComponent.displayName = "New Data Form Cell";
+DataFormComponent.uniqueName = "apogeeapp.NewDataFormCell";
+DataFormComponent.DEFAULT_MEMBER_JSON = {
+    "type": "apogee.Folder",
+    "childrenNotWriteable": true,
+    "children": {
+        "input": {
+            "name": "input",
+            "type": "apogee.JsonMember",
+            "updateData": {
+                "data": "",
+            }
+        },
+        "value": {
+            "name": "value",
+            "type": "apogee.JsonMember",
+            "updateData": {
+                "data": "",
+            }
+        }
+    }
 };
 
 //=====================================
@@ -101,29 +138,39 @@ ActionFormComponent.DEFAULT_MEMBER_JSON = {
  * {
  *   "type":"actionFormComponentUpdateCommand",
  *   "memberId":(main member ID),
+ *   "field": (field to update, "layout" or "validator")
  *   "initialValue":(original fields value)
  *   "targetValue": (desired fields value)
  * }
  */ 
-let actionFormUpdateCommand = {};
+let dataFormUpdateCommand = {};
 
-actionFormUpdateCommand.createUndoCommand = function(workspaceManager,commandData) {
+dataFormUpdateCommand.createUndoCommand = function(workspaceManager,commandData) {
     let undoCommandData = {};
-    undoCommandData.type = actionFormUpdateCommand.commandInfo.type;
+    undoCommandData.type = dataFormInputUpdate.commandInfo.type;
     undoCommandData.memberId = commandData.memberId;
+    undoCommandData.field = commandData.field;
     undoCommandData.initialValue = commandData.targetValue;
     undoCommandData.targetValue = commandData.initialValue;
     return undoCommandData;
 }
 
-actionFormUpdateCommand.executeCommand = function(workspaceManager,commandData) {
+dataFormUpdateCommand.executeCommand = function(workspaceManager,commandData) {
     let modelManager = workspaceManager.getMutableModelManager();
     let componentId = modelManager.getComponentIdByMemberId(commandData.memberId);
     let component = modelManager.getMutableComponentByComponentId(componentId);
     var commandResult = {};
     if(component) {
         try {
-            component.updateLayoutCode(commandData.targetValue);
+            if(commandData.field == "layout") {
+                component.updateLayoutCode(commandData.targetValue);
+            }
+            else if(commandData.field == "validator") {
+                component.updateValidatorCode(commandData.targetValue);
+            }
+            else {
+                throw new Error("Internal error: unknown update field: " + commandData.field);
+            }
 
             commandResult.cmdDone = true;
             commandResult.target = component;
@@ -144,13 +191,14 @@ actionFormUpdateCommand.executeCommand = function(workspaceManager,commandData) 
     return commandResult;
 }
 
-actionFormUpdateCommand.commandInfo = {
-    "type": "actionFormUpdateCommand",
+dataFormUpdateCommand.commandInfo = {
+    "type": "dataFormUpdateCommand",
     "targetType": "component",
     "event": "updated"
 }
 
-CommandManager.registerCommand(actionFormUpdateCommand);
+
+CommandManager.registerCommand(dataFormUpdateCommand);
 
 
 
