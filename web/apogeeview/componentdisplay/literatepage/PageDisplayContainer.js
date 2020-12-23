@@ -262,9 +262,6 @@ export default class PageDisplayContainer {
 
         this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass visiui_hideSelection",this.viewToolbarElement);
         this.viewLabelElement.innerHTML = this.viewTypeLabel;
-        if(this.viewModeInfo.isInfoView) {
-            this.viewLabelElement.classList.add("visiui_displayContainer_infoLabel");
-        }
         this.sizingElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewSizingElementClass",this.viewToolbarElement);
 
         //create the view display

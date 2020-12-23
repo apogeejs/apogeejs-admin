@@ -1,5 +1,6 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
+import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
@@ -86,6 +87,10 @@ export default class CustomComponentView extends ComponentView {
             case CustomComponentView.VIEW_UI_CODE:
                 dataDisplaySource = this.getUiDataDisplaySource("uiCode");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case ComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
     //temporary error handling...
@@ -168,12 +173,13 @@ CustomComponentView.VIEW_CSS = "CSS";
 CustomComponentView.VIEW_UI_CODE = "uiGenerator()";
 
 CustomComponentView.VIEW_MODES = [
-    CustomComponentView.VIEW_OUTPUT,
-    CustomComponentView.VIEW_CODE,
-    CustomComponentView.VIEW_SUPPLEMENTAL_CODE,
-    CustomComponentView.VIEW_HTML,
-    CustomComponentView.VIEW_CSS,
-    CustomComponentView.VIEW_UI_CODE
+    ComponentView.VIEW_INFO_MODE_ENTRY,
+    {name: CustomComponentView.VIEW_OUTPUT, label: "Display", isActive: true},
+    {name: CustomComponentView.VIEW_CODE, label: "Input Code", isActive: false},
+    {name: CustomComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Input Private", isActive: false},
+    {name: CustomComponentView.VIEW_HTML, label: "HTML", isActive: false},
+    {name: CustomComponentView.VIEW_CSS, label: "CSS", isActive: false},
+    {name: CustomComponentView.VIEW_UI_CODE, label: "uiGenerator()", isActive: false}
 ];
 
 CustomComponentView.TABLE_EDIT_SETTINGS = {

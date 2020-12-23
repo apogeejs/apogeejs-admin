@@ -1,5 +1,6 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
+import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 
 /** This component represents a table object. */
@@ -37,6 +38,10 @@ export default class FunctionComponentView extends ComponentView {
             case FunctionComponentView.VIEW_SUPPLEMENTAL_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case ComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
     //temporary error handling...
@@ -52,8 +57,9 @@ FunctionComponentView.VIEW_CODE = "Code";
 FunctionComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 FunctionComponentView.VIEW_MODES = [
-    FunctionComponentView.VIEW_CODE,
-    FunctionComponentView.VIEW_SUPPLEMENTAL_CODE
+    ComponentView.VIEW_INFO_MODE_ENTRY,
+    {name: FunctionComponentView.VIEW_CODE, label: "Code", isActive: true},
+    {name: FunctionComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false},
 ];
 
 FunctionComponentView.TABLE_EDIT_SETTINGS = {

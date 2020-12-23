@@ -13,7 +13,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
      *  - getData - returns the desired form value,
      *  - getEditOk - gets if form is editable (optional)
      *  - setData - called when data is saved, with the form value (optional)
-     *  - getLayout - This returns the layour for the configurable form.
+     *  - getLayout - This returns the layout for the configurable form.
      *  }
      */
     constructor(displayContainer,dataSource) {
@@ -70,7 +70,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
     }
 
     onFormInput(formValue) {
-        //set change to enable save bar is form value differs from initial data
+        //set change to enable save bar if form value differs from initial data
         let dataSource = this.getDataSource();
         let editOk = (dataSource.getEditOk)&&(dataSource.getEditOk()); 
         if(editOk) {

@@ -1,5 +1,6 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
+import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 
 export default class JsonPlusTableComponentView extends ComponentView {
@@ -39,6 +40,10 @@ export default class JsonPlusTableComponentView extends ComponentView {
             case JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member",DEFAULT_DATA_VALUE);
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case ComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
     //temporary error handling...
@@ -152,9 +157,10 @@ JsonPlusTableComponentView.VIEW_CODE = "Formula";
 JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 JsonPlusTableComponentView.VIEW_MODES = [
-    JsonPlusTableComponentView.VIEW_DATA,
-    JsonPlusTableComponentView.VIEW_CODE,
-    JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE
+    ComponentView.VIEW_INFO_MODE_ENTRY,
+    {name: JsonPlusTableComponentView.VIEW_DATA, label: "Data", isActive: true},
+    {name: JsonPlusTableComponentView.VIEW_CODE, label: "Formula", isActive: false},
+    {name: JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false}
 ];
 
 JsonPlusTableComponentView.TABLE_EDIT_SETTINGS = {

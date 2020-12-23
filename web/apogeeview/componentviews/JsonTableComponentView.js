@@ -64,9 +64,6 @@ export default class JsonTableComponentView extends ComponentView {
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
             case ComponentView.VIEW_INFO: 
-                //DOH! If the data view is transient then for now it must not be destroyed when it is made inactive
-                //Otherwise when there is a component update you can not query it to see if it should be made hidden/shown.
-                displayContainer.setDestroyViewOnInactive(false);
                 dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 

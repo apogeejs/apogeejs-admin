@@ -156,10 +156,6 @@
     font-weight: bold;
     user-select: none;
 }
-.visiui_displayContainer_infoLabel {
-    color: red;
-}
-
 .visiui_displayContainer_viewSelectorContainerClass {
     display: inline;
     margin-left: 10px;
@@ -177,8 +173,8 @@
     user-select: none;
 }
 .visiui_displayContainer_infoSelectorLink {
-    background-color: yellow;
-    border: 2px solid yellow;
+    background-color: rgba(255,255,0,.8);
+    border: 2px solid rgba(255,255,0,.8);
 }
 .visiui_displayContainer_viewActiveElementClass {
     display: inline;
@@ -238,20 +234,16 @@
     z-index: 0;
     /*outline: .5px solid rgb(200,200,200);*/
 }
-.visiui_displayContainer_errorContainerClass {
-    position: relative;
-    margin: 3px;
-    z-index: 0;
-    max-height: 300px;
-    overflow: auto;
-    border: 1px solid rgb(196,196,196);
-}
 
 .errorDisplay_main {
     position: relative;
     background-color: rgb(255,240,240);
     padding: 0px;
     margin: 0px;
+
+    max-height: 250px;
+    overflow: auto;
+    border: 1px solid rgb(196,196,196);
 }
 .errorDisplay_errorInfoDiv {
     position: relative;
