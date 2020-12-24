@@ -31,7 +31,7 @@ export default class ActionFormComponent extends Component {
         if((formCodeText !== undefined)&&(formCodeText !== null)) {
             try {
                 //create the resource generator wrapped with its closure
-                formLayoutFunction = new Function("admin",formCodeText);
+                formLayoutFunction = new Function("admin","inputData",formCodeText);
             }
             catch(error) {
                 if(error.stack) console.error(error.stack);

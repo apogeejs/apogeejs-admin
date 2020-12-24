@@ -9,6 +9,7 @@ import CustomDataComponent from "/apogeeapp/components/CustomDataComponent.js";
 import ErrorComponent from "/apogeeapp/components/ErrorComponent.js";
 
 import ActionFormComponent from "/apogeeapp/components/ActionFormComponent.js";
+import DataFormComponent from "/apogeeapp/components/DataFormComponent.js";
 
 //JSON PLUS COMPONENT
 import JsonPlusTableComponent from "/apogeeapp/components/JsonPlusTableComponent.js";
@@ -109,6 +110,7 @@ componentInfo.ERROR_COMPONENT_CLASS = ErrorComponent;
 
 //test for new formS
 componentInfo.registerComponent(ActionFormComponent);
+componentInfo.registerComponent(DataFormComponent);
 
 //JSON PLUS COMPONENT
 componentInfo.registerComponent(JsonPlusTableComponent);

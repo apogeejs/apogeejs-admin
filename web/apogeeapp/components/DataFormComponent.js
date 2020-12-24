@@ -9,7 +9,11 @@ export default class DataFormComponent extends Component {
 
     constructor(member,modelManager,instanceToCopy,keepUpdatedFixed) {
         super(member,modelManager,instanceToCopy,keepUpdatedFixed);
+
+        //this should be present in the json that builds the folder, but in case it isn't (for one, because of a previous mistake)
+        member.setChildrenWriteable(false);
         
+        let model = modelManager.getModel();
         //==============
         //Fields
         //==============
@@ -17,6 +21,13 @@ export default class DataFormComponent extends Component {
         if(!instanceToCopy) {
             this.setField("layoutCode","return []");
             this.setField("validatorCode","return true");
+
+            //internal tables
+            let valueMember = member.lookupChild(model,"value");
+            this.registerMember(modelManager,valueMember,"member.value",false);
+
+            let inputMember = member.lookupChild(model,"input");
+            this.registerMember(modelManager,inputMember,"member.input",false);
         }
     };
 
@@ -31,12 +42,12 @@ export default class DataFormComponent extends Component {
         try {
             if((layoutCodeText !== undefined)&&(layoutCodeText !== null)) {
                 //create the resource generator wrapped with its closure
-                layoutFunction = new Function("admin",layoutCodeText);
+                layoutFunction = new Function("admin","inputData",layoutCodeText);
             }
 
             if((validatorCodeText !== undefined)&&(validatorCodeText !== null)) {
                 //create the resource generator wrapped with its closure
-                validatorFunction = new Function("admin",validatorCodeText);
+                validatorFunction = new Function("formValue","inputData",validatorCodeText);
             }
             
         }
@@ -84,7 +95,7 @@ export default class DataFormComponent extends Component {
         
         //load the resource
         if(json.layoutCode) { 
-            this.updateFormInputCode(json.layoutCode); 
+            this.updateLayoutCode(json.layoutCode); 
         }
 
         if(json.validatorCode) {
@@ -147,7 +158,7 @@ let dataFormUpdateCommand = {};
 
 dataFormUpdateCommand.createUndoCommand = function(workspaceManager,commandData) {
     let undoCommandData = {};
-    undoCommandData.type = dataFormInputUpdate.commandInfo.type;
+    undoCommandData.type = dataFormUpdateCommand.commandInfo.type;
     undoCommandData.memberId = commandData.memberId;
     undoCommandData.field = commandData.field;
     undoCommandData.initialValue = commandData.targetValue;

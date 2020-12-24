@@ -67,9 +67,8 @@ export default class ActionFormComponentView extends ComponentView {
 
             //This method reloads the component and checks if there is a DATA update. UI update is checked later.
             doUpdate: () => {
-                //return value is whether or not the data display needs to be udpated
-                let reloadData = this.getComponent().isMemberDataUpdated("member");
-                let reloadDataDisplay = this.getComponent().isFieldUpdated("formCode");
+                let reloadData = false;
+                let reloadDataDisplay = this.getComponent().isFieldUpdated("layoutCode") || this.getComponent().isMemberDataUpdated("member");
                 return {reloadData,reloadDataDisplay};
             },
 
@@ -78,13 +77,16 @@ export default class ActionFormComponentView extends ComponentView {
                 let layoutFunction = component.createFormLayoutFunction(); 
                 let contextMemberId = component.getMember().getParentId();
 
+                let member = this.getComponent().getMember();
+                let inputData = member.getData();
+
                 //make sure this is a function (could be invalid value, or a user code error)
                 if(layoutFunction instanceof Function) {
                     let admin = {
                         getCommandMessenger: () => new UiCommandMessenger(this,contextMemberId)
                     }
                     try {
-                        let layout = layoutFunction(admin);
+                        let layout = layoutFunction(admin,inputData);
                         if(layout) return layout;
                         else return ConfigurableFormEditor.getEmptyLayout();
                     }
@@ -98,10 +100,8 @@ export default class ActionFormComponentView extends ComponentView {
                 return apogeeutil.INVALID_VALUE;
             },
 
-            getData: () => {
-                let member = this.getComponent().getMember();
-                return member.getData();
-            }
+            //no data
+            getData: () => null
         }
     }
 
@@ -128,7 +128,7 @@ export default class ActionFormComponentView extends ComponentView {
                 let component = this.getComponent();
 
                 var command = {};
-                command.type = "actionFormComponentUpdateCommand";
+                command.type = "actionFormUpdateCommand";
                 command.memberId = component.getMemberId();
                 command.initialValue = component.getField("layoutCode");
                 command.targetValue = targetLayoutCode;
