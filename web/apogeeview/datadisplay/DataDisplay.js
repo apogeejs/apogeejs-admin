@@ -1,3 +1,5 @@
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
+
 /** This is the base class for data displays, which show individual edit/display fields for a component. For example, a standard JSON
  * data component has three data displays, for the component value, the function body and the supplemental code.
  * 
@@ -7,12 +9,12 @@
  *      held by the data source and it returns to boolean values, "reloadDataDisplay", which indicates is the data display should 
  *      be reloaded (such as if it is replaced with a new data display or if the UI elements for it have been updated) and
  *      "reloadData" which indicates the data value displayed in the data display should be reloaded.  
- *  - data = getData() - Requiried - This returns model data that should be displayed. The format of the data depends on the 
+ *  - data = getData() - Required - This returns model data that should be displayed. The format of the data depends on the 
  *      data display. If the data is not valid, then the value apogeeutil.INVALID_VALUE should be returned.
  *  - editOk = getEditOk() - Optional - If present, this indicates if the data display edit mode should be used. If it is not present
  *      it is assumed to be false.
  *  - closeDialog = saveData(data) - Optional This is used if the data display edit mode is used. It should save the data. The return value
- *      should be true if the edit operation should be concluded. It shoudl return false if there is a save failure such that you want to 
+ *      should be true if the edit operation should be concluded. It should return false if there is a save failure such that you want to 
  *      stay in edit mode.
  *  - (other) - Optional - Data displays may define additional functions as needed for their implmentations. Examples where this is done in in the custom
  *      components to pass non-model data (like the HTML or the UI generator code) into the data display.
@@ -32,15 +34,6 @@ export default class DataDisplay {
     doUpdate() {
         if(this.dataSource) {
             return this.dataSource.doUpdate();
-        }
-        else {
-            return false;
-        }
-    }
-
-    getHideDisplay() {
-        if((this.dataSource)&&(this.dataSource.hideDisplay)) {
-            return this.dataSource.hideDisplay();
         }
         else {
             return false;
@@ -159,27 +152,57 @@ export default class DataDisplay {
     //=============================
 	
     showData() {
-        var data;
-        var editOk;
+        let dataReturn;
+        //load data from data source
         if(this.dataSource) {
             if(this.dataSource.getData) {
-                data = this.dataSource.getData();
+                dataReturn = this.dataSource.getData();
             }
             if(this.dataSource.getEditOk) {
-                editOk = this.dataSource.getEditOk();
+                this.editOk = this.dataSource.getEditOk();
+            }
+            else {
+                this.editOk = false;
             }
         }
-        if(data === undefined) {
-            data = "DATA UNAVAILABLE";
-            this.editOK = false;
-        }
-        else if(editOk === undefined) {
-            this.editOk = false;
+
+        //load data display values
+        let data;
+        let messageType;
+        let message;
+        let hideDisplay;
+        let removeView;
+        if((dataReturn)&&(dataReturn[DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY] === DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE)) {
+            //handle a wrapped return value
+            data = dataReturn.data;
+            messageType = dataReturn.messageType;
+            message = dataReturn.message;
+            removeView = dataReturn.removeView;
+            hideDisplay = dataReturn.hideDisplay;
         }
         else {
-            this.editOk = editOk;
+            //straight data was returned
+            data = dataReturn;
         }
-        
+
+        //set values that have not be set
+        if(messageType === undefined) {
+            messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_NONE
+            message = "";
+        }
+        if(hideDisplay === undefined) {
+            hideDisplay = (data === apogeeutil.INVALID_VALUE);
+        }
+        removeView = removeView ? true : false;
+
+        //configure view
+        this.displayContainer.removeView(removeView);
+        if(!removeView) {
+            //only hide view and show message if view is not removed
+            //we will set data either way to clear old date
+            this.displayContainer.hideDisplay(hideDisplay);
+            this.displayContainer.setMessage(messageType,message);
+        }
         this.setData(data);
     }
 

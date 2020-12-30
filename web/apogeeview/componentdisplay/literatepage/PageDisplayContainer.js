@@ -30,7 +30,7 @@ export default class PageDisplayContainer {
         this.isViewRemoved = viewModeInfo.isTransient; //start removed for transient displays
         this.isViewHidden = false;
         this.message = "";
-        this.messageType = "none";  //start with an empty message
+        this.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_NONE;  //start with an empty message
         this.isContentLoaded = false;
         
         this.destroyViewOnInactive = true;
@@ -211,16 +211,16 @@ export default class PageDisplayContainer {
         return this.isViewRemoved;
     }
 
-    showMessage(messageType,message) {
+    setMessage(messageType,message) {
         this.messageType = messageType;
 
         this.messageContainer.className = MESSAGE_CONTAINER_BASE_CLASS;
         let messageTypeClass = MESSAGE_TYPE_CLASS_MAP[messageType];
-        if(!messageTypeClass) messageTypeClass = "none";
+        if(!messageTypeClass) messageTypeClass = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_NONE;
 
         this.messageContainer.classList.add(messageTypeClass);
 
-        this.message = (this.messageType != "none") ? message : "";
+        this.message = (this.messageType != DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_NONE) ? message : "";
         this.messageContainer.innerHTML = this.message;
     }
 
@@ -343,7 +343,7 @@ export default class PageDisplayContainer {
         this.viewSelectorLink.onclick = () => { this._setIsViewActive(!this.isViewActive); return false; }
 
         //set initial state
-        this.showMessage(this.messageType,this.message);
+        this.setMessage(this.messageType,this.message);
         this._updateViewState();
     }
 
@@ -412,6 +412,7 @@ export default class PageDisplayContainer {
             this.viewSelectorContainer.style.display = "";
             this.expandImage.style.display = "";
             this.contractImage.style.display = "none";
+            this.mainElement.style.display = "none";
         }
     }
 

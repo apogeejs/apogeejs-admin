@@ -1,3 +1,5 @@
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
+
 let dataDisplayHelper = {};
 export {dataDisplayHelper as default}
 
@@ -221,19 +223,20 @@ dataDisplayHelper.getStandardErrorDataSource = function(app,componentView,member
             return {reloadData,reloadDataDisplay};
         },
 
-        hideDisplay() {
-            let member = _getDataMember();
-            return ((member.getState() != apogeeutil.STATE_ERROR)||(!member.getExtendedErrorInfo())||(member.getExtendedErrorInfo().length == 0));
-        },
-
         getData: function() {
             let member = _getDataMember();
-            if(member.getState() == apogeeutil.STATE_ERROR) {
-                return member.getExtendedErrorInfo();
+            let extendedErrorInfo = member.getExtendedErrorInfo()
+            if((member.getState() == apogeeutil.STATE_ERROR)&&(extendedErrorInfo)) {
+                //show data view, this is our data
+                return extendedErrorInfo;
             }
             else {
-                return null;
+                //no error, or error info; remove the data view
+                let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                wrappedData.removeView = true;
+                return wrappedData;
             }
+            
         }
     }
 }

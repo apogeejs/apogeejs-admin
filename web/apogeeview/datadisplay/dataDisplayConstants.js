@@ -38,4 +38,9 @@ DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO = "info";
 DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY = "wrapped_data";
 DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE = {}; //must use this exactly, not a copy
 
-
+/** This function returns  empty wrapped data, since it can be cumbersome to construct. */
+DATA_DISPLAY_CONSTANTS.getEmptyWrappedData = function() {
+    let wrappedData = {};
+    wrappedData[DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY] = DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE;
+    return wrappedData;
+}
