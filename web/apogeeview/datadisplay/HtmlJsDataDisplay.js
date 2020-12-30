@@ -8,7 +8,9 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
  * fields defined for it: 
  * 
  * - html = dataSource.getHtml(); REQUIRED - This retrieves the HTML for the display
- * - resource = dataSource.getResource(); REQUIRED - This retrieves the "resource" object to run the display
+ * - resource = dataSource.getResource(); REQUIRED - This retrieves the "resource" object to run the display (This is similar to
+ *              getDisplayData listed below in that it is used during the construction of the display, however this returns an 
+ *              object generated at the app layer for constructing the UI.)
  * - member = dataSource.getContextMember(); REQUIRED - This retrieves a member to use as a context reference
  * - displayData = dataSource.getDisplayData(); OPTIONAL - This returns model data to _construct_ the form
  *              whereas the standard getData() method returns data to _populate_ the form. If the display data is

@@ -7,7 +7,7 @@
  *      held by the data source and it returns to boolean values, "reloadDataDisplay", which indicates is the data display should 
  *      be reloaded (such as if it is replaced with a new data display or if the UI elements for it have been updated) and
  *      "reloadData" which indicates the data value displayed in the data display should be reloaded.  
- *  - data = getData() - Requiried - This returns the data that should be displayed. The format of the data depends on the 
+ *  - data = getData() - Requiried - This returns model data that should be displayed. The format of the data depends on the 
  *      data display. If the data is not valid, then the value apogeeutil.INVALID_VALUE should be returned.
  *  - editOk = getEditOk() - Optional - If present, this indicates if the data display edit mode should be used. If it is not present
  *      it is assumed to be false.

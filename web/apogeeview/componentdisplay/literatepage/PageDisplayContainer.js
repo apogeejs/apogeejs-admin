@@ -17,6 +17,7 @@ export default class PageDisplayContainer {
         this.viewToolbarElement = null;
         this.viewLabelElement = null;
         this.headerContainer = null;
+        this.messageContainer = null;
         this.viewContainer = null;
         this.viewDisplayElement = null;
 
@@ -26,7 +27,10 @@ export default class PageDisplayContainer {
         
         this.isComponentShowing = false;
         this.isViewActive = viewModeInfo.isActive;
-        this.isViewHidden = viewModeInfo.isTransient; //start this hidden. It will show if needed
+        this.isViewRemoved = viewModeInfo.isTransient; //start removed for transient displays
+        this.isViewHidden = false;
+        this.message = "";
+        this.messageType = "none";  //start with an empty message
         this.isContentLoaded = false;
         
         this.destroyViewOnInactive = true;
@@ -179,10 +183,56 @@ export default class PageDisplayContainer {
             }
         }
     }
-        
+
+
+    //-----------------------------
+    // Accessed by the data display
     //------------------------------
-    // Accessed by the Editor, if applicable
-    //------------------------------
+
+    hideDisplay(doHide) {
+        if(doHide != this.isViewHidden) {
+            this.isViewHidden = doHide;
+            this._updateViewState();
+        }
+    }
+
+    getDisplayHidden() {
+        return this.isViewHidden;
+    }
+
+    removeView(doRemove) {
+        if(doRemove != this.isViewRemoved) {
+            this.isViewRemoved = doRemove;
+            this._updateViewState();
+        }
+    }
+
+    getViewRemoved() {
+        return this.isViewRemoved;
+    }
+
+    showMessage(messageType,message) {
+        this.messageType = messageType;
+
+        this.messageContainer.className = MESSAGE_CONTAINER_BASE_CLASS;
+        let messageTypeClass = MESSAGE_TYPE_CLASS_MAP[messageType];
+        if(!messageTypeClass) messageTypeClass = "none";
+
+        this.messageContainer.classList.add(messageTypeClass);
+
+        this.message = (this.messageType != "none") ? message : "";
+        this.messageContainer.innerHTML = this.message;
+    }
+
+    getMessageType() {
+        return this.messageType;
+    }
+
+    getMessage() {
+        return this.message;
+    }
+
+    //edit mode methods
 
     onCancel() {
         //reload old data
@@ -241,14 +291,8 @@ export default class PageDisplayContainer {
     /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
     _setIsViewActive(isViewActive) {
         this.isViewActive = isViewActive;
-        this._updateViewSelectorState();
+        this._updateViewState();
         this._updateDataDisplayLoadedState();
-    }
-
-    /** This method should be called whent the frame parent is loaded or unloaded from the DOM. */
-    _setIsViewHidden(isViewHidden) {
-        this.isViewHidden = isViewHidden;
-        this._updateViewSelectorState();
     }
 
     /** @private */
@@ -270,6 +314,9 @@ export default class PageDisplayContainer {
         //add the header elment (for the save bar)
         this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
 
+        //add the message element
+        this.messageContainer = uiutil.createElementWithClass("div","visiui_displayContainer_messageContainerClass",this.mainElement);
+
         //add the view container
         this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
 
@@ -278,6 +325,8 @@ export default class PageDisplayContainer {
         //this is set from link to div so it can not get focus. later, we _do_ want it to get focuus, but if it does we need to make
         //sure button presses are handled properly. (as it would have been, enter does not work to leave the cell)
         this.viewSelectorLink = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorLinkClass visiui_hideSelection",this.viewSelectorContainer);
+        //ideally we should allow more flexibility for styling these labels. For now we just have the standard style and an additional style for
+        //an error/info view. 
         if(this.viewModeInfo.isInfoView) {
             this.viewSelectorLink.classList.add("visiui_displayContainer_infoSelectorLink");
         }
@@ -293,7 +342,9 @@ export default class PageDisplayContainer {
 
         this.viewSelectorLink.onclick = () => { this._setIsViewActive(!this.isViewActive); return false; }
 
-        this._updateViewSelectorState();
+        //set initial state
+        this.showMessage(this.messageType,this.message);
+        this._updateViewState();
     }
 
     /** This tears down any elements created in UI initialization */
@@ -340,27 +391,31 @@ export default class PageDisplayContainer {
         }
     }
 
-    _updateViewSelectorState() {
+    _updateViewState() {
         //show/hide ui elements
-        if(this.isViewHidden) {
+        if(this.isViewRemoved) {
             this.mainElement.style.display = "none";
             this.viewSelectorContainer.style.display = "none";
         }
-        else if(this.isViewActive) {
-            this.mainElement.style.display = ""; 
+        else if(this.isViewActive) { 
             this.viewSelectorContainer.style.display = "";
             this.expandImage.style.display = "none";
             this.contractImage.style.display = "";
+            if(this.isViewHidden) {
+                this.mainElement.style.display = "none";
+            }
+            else {
+                this.mainElement.style.display = "";
+            }
         }
         else {
-            this.mainElement.style.display = "none";
             this.viewSelectorContainer.style.display = "";
             this.expandImage.style.display = "";
             this.contractImage.style.display = "none";
         }
     }
 
-    /** This method cleasr the data display. It should only be called when the data display is not showing. 
+    /** This method clears the data display. It should only be called when the data display is not showing. 
      * maybe allow this when the display is showing - unload and reload it*/
     _reloadDataDisplay() {
 
@@ -431,7 +486,7 @@ export default class PageDisplayContainer {
     _updateViewSizeButtons() {
         if(this.heightUiActive) {
             let showLessVisible = false, showMoreVisible = false, showMaxVisible = false;
-            if(this.dataDisplay) {
+            if((this.dataDisplay)&&(!this.isViewHidden)) {
                 let resizeButtonFlags = this.dataDisplay.getHeightAdjustFlags();
                 if(resizeButtonFlags & DATA_DISPLAY_CONSTANTS.RESIZE_SHOW_FLAG) {
                     if(resizeButtonFlags & DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX_FLAG) {
@@ -511,15 +566,8 @@ export default class PageDisplayContainer {
         //don't reload data if we are in edit mode. It will reload after completion, whether through cancel or save.
         if(this.inEditMode) return;
 
-        let hideDataDisplay = this.dataDisplay.getHideDisplay();
-        if(hideDataDisplay != this.isViewHidden) {
-            this._setIsViewHidden(hideDataDisplay);
-        }
-
         this.dataDisplay.showData();
-        if(!this.isViewHidden) {
-            this._updateViewSizeButtons();
-        }
+        this._updateViewSizeButtons();
     }
 
     _cleanupDataDisplayUI() {
@@ -583,6 +631,15 @@ export default class PageDisplayContainer {
 /** This method returns the main dom element for the window frame. */
 PageDisplayContainer.VIEW_CLOSED_IMAGE_PATH = "/closed_black.png";
 PageDisplayContainer.VIEW_OPENED_IMAGE_PATH = "/opened_black.png";
+
+const MESSAGE_CONTAINER_BASE_CLASS = "visiui_displayContainer_messageContainerClass";
+
+const MESSAGE_TYPE_CLASS_MAP = {
+    "none": "visiui_displayContainer_messageNone",
+    "error": "visiui_displayContainer_messageError",
+    "warning": "visiui_displayContainer_messageWarning",
+    "info": "visiui_displayContainer_messageInfo"
+}
 
 
 
