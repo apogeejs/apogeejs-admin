@@ -27,7 +27,13 @@ dataDisplayHelper.getMemberDataJsonDataSource = function(app,componentView,membe
         },
 
         getData: function() {
-            return _getDataMember().getData();
+            let data = _getDataMember().getData();
+            if(data == apogeeutil.INVALID_VALUE) {
+                return DATA_DISPLAY_CONSTANTS.STANDARD_INVALID_WRAPPED_DATA;
+            }
+            else {
+                return data;
+            }
         },
 
         getEditOk: doReadOnly ? 
@@ -61,9 +67,23 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
             let json = baseSource.getData();
 
             var textData;
+            if(DATA_DISPLAY_CONSTANTS.isWrappedData(json)) {
+                if(json.data == apogeeutil.INVALID_VALUE) {
+                    return json;
+                }
+                else {
+                    //!!!!!!!!!!
+                    //THIS NEEDS TO BE FIXED
+                    //if wrapped data is returned containing valid data
+                    //we should reconstruct the wrapped data
+                    //instead I unwrapped it.
+                    textData = json.data;
+                    //!!!!!!!!!
+                }
+            }
             if(json == apogeeutil.INVALID_VALUE) {
                 //for invalid input, convert to display an empty string
-                textData = "";
+                textData = apogeeutil.INVALID_VALUE;
             }
             else if(json === null) {
                 textData = "null";

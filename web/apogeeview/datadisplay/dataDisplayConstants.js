@@ -1,3 +1,5 @@
+import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
+
 /** 
  * This namespace includes some data display constants.
  * @namespace
@@ -38,9 +40,28 @@ DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO = "info";
 DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY = "wrapped_data";
 DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE = {}; //must use this exactly, not a copy
 
-/** This function returns  empty wrapped data, since it can be cumbersome to construct. */
+/** This function returns true if the passed in data is wrapped data. */
+DATA_DISPLAY_CONSTANTS.isWrappedData = function(data) {
+    if(!data) return false;
+    return (data[DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY] == DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE);
+}
+
+/** This function returns empty wrapped data, since it can be cumbersome to construct. The return
+ * value can be modified by adding additional fields. */
 DATA_DISPLAY_CONSTANTS.getEmptyWrappedData = function() {
     let wrappedData = {};
     wrappedData[DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY] = DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE;
     return wrappedData;
 }
+
+/** This is the standard wrapped data value for invalid data. It will print a message the data is not
+ * available and it will hide the display. This value is constant and should not be modified. */
+DATA_DISPLAY_CONSTANTS.STANDARD_INVALID_WRAPPED_DATA = apogeeutil.deepFreeze(
+    {
+        "wrapped_data": DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE,
+        "data": apogeeutil.INVALID_VALUE,
+        "messageType": DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO,
+        "message": "Data Unavailable",
+        "hideDisplay": true
+    }
+)

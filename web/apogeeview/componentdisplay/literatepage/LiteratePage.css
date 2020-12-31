@@ -244,12 +244,17 @@
 }
 .visiui_displayContainer_messageError {
     color: red;
+    font-style: italic;
 }
 .visiui_displayContainer_messageWarning {
     color: blue;
+    font-style: italic;
+    font-size: smaller;
 }
 .visiui_displayContainer_messageInfo {
     color: rgb(96,96,96);
+    font-style: italic;
+    font-size: smaller;
 }
 
 .errorDisplay_main {

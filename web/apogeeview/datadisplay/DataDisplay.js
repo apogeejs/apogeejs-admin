@@ -71,6 +71,14 @@ export default class DataDisplay {
             this.endEditMode();
         }
     }
+
+    getDisplayContainer() {
+        return this.displayContainer;
+    }
+
+    getDataSource() {
+        return this.dataSource;
+    }
     
     //=============================
     // Implemement in extending class
@@ -196,11 +204,11 @@ export default class DataDisplay {
         removeView = removeView ? true : false;
 
         //configure view
-        this.displayContainer.removeView(removeView);
+        this.displayContainer.setRemoveView(removeView);
         if(!removeView) {
             //only hide view and show message if view is not removed
             //we will set data either way to clear old date
-            this.displayContainer.hideDisplay(hideDisplay);
+            this.displayContainer.setHideDisplay(hideDisplay);
             this.displayContainer.setMessage(messageType,message);
         }
         this.setData(data);

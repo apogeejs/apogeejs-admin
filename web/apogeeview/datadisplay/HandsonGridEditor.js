@@ -74,15 +74,19 @@ export default class HandsonGridEditor extends DataDisplay {
         this.dataError = false;
 
         if(json == apogeeutil.INVALID_VALUE) {
-            var errorMsg = "ERROR: Data value is not valid"
-            this.cachedDisplayData = [[errorMsg]];
+            //clear the display
+            this.cachedDisplayData = [[]];
+            //the displaly shoudl be hidden, but do it again anyway
+            let displayContainer = this.getDisplayContainer();
+            displayContainer.setHideDisplay(true);
             this.dataError = true;
         }
-        
-        //verify data is the proper format
-        if(!this.dataIsValidFormat(json)) {
-            var errorMsg = "ERROR: Data value is not an array of arrays"
-            this.cachedDisplayData = [[errorMsg]];
+        else if(!this.dataIsValidFormat(json)) {
+            let displayContainer = this.getDisplayContainer();
+            displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO, "Data cannot be shown in grid: value is not an array of arrays")
+            displayContainer.setHideDisplay(true);
+            //clear the display
+            this.cachedDisplayData = [[]];
             this.dataError = true;
         }
 

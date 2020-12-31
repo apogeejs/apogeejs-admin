@@ -189,7 +189,7 @@ export default class PageDisplayContainer {
     // Accessed by the data display
     //------------------------------
 
-    hideDisplay(doHide) {
+    setHideDisplay(doHide) {
         if(doHide != this.isViewHidden) {
             this.isViewHidden = doHide;
             this._updateViewState();
@@ -200,7 +200,7 @@ export default class PageDisplayContainer {
         return this.isViewHidden;
     }
 
-    removeView(doRemove) {
+    setRemoveView(doRemove) {
         if(doRemove != this.isViewRemoved) {
             this.isViewRemoved = doRemove;
             this._updateViewState();
@@ -401,11 +401,12 @@ export default class PageDisplayContainer {
             this.viewSelectorContainer.style.display = "";
             this.expandImage.style.display = "none";
             this.contractImage.style.display = "";
+            this.mainElement.style.display = "";
             if(this.isViewHidden) {
-                this.mainElement.style.display = "none";
+                this.viewContainer.style.display = "none";
             }
             else {
-                this.mainElement.style.display = "";
+                this.viewContainer.style.display = "";
             }
         }
         else {

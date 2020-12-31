@@ -130,15 +130,19 @@ export default class AceTextEditor extends DataDisplay {
         //The data source should give a text value "" if the data in invalid rather than sending
         //in a json, but we will do this check anyway.
         if(text == apogeeutil.INVALID_VALUE) {
-            var errorMsg = "ERROR: Data value is not valid"
+            //clear the display
             this.cachedDisplayData = "";
+            //the dispaly shoudl be hidden, but do it again anyway
+            let displayContainer = this.getDisplayContainer();
+            displayContainer.setHideDisplay(true);
             this.dataError = true;
         }
-
-        //check data is valid
-        if(!apogeeutil.isString(text)) {
-            var errorMsg = "ERROR: Data value is not text";
-            this.cachedDisplayData = errorMsg;
+        else if(!apogeeutil.isString(text)) {
+            let displayContainer = this.getDisplayContainer();
+            displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO, "Data cannot be shown in editor: value is not text")
+            displayContainer.setHideDisplay(true);
+            //clear the display
+            this.cachedDisplayData = "";
             this.dataError = true;
         }
         
