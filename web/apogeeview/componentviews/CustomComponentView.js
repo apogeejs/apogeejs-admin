@@ -183,8 +183,7 @@ CustomComponentView.VIEW_MODES = [
 ];
 
 CustomComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": CustomComponentView.VIEW_MODES,
-    "defaultView": CustomComponentView.VIEW_OUTPUT
+    "viewModes": CustomComponentView.VIEW_MODES
 }
 
 /** This is the format string to create the code body for updateing the member

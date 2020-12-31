@@ -63,8 +63,7 @@ FunctionComponentView.VIEW_MODES = [
 ];
 
 FunctionComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": FunctionComponentView.VIEW_MODES,
-    "defaultView": FunctionComponentView.VIEW_CODE
+    "viewModes": FunctionComponentView.VIEW_MODES
 }
 
 

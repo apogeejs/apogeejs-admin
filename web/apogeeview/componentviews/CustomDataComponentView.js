@@ -230,7 +230,7 @@ CustomDataComponentView.propertyDialogLines = [
     }
 ];
 
-CustomDataComponentView.VIEW_FORM = "Form";
+CustomDataComponentView.VIEW_OUTPUT = "Form"; //oops! this was a mistake, from copying from form data component
 CustomDataComponentView.VIEW_VALUE = "Data Value";
 CustomDataComponentView.VIEW_CODE = "Input Code";
 CustomDataComponentView.VIEW_SUPPLEMENTAL_CODE = "Input Private";
@@ -239,18 +239,17 @@ CustomDataComponentView.VIEW_CSS = "CSS";
 CustomDataComponentView.VIEW_UI_CODE = "uiGenerator(mode)";
 
 CustomDataComponentView.VIEW_MODES = [
-    CustomDataComponentView.VIEW_FORM,
-    CustomDataComponentView.VIEW_VALUE,
-    CustomDataComponentView.VIEW_CODE,
-    CustomDataComponentView.VIEW_SUPPLEMENTAL_CODE,
-    CustomDataComponentView.VIEW_HTML,
-    CustomDataComponentView.VIEW_CSS,
-    CustomDataComponentView.VIEW_UI_CODE
+    {name: CustomComponentView.VIEW_OUTPUT, label: "Display", isActive: true},
+    {name: CustomComponentView.VIEW_VALUE, label: "Data Value", isActive: false},
+    {name: CustomComponentView.VIEW_CODE, label: "Input Code", isActive: false},
+    {name: CustomComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Input Private", isActive: false},
+    {name: CustomComponentView.VIEW_HTML, label: "HTML", isActive: false},
+    {name: CustomComponentView.VIEW_CSS, label: "CSS", isActive: false},
+    {name: CustomComponentView.VIEW_UI_CODE, label: "uiGenerator()", isActive: false}
 ];
 
 CustomDataComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": CustomDataComponentView.VIEW_MODES,
-    "defaultView": CustomDataComponentView.VIEW_FORM
+    "viewModes": CustomDataComponentView.VIEW_MODES
 }
 
 

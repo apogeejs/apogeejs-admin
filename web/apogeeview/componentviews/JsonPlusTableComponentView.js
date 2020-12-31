@@ -165,7 +165,6 @@ JsonPlusTableComponentView.VIEW_MODES = [
 
 JsonPlusTableComponentView.TABLE_EDIT_SETTINGS = {
     "viewModes": JsonPlusTableComponentView.VIEW_MODES,
-    "defaultView": JsonPlusTableComponentView.VIEW_DATA,
     "emptyDataValue": ""
 }
 

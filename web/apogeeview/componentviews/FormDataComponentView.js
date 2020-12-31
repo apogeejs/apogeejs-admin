@@ -198,8 +198,7 @@ FormDataComponentView.VIEW_MODES = [
 ];
 
 FormDataComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": FormDataComponentView.VIEW_MODES,
-    "defaultView": FormDataComponentView.VIEW_FORM,
+    "viewModes": FormDataComponentView.VIEW_MODES
 }
 
 //======================================

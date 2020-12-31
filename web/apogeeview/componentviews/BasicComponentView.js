@@ -74,8 +74,7 @@ BasicComponentView.VIEW_MODES = [
 ];
 
 BasicComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": BasicComponentView.VIEW_MODES,
-    "defaultView": BasicComponentView.VIEW_OUTPUT
+    "viewModes": BasicComponentView.VIEW_MODES
 }
 
 //===============================

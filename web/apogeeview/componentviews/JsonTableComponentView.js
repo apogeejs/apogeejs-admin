@@ -123,7 +123,6 @@ JsonTableComponentView.VIEW_MODES = [
 
 JsonTableComponentView.TABLE_EDIT_SETTINGS = {
     "viewModes": JsonTableComponentView.VIEW_MODES,
-    "defaultView": JsonTableComponentView.VIEW_DATA,
     "emptyDataValue": ""
 }
 

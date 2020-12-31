@@ -116,8 +116,7 @@ DynamicFormView.VIEW_MODES = [
 ];
 
 DynamicFormView.TABLE_EDIT_SETTINGS = {
-    "viewModes": DynamicFormView.VIEW_MODES,
-    "defaultView": DynamicFormView.VIEW_FORM
+    "viewModes": DynamicFormView.VIEW_MODES
 }
 
 //======================================
