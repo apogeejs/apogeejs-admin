@@ -207,10 +207,6 @@ export default class Member extends FieldObject {
         return errorInfoList;
     }
 
-    getDependsOnError() {
-        return new Error("TEMP! Depends on member with error: " + this.getName());
-    }
-
     /** This returns true if the member is not up to date, typically
      * do to waiting on an asynchronous operation. */
     getPendingPromise() {
@@ -336,7 +332,7 @@ export default class Member extends FieldObject {
             //update the state
             let newStateStruct = {};
 
-            //do some safety checks on the error list
+            //for error state, add all errors together
             if(state == apogeeutil.STATE_ERROR) {
                 newStateStruct.state = apogeeutil.STATE_ERROR;
 

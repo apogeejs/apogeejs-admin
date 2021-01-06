@@ -239,13 +239,13 @@ CustomDataComponentView.VIEW_CSS = "CSS";
 CustomDataComponentView.VIEW_UI_CODE = "uiGenerator(mode)";
 
 CustomDataComponentView.VIEW_MODES = [
-    {name: CustomComponentView.VIEW_OUTPUT, label: "Display", isActive: true},
-    {name: CustomComponentView.VIEW_VALUE, label: "Data Value", isActive: false},
-    {name: CustomComponentView.VIEW_CODE, label: "Input Code", isActive: false},
-    {name: CustomComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Input Private", isActive: false},
-    {name: CustomComponentView.VIEW_HTML, label: "HTML", isActive: false},
-    {name: CustomComponentView.VIEW_CSS, label: "CSS", isActive: false},
-    {name: CustomComponentView.VIEW_UI_CODE, label: "uiGenerator()", isActive: false}
+    {name: CustomDataComponentView.VIEW_OUTPUT, label: "Display", isActive: true},
+    {name: CustomDataComponentView.VIEW_VALUE, label: "Data Value", isActive: false},
+    {name: CustomDataComponentView.VIEW_CODE, label: "Input Code", isActive: false},
+    {name: CustomDataComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Input Private", isActive: false},
+    {name: CustomDataComponentView.VIEW_HTML, label: "HTML", isActive: false},
+    {name: CustomDataComponentView.VIEW_CSS, label: "CSS", isActive: false},
+    {name: CustomDataComponentView.VIEW_UI_CODE, label: "uiGenerator()", isActive: false}
 ];
 
 CustomDataComponentView.TABLE_EDIT_SETTINGS = {
