@@ -245,10 +245,10 @@ dataDisplayHelper.getStandardErrorDataSource = function(app,componentView,member
 
         getData: function() {
             let member = _getDataMember();
-            let extendedErrorInfo = member.getExtendedErrorInfo()
-            if((member.getState() == apogeeutil.STATE_ERROR)&&(extendedErrorInfo)) {
+            let errorInfo = member.getErrorInfo()
+            if((member.getState() == apogeeutil.STATE_ERROR)&&(errorInfo)) {
                 //show data view, this is our data
-                return extendedErrorInfo;
+                return errorInfo;
             }
             else {
                 //no error, or error info; remove the data view

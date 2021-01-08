@@ -26,16 +26,6 @@ export default class FolderFunction extends DependentMember {
             //It is used in the "virtual model" to prevent any unnecessary downstream calculations
             this.setField("sterilized",false)
         }
-
-        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        this.temporaryVirtualModelRunContext = {
-            doAsynchActionCommand: function(modelId,actionData) {
-                let msg = "NOT IPLEMENTED: Asynchronous actions in folder function!"
-                apogeeUserAlert(msg);
-                throw new Error(msg);
-            }
-        }
-        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     }
 
     /** This gets the internal forlder for the folderFunction. */
@@ -270,7 +260,7 @@ export default class FolderFunction extends DependentMember {
     getFolderFunctionFunction(model) {
 
         //create a copy of the model to do the function calculation - we don't update the UI display version
-        var virtualModel;
+        var baseVirtualModel;
         var inputMemberIdArray;
         var returnValueMemberId; 
         
@@ -287,15 +277,16 @@ export default class FolderFunction extends DependentMember {
                 //prepare the virtual function
                 //this is a copy of the original model, but with any member that is unlocked replaced.
                 //to prevent us from modifying an object in use by our current real model calculation.
-                virtualModel = model.getCleanCopy(this.temporaryVirtualModelRunContext);
+                baseVirtualModel = model.getCleanCopy(DUMMY_RUN_CONTEXT);
 
                 //we want to set the folder function as "sterilized" - this prevents any downstream work from the folder function updating
+                //(this is an synchronous command)
                 let commandData = {}
                 commandData.action = "setField";
                 commandData.memberId = this.getId();
                 commandData.fieldName = "sterilized";
                 commandData.fieldValue = "true";
-                let actionResult = doAction(virtualModel,commandData);
+                let actionResult = doAction(baseVirtualModel,commandData);
 
                 //we should do something with the action result
                 if(!actionResult.actionDone) {
@@ -320,19 +311,33 @@ export default class FolderFunction extends DependentMember {
             actionData.actions = updateActionList;
 
             //apply the update
-            let workingVirtualModel = virtualModel.getMutableModel();
-            var actionResult = doAction(workingVirtualModel,actionData);        
+            let instanceVirtualModel = baseVirtualModel.getMutableModel();
+            var actionResult = doAction(instanceVirtualModel,actionData);        
             if(actionResult.actionDone) {
                 //retrieve the result
                 if(returnValueMemberId) {
-                    let returnValueMember = workingVirtualModel.lookupMemberById(returnValueMemberId);
-                    
-                    if(returnValueMember.getState() == apogeeutil.STATE_PENDING) {
-                        throw new Error("A folder function must not be asynchronous: " + this.getFullName(workingVirtualModel));
+                    let returnValueMember = instanceVirtualModel.lookupMemberById(returnValueMemberId);
+                    let returnState = returnValueMember.getState();
+                    switch(returnState) {
+                        case apogeeutil.STATE_NORMAL:
+                            return returnValueMember.getData();
+
+                        case apogeeutil.STATE_ERROR:
+                            //we should do better than this...
+                            let error = returnValueMember.getError();
+                            if(error) throw error;
+                            else throw new Error("Error in function " + this.getName());
+
+                        case apogeeutil.STATE_PENDING:
+                            throw new Error("Error; asynchrnous functions not supporred!");
+
+                        case apogeeutil.STATE_INVALID:
+                            throw apogeeutil.MEMBER_FUNCTION_INVALID_THROWABLE;
+
+                        default:
+                            //this shouldn't happen
+                            throw new Error("Unknown internal state in function!");
                     }
-                    
-                    //get the resulting output
-                    return returnValueMember.getData();
                 }
                 else {
                     //no return value found
@@ -395,6 +400,91 @@ FolderFunction.generator.setCodeOk = false;
 
 //register this member
 Model.addMemberGenerator(FolderFunction.generator);
+
+
+
+//////////////////////////////////////////////////////////////////
+
+/** This is a dummy trun context. It does not allow asynch functions.
+ * The usual function of the run context is to provide the proper instance 
+ * of the model when an asynch command is run.
+ */
+const DUMMY_RUN_CONTEXT = {
+    doAsynchActionCommand: function(modelId,actionData) {
+        throw new Error("There should be no asych functions in this context!");
+    }
+}
+
+
+//we will need to rethink this
+// /** This is used when the return value is pending. */
+// getReturnPromise(activeModelWrapper,returnValueMemberId) {
+//     let promiseCompleteFunction;
+//     let promise = new Promise( (resolve,reject) => {
+//         promiseCompleteFunction = member => {
+//             if(member.getId() == returnValueMemberId) {
+//                 let memberState = member.getState();
+//                 if(memberState == apogeeutil.STATE_ERROR) {
+//                     //error
+//                     reject(member.getErrorMsg());
+//                 }
+//                 else if(memberState == apogeeutil.STATE_PENDING) {
+//                     //just wait for resolution
+//                 }
+//                 else if(memberstate == apogeeutil.STATE_INVALID) {
+//                     //maybe not really what we want
+//                     return INVALID_VALUE;
+//                 }
+//                 else {
+//                     //good data
+//                     return member.getData();
+//                 }
+//             }
+//         }
+//     });
+//     //add listener fro promise
+//     activeModelWrapper.addUpdateListener(promiseCompleteFunction);
+//     return promise;
+// }
+
+
+    //===============================
+    // Virtual Context
+    //===============================
+
+//we will need to rethink this
+// function getNewInstanceContext(model) {
+//     //this is needed to execute an action asynchronously
+//     // let virtualRunContext = {};
+//     // virtualRunContext.doAsynchActionCommand = (modelId,action) => {
+//     //     setTimeout( () => {
+//     //         activeVirtualModel = activeVirtualModel.getMutableModel();
+//     //         activeVirtualModel.addListener("member_updated", updateListener);
+//     //         doAction(activeVirtualModel,actionData); 
+//     //     })
+//     // }
+
+//     let activeVirtualModel = model.getCleanModelCopy(virtualRunContext);
+//     let updateListener;
+
+//     //this manages the active copy of the model
+//     let instanceContext = {
+//         getMutableModel: () => {
+//             activeVirtualModel = activeVirtualModel.getMutableModel();
+//             return activeVirtualModel;
+//         }
+//     }
+
+//     return instanceContext;
+// }
+
+
+
+
+
+
+
+
 
 
 

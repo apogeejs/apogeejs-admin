@@ -25,6 +25,12 @@ export default class ComponentView {
         this.treeState = null;
 
         this.component.setViewStateCallback(() => this.getViewState());
+
+        //state info
+        this.stateUpdated = false;
+        this.state = null;
+        this.bannerMessage = null;
+        this.errorInfoList = null;
     }
 
     //==============================
@@ -55,43 +61,27 @@ export default class ComponentView {
         return this.component.isDisplayNameUpdated();
     }
 
+    /** This method returns true if the component state was updated in the last component update. */
+    isStateUpdated() {
+        return this.isStateUpdated;
+    }
+
+    /** This gets the state for the component. */
     getBannerState() {
-        let member = this.component.getMember();
-        return member.getState();
+        if(this.state == null) this._createMemberStateInfo();
+        return this.state;
     }
 
+    /** This gets the state message for the component. */
     getBannerMessage() {
-        let member = this.component.getMember();
-        let state =  member.getState();
-        switch(state) {
-            case apogeeutil.STATE_NORMAL:
-                return "";
-
-            case apogeeutil.STATE_PENDING:
-                return bannerConstants.PENDING_MESSAGE;
-
-            case apogeeutil.STATE_INVALID:
-                return bannerConstants.INVALID_MESSAGE;
-
-            case apogeeutil.STATE_ERROR:
-                return this.getBannerErrorMessage(member);
-
-            default:
-                return "Unknown state: " + state; 
-        }
+        if(this.state == null) this._createMemberStateInfo();
+        return this.bannerMessage;
     }
 
-    //DEV - we will probably change this
-    getExtendedErrorInfo() {
-        let member = this.component.getMember();
-        return member.getExtendedErrorInfo();
-    }
-
-    /** This gets the banner error message for the component. It is separated so it can be overwritten 
-     * for compound components. These have the member being a folder. They will just have dependency
-     * errors for the child members. */
-    getBannerErrorMessage(member) {
-        return member.getErrorMsg();
+    /** This gets the error info for the component. */
+    getErrorInfoList() {
+        if(this.state == null) this._createMemberStateInfo();
+        return this.errorInfoList;
     }
 
     /** This method gets the parent component view of the current component view. 
@@ -420,6 +410,12 @@ export default class ComponentView {
         this.component = component;
         this.component.setViewStateCallback(() => this.getViewState());
 
+        //clear the locally stored member state info, It will be reconstructed on demand
+        this.stateUpdated = this.component.isStateUpdated();
+        if(this.stateUpdated) {
+            this._clearMemberStateInfo();
+        }
+
         //check for parent change
         if(component.isFieldUpdated("member")) {
             let member = component.getMember();
@@ -521,6 +517,96 @@ export default class ComponentView {
         }
         
         return openCallback;
+    }
+
+    //---------------------------
+    // Member (model) state
+    //---------------------------
+
+
+    /** THis clears the member state info */
+    _clearMemberStateInfo() {
+        this.state = null;
+        this.bannerMessage = null;
+        this.errorInfoList = null;
+    }
+
+    _createMemberStateInfo() {
+        //state matches state of main member
+        let member = this.component.getMember();
+        this.state = member.getState();
+
+        switch(this.state) {
+            case apogeeutil.STATE_NORMAL:
+                this.bannerMessage = "";
+                this.errorInfoList = null;
+                break;
+
+            case apogeeutil.STATE_PENDING:
+                this.bannerMessage = bannerConstants.PENDING_MESSAGE;
+                this.errorInfoList = null;
+                break;
+
+            case apogeeutil.STATE_INVALID:
+                this.bannerMessage = bannerConstants.INVALID_MESSAGE;
+                this.errorInfoList = null;
+                break;
+
+            case apogeeutil.STATE_ERROR:
+                this._constructErrorInfo();
+                break;
+
+            default:
+                this.bannerMessage = "Unknown state: " + state;
+                this.errorInfoList = null;
+                break; 
+        }
+    }
+
+    /** This constructs the error info for the component. It should be called when 
+     * the component is in the error state.
+     */
+    _constructErrorInfo() {
+        let memberFieldMap = this.component.getMemberFieldMap();
+        let memberDataList = [];
+        let memberCount = 0;
+        for(let id in memberFieldMap) {
+            let lookupName = memberFieldMap[id];
+            let member = this.component.getField(lookupName);
+            memberCount++;
+            let memberError = member.getError();
+            if(memberError) {
+                let memberData = {}
+                memberData.name = member.getName();
+                memberData.msg = memberError.toString();
+                if(memberError.errorInfoList) memberData.errorInfoList = memberError.errorInfoList;
+                memberDataList.push(memberData);
+            }   
+        }
+
+        if(memberDataList.length > 0) {
+            if(memberCount == 1) {
+                let memberData = memberDataList[0];
+                this.bannerMessage = memberData.msg;
+                this.errorInfoList = memberData.errorInfoList;
+            }
+            else {
+                this.bannerMessage = memberDataList.map( memberData => memberData.name + ": " + memberData.msg).join("; ");
+                let multiMemberErrorInfo = {};
+                multiMemberErrorInfo.type = "multiMember";
+                multiMemberErrorInfo.memberEntries = memberDataList.map( memberData => {
+                    return {
+                        name: memberData.name,
+                        errorInfoList: memberData.errorInfoList
+                    }
+                } )
+                this.errorInfoList = [multiMemberErrorInfo];
+            }
+        }
+        else {
+            this.bannerMessage = "Unknown Error";
+        }
+
     }
 }
 

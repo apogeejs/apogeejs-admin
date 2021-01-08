@@ -100,7 +100,6 @@ export default class DependentMember extends Member {
 
         let state;
         let error;
-        let extendedErrorInfo;
         if(errorImpactorList.length > 0) {
             state = apogeeutil.STATE_ERROR;
             error = Member.createDependsOnError(model,errorImpactorList);
@@ -119,7 +118,7 @@ export default class DependentMember extends Member {
             //state not set in normal case - will be set when data is set
         }
 
-        return {state, error, extendedErrorInfo};
+        return {state, error};
     }
 
     /** This method makes sure any impactors are set. It sets a dependency 

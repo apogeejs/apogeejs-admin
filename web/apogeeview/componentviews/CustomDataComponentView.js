@@ -43,24 +43,6 @@ export default class CustomDataComponentView extends ComponentView {
     // Protected and Private Instance Methods
     //==============================
 
-    /* The banner error message is overwridden to show errors from the child members rather than from the 
-     * containing folder, which will just be dependency errors. */
-    getBannerErrorMessage(member) {
-        let msgList = [];
-
-        //there is ust one user code member
-        //note the data member does not have code
-        let inputMember = this.getComponent().getField("member.input");
-        if(inputMember.getState() == apogeeutil.STATE_ERROR) {
-            msgList.push("input: " + inputMember.getErrorMsg());
-        }
-
-        //note - the input field uiGenerator can also have errors, howver that is not covered by state for now since it is UI code
-        //and not model code.
-
-        return msgList.join(";\n");
-    }
-
     /** This component extends the on delete method to get rid of any css data for this component. */
     onDelete() {
         //remove the css data for this component

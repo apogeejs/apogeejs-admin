@@ -248,9 +248,9 @@ export function analyzeCode(functionText) {
         //check for errors in parsing
         if((ast.errors)&&(ast.errors.length > 0)) {
             returnValue.success = false;
-            let {errorMsg,extendedErrorInfo} = createErrorInfoFromAstInfo(functionText,ast.errors);
+            let {errorMsg,errorInfo} = createErrorInfoFromAstInfo(functionText,ast.errors);
             returnValue.errorMsg = errorMsg; 
-            returnValue.extendedErrorInfo = extendedErrorInfo;
+            returnValue.errorInfo = errorInfo;
             return returnValue;
         }
         
@@ -263,9 +263,9 @@ export function analyzeCode(functionText) {
         return returnValue;
     }
     catch(internalError) {
-        let {errorMsg,extendedErrorInfo} = createErrorInfoFromInternalError(functionText,internalError);
+        let {errorMsg,errorInfo} = createErrorInfoFromInternalError(functionText,internalError);
         returnValue.errorMsg = errorMsg; 
-        returnValue.extendedErrorInfo = extendedErrorInfo;
+        returnValue.errorInfo = errorInfo;
         return returnValue;
     }
 }
@@ -600,27 +600,27 @@ function createInternalParsingError(errorMsg,location,range) {
 }
 
 function createErrorInfoFromInternalError(functionText,internalError) {
-    let extendedErrorInfo = {};
-    extendedErrorInfo.type = "esprimaParseError";
-    extendedErrorInfo.description = "Error parsing code: " + internalError.description;
-    let errorMsg = internalError.toString();
     let errorInfo = {};
-    if(internalError.lineNumber !== undefined) errorInfo.lineNumber = internalError.lineNumber;
-    if(internalError.index !== undefined) errorInfo.index = internalError.index;
-    if(internalError.column !== undefined) errorInfo.column = internalError.column;
-    extendedErrorInfo.errors = [errorInfo]
-    extendedErrorInfo.code = functionText;
-    return {errorMsg,extendedErrorInfo};
+    errorInfo.type = "esprimaParseError";
+    errorInfo.description = "Error parsing code: " + internalError.description;
+    let errorMsg = internalError.toString();
+    let errorData = {};
+    if(internalError.lineNumber !== undefined) errorData.lineNumber = internalError.lineNumber;
+    if(internalError.index !== undefined) errorData.index = internalError.index;
+    if(internalError.column !== undefined) errorData.column = internalError.column;
+    errorInfo.errors = [errorData]
+    errorInfo.code = functionText;
+    return {errorMsg,errorInfo};
 }
 
 /** this converts info from code analysis to a proper error */
 function createErrorInfoFromAstInfo(functionText,astErrors) {
     let errorTextArray = astErrors.map(errorInfo => errorInfo.description);
     let errorMsg = "Error parsing user code: " + errorTextArray.join("; ");
-    let extendedErrorInfo = {};
-    extendedErrorInfo.type = "esprimaParseError";
-    extendedErrorInfo.description = errorMsg;
-    extendedErrorInfo.errors = astErrors;
-    extendedErrorInfo.code = functionText;
-    return {errorMsg,extendedErrorInfo};
+    let errorInfo = {};
+    errorInfo.type = "esprimaParseError";
+    errorInfo.description = errorMsg;
+    errorInfo.errors = astErrors;
+    errorInfo.code = functionText;
+    return {errorMsg,errorInfo};
 }

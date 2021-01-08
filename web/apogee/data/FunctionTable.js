@@ -74,7 +74,7 @@ export default class FunctionTable extends CodeableMember {
 
         source.handleError = error => {
             console.error("Error in function call to " + this.getName());
-            CodeableMember.appendMemberTraceInfo(model,error,this);
+            CodeableMember.storeMemberTraceInfo(model,error,this);
             throw error;
         }
 

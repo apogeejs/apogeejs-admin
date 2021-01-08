@@ -67,7 +67,7 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
     }
     else {
         compiledInfo.errorMsg = analyzeOutput.errorMsg;
-        if(analyzeOutput.extendedErrorInfo) compiledInfo.extendedErrorInfo = analyzeOutput.extendedErrorInfo;
+        if(analyzeOutput.errorInfo) compiledInfo.errorInfo = analyzeOutput.errorInfo;
         compiledInfo.valid = false;
         return compiledInfo;
     }
@@ -89,11 +89,11 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
     catch(ex) {
         //this is for parse errors not captured in esprmia
         compiledInfo.errorMsg = ex.toString();
-        let extendedErrorInfo = {};
-        extendedErrorInfo.type = "javascriptParseError";
-        if(ex.stack) extendedErrorInfo.stack =  ex.stack;
-        extendedErrorInfo.code = generatorBody;
-        compiledInfo.extendedErrorInfo = extendedErrorInfo;
+        let errorInfo = {};
+        errorInfo.type = "javascriptParseError";
+        if(ex.stack) errorInfo.stack =  ex.stack;
+        errorInfo.code = generatorBody;
+        compiledInfo.errorInfo = errorInfo;
         compiledInfo.valid = false;
     }
     

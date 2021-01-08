@@ -117,6 +117,12 @@ export default class Component extends FieldObject {
         return this.isMemberFieldUpdated("member","state");
     }
 
+    /** This gets the map of members in this component. The key is the member ID and
+     * the value is the stored name for the component. */
+    getMemberFieldMap() {
+        return this.getField("memberFieldMap");
+    }
+
     getParentComponent(modelManager) {
         let model = modelManager.getModel();
         let parent = this.getField("member").getParentMember(model);

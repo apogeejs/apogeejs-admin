@@ -150,6 +150,35 @@ export default class Member extends FieldObject {
         return this.constructor.generator.setDataOk;
     }
 
+    /** This returns the error object for this member. The entries can be javscript Error objects or other objects with a
+     * toString() method. See documentation for some additional properties of these errors. */
+    getError() {
+        let stateStruct = this.getField("state");
+        if(stateStruct) return stateStruct.error;
+        else return null;
+    }
+
+    /** This method returns a simple error message for this member, if the member is in
+     * the error state. Additional information can be obtained by getting the actual error object. */
+    getErrorMsg() {
+        let stateStruct = this.getField("state");
+        if((stateStruct)&&(stateStruct.error)) {
+            return stateStruct.error.toString();
+        }
+        else {
+            //this shouldn't happen if the state is actually an error state
+            return "";
+        }
+    }
+
+    /** This method returns the list of error info objects for this member. It should be
+     * called only when the state is error. */
+    getErrorInfo() {
+        let stateStruct = this.getField("state");
+        if((stateStruct)&&(stateStruct.error)) return stateStruct.error.errorInfoList;
+        else return [];
+    }
+
     /** This returns the list of errors. The entries can be javscript Error objects, members (signifying a
      * dependency error), strings or other objects (which should be converted to strings). 
      * @deprecated*/
@@ -164,51 +193,7 @@ export default class Member extends FieldObject {
         }
     }
 
-    getErrorMsg() {
-        let stateStruct = this.getField("state");
-        if((stateStruct)&&(stateStruct.errorList)) {
-            let msgList = [];
-            //get the errors not including depends on error
-            stateStruct.errorList.forEach(error => {
-                if(!error.isDependsOnError) {
-                    msgList.push(error.toString());
-                }
-            })
-            if(stateStruct.dependOnErrorList) {
-                let dependsMemberList = stateStruct.dependOnErrorList.map(item => item.name);
-                let prefix = (dependsMemberList.length > 1) ? "Error in dependencies: " : "Error in dependency: ";
-                let dependsOnMsg = prefix + dependsMemberList.join(", ");
-                msgList.push(dependsOnMsg);
-            }
-            return msgList.join("; ");
-        }
-        else {
-            //this shouldn't happen if the state is actually an error state
-            return "";
-        }
-    }
-
-    /** This returns the list of extended error info objects for this member. */
-    getExtendedErrorInfo() {
-        let errorInfoList = [];
-        let stateStruct = this.getField("state");
-        if((stateStruct)&&(stateStruct.errorList)) {
-            stateStruct.errorList.forEach(error => {
-                if(error.extendedErrorInfo) {
-                    if(error.extendedErrorInfo.type == "multi") {
-                        error.extendedErrorInfo.infos.forEach(extendedErrorInfo => errorInfoList.push(extendedErrorInfo));
-                    }
-                    else {
-                        errorInfoList.push(error.extendedErrorInfo);
-                    }
-                }
-            })
-        }
-        return errorInfoList;
-    }
-
-    /** This returns true if the member is not up to date, typically
-     * do to waiting on an asynchronous operation. */
+    /** This returns the promise that is pending. */
     getPendingPromise() {
         return this.getField("pendingPromise");
     }
@@ -332,32 +317,9 @@ export default class Member extends FieldObject {
             //update the state
             let newStateStruct = {};
 
-            //for error state, add all errors together
+            newStateStruct.state = state;
             if(state == apogeeutil.STATE_ERROR) {
-                newStateStruct.state = apogeeutil.STATE_ERROR;
-
-                if(oldStateStruct.state == apogeeutil.STATE_ERROR) {
-                    //copy info from old state struct
-                    newStateStruct.errorList = oldStateStruct.errorList;
-                    if(oldStateStruct.dependsOnErrorList) newStateStruct.dependOnErrorList = oldStateStruct.dependOnErrorList;
-                }
-                else {
-                    //fill in needed fields for new struct
-                    newStateStruct.errorList = [];
-                }
-
-                if(error.isDependsOnError) {
-                    //if this is a depends on error, add it to depends on list
-                    if(!newStateStruct.dependOnErrorList) newStateStruct.dependOnErrorList = [];
-                    this._updateDependsOnErrorList(newStateStruct.dependOnErrorList,error.dependsOnErrorList);
-                }
-                else {
-                    //add to error list
-                    newStateStruct.errorList.push(error);
-                }
-            }
-            else {
-                newStateStruct.state = state;
+                newStateStruct.error = error;
             }
             this.setField("state",newStateStruct);
         }
@@ -467,94 +429,26 @@ export default class Member extends FieldObject {
                 name: impactor.getFullName(model)
             }
         });
-        let dependsOnError = new Error();
+        let dependsOnErrorInfo = {
+            type: "dependsOn",
+            dependsOnErrorList: dependsOnErrorList
+        }
+        let dependsOnError = new Error("Error in dependency");
         dependsOnError.isDependsOnError = true;
-        dependsOnError.dependsOnErrorList = dependsOnErrorList;
+        Member.appendErrorInfo(dependsOnError,dependsOnErrorInfo);
         return dependsOnError;
     }
 
     /** This method adds the extended info to the error. It allows for multiple
      * error infos to be added. */
-    static appendExtendedInfo(error,extendedErrorInfo) {
-        if(!error.extendedErrorInfo) {
-            error.extendedErrorInfo = extendedErrorInfo;
-            return;
+    static appendErrorInfo(error,errorInfo) {
+        if(!error.errorInfoList) {
+            error.errorInfoList = [];
         }
-        //handle multiple infos added
-        if(error.extendedErrorInfo.type == "multi") {
-            error.extendedErrorInfo.infos.push(extendedErrorInfo);
-            return;
-        }
-        else {
-            let multiInfo = {
-                type: "multi",
-                infos: []
-            }
-            multiInfo.push(error.extendedErrorInfo);
-            multiInfo.push(extendedErrorInfo)
-            return;
-        }
+        error.errorInfoList.push(errorInfo);
     }
-
-    /** This method is used to add trace of members whose code was called */
-    static appendMemberTraceInfo(model,error,member) {
-        if(!error.memberTrace) {
-            error.memberTrace = [];
-        }
-        let memberInfo = {};
-        memberInfo.id = member.getId();
-        memberInfo.name = member.getFullName(model);
-        if(member.getCodeText) memberInfo.code = member.getCodeText();
-        error.memberTrace.push(memberInfo);
-    }
-
-    static getMemberTraceInfo(error) {
-        return error.memberTrace;
-    }
-
-    /** This method adds depends on members to the depends on error list. */
-    _updateDependsOnErrorList(currentDependsOnErrorList,addedDependsOnErrorList) {
-        addedDependsOnErrorList.forEach(addedItem => {
-            if(!currentDependsOnErrorList.some(existingItem => existingItem.id == addedItem.id)) {
-                currentDependsOnErrorList.push(addedItem);
-            }
-        })
-    }
-
 }
 
 //add mixins to this class
 apogeeutil.mixin(Member,FieldObject);
-
-
-let UNKNOWN_ERROR_MSG_PREFIX = "Unknown error in member ";
-
-
-// function _getErrorData(errorList) {
-//     let text = "";
-//     if((errorList)&&(errorList.length > 0)) {
-//         errorList.forEach(errorElement => {
-//             if(errorElement) {
-//                 if(errorElement.extendedInfo) {
-//                     errorElement.extendedInfo.forEach(infoElement => {
-//                         if(text.length > 0) text += "\n#################################################################################\n";
-//                         if(infoElement.label) {
-//                             text += infoElement.label + "\n===================\n";
-//                         }
-//                         if(infoElement.body) {
-//                             text += infoElement.body;
-//                         }
-//                     });
-//                 }
-//             }
-//         });
-//     }
-
-//     if(text.length > 0) {
-//         return text;
-//     }
-//     else {
-//         return apogeeutil.INVALID_VALUE;
-//     }
-// }
 
