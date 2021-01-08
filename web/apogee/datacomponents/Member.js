@@ -430,7 +430,7 @@ export default class Member extends FieldObject {
             }
         });
         let dependsOnErrorInfo = {
-            type: "dependsOn",
+            type: "dependency",
             dependsOnErrorList: dependsOnErrorList
         }
         let dependsOnError = new Error("Error in dependency");

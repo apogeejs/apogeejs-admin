@@ -25,27 +25,9 @@ export default class StandardErrorDisplay extends DataDisplay {
         uiutil.removeAllChildren(this.editorDiv);
 
         if(Array.isArray(json)) {
-            json.forEach(errorInfo => {
-                let errorInfoDiv = _createErrorInfoDiv();
-                this.editorDiv.appendChild(errorInfoDiv);
-                switch(errorInfo.type) {
-                    case "esprimaParseError":
-                        _addEsprimseParseError(errorInfoDiv,errorInfo);
-                        break;
-
-                    case "javascriptParseError":
-                        _addJavascriptParseError(errorInfoDiv,errorInfo);
-                        break;
-
-                    case "runtimeError":
-                        _addRuntimeError(errorInfoDiv,errorInfo);
-                        break;
-
-                    default:
-                        //for now we will print other errors too
-                        _addOtherError(errorInfoDiv,errorInfo);
-                }
-            });
+            let errorInfoDiv = _createErrorInfoDiv();
+            this.editorDiv.appendChild(errorInfoDiv);
+            _processList(errorInfoDiv,json);
         }
     }
     
@@ -61,8 +43,35 @@ export default class StandardErrorDisplay extends DataDisplay {
 // Error Info Elements
 //===================================
 
-function _clearDisplay(errorInfoDiv) {
-    uiutil.removeAllChildren(errorInfoDiv);
+function _processList(errorInfoDiv,errorInfoList) {
+    errorInfoList.forEach(errorInfo => {
+        switch(errorInfo.type) {
+            case "esprimaParseError":
+                _addEsprimseParseError(errorInfoDiv,errorInfo);
+                break;
+
+            case "javascriptParseError":
+                _addJavascriptParseError(errorInfoDiv,errorInfo);
+                break;
+
+            case "runtimeError":
+                _addRuntimeError(errorInfoDiv,errorInfo);
+                break;
+
+            case "multiMember":
+                _addMultiMemberError(errorInfoDiv,errorInfo);
+                break;
+
+            case "dependency":
+                _addDependencyError(errorInfoDiv,errorInfo);
+                break;
+            
+
+            default:
+                //for now we will print other errors too
+                _addOtherError(errorInfoDiv,errorInfo);
+        }
+    });
 }
 
 function _addEsprimseParseError(errorInfoDiv,errorInfo) {
@@ -81,6 +90,20 @@ function _addRuntimeError(errorInfoDiv,errorInfo) {
     if(errorInfo.description) _addMainDescription(errorInfoDiv,errorInfo.description);
     if(errorInfo.stack) _addStackTraceSection(errorInfoDiv,errorInfo.stack);
     if(errorInfo.memberTrace) _addMemberCodeSection(errorInfoDiv,errorInfo.memberTrace);
+}
+
+function _addMultiMemberError(errorInfoDiv,errorInfo) {
+    if(errorInfo.memberEntries) errorInfo.memberEntries.forEach( memberData => {
+        _addMemberTitle(errorInfoDiv,memberData.name);
+        _processList(errorInfoDiv,memberData.errorInfoList) 
+    });
+}
+
+function _addDependencyError(errorInfoDiv,errorInfo) {
+    if((errorInfo.dependsOnErrorList)&&(errorInfo.dependsOnErrorList.length > 0)) {
+        let dependencyNameString = errorInfo.dependsOnErrorList.map( dependsOnEntry => dependsOnEntry.name).join(", "); 
+        _addSectionHeading(errorInfoDiv,"Error in dependencies: " + dependencyNameString,1);
+    }
 }
 
 function _addOtherError(errorInfoDiv,errorInfo) {
@@ -168,6 +191,13 @@ function _createErrorInfoDiv() {
     let errorInfoDiv = document.createElement("div");
     errorInfoDiv.className = "errorDisplay_errorInfoDiv";
     return errorInfoDiv;
+}
+
+function _addMemberTitle(errorInfoDiv,memberName) {
+    let containerDiv = document.createElement("div");
+    containerDiv.innerHTML = memberName + ":";
+    containerDiv.className = "errorDisplay_memberTitleDiv";
+    errorInfoDiv.appendChild(containerDiv);
 }
 
 /** This is the main description for a error info. It should be 

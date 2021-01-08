@@ -244,18 +244,18 @@ dataDisplayHelper.getStandardErrorDataSource = function(app,componentView,member
         },
 
         getData: function() {
-            let member = _getDataMember();
-            let errorInfo = member.getErrorInfo()
-            if((member.getState() == apogeeutil.STATE_ERROR)&&(errorInfo)) {
-                //show data view, this is our data
-                return errorInfo;
+            if(componentView.getBannerState() == apogeeutil.STATE_ERROR) {
+                let errorInfoList = componentView.getErrorInfoList()
+                if((errorInfoList)&&(errorInfoList.length > 0)) {
+                    //show data view, this is our data
+                    return errorInfoList;
+                }
             }
-            else {
-                //no error, or error info; remove the data view
-                let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
-                wrappedData.removeView = true;
-                return wrappedData;
-            }
+
+            //no error or error info; remove the data view
+            let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+            wrappedData.removeView = true;
+            return wrappedData;
             
         }
     }

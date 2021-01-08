@@ -285,6 +285,11 @@
     padding: 2px;
     color: red;
 }
+.errorDisplay_memberTitleDiv {
+    padding: 2px;
+    color: rgb(50,50,160);
+    font-weight: bold;
+}
 .errorDisplay_sectionHeadingDiv1 {
     padding: 2px;
     color: rgb(0,0,0);

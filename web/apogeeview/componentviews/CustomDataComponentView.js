@@ -1,6 +1,7 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
+import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
@@ -97,6 +98,10 @@ export default class CustomDataComponentView extends ComponentView {
             case CustomDataComponentView.VIEW_UI_CODE:
                 dataDisplaySource = this.getUiDataDisplaySource("uiCode");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case ComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
     //temporary error handling...
@@ -221,6 +226,7 @@ CustomDataComponentView.VIEW_CSS = "CSS";
 CustomDataComponentView.VIEW_UI_CODE = "uiGenerator(mode)";
 
 CustomDataComponentView.VIEW_MODES = [
+    ComponentView.VIEW_INFO_MODE_ENTRY,
     {name: CustomDataComponentView.VIEW_OUTPUT, label: "Display", isActive: true},
     {name: CustomDataComponentView.VIEW_VALUE, label: "Data Value", isActive: false},
     {name: CustomDataComponentView.VIEW_CODE, label: "Input Code", isActive: false},
