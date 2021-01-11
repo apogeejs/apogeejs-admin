@@ -91,6 +91,7 @@ export function processCode(argList,functionBody,supplementalCode,memberName) {
         compiledInfo.errorMsg = ex.toString();
         let errorInfo = {};
         errorInfo.type = "javascriptParseError";
+        errorInfo.description = compiledInfo.errorMsg;
         if(ex.stack) errorInfo.stack =  ex.stack;
         errorInfo.code = generatorBody;
         compiledInfo.errorInfo = errorInfo;

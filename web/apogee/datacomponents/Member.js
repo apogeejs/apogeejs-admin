@@ -406,21 +406,6 @@ export default class Member extends FieldObject {
     // Error methods
     //----------------------------------
 
-/* Some Extended Error Info formats:
-//basic format
-{
-    type: (extended error info type name),
-    (other, based on type),
-}
-
-//"multi" type
-{
-    type: "multi",
-    infos: [(child extended error infos)]
-}
-*/
-    
-
     /** This methos created a depends on error, with a dependency on all members in the passed list. */
     static createDependsOnError(model,errorImpactorList) {
         let dependsOnErrorList = errorImpactorList.map(impactor => {
@@ -429,11 +414,13 @@ export default class Member extends FieldObject {
                 name: impactor.getFullName(model)
             }
         });
+        let msgPrefix = dependsOnErrorList.length ? "Error in dependency: " : "Error in dependencies: ";
+        let errorMsg = msgPrefix + dependsOnErrorList.map(dependsOnEntry => dependsOnEntry.name).join(", ")
         let dependsOnErrorInfo = {
             type: "dependency",
             dependsOnErrorList: dependsOnErrorList
         }
-        let dependsOnError = new Error("Error in dependency");
+        let dependsOnError = new Error(errorMsg);
         dependsOnError.isDependsOnError = true;
         Member.appendErrorInfo(dependsOnError,dependsOnErrorInfo);
         return dependsOnError;
