@@ -570,17 +570,30 @@ export default class ComponentView {
         let memberFieldMap = this.component.getMemberFieldMap();
         let memberDataList = [];
         let memberCount = 0;
+        //get the error info for the member(s) for thei component
         for(let id in memberFieldMap) {
             let lookupName = memberFieldMap[id];
             let member = this.component.getField(lookupName);
             memberCount++;
             let memberError = member.getError();
             if(memberError) {
-                let memberData = {}
+                let memberData = {};
+                let saveError = true;
                 memberData.name = member.getName();
-                memberData.msg = memberError.toString();
-                if(memberError.errorInfoList) memberData.errorInfoList = memberError.errorInfoList;
-                memberDataList.push(memberData);
+                if(memberError.isDependsOnError) {
+                    //for a dependency error, we remove mention of depends on error that are internal
+                    //to the component, keeping only depends on errors from external member
+                    let {hasError, msg, errorInfoList} = this._processDependencyError(memberError, memberFieldMap);
+                    saveError = hasError;
+                    memberData.msg = msg;
+                    memberData.errorInfoList = errorInfoList;
+                }
+                else {
+                    memberData.msg = memberError.toString();
+                    if(memberError.errorInfoList) memberData.errorInfoList = memberError.errorInfoList;
+                }
+                
+                if(saveError) memberDataList.push(memberData);
             }   
         }
 
@@ -607,6 +620,34 @@ export default class ComponentView {
             this.bannerMessage = "Unknown Error";
         }
 
+    }
+
+    /** For dependency errors, we will get rid of an error reference where the dependency is on another
+     * member that is in this same component. We want our error display to only show external errors */
+    _processDependencyError(memberError, memberFieldMap) {
+        let msg, errorInfoList;
+        let hasError = false;
+        if(memberError.errorInfoList){
+            let dependencyErrorInfo = memberError.errorInfoList.find(entry => entry.type == "dependency");
+            if(dependencyErrorInfo) {
+                //dependency error info - keep any member reference that is not an internal member
+                let newDependsOnErrorList = dependencyErrorInfo.dependsOnErrorList.filter( dependsOnEntry => (memberFieldMap[dependsOnEntry.id] === undefined) );
+                let newErrorInfo = {
+                    type: "dependency",
+                    dependsOnErrorList: newDependsOnErrorList
+                }
+                if(newDependsOnErrorList.length > 0) {
+                    hasError = true;
+                    //here we reconstruct the error info assuming this was the only error info entry, we may want
+                    //to modify this to be more general.
+                    errorInfoList = [newErrorInfo];
+                    //update message to give depends on members in error
+                    let msgPrefix = newDependsOnErrorList.length ? "Error in dependency: " : "Error in dependencies: ";
+                    msg = msgPrefix + newDependsOnErrorList.map(dependsOnEntry => dependsOnEntry.name).join(", ")
+                }
+            }
+        }
+        return {hasError, msg, errorInfoList};
     }
 }
 
