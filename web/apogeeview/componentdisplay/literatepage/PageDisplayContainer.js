@@ -322,14 +322,12 @@ export default class PageDisplayContainer {
 
         //make the selector for the view, displayed in the component title bar
         this.viewSelectorContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorContainerClass",null);
+        if(this.viewModeInfo.isInfoView) {
+            this.viewSelectorContainer.classList.add("visiui_displayContainer_viewSelectorContainerClass_info");
+        }
         //this is set from link to div so it can not get focus. later, we _do_ want it to get focuus, but if it does we need to make
         //sure button presses are handled properly. (as it would have been, enter does not work to leave the cell)
         this.viewSelectorLink = uiutil.createElementWithClass("div","visiui_displayContainer_viewSelectorLinkClass visiui_hideSelection",this.viewSelectorContainer);
-        //ideally we should allow more flexibility for styling these labels. For now we just have the standard style and an additional style for
-        //an error/info view. 
-        if(this.viewModeInfo.isInfoView) {
-            this.viewSelectorLink.classList.add("visiui_displayContainer_infoSelectorLink");
-        }
 
         this.expandImage = uiutil.createElementWithClass("img","visiui_displayContainer_expandContractClass visiui_hideSelection",this.viewSelectorLink);
         this.expandImage.src = uiutil.getResourcePath(PageDisplayContainer.VIEW_CLOSED_IMAGE_PATH);

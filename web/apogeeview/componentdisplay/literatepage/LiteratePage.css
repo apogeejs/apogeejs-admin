@@ -5,7 +5,7 @@
     
 }
 .visiui_litPage_editNotice {
-    background-color: rgb(0,255,255);
+    background-color: rgb(64,255,255);
 }
 .visiui_litPage_editorToolbar {
     border: 1px solid #ccc;
@@ -138,8 +138,8 @@
     position: relative;
 }
 .visiui_displayContainer_editMode {
-    border: 2px solid rgb(0,255,255);
-    background-color: rgb(0,255,255);
+    border: 2px solid rgb(64,255,255);
+    background-color: rgb(64,255,255);
 }
 .visiui_displayContainer_viewToolbarClass {
     position: relative;
@@ -158,11 +158,15 @@
 }
 .visiui_displayContainer_viewSelectorContainerClass {
     display: inline;
-    margin-left: 10px;
+    margin-left: 6px;
 }
 .visiui_displayContainer_viewSelectorContainerClass_editMode {
-    background-color: rgb(0,255,255);
-    border: 2px solid rgb(0,255,255);
+    background-color: rgb(64,255,255);
+    border: 2px solid rgb(64,255,255);
+}
+.visiui_displayContainer_viewSelectorContainerClass_info {
+    background-color: rgb(255,160,160);
+    border: 2px solid rgb(255,160,160);
 }
 .visiui_displayContainer_viewSelectorContainerClass:hover {
     background-color: rgba(128,128,144,.35);
@@ -171,10 +175,7 @@
     text-decoration:none;
     display: inline;
     user-select: none;
-}
-.visiui_displayContainer_infoSelectorLink {
-    background-color: rgba(255,255,0,.8);
-    border: 2px solid rgba(255,255,0,.8);
+    padding-right: 4px;
 }
 .visiui_displayContainer_viewActiveElementClass {
     display: inline;
