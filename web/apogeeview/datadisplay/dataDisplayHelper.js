@@ -225,13 +225,15 @@ dataDisplayHelper.getMemberSupplementalDataSource = function(app,componentView,m
 
 /** This function creates the data display data source  for the data of the given member. The
  * member field should be the field name used to access the data source from the associated component. */
-dataDisplayHelper.getStandardErrorDataSource = function(app,componentView,memberFieldName) {
+dataDisplayHelper.getStandardErrorDataSource = function(app,componentView) {
     
     return {
         doUpdate: function() {
             //return value is whether or not the data display needs to be udpated
+            //the overall state is taken from the main memberm which will encompass any changes to 
+            //the child members.
             let component = componentView.getComponent();
-            let reloadData = component.isMemberDataUpdated(memberFieldName);
+            let reloadData = component.isMemberDataUpdated("member");
             let reloadDataDisplay = false;
             return {reloadData,reloadDataDisplay};
         },

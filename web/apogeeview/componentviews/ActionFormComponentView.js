@@ -52,7 +52,7 @@ export default class ActionFormComponentView extends ComponentView {
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
             case ComponentView.VIEW_INFO: 
-                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
@@ -82,11 +82,9 @@ export default class ActionFormComponentView extends ComponentView {
 
                 //make sure this is a function (could be invalid value, or a user code error)
                 if(layoutFunction instanceof Function) {
-                    let admin = {
-                        getCommandMessenger: () => new UiCommandMessenger(this,contextMemberId)
-                    }
+                    let commandMessenger = new UiCommandMessenger(this,contextMemberId);
                     try {
-                        let layout = layoutFunction(admin,inputData);
+                        let layout = layoutFunction(commandMessenger,inputData);
                         if(layout) return layout;
                         else return ConfigurableFormEditor.getEmptyLayout();
                     }

@@ -89,7 +89,7 @@ export default class CustomComponentView extends ComponentView {
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
             case ComponentView.VIEW_INFO: 
-                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:

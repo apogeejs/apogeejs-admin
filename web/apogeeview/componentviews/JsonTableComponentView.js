@@ -48,11 +48,6 @@ export default class JsonTableComponentView extends ComponentView {
                     case JsonTableComponentView.GRID_DATA_VEW:
                         dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member"));
                         return new HandsonGridEditor(displayContainer,dataDisplaySource);
-                        
-                    // case JsonTableComponentView.PLAIN_DATA_VEW:
-                    // default:
-                    //     callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.member);
-                    //     return new AceTextEditor(displayContainer,callbacks,"ace/mode/text",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 }
                 
             case JsonTableComponentView.VIEW_CODE:
@@ -64,7 +59,7 @@ export default class JsonTableComponentView extends ComponentView {
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
 
             case ComponentView.VIEW_INFO: 
-                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this,"member");
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:

@@ -13,7 +13,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
      *  - getData - returns the desired form value,
      *  - getEditOk - gets if form is editable (optional)
      *  - setData - called when data is saved, with the form value (optional)
-     *  - getLayout - This returns the layout for the configurable form.
+     *  - getDisplayData - This returns the layout for the configurable form.
      *  }
      */
     constructor(displayContainer,dataSource) {
