@@ -48,44 +48,30 @@ export default class CustomComponent extends Component {
     }
 
 
+    /** This method creates the resource. It may throw an exception if there
+     * is a problem compiling user code. The caller should handle this. */
     createResource() {
-        try {
-            var uiGeneratorBody = this.getField("uiCode");
+        var uiGeneratorBody = this.getField("uiCode");
+        
+        var resource;
+        if((uiGeneratorBody)&&(uiGeneratorBody.length > 0)) {
+            //create the resource generator wrapped with its closure
+            var generatorFunctionBody = apogeeutil.formatString(
+                CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
+                uiGeneratorBody
+            );
+
+            //create the function generator, with the aliased variables in the closure
+            var generatorFunction = new Function(generatorFunctionBody);
+            var resourceFunction = generatorFunction();
             
-            var resource;
-            if((uiGeneratorBody)&&(uiGeneratorBody.length > 0)) {
-                try {
-
-                    //create the resource generator wrapped with its closure
-                    var generatorFunctionBody = apogeeutil.formatString(
-                        CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
-                        uiGeneratorBody
-                    );
-
-                    //create the function generator, with the aliased variables in the closure
-                    var generatorFunction = new Function(generatorFunctionBody);
-                    var resourceFunction = generatorFunction();
-                    
-                    resource = resourceFunction();
-                }
-                catch(err) {
-                    if(error.stack) console.error(error.stack);
-                    console.log("bad ui generator function");
-                }
-            }
-                
-            //create a dummy
-            if(!resource) {
-                resource = {};
-            }
-
-            return resource;
+            resource = resourceFunction();
         }
-        catch(error) {
-            if(error.stack) console.error(error.stack);
-            
-            apogeeUserAlert("Error creating custom control: " + error.message);
+        else {
+            resource = {};
         }
+
+        return resource;
     }
 
 

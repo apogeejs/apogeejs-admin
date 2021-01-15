@@ -24,6 +24,7 @@ export default class DataDisplay {
         this.displayContainer = displayContainer;
         this.dataSource = dataSource;
         this.editOk = false;
+        this.displayValid = true; //default this to true, so simple displays don't need to use it
 
         //defaults for container sizing logic
         this.useContainerHeightUi = false;
@@ -84,7 +85,7 @@ export default class DataDisplay {
     // Implemement in extending class
     //=============================
     
-    //This method gets the data from the editor. OPTIONAL. Required id editing is enabled.
+    //This method gets the data from the editor. OPTIONAL. Required if editing is enabled.
     //getData() {}
     
     //this sets the data into the editor display. REQUIRED if edit mode or save is used
@@ -158,39 +159,59 @@ export default class DataDisplay {
     //=============================
     // protected, package and private Methods
     //=============================
+
+    /** This method should be called when the underlying display is loaded, indicating if it is 
+     * valid or if it should not be used. */
+    setDisplayValid(displayValid) {
+        this.displayValid = displayValid;
+    }
 	
     showData() {
+        if(!this.displayValid) return;
+        
         let dataReturn;
-        //load data from data source
-        if(this.dataSource) {
-            if(this.dataSource.getData) {
-                dataReturn = this.dataSource.getData();
-            }
-            if(this.dataSource.getEditOk) {
-                this.editOk = this.dataSource.getEditOk();
-            }
-            else {
-                this.editOk = false;
-            }
-        }
-
-        //load data display values
         let data;
         let messageType;
         let message;
         let hideDisplay;
         let removeView;
-        if((dataReturn)&&(dataReturn[DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY] === DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE)) {
-            //handle a wrapped return value
-            data = dataReturn.data;
-            messageType = dataReturn.messageType;
-            message = dataReturn.message;
-            removeView = dataReturn.removeView;
-            hideDisplay = dataReturn.hideDisplay;
+        try {
+            //load data from data source
+            if(this.dataSource) {
+                if(this.dataSource.getData) {
+                    dataReturn = this.dataSource.getData();
+                }
+                if(this.dataSource.getEditOk) {
+                    this.editOk = this.dataSource.getEditOk();
+                }
+                else {
+                    this.editOk = false;
+                }
+            }
+
+            //load data display values
+            if((dataReturn)&&(dataReturn[DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY] === DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE)) {
+                //handle a wrapped return value
+                data = dataReturn.data;
+                messageType = dataReturn.messageType;
+                message = dataReturn.message;
+                removeView = dataReturn.removeView;
+                hideDisplay = dataReturn.hideDisplay;
+            }
+            else {
+                //straight data was returned
+                data = dataReturn;
+            }
         }
-        else {
-            //straight data was returned
-            data = dataReturn;
+        catch(error) {
+            //hide dispay and show error message
+            messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+            message = "Error loading display data: " + error.toString();
+            removeView = false;
+            hideDisplay = true;
+            data = apogeeutil.INVALID_VALUE;
+
+            if(error.stack) console.error(error.stack);
         }
 
         //set values that have not be set

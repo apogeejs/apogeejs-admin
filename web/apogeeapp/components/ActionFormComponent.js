@@ -23,28 +23,21 @@ export default class ActionFormComponent extends Component {
     //Resource Accessors
     //==============================
 
-
+    /** This method compiles the layout function entered by the user. It will rturn a valid function
+     * or throw an exception if there is a problem in user code, which should be handled by the caller. */
     createFormLayoutFunction() {
         var formCodeText = this.getField("layoutCode");
         
         var formLayoutFunction;
         if((formCodeText !== undefined)&&(formCodeText !== null)) {
-            try {
-                //create the resource generator wrapped with its closure
-                formLayoutFunction = new Function("admin","inputData",formCodeText);
-            }
-            catch(error) {
-                if(error.stack) console.error(error.stack);
-                console.log("bad form function code");
-            }
+            //create the resource generator wrapped with its closure
+            formLayoutFunction = new Function("admin","inputData",formCodeText);
+            return formLayoutFunction;
         }
-            
-        //create a dummy
-        if(!formLayoutFunction) {
-            formLayoutFunction = () => [];
+        else {
+            //no layout defined. Return an empty layout
+            return () => [];
         }
-
-        return formLayoutFunction;
     }
 
 

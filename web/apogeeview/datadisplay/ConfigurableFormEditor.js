@@ -1,6 +1,7 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import {ConfigurablePanel} from "/apogeeui/apogeeUiLib.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 
 /** This is an editor that displays a customized form for data input. */
 export default class ConfigurableFormEditor extends DataDisplay {
@@ -27,9 +28,25 @@ export default class ConfigurableFormEditor extends DataDisplay {
         
         //construct the display
         this.panel = new ConfigurablePanel();
+        let displayValid;
         if(dataSource.getDisplayData) {
-            this.panel.configureForm(dataSource.getDisplayData());
+            try {
+                this.panel.configureForm(dataSource.getDisplayData());
+                displayValid = true;
+            }
+            catch(error) {
+                let errorMsg = "Error loading form: " + error.toString();
+                displayContainer.setHideDisplay(true);
+                displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
+
+                if(error.stack) console.error(error.stack);
+                displayValid = false;
+            }
         }
+        else {
+            displayValid = false;
+        }
+        this.setDisplayValid(displayValid);
 
         this.panel.addOnInput( formValue => this.onFormInput(formValue));
     }

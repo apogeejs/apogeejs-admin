@@ -88,30 +88,18 @@ export default class DataFormComponentView extends ComponentView {
             },
 
             getDisplayData: () => {       
-                let component = this.getComponent();
-                let { layoutFunction, validatorFunction } = component.createFormFunctions(); 
+                let component = this.getComponent(); 
                 let contextMemberId = component.getMember().getParentId();
                 let inputData = component.getField("member.input").getData();
+                let { layoutFunction, validatorFunction } = component.createFormFunctions();
 
                 //save this for use on submit
                 isDataValidFunction = validatorFunction;
 
-                //make sure this is a function (could be invalid value, or a user code error)
-                if(layoutFunction instanceof Function) {
-                    let commandMessenger = new UiCommandMessenger(this,contextMemberId)
-                    try {
-                        let layout = layoutFunction(commandMessenger,inputData);
-                        if(layout) return layout;
-                        else return ConfigurableFormEditor.getEmptyLayout();
-                    }
-                    catch(error) {
-                        console.error("Error reading form layout " + this.getName() + ": " + error.toString());
-                        if(error.stack) console.error(error.stack);
-                        return ConfigurableFormEditor.getErrorLayout("Error in layout: " + error.toString())
-                    }
-                }
-                //if we get here there was a problem with the layout
-                return apogeeutil.INVALID_VALUE;
+                //create the layout
+                let commandMessenger = new UiCommandMessenger(this,contextMemberId)
+                let layout = layoutFunction(commandMessenger,inputData);
+                return layout;
             },
 
             getData: () => {

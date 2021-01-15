@@ -73,29 +73,17 @@ export default class ActionFormComponentView extends ComponentView {
             },
 
             getDisplayData: () => {       
-                let component = this.getComponent();
-                let layoutFunction = component.createFormLayoutFunction(); 
+                let component = this.getComponent(); 
+                //use the parent folder as the context base
                 let contextMemberId = component.getMember().getParentId();
 
                 let member = this.getComponent().getMember();
                 let inputData = member.getData();
 
-                //make sure this is a function (could be invalid value, or a user code error)
-                if(layoutFunction instanceof Function) {
-                    let commandMessenger = new UiCommandMessenger(this,contextMemberId);
-                    try {
-                        let layout = layoutFunction(commandMessenger,inputData);
-                        if(layout) return layout;
-                        else return ConfigurableFormEditor.getEmptyLayout();
-                    }
-                    catch(error) {
-                        console.error("Error reading form layout " + this.getName() + ": " + error.toString());
-                        if(error.stack) console.error(error.stack);
-                        return ConfigurableFormEditor.getErrorLayout("Error in layout: " + error.toString())
-                    }
-                }
-                //if we get here there was a problem with the layout
-                return apogeeutil.INVALID_VALUE;
+                let layoutFunction = component.createFormLayoutFunction();
+                let commandMessenger = new UiCommandMessenger(this,contextMemberId);
+                let layout = layoutFunction(commandMessenger,inputData);
+                return layout;
             },
 
             //no data

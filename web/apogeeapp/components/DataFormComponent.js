@@ -35,32 +35,27 @@ export default class DataFormComponent extends Component {
     //Resource Accessors
     //==============================
 
+    /** This method returns a layout function and validator function. It will
+     * throw an exception is there is a problem compiling the user code. This
+     * should be handled by the caller. */
     createFormFunctions() {
         var layoutCodeText = this.getField("layoutCode");
         var validatorCodeText = this.getField("validatorCode");
         var layoutFunction, validatorFunction;
-        try {
-            if((layoutCodeText !== undefined)&&(layoutCodeText !== null)) {
-                //create the resource generator wrapped with its closure
-                layoutFunction = new Function("admin","inputData",layoutCodeText);
-            }
 
-            if((validatorCodeText !== undefined)&&(validatorCodeText !== null)) {
-                //create the resource generator wrapped with its closure
-                validatorFunction = new Function("formValue","inputData",validatorCodeText);
-            }
-            
+        if((layoutCodeText !== undefined)&&(layoutCodeText !== null)) {
+            //create the resource generator wrapped with its closure
+            layoutFunction = new Function("admin","inputData",layoutCodeText);
         }
-        catch(error) {
-            if(error.stack) console.error(error.stack);
-            console.log("bad form function code");
-        }
-            
-        //create a dummy
-        if(!layoutFunction) {
+        else {
             layoutFunction = () => [];
         }
-        if(!validatorFunction) {
+
+        if((validatorCodeText !== undefined)&&(validatorCodeText !== null)) {
+            //create the resource generator wrapped with its closure
+            validatorFunction = new Function("formValue","inputData",validatorCodeText);
+        }
+        else {
             validatorFunction = () => true;
         }
 

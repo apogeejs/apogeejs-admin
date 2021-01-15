@@ -1,6 +1,7 @@
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from
@@ -49,7 +50,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             "position":"relative"
         });
 
-        this._constructDisplay();
+        this._constructDisplay(displayContainer,dataSource);
     }
 
     getContent() {
@@ -57,155 +58,177 @@ export default class HtmlJsDataDisplay extends DataDisplay {
     }
 
     /** This method implements the methods needed for the display interface from the data source */
-    _constructDisplay() {
+    _constructDisplay(displayContainer,dataSource) {
+        let displayValid;
+        try {
+            let html = dataSource.getHtml();
+            let resource = dataSource.getResource();
+            let componentView = this.getComponentView();
+            let member = dataSource.getContextMember();
 
-        let dataSource = this.getDataSource();
-        let html = dataSource.getHtml();
-        let resource = dataSource.getResource();
-        let componentView = this.getComponentView();
-        let member = dataSource.getContextMember();
+            let displayData = dataSource.getDisplayData ? dataSource.getDisplayData() : undefined;
 
-        let displayData = dataSource.getDisplayData ? dataSource.getDisplayData() : undefined;
+            //content
+            if(html) {
+                this.outputElement.innerHTML = html;
+            }
+            
+            //this gives the ui code access to some data display functions
+            var admin = {
+                getCommandMessenger: () => new UiCommandMessenger(componentView,member.getId()),
+                startEditMode: () => this.startEditMode(),
+                endEditMode: () => this.endEditMode()
+            }
 
-        //content
-        if(html) {
-            this.outputElement.innerHTML = html;
-        }
-        
-        //this gives the ui code access to some data display functions
-        var admin = {
-            getCommandMessenger: () => new UiCommandMessenger(componentView,member.getId()),
-            startEditMode: () => this.startEditMode(),
-            endEditMode: () => this.endEditMode()
-        }
+            if(resource.onLoad) {
+                this.onLoad = () => {
+                    try {
+                        resource.onLoad.call(resource,this.outputElement,admin);
+                        this.isLoaded = true;
 
-        if(resource.onLoad) {
-            this.onLoad = () => {
-                try {
-                    resource.onLoad.call(resource,this.outputElement,admin);
-                    this.isLoaded = true;
-
-                    //set the display data if we have any
-                    if((displayData !== undefined)&&(resource.setDisplayData)) {
-                        resource.setDisplayData(displayData);
-                        displayData = undefined;
+                        //set the display data if we have any
+                        if((displayData !== undefined)&&(resource.setDisplayData)) {
+                            resource.setDisplayData(displayData);
+                            displayData = undefined;
+                        }
+                        
+                        //handle the case the data loaded before the html (which we don't want)
+                        if(this.cachedData != undefined) {
+                            this.setData(this.cachedData);
+                            this.cachedData = undefined;
+                        }
                     }
-                    
-                    //handle the case the data loaded before the html (which we don't want)
-                    if(this.cachedData != undefined) {
-                        this.setData(this.cachedData);
+                    catch(error) {
+                        //hide dispay and show error message
+                        let errorMsg = "Error in onload of display: " + error.toString();
+                        displayContainer.setHideDisplay(true);
+                        displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
+                        //set display invalid because this is part of creating the display
+                        this.setDisplayValid(false);
+
+                        if(error.stack) console.error(error.stack);
+                    }
+                };
+            }
+            else {
+                this.isLoaded = true;
+            }
+
+            if(resource.onUnload) {   
+                this.onUnload = () => {
+                    try {
+                        
+                        this.isLoaded = false;
                         this.cachedData = undefined;
+                        
+                        resource.onUnload.call(resource,this.outputElement,admin);
+                    }
+                    catch(error) {
+                        if(error.stack) console.error(error.stack);
+                        
+                        //display message for user
+                        apogeeUserAlert("Error in " + member.getName()+ " onUnload function: " + error.message);
+                    }
+                }
+            }
+
+            this.setData = (data) => {
+                try {
+                    if(resource.setData) {
+                        if(!this.isLoaded) {
+                            this.cachedData = data;
+                            return;
+                        }
+                        
+                        resource.setData.call(resource,data,this.outputElement,admin);
+                    }
+                    else {
+                        //we must include a function here
+                        this.setData = () => {};
                     }
                 }
                 catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    
-                    apogeeUserAlert("Error in " + member.getName() + " onLoad function: " + error.message);
-                }
-            };
-        }
-        else {
-            this.isLoaded = true;
-        }
+                    //hide dispay and show error message
+                    let errorMsg = "Error set data in display: " + error.toString();
+                    displayContainer.setHideDisplay(true);
+                    displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
+                    //note - do not set display invalid here because this is part of data loading, not display loading
 
-        if(resource.onUnload) {   
-            this.onUnload = () => {
-                try {
-                    
-                    this.isLoaded = false;
-                    this.cachedData = undefined;
-                    
-                    resource.onUnload.call(resource,this.outputElement,admin);
-                }
-                catch(error) {
                     if(error.stack) console.error(error.stack);
-                    
-                    apogeeUserAlert("Error in " + member.getName()+ " onUnload function: " + error.message);
                 }
             }
-        }
-
-        this.setData = (data) => {
-            try {
-                if(resource.setData) {
-                    if(!this.isLoaded) {
-                        this.cachedData = data;
-                        return;
+            
+            if(resource.getData) {
+                this.getData = () => {
+                    try {
+                        return resource.getData.call(resource,this.outputElement,admin);
                     }
-                    
-                    resource.setData.call(resource,data,this.outputElement,admin);
-                }
-                else {
-                     //we must include a function here
-                     this.setData = () => {};
+                    catch(error) {
+                        if(error.stack) console.error(error.stack);
+                        
+                        //display message for user
+                        apogeeUserAlert("Error in " + member.getName()+ " saving data: " + error.message);
+
+                        return apogeeutil.INVALID_VALUE;
+                    }
                 }
             }
-            catch(error) {
-                if(error.stack) console.error(error.stack);
-                
-                apogeeUserAlert("Error in " + member.getName() + " setData function: " + error.message);
+            else {
+                //we must include a function here
+                //WHY RETURN A DUMMY OBJECT? WHY NOT NULL? OR INVALID?
+                this.getData = () => {};
             }
-        }
-        
-        if(resource.getData) {
-            this.getData = () => {
-                try {
-                    return resource.getData.call(resource,this.outputElement,admin);
-                }
-                catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    
-                    apogeeUserAlert("Error in " + member.getName() + " getData function: " + error.message);
-                }
-            }
-        }
-        else {
-            //we must include a function here
-            //WHY RETURN A DUMMY OBJECT? WHY NOT NULL? OR INVALID?
-            this.getData = () => {};
-        }
 
 
-        if(resource.isCloseOk) {     
-            this.isCloseOk = () => {
-                try {
-                    return resource.isCloseOk.call(resource,this.outputElement,admin);
-                }
-                catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    
-                    apogeeUserAlert("Error in " + member.getName() + " isCloseOk function: " + error.message);
+            if(resource.isCloseOk) {     
+                this.isCloseOk = () => {
+                    try {
+                        return resource.isCloseOk.call(resource,this.outputElement,admin);
+                    }
+                    catch(error) {
+                        if(error.stack) console.error(error.stack);
+
+                        //display message for user
+                        apogeeUserAlert("Error in " + member.getName() + " isCloseOk function: " + error.message);
+                    }
                 }
             }
-        }
 
-        if(resource.destroy) {
-            this.destroy = () => {
-                try {
-                    resource.destroy.call(resource,this.outputElement,admin);
-                }
-                catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    
-                    apogeeUserAlert("Error in " + member.getName() + " destroy function: " + error.message);
+            if(resource.destroy) {
+                this.destroy = () => {
+                    try {
+                        resource.destroy.call(resource,this.outputElement,admin);
+                    }
+                    catch(error) {
+                        if(error.stack) console.error(error.stack);
+                        
+                        //display message for user
+                        apogeeUserAlert("Error in " + member.getName() + " destroy function: " + error.message);
+                    }
                 }
             }
-        }
 
-        //-------------------
-        //initialization
-        //-------------------
+            //-------------------
+            //initialization
+            //-------------------
 
-        if(resource.init) {
-            try {
+            if(resource.init) {
                 resource.init.call(resource,this.outputElement,admin);
             }
-            catch(error) {
-                if(error.stack) console.error(error.stack);
-                
-                apogeeUserAlert("Error in " + member.getName() + " init function: " + error.message);
-            }
+
+            displayValid = true;
         }
+        catch(error) {
+            let errorMsg = "Error loading display: " + error.toString();
+            displayContainer.setHideDisplay(true);
+            displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
+
+            if(error.stack) console.error(error.stack);
+
+            displayValid = false;
+        }
+
+        this.setDisplayValid(displayValid);
     }
 }
 
