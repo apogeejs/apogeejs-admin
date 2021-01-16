@@ -113,7 +113,41 @@ export default class CustomComponentView extends ComponentView {
 
             getData: () => {
                 let member = this.getComponent().getMember();
-                return member.getData();
+                switch(member.getState()) {
+                    case apogeeutil.STATE_NORMAL:
+                        return member.getData();
+
+                    case apogeeutil.STATE_ERROR: {
+                        let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                        wrappedData.hideDisplay = true;
+                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                        wrappedData.message = "Error in data value: " + member.getErrorMsg();
+                        return wrappedData;
+                    }
+
+                    case apogeeutil.STATE_PENDING: {
+                        let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                        wrappedData.hideDisplay = true;
+                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                        wrappedData.message = "Display data value pending!";
+                        return wrappedData;
+                    }
+
+                    case apogeeutil.STATE_INVALID: {
+                        //CAREFUL! We don't want to hide the data view since that is how
+                        //the value is set. If we hide it, there will be no way to make the
+                        //value not INVALID.
+                        let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                        wrappedData.data = apogeeutil.INVALID_VALUE;
+                        wrappedData.hideDisplay = false;
+                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                        wrappedData.message = "Display data value invalid!";
+                        return wrappedData;
+                    }
+
+                    default:
+                        throw new Error("Unknown display data value state!")
+                }
             },
 
             //below - custom methods for HtmlJsDataDisplay

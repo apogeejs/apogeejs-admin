@@ -48,26 +48,42 @@ export default class CustomComponent extends Component {
     }
 
 
-    /** This method creates the resource. It may throw an exception if there
-     * is a problem compiling user code. The caller should handle this. */
+    /** This method creates the resource. */
     createResource() {
         var uiGeneratorBody = this.getField("uiCode");
         
         var resource;
         if((uiGeneratorBody)&&(uiGeneratorBody.length > 0)) {
-            //create the resource generator wrapped with its closure
-            var generatorFunctionBody = apogeeutil.formatString(
-                CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
-                uiGeneratorBody
-            );
+            //compile the user code for the generator
+            var generatorFunction;
+            try {
+                generatorFunction = new Function(uiGeneratorBody);
+            }
+            catch(error) {
+                resource = {
+                    error: true,
+                    errorMsg: "Error parsing uiGenerator code: " + error.toString()
+                }
+                if(error.stack) console.error(error.stack);
+                generatorFunction = null;
+            }
 
-            //create the function generator, with the aliased variables in the closure
-            var generatorFunction = new Function(generatorFunctionBody);
-            var resourceFunction = generatorFunction();
-            
-            resource = resourceFunction();
+            //execute the generator function
+            if(generatorFunction) {
+                try {
+                    resource = generatorFunction();
+                }
+                catch(error) {
+                    resource = {
+                        error: true,
+                        errorMsg: "Error executing uiGenerator code: " + error.toString()
+                    }
+                    if(error.stack) console.error(error.stack);
+                }
+            }
         }
         else {
+            //generator not yet present
             resource = {};
         }
 
@@ -147,24 +163,6 @@ export default class CustomComponent extends Component {
         }
     }
 }
-
-/** This is the format string to create the code body for updateing the member
- * Input indices:
- * 0: resouce methods code
- * 1: uiPrivate
- * @private
- */
-CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
-    "//member functions",
-    "var resourceFunction = function(component) {",
-    "{0}",
-    "}",
-    "//end member functions",
-    "return resourceFunction;",
-    ""
-       ].join("\n");
-    
-
 
 //======================================
 // This is the control generator, to register the control

@@ -28,27 +28,26 @@ export default class ConfigurableFormEditor extends DataDisplay {
         
         //construct the display
         this.panel = new ConfigurablePanel();
-        let displayValid;
-        if(dataSource.getDisplayData) {
-            try {
-                this.panel.configureForm(dataSource.getDisplayData());
-                displayValid = true;
-            }
-            catch(error) {
-                let errorMsg = "Error loading form: " + error.toString();
-                displayContainer.setHideDisplay(true);
-                displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
 
-                if(error.stack) console.error(error.stack);
-                displayValid = false;
-            }
+        //get data
+        let dataResult = DATA_DISPLAY_CONSTANTS.readData(this.dataSource.getDisplayData,"Error loading form layout: ");
+
+        //configure view
+        this.displayContainer.setRemoveView(dataResult.removeView);
+        if(!dataResult.removeView) {
+            //only hide view and show message if view is not removed
+            //we will set data either way to clear old date
+            this.displayContainer.setHideDisplay(dataResult.hideDisplay);
+            this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
+        }
+        if(dataResult.data !== apogeeutil.INVALID_VALUE) {
+            this.panel.configureForm(dataResult.data);
+            this.panel.addOnInput( formValue => this.onFormInput(formValue));
+            this.setDisplayValid(true);
         }
         else {
-            displayValid = false;
+            this.setDisplayValid(false);
         }
-        this.setDisplayValid(displayValid);
-
-        this.panel.addOnInput( formValue => this.onFormInput(formValue));
     }
 
     /** This method will return undefined until showData is called. */

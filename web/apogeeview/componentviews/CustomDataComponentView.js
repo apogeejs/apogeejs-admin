@@ -4,7 +4,9 @@ import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
+
 
 /** This attempt has a single form edit page which returns an object. */
 // To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
@@ -69,7 +71,7 @@ export default class CustomDataComponentView extends ComponentView {
         //create the new view element;
         switch(viewType) {
             
-            case CustomDataComponentView.VIEW_FORM:
+            case CustomDataComponentView.VIEW_OUTPUT:
                 displayContainer.setDestroyViewOnInactive(this.getComponent().getDestroyOnInactive());
                 var dataDisplaySource = this.getOutputDataDisplaySource();
                 var dataDisplay = new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
@@ -123,12 +125,83 @@ export default class CustomDataComponentView extends ComponentView {
 
             getDisplayData: () => {
                 let inputMember = this.getComponent().getField("member.input");
-                return inputMember.getData();
+                switch(inputMember.getState()) {
+                    case apogeeutil.STATE_NORMAL:
+                        return inputMember.getData();
+
+                    case apogeeutil.STATE_ERROR: {
+                        let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                        wrappedData.data = apogeeutil.INVALID_VALUE;
+                        wrappedData.hideDisplay = true;
+                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                        wrappedData.message = "Error in display input value!";
+                        return wrappedData;
+                    }
+
+                    case apogeeutil.STATE_PENDING: {
+                        let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                        wrappedData.data = apogeeutil.INVALID_VALUE;
+                        wrappedData.hideDisplay = true;
+                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                        wrappedData.message = "Display input value pending!";
+                        return wrappedData;
+                    }
+
+                    case apogeeutil.STATE_INVALID: {
+                        //CAREFUL! We don't want to hide the data view since that is how
+                        //the value is set. If we hide it, there will be no way to make the
+                        //value not INVALID.
+                        let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                        wrappedData.data = apogeeutil.INVALID_VALUE;
+                        wrappedData.hideDisplay = false;
+                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                        wrappedData.message = "Display input value invalid!";
+                        wrappedData.data = apogeeutil.INVALID_VALUE;
+                        return wrappedData;
+                    }
+
+                    default:
+                        throw new Error("Unknown display data value state!")
+                }
             },
 
             getData: () => {
                 let dataMember = this.getComponent().getField("member.data");
-                return dataMember.getData();
+                switch(dataMember.getState()) {
+                    case apogeeutil.STATE_NORMAL:
+                        return dataMember.getData();
+
+                    case apogeeutil.STATE_ERROR: {
+                        let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                        wrappedData.hideDisplay = true;
+                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                        wrappedData.message = "Error in data value: " + dataMember.getErrorMsg();
+                        return wrappedData;
+                    }
+
+                    case apogeeutil.STATE_PENDING: {
+                        let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                        wrappedData.hideDisplay = true;
+                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                        wrappedData.message = "Display data value pending!";
+                        return wrappedData;
+                    }
+
+                    case apogeeutil.STATE_INVALID: {
+                        //CAREFUL! We don't want to hide the data view since that is how
+                        //the value is set. If we hide it, there will be no way to make the
+                        //value not INVALID.
+                        let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                        wrappedData.hideDisplay = false;
+                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                        wrappedData.message = "Display data value invalid!";
+                        wrappedData.data = apogeeutil.INVALID_VALUE;
+                        return wrappedData;
+                    }
+
+                    default:
+                        throw new Error("Unknown display data value state!")
+                }
             },
 
             //edit ok - always true

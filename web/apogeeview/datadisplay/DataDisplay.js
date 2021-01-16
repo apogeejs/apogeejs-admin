@@ -22,7 +22,7 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
 export default class DataDisplay {
     constructor(displayContainer,dataSource) {
         this.displayContainer = displayContainer;
-        this.dataSource = dataSource;
+        this.dataSource = dataSource ? dataSource : {};
         this.editOk = false;
         this.displayValid = true; //default this to true, so simple displays don't need to use it
 
@@ -42,25 +42,45 @@ export default class DataDisplay {
     }
     
     save() {
-        var data = this.getData();
-        var saveComplete;
-        
-        //figure out if there is a problem with this - we hav to end edit mode before
-        //we save because in edit mode it will not overwrite the data in the display
-        //if we fail, we restart edit mode below
-        this.endEditMode();
-
-        if((this.dataSource)&&(this.dataSource.saveData)) {
-            saveComplete = this.dataSource.saveData(data);
+        var data;
+        var dataValid = false;
+        try {
+            data = this.getData();
+            dataValid = true;
         }
-        else {
-            apogeeUserAlert("Error: Data not saved: save callback not set!");
-            saveComplete = true;
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+            apogeeUserAlert("Error loading data from data display: " + error.message);
         }
 
-        //end edit mode if we entered it
-        if(!saveComplete) {
-            this.startEditMode();
+        //save data if we read it out
+        if(dataValid) {
+            var saveComplete;
+
+            //figure out if there is a problem with this - we hav to end edit mode before
+            //we save because in edit mode it will not overwrite the data in the display
+            //if we fail, we restart edit mode below
+            this.endEditMode();
+
+            if(this.dataSource.saveData) {
+                try {
+                    saveComplete = this.dataSource.saveData(data);
+                }
+                catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    apogeeUserAlert("Error saving data: " + error.message);
+                    saveComplete = false;
+                }
+            }
+            else {
+                apogeeUserAlert("Error: Data not saved: save callback not set!");
+                saveComplete = false;
+            }
+
+            //end edit mode if we entered it
+            if(!saveComplete) {
+                this.startEditMode();
+            }
         }
     }
 
@@ -79,6 +99,10 @@ export default class DataDisplay {
 
     getDataSource() {
         return this.dataSource;
+    }
+
+    getComponentView() {
+        return this.displayContainer.getComponentView();
     }
     
     //=============================
@@ -168,71 +192,27 @@ export default class DataDisplay {
 	
     showData() {
         if(!this.displayValid) return;
-        
-        let dataReturn;
-        let data;
-        let messageType;
-        let message;
-        let hideDisplay;
-        let removeView;
-        try {
-            //load data from data source
-            if(this.dataSource) {
-                if(this.dataSource.getData) {
-                    dataReturn = this.dataSource.getData();
-                }
-                if(this.dataSource.getEditOk) {
-                    this.editOk = this.dataSource.getEditOk();
-                }
-                else {
-                    this.editOk = false;
-                }
-            }
 
-            //load data display values
-            if((dataReturn)&&(dataReturn[DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY] === DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE)) {
-                //handle a wrapped return value
-                data = dataReturn.data;
-                messageType = dataReturn.messageType;
-                message = dataReturn.message;
-                removeView = dataReturn.removeView;
-                hideDisplay = dataReturn.hideDisplay;
-            }
-            else {
-                //straight data was returned
-                data = dataReturn;
-            }
+        //get edit ok
+        if(this.dataSource.getEditOk) {
+            this.editOk = this.dataSource.getEditOk()
         }
-        catch(error) {
-            //hide dispay and show error message
-            messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-            message = "Error loading display data: " + error.toString();
-            removeView = false;
-            hideDisplay = true;
-            data = apogeeutil.INVALID_VALUE;
-
-            if(error.stack) console.error(error.stack);
+        else {
+            this.editOk = false;
         }
 
-        //set values that have not be set
-        if(messageType === undefined) {
-            messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_NONE
-            message = "";
-        }
-        if(hideDisplay === undefined) {
-            hideDisplay = (data === apogeeutil.INVALID_VALUE);
-        }
-        removeView = removeView ? true : false;
+        //get data
+        let dataResult = DATA_DISPLAY_CONSTANTS.readData(this.dataSource.getData,"Error loading display data: ");
 
         //configure view
-        this.displayContainer.setRemoveView(removeView);
-        if(!removeView) {
+        this.displayContainer.setRemoveView(dataResult.removeView);
+        if(!dataResult.removeView) {
             //only hide view and show message if view is not removed
             //we will set data either way to clear old date
-            this.displayContainer.setHideDisplay(hideDisplay);
-            this.displayContainer.setMessage(messageType,message);
+            this.displayContainer.setHideDisplay(dataResult.hideDisplay);
+            this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
         }
-        this.setData(data);
+        this.setData(dataResult.data);
     }
 
     /** @protected */
@@ -255,13 +235,4 @@ export default class DataDisplay {
             this.startEditMode();
         }
     }
-
-    /** This method retrieves the data source for the data display */
-    getDataSource() {
-        return this.dataSource;
-    }
-
-    getComponentView() {
-        return this.displayContainer.getComponentView();
-    }
-}
+} 

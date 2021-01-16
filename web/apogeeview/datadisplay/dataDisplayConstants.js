@@ -65,3 +65,59 @@ DATA_DISPLAY_CONSTANTS.STANDARD_INVALID_WRAPPED_DATA = apogeeutil.deepFreeze(
         "hideDisplay": true
     }
 )
+
+DATA_DISPLAY_CONSTANTS.readData = function(getDataFunction,errorPrefix) {
+    
+    let data;
+    let messageType;
+    let message;
+    let hideDisplay;
+    let removeView;
+
+    try {
+        //load data from data source
+        let dataReturn
+        if(getDataFunction) {
+            dataReturn = getDataFunction();
+        }
+        else {
+            dataReturn = apogeeutil.INVALID_VALUE;
+        }
+
+        //load data display values
+        if((dataReturn)&&(DATA_DISPLAY_CONSTANTS.isWrappedData(dataReturn))) {
+            //handle a wrapped return value
+            data = dataReturn.data;
+            messageType = dataReturn.messageType;
+            message = dataReturn.message;
+            removeView = dataReturn.removeView;
+            hideDisplay = dataReturn.hideDisplay;
+        }
+        else {
+            //straight data was returned
+            data = dataReturn;
+        }
+    }
+    catch(error) {
+        //hide dispay and show error message
+        messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+        message = errorPrefix + error.toString();
+        removeView = false;
+        hideDisplay = true;
+        data = apogeeutil.INVALID_VALUE;
+
+        if(error.stack) console.error(error.stack);
+    }
+
+    //set values that have not be set
+    if(messageType === undefined) {
+        messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_NONE
+        message = "";
+    }
+    if(hideDisplay === undefined) {
+        hideDisplay = (data === apogeeutil.INVALID_VALUE);
+    }
+    removeView = removeView ? true : false;
+
+    return {data,messageType,message,hideDisplay,removeView};
+}

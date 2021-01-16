@@ -58,15 +58,50 @@ export default class HtmlJsDataDisplay extends DataDisplay {
     }
 
     /** This method implements the methods needed for the display interface from the data source */
-    _constructDisplay(displayContainer,dataSource) {
+    _constructDisplay() {
+        let displayContainer = this.getDisplayContainer();
+        let dataSource = this.getDataSource();
+
         let displayValid;
         try {
-            let html = dataSource.getHtml();
-            let resource = dataSource.getResource();
             let componentView = this.getComponentView();
-            let member = dataSource.getContextMember();
+            let member = dataSource.getContextMember ? dataSource.getContextMember() : componentView.getComponent().getMember();
 
-            let displayData = dataSource.getDisplayData ? dataSource.getDisplayData() : undefined;
+            //get html
+            let html = dataSource.getHtml ? dataSource.getHtml() : "";
+            
+            //get resource
+            let resource = dataSource.getResource();
+            if(resource.error) {
+                if(resource.errorMsg) {
+                    this.displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,resource.errorMsg);
+                }
+                this.displayContainer.setHideDisplay(true);
+                this.setDisplayValid(false);
+                return;
+            }
+
+            //get display data
+            let displayData;
+            let dataResult = DATA_DISPLAY_CONSTANTS.readData(dataSource.getDisplayData,"Error loading display input data: ");
+
+            //configure view
+            this.displayContainer.setRemoveView(dataResult.removeView);
+            if(!dataResult.removeView) {
+                //only hide view and show message if view is not removed
+                //we will set data either way to clear old date
+                this.displayContainer.setHideDisplay(dataResult.hideDisplay);
+                this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
+            }
+            if(dataResult.data !== apogeeutil.INVALID_VALUE) {
+                displayData = dataResult.data;
+                this.setDisplayValid(true);
+            }
+            else {
+                //display invalid!
+                this.setDisplayValid(false);
+                return;
+            }
 
             //content
             if(html) {
@@ -89,7 +124,6 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                         //set the display data if we have any
                         if((displayData !== undefined)&&(resource.setDisplayData)) {
                             resource.setDisplayData(displayData);
-                            displayData = undefined;
                         }
                         
                         //handle the case the data loaded before the html (which we don't want)
@@ -160,17 +194,8 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             
             if(resource.getData) {
                 this.getData = () => {
-                    try {
-                        return resource.getData.call(resource,this.outputElement,admin);
-                    }
-                    catch(error) {
-                        if(error.stack) console.error(error.stack);
-                        
-                        //display message for user
-                        apogeeUserAlert("Error in " + member.getName()+ " saving data: " + error.message);
-
-                        return apogeeutil.INVALID_VALUE;
-                    }
+                    //here we let data display handle any failure to get data.
+                    return resource.getData.call(resource,this.outputElement,admin);
                 }
             }
             else {
@@ -179,17 +204,17 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 this.getData = () => {};
             }
 
-
             if(resource.isCloseOk) {     
                 this.isCloseOk = () => {
                     try {
                         return resource.isCloseOk.call(resource,this.outputElement,admin);
                     }
                     catch(error) {
+                        //allow close if we have an error
                         if(error.stack) console.error(error.stack);
 
-                        //display message for user
-                        apogeeUserAlert("Error in " + member.getName() + " isCloseOk function: " + error.message);
+                        apogeeUserAlert("Error in " + member.getName()+ " isCloseOk function: " + error.message);
+                        return true;
                     }
                 }
             }
