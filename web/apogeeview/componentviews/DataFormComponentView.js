@@ -3,6 +3,7 @@ import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 
 /** This is a custom resource component. 
@@ -88,18 +89,65 @@ export default class DataFormComponentView extends ComponentView {
             },
 
             getDisplayData: () => {       
-                let component = this.getComponent(); 
-                let contextMemberId = component.getMember().getParentId();
-                let inputData = component.getField("member.input").getData();
-                let { layoutFunction, validatorFunction } = component.createFormFunctions();
+                let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+
+                //get the layout function
+                let component = this.getComponent();
+                let {layoutFunction,validatorFunction,errorMessage} = component.createFormFunctions();
+                if(errorMessage) {
+                    wrappedData.displayInvalid = true;
+                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                    wrappedData.message = errorMessage;
+                    return wrappedData;
+                }
+
+                //load the layout
+                let inputMember = component.getField("member.input");
+
+                //check the input data state
+                if(inputMember.getState() != apogeeutil.STATE_NORMAL) {
+                    wrappedData.displayInvalid = true;
+
+                    switch(inputMember.getState()) {
+                        case apogeeutil.STATE_ERROR: 
+                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                            wrappedData.message = "Error in layout input value: " + inputMember.getErrorMsg();
+                            break;
+
+                        case apogeeutil.STATE_PENDING:
+                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                            wrappedData.message = "Display layout input value pending!";
+                            break;
+
+                        case apogeeutil.STATE_INVALID:
+                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                            wrappedData.message = "Display layout input value invalid!";
+                            break;
+
+                        default:
+                            throw new Error("Unknown display data value state!")
+                    }
+                    return wrappedData;
+                }
 
                 //save this for use on submit
                 isDataValidFunction = validatorFunction;
 
-                //create the layout
-                let commandMessenger = new UiCommandMessenger(this,contextMemberId)
-                let layout = layoutFunction(commandMessenger,inputData);
-                return layout;
+                //use the parent folder as the context base
+                let contextMemberId = component.getMember().getParentId();
+                let commandMessenger = new UiCommandMessenger(this,contextMemberId);
+                let inputData = inputMember.getData();
+                try {
+                    let layout = layoutFunction(commandMessenger,inputData);
+                    wrappedData.data = layout;
+                    return wrappedData;
+                }
+                catch(error) {
+                    wrappedData.displayInvalid = true;
+                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                    wrappedData.message = "Error executing layout function: " + error.toString();
+                    return wrappedData;
+                }
             },
 
             getData: () => {

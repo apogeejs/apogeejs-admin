@@ -29,24 +29,21 @@ export default class ConfigurableFormEditor extends DataDisplay {
         //construct the display
         this.panel = new ConfigurablePanel();
 
-        //get data
-        let dataResult = DATA_DISPLAY_CONSTANTS.readData(this.dataSource.getDisplayData,"Error loading form layout: ");
-
-        //configure view
-        this.displayContainer.setRemoveView(dataResult.removeView);
-        if(!dataResult.removeView) {
-            //only hide view and show message if view is not removed
-            //we will set data either way to clear old date
-            this.displayContainer.setHideDisplay(dataResult.hideDisplay);
-            this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
-        }
-        if(dataResult.data !== apogeeutil.INVALID_VALUE) {
-            this.panel.configureForm(dataResult.data);
-            this.panel.addOnInput( formValue => this.onFormInput(formValue));
-            this.setDisplayValid(true);
-        }
-        else {
-            this.setDisplayValid(false);
+        //get data and handle invalid display
+        if(this.dataSource.getDisplayData) {
+            let dataResult = DATA_DISPLAY_CONSTANTS.readWrappedDisplayData(this.dataSource.getDisplayData,"Error loading form layout: ");
+            if(dataResult.displayInvalid) {
+                //display invalid! hide display and show message
+                this.displayContainer.setHideDisplay(dataResult.hideDisplay);
+                this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
+                this.setDisplayValid(false);
+            }
+            else {
+                //display display valid
+                this.panel.configureForm(dataResult.data);
+                this.panel.addOnInput( formValue => this.onFormInput(formValue));
+                this.setDisplayValid(true);
+            }
         }
     }
 

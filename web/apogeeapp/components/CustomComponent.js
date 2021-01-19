@@ -61,8 +61,8 @@ export default class CustomComponent extends Component {
             }
             catch(error) {
                 resource = {
-                    error: true,
-                    errorMsg: "Error parsing uiGenerator code: " + error.toString()
+                    displayInvalid: true,
+                    message: "Error parsing uiGenerator code: " + error.toString()
                 }
                 if(error.stack) console.error(error.stack);
                 generatorFunction = null;
@@ -75,8 +75,8 @@ export default class CustomComponent extends Component {
                 }
                 catch(error) {
                     resource = {
-                        error: true,
-                        errorMsg: "Error executing uiGenerator code: " + error.toString()
+                        displayInvalid: true,
+                        message: "Error executing uiGenerator code: " + error.toString()
                     }
                     if(error.stack) console.error(error.stack);
                 }

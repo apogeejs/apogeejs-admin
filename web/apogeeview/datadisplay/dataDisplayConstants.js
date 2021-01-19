@@ -66,7 +66,23 @@ DATA_DISPLAY_CONSTANTS.STANDARD_INVALID_WRAPPED_DATA = apogeeutil.deepFreeze(
     }
 )
 
-DATA_DISPLAY_CONSTANTS.readData = function(getDataFunction,errorPrefix) {
+/** This function reads data, handling wrapped or unwrapped data.
+ * Wrapped Data Options:
+ * - data - This is the data to pass return
+ * - messageType - This is the type of message to show. The option are none, error, warning and info. The message can be shown
+ *      even if the display is not hidden (which is not true for display data).
+ * - message - This is the message to show.
+ * - hideDisplay - If this is true, the main display element will not be shown.
+ * - removeView - If this is true, the entire data view will be removed, as if it were not there.
+ * 
+ * Unwrapped Data:
+ * If the data is not wrapped, the return value is the data. If this value is apogeeutil.INVALID_VALUE, hideDisplay
+ * will be set to true and a default message will be shown.
+ * 
+ * The return values is:
+ *  {data,messageType,message,hideDisplay,removeView}
+ */
+DATA_DISPLAY_CONSTANTS.readWrappedData = function(getDataFunction,errorPrefix) {
     
     let data;
     let messageType;
@@ -96,6 +112,7 @@ DATA_DISPLAY_CONSTANTS.readData = function(getDataFunction,errorPrefix) {
         else {
             //straight data was returned
             data = dataReturn;
+            hideDisplay = (data === apogeeutil.INVALID_VALUE);
         }
     }
     catch(error) {
@@ -114,10 +131,74 @@ DATA_DISPLAY_CONSTANTS.readData = function(getDataFunction,errorPrefix) {
         messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_NONE
         message = "";
     }
-    if(hideDisplay === undefined) {
-        hideDisplay = (data === apogeeutil.INVALID_VALUE);
-    }
+    hideDisplay = hideDisplay ? true : false;
     removeView = removeView ? true : false;
 
     return {data,messageType,message,hideDisplay,removeView};
+}
+
+/** This function reads display data, handling wrapped or unwrapped data.
+ * Wrapped Data Options:
+ * - data - this is the data to pass to the dispaly
+ * - displayInvalid - if this is true the display is hidden and a message is shown. 
+ * - messageType - This is the type of message to show. This is valid only if the display is invalid and ignored otherwise.
+ *      If a message will be shown and this is not set, the message type wil be error.
+ * - message - This is the message to show.
+ * 
+ * Unwrapped Data:
+ * If the data is not wrapped, the return value is the data. If this value is apogeeutil.INVALID_VALUE, displayInvalid
+ * will be set to true and a default message will be shown.
+ * 
+ * The return values is:
+ *  {data,displayInvalid,messageType,message}
+ */
+DATA_DISPLAY_CONSTANTS.readWrappedDisplayData = function(getDataFunction,errorPrefix) {
+    
+    let data;
+    let messageType;
+    let message;
+    let displayInvalid;
+
+    try {
+        //load data from data source
+        let dataReturn
+        if(getDataFunction) {
+            dataReturn = getDataFunction();
+        }
+        else {
+            dataReturn = apogeeutil.INVALID_VALUE;
+        }
+
+        //load data display values
+        if((dataReturn)&&(DATA_DISPLAY_CONSTANTS.isWrappedData(dataReturn))) {
+            //handle a wrapped return value
+            data = dataReturn.data;
+            displayInvalid = dataReturn.displayInvalid;
+            messageType = dataReturn.messageType;
+            message = dataReturn.message;
+        }
+        else {
+            //straight data was returned
+            data = dataReturn;
+            displayInvalid = (data === apogeeutil.INVALID_VALUE);
+        }
+    }
+    catch(error) {
+        //hide dispay and show error message
+        messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+        message = errorPrefix + error.toString();
+        displayInvalid = true;
+        data = apogeeutil.INVALID_VALUE;
+
+        if(error.stack) console.error(error.stack);
+    }
+
+    //fill in the message type and message if they are not set
+    //by default, set message type to error
+    if(displayInvalid) {
+        if(messageType === undefined) messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+        if(message === undefined) message = "Data unavailable";
+    }
+
+    return {data,displayInvalid,messageType,message};
 }

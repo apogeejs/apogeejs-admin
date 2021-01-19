@@ -3,6 +3,7 @@ import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 
 /** This is a custom resource component. 
@@ -73,17 +74,62 @@ export default class ActionFormComponentView extends ComponentView {
             },
 
             getDisplayData: () => {       
-                let component = this.getComponent(); 
+                let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+
+                //get the layout function
+                let component = this.getComponent();
+                let {formLayoutFunction,errorMessage} = component.createFormLayoutFunction();
+                if(errorMessage) {
+                    wrappedData.displayInvalid = true;
+                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                    wrappedData.message = errorMessage;
+                    return wrappedData;
+                }
+
+                //load the layout
+                let member = this.getComponent().getMember();
+
+                //check the input data state
+                if(member.getState() != apogeeutil.STATE_NORMAL) {
+                    wrappedData.displayInvalid = true;
+
+                    switch(member.getState()) {
+                        case apogeeutil.STATE_ERROR: 
+                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                            wrappedData.message = "Error in layout input value: " + member.getErrorMsg();
+                            break;
+
+                        case apogeeutil.STATE_PENDING:
+                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                            wrappedData.message = "Display layout input value pending!";
+                            break;
+
+                        case apogeeutil.STATE_INVALID:
+                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                            wrappedData.message = "Display layout input value invalid!";
+                            break;
+
+                        default:
+                            throw new Error("Unknown display data value state!")
+                    }
+                    return wrappedData;
+                }
+
                 //use the parent folder as the context base
                 let contextMemberId = component.getMember().getParentId();
-
-                let member = this.getComponent().getMember();
-                let inputData = member.getData();
-
-                let layoutFunction = component.createFormLayoutFunction();
                 let commandMessenger = new UiCommandMessenger(this,contextMemberId);
-                let layout = layoutFunction(commandMessenger,inputData);
-                return layout;
+                let inputData = member.getData();
+                try {
+                    let layout = formLayoutFunction(commandMessenger,inputData);
+                    wrappedData.data = layout;
+                    return wrappedData;
+                }
+                catch(error) {
+                    wrappedData.displayInvalid = true;
+                    wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                    wrappedData.message = "Error executing layout function: " + error.toString();
+                    return wrappedData;
+                }
             },
 
             //no data

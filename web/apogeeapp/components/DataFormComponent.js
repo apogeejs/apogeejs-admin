@@ -35,33 +35,43 @@ export default class DataFormComponent extends Component {
     //Resource Accessors
     //==============================
 
-    /** This method returns a layout function and validator function. It will
-     * throw an exception is there is a problem compiling the user code. This
-     * should be handled by the caller. */
+    /** This method compiles the layout function entered by the user. It returns
+     * the fields  {formLayoutFunction,validatorFunction,errorMessage}. */
     createFormFunctions() {
         var layoutCodeText = this.getField("layoutCode");
         var validatorCodeText = this.getField("validatorCode");
-        var layoutFunction, validatorFunction;
+        var layoutFunction, validatorFunction, errorMessage;
 
         if((layoutCodeText !== undefined)&&(layoutCodeText !== null)) {
-            //create the resource generator wrapped with its closure
-            layoutFunction = new Function("admin","inputData",layoutCodeText);
+            try {
+                //create the layout function
+                layoutFunction = new Function("commandMessenger","inputData",layoutCodeText);
+            }
+            catch(error) {
+                errorMessage = "Error parsing layout function code: " + error.toString()
+                if(error.stack) console.error(error.stack);
+            }
         }
         else {
             layoutFunction = () => [];
         }
 
-        if((validatorCodeText !== undefined)&&(validatorCodeText !== null)) {
-            //create the resource generator wrapped with its closure
-            validatorFunction = new Function("formValue","inputData",validatorCodeText);
+        if((validatorCodeText !== undefined)&&(validatorCodeText !== null))  {
+            try {
+                //create the validator function
+                validatorFunction = new Function("formValue","inputData",validatorCodeText);
+            }
+            catch(error) {
+                errorMessage = "Error parsing validator function code: " + error.toString()
+                if(error.stack) console.error(error.stack);
+            }
         }
         else {
             validatorFunction = () => true;
         }
 
-        return { layoutFunction, validatorFunction};
+        return { layoutFunction, validatorFunction, errorMessage};
     }
-
 
     //=============================
     // Action

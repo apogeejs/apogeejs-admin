@@ -65,42 +65,39 @@ export default class HtmlJsDataDisplay extends DataDisplay {
         let displayValid;
         try {
             let componentView = this.getComponentView();
-            let member = dataSource.getContextMember ? dataSource.getContextMember() : componentView.getComponent().getMember();
+            let contextMember = dataSource.getContextMember ? dataSource.getContextMember() : componentView.getComponent().getMember();
+            let contextMemberId = contextMember.getId();
 
             //get html
             let html = dataSource.getHtml ? dataSource.getHtml() : "";
             
-            //get resource
+            //get resource and handle invalid resource
             let resource = dataSource.getResource();
-            if(resource.error) {
-                if(resource.errorMsg) {
-                    this.displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,resource.errorMsg);
-                }
+            if(resource.displayInvalid) {
+                let messageType = (resource.messageType !== undefined) ? resource.messageType : DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                let message = (resource.message !== undefined) ? resource.message : "Display unavailable";
                 this.displayContainer.setHideDisplay(true);
+                this.displayContainer.setMessage(messageType,message);
                 this.setDisplayValid(false);
                 return;
             }
 
-            //get display data
+            //get display data and handle invalid display data
             let displayData;
-            let dataResult = DATA_DISPLAY_CONSTANTS.readData(dataSource.getDisplayData,"Error loading display input data: ");
-
-            //configure view
-            this.displayContainer.setRemoveView(dataResult.removeView);
-            if(!dataResult.removeView) {
-                //only hide view and show message if view is not removed
-                //we will set data either way to clear old date
-                this.displayContainer.setHideDisplay(dataResult.hideDisplay);
-                this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
-            }
-            if(dataResult.data !== apogeeutil.INVALID_VALUE) {
-                displayData = dataResult.data;
-                this.setDisplayValid(true);
-            }
-            else {
-                //display invalid!
-                this.setDisplayValid(false);
-                return;
+            if(dataSource.getDisplayData) {
+                let dataResult = DATA_DISPLAY_CONSTANTS.readWrappedDisplayData(dataSource.getDisplayData,"Error loading display input data: ");
+                if(dataResult.displayInvalid) {
+                    //display invalid! hide display and show message
+                    this.displayContainer.setHideDisplay(dataResult.hideDisplay);
+                    this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
+                    this.setDisplayValid(false);
+                    return
+                }
+                else {
+                    //display display valid
+                    displayData = dataResult.data;
+                    this.setDisplayValid(true);
+                }
             }
 
             //content
@@ -110,7 +107,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             
             //this gives the ui code access to some data display functions
             var admin = {
-                getCommandMessenger: () => new UiCommandMessenger(componentView,member.getId()),
+                getCommandMessenger: () => new UiCommandMessenger(componentView,contextMemberId),
                 startEditMode: () => this.startEditMode(),
                 endEditMode: () => this.endEditMode()
             }
@@ -161,7 +158,8 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                         if(error.stack) console.error(error.stack);
                         
                         //display message for user
-                        apogeeUserAlert("Error in " + member.getName()+ " onUnload function: " + error.message);
+                        let member = componentView.getComponent().getMember();
+                        apogeeUserAlert("Error in '" + member.getName() + "' onUnload function: " + error.message);
                     }
                 }
             }
@@ -213,7 +211,8 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                         //allow close if we have an error
                         if(error.stack) console.error(error.stack);
 
-                        apogeeUserAlert("Error in " + member.getName()+ " isCloseOk function: " + error.message);
+                        let member = componentView.getComponent().getMember();
+                        apogeeUserAlert("Error in '" + member.getName()+ "' isCloseOk function: " + error.message);
                         return true;
                     }
                 }
@@ -228,7 +227,8 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                         if(error.stack) console.error(error.stack);
                         
                         //display message for user
-                        apogeeUserAlert("Error in " + member.getName() + " destroy function: " + error.message);
+                        let member = componentView.getComponent().getMember();
+                        apogeeUserAlert("Error in '" + member.getName() + "' destroy function: " + error.message);
                     }
                 }
             }

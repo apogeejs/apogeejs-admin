@@ -23,21 +23,28 @@ export default class ActionFormComponent extends Component {
     //Resource Accessors
     //==============================
 
-    /** This method compiles the layout function entered by the user. It will rturn a valid function
-     * or throw an exception if there is a problem in user code, which should be handled by the caller. */
+    /** This method compiles the layout function entered by the user. It returns
+     * the fields  {formLayoutFunction,errorMessage}. */
     createFormLayoutFunction() {
         var formCodeText = this.getField("layoutCode");
         
         var formLayoutFunction;
+        var errorMessage;
         if((formCodeText !== undefined)&&(formCodeText !== null)) {
-            //create the resource generator wrapped with its closure
-            formLayoutFunction = new Function("admin","inputData",formCodeText);
-            return formLayoutFunction;
+            try {
+                //create the layout function
+                formLayoutFunction = new Function("admin","inputData",formCodeText);
+            }
+            catch(error) {
+                errorMessage = "Error parsing uiGenerator code: " + error.toString()
+                if(error.stack) console.error(error.stack);
+            }
         }
         else {
-            //no layout defined. Return an empty layout
-            return () => [];
+            formLayoutFunction = () => [];
         }
+        
+        return {formLayoutFunction,errorMessage}
     }
 
 

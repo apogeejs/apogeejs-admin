@@ -202,7 +202,7 @@ export default class DataDisplay {
         }
 
         //get data
-        let dataResult = DATA_DISPLAY_CONSTANTS.readData(this.dataSource.getData,"Error loading display data: ");
+        let dataResult = DATA_DISPLAY_CONSTANTS.readWrappedData(this.dataSource.getData,"Error loading display data: ");
 
         //configure view
         this.displayContainer.setRemoveView(dataResult.removeView);
