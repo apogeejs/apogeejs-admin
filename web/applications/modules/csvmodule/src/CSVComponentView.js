@@ -1,5 +1,5 @@
 //These are in lieue of the import statements
-let {FormInputBaseComponentView,HandsonGridEditor,AceTextEditor} = apogeeview;
+let {FormInputBaseComponentView,HandsonGridEditor,AceTextEditor,StandardErrorDisplay,dataDisplayHelper} = apogeeview;
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
@@ -51,6 +51,10 @@ export default class CSVComponentView extends FormInputBaseComponentView {
 
             case CSVComponentView.VIEW_INPUT:
                 return this.getFormDataDisplay(displayContainer);
+
+            case FormInputBaseComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
 
             default:
                 console.error("unrecognized view element: " + viewType);
@@ -114,23 +118,33 @@ export default class CSVComponentView extends FormInputBaseComponentView {
             },
     
             getData: () => {
-                let allData = this.getComponent().getField("member.data").getData();
-                if(allData != apogeeutil.INVALID_VALUE) {
-                    let bodyData = allData.body;
-                    if(useMapsFormat) {
-                        if(!bodyData) bodyData = [];
-                        //return text for text editor
-                        return JSON.stringify(bodyData,null,JSON_TEXT_FORMAT_STRING);
-                    }
-                    else {
-                        //return json for grid editor
-                        if(!bodyData) bodyData = [[]];
-                        return bodyData;
-                    }
-                }
-                else {
-                    return apogeeutil.INVALID_VALUE;
-                }
+                //here we need to extract data from the member so we return
+                //the starndard wrapped data for the non-normal case and 
+                //extract the proper data for the normal case, returning
+                //unwrapped data in that case.
+                let allDataMember = this.getComponent().getField("member.data");
+				if(allDataMember.getState() != apogeeutil.STATE_NORMAL) {
+					return displayDataHelper.getStandardWrappedMemberData(allDataMember);
+				}
+				else {
+					let allData = allDataMember.getData();
+					if(allData != apogeeutil.INVALID_VALUE) {
+                        let bodyData = allData.body;
+                        if(useMapsFormat) {
+                            if(!bodyData) bodyData = [];
+                            //return text for text editor
+                            return JSON.stringify(bodyData,null,JSON_TEXT_FORMAT_STRING);
+                        }
+                        else {
+                            //return json for grid editor
+                            if(!bodyData) bodyData = [[]];
+                            return bodyData;
+                        }
+					}
+					else {
+						return apogeeutil.INVALID_VALUE
+					}
+				}
             }
         }
     }
@@ -146,16 +160,29 @@ export default class CSVComponentView extends FormInputBaseComponentView {
             },
     
             getData: () => {
-                let allData = this.getComponent().getField("member.data").getData();
-                if(allData != apogeeutil.INVALID_VALUE) {
-                    let header = allData.header;
-                    if(!header) header = [];
-                    //convert to grid for grid display
-                    return [header];
-                }
-                else {
-                    return apogeeutil.INVALID_VALUE;
-                }
+                //here we need to extract data from the member so we return
+                //the starndard wrapped data for the non-normal case and 
+                //extract the proper data for the normal case, returning
+                //unwrapped data in that case.
+                let allDataMember = this.getComponent().getField("member.data");
+				if(allDataMember.getState() != apogeeutil.STATE_NORMAL) {
+					return displayDataHelper.getStandardWrappedMemberData(allDataMember);
+				}
+				else {
+					let allData = allDataMember.getData();
+					if(allData != apogeeutil.INVALID_VALUE) {
+                        let header = allData.header;
+                        if(header) {
+                            return [header]
+                        }
+                        else {
+                            return []
+                        }
+					}
+					else {
+						return apogeeutil.INVALID_VALUE
+					}
+				}
             }
         }
     }
@@ -174,6 +201,7 @@ CSVComponentView.VIEW_HEADER = "Header";
 CSVComponentView.VIEW_DATA = "Data";
 
 CSVComponentView.VIEW_MODES = [
+    FormInputBaseComponentView.VIEW_INFO_MODE_ENTRY,
     {name: CSVComponentView.VIEW_HEADER, label: "Header", isActive: false},
     {name: CSVComponentView.VIEW_DATA, label: "Data", isActive: false},
     FormInputBaseComponentView.INPUT_VIEW_MODE_INFO

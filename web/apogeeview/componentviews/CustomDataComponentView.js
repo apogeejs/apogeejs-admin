@@ -125,74 +125,17 @@ export default class CustomDataComponentView extends ComponentView {
 
             getDisplayData: () => {
                 let inputMember = this.getComponent().getField("member.input");
-                let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
-                switch(inputMember.getState()) {
-                    case apogeeutil.STATE_NORMAL:
-                        wrappedData.data = inputMember.getData();
-                        break;
-
-                    case apogeeutil.STATE_ERROR:
-                        wrappedData.displayInvalid = true;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                        wrappedData.message = "Error in display input value!";
-                        break;
-
-                    case apogeeutil.STATE_PENDING:
-                        wrappedData.displayInvalid = true;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                        wrappedData.message = "Display input value pending!";
-                        break;
-
-                    case apogeeutil.STATE_INVALID:
-                        wrappedData.displayInvalid = true;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                        wrappedData.message = "Display input value invalid!";
-                        break;
-
-                    default:
-                        throw new Error("Unknown display data value state!")
+                let {abnormalWrappedData,inputData} = displayDataHelper.getProcessedMemberDisplayData(inputMember);
+                if(abnormalWrappedData) {
+                    return abnormalWrappedData;
                 }
-
-                return wrappedData;
+                //data is just the member data, return as unwrapped 
+                return inputData;
             },
 
             getData: () => {
-                let dataMember = this.getComponent().getField("member.data");
-                let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
-                switch(dataMember.getState()) {
-                    case apogeeutil.STATE_NORMAL:
-                        wrappedData.data = dataMember.getData();
-                        wrappedData.hideDisplay = false;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_NONE;
-                        break;
-
-                    case apogeeutil.STATE_ERROR:
-                        wrappedData.hideDisplay = true;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                        wrappedData.message = "Error in data value: " + dataMember.getErrorMsg();
-                        break;
-
-                    case apogeeutil.STATE_PENDING:
-                        wrappedData.hideDisplay = true;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                        wrappedData.message = "Display data value pending!";
-                        break;
-
-                    case apogeeutil.STATE_INVALID:
-                        //CAREFUL! We don't want to hide the data view since that is how
-                        //the value is set. If we hide it, there will be no way to make the
-                        //value not INVALID.
-                        wrappedData.data = apogeeutil.INVALID_VALUE;
-                        wrappedData.hideDisplay = false;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                        wrappedData.message = "Display data value invalid!";
-                        break;
-
-                    default:
-                        throw new Error("Unknown display data value state!")
-                }
-
-                return wrappedData;
+                let member = this.getComponent().getField("member.data");
+                return displayDataHelper.getStandardWrappedMemberData(member);
             },
 
             //edit ok - always true

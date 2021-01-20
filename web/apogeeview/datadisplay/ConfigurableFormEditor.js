@@ -1,7 +1,7 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import {ConfigurablePanel} from "/apogeeui/apogeeUiLib.js";
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 
 /** This is an editor that displays a customized form for data input. */
 export default class ConfigurableFormEditor extends DataDisplay {
@@ -31,7 +31,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
 
         //get data and handle invalid display
         if(this.dataSource.getDisplayData) {
-            let dataResult = DATA_DISPLAY_CONSTANTS.readWrappedDisplayData(this.dataSource.getDisplayData,"Error loading form layout: ");
+            let dataResult = dataDisplayHelper.readWrappedDisplayData(this.dataSource.getDisplayData,"Error loading form layout: ");
             if(dataResult.displayInvalid) {
                 //display invalid! hide display and show message
                 this.displayContainer.setHideDisplay(dataResult.hideDisplay);

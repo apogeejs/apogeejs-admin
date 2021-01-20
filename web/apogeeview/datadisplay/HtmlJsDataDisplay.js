@@ -2,6 +2,7 @@ import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from
@@ -85,7 +86,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             //get display data and handle invalid display data
             let displayData;
             if(dataSource.getDisplayData) {
-                let dataResult = DATA_DISPLAY_CONSTANTS.readWrappedDisplayData(dataSource.getDisplayData,"Error loading display input data: ");
+                let dataResult = dataDisplayHelper.readWrappedDisplayData(dataSource.getDisplayData,"Error loading display input data: ");
                 if(dataResult.displayInvalid) {
                     //display invalid! hide display and show message
                     this.displayContainer.setHideDisplay(dataResult.hideDisplay);

@@ -1,4 +1,4 @@
-import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 
 /** This is the base class for data displays, which show individual edit/display fields for a component. For example, a standard JSON
  * data component has three data displays, for the component value, the function body and the supplemental code.
@@ -202,7 +202,7 @@ export default class DataDisplay {
         }
 
         //get data
-        let dataResult = DATA_DISPLAY_CONSTANTS.readWrappedData(this.dataSource.getData,"Error loading display data: ");
+        let dataResult = dataDisplayHelper.readWrappedData(this.dataSource.getData,"Error loading display data: ");
 
         //configure view
         this.displayContainer.setRemoveView(dataResult.removeView);

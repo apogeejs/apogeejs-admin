@@ -74,7 +74,7 @@ export default class ActionFormComponentView extends ComponentView {
             },
 
             getDisplayData: () => {       
-                let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
+                let wrappedData = dataDisplayHelper.getEmptyWrappedData();
 
                 //get the layout function
                 let component = this.getComponent();
@@ -87,38 +87,16 @@ export default class ActionFormComponentView extends ComponentView {
                 }
 
                 //load the layout
+                //read the input data (checking for non-normal state)
                 let member = this.getComponent().getMember();
-
-                //check the input data state
-                if(member.getState() != apogeeutil.STATE_NORMAL) {
-                    wrappedData.displayInvalid = true;
-
-                    switch(member.getState()) {
-                        case apogeeutil.STATE_ERROR: 
-                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                            wrappedData.message = "Error in layout input value: " + member.getErrorMsg();
-                            break;
-
-                        case apogeeutil.STATE_PENDING:
-                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                            wrappedData.message = "Display layout input value pending!";
-                            break;
-
-                        case apogeeutil.STATE_INVALID:
-                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                            wrappedData.message = "Display layout input value invalid!";
-                            break;
-
-                        default:
-                            throw new Error("Unknown display data value state!")
-                    }
-                    return wrappedData;
+                let {abnormalWrappedData,inputData} = displayDataHelper.getProcessedMemberDisplayData(member);
+                if(abnormalWrappedData) {
+                    return abnormalWrappedData;
                 }
 
                 //use the parent folder as the context base
                 let contextMemberId = component.getMember().getParentId();
                 let commandMessenger = new UiCommandMessenger(this,contextMemberId);
-                let inputData = member.getData();
                 try {
                     let layout = formLayoutFunction(commandMessenger,inputData);
                     wrappedData.data = layout;

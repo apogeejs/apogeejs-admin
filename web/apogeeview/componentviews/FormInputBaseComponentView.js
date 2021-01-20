@@ -31,7 +31,10 @@ export default class FormInputBaseComponentView extends ComponentView {
                 return {reloadData,reloadDataDisplay};
             }, 
             getDisplayData: () => this.getFormLayout(),
-            getData: () => this.getComponent().getField("member.formData").getData(),
+            getData: () => {
+                let formMember = this.getComponent().getField("member.formData");
+                return displayDataHelper.getStandardWrappedMemberData(formMember);
+            },
             getEditOk: () => true,
             saveData: (formData) => this._onSubmit(formData)
         }

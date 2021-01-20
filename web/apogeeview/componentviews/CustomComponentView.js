@@ -114,41 +114,7 @@ export default class CustomComponentView extends ComponentView {
 
             getData: () => {
                 let member = this.getComponent().getMember();
-                let wrappedData = DATA_DISPLAY_CONSTANTS.getEmptyWrappedData();
-                switch(member.getState()) {
-                    case apogeeutil.STATE_NORMAL:
-                        wrappedData.data = member.getData();
-                        wrappedData.hideDisplay = false;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_NONE;
-                        break;
-
-                    case apogeeutil.STATE_ERROR:
-                        wrappedData.hideDisplay = true;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
-                        wrappedData.message = "Error in data value: " + member.getErrorMsg();
-                        break;
-
-                    case apogeeutil.STATE_PENDING:
-                        wrappedData.hideDisplay = true;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                        wrappedData.message = "Display data value pending!";
-                        break;
-
-                    case apogeeutil.STATE_INVALID:
-                        //CAREFUL! We don't want to hide the data view since that is how
-                        //the value is set. If we hide it, there will be no way to make the
-                        //value not INVALID.
-                        wrappedData.data = apogeeutil.INVALID_VALUE;
-                        wrappedData.hideDisplay = false;
-                        wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
-                        wrappedData.message = "Display data value invalid!";
-                        break;
-
-                    default:
-                        throw new Error("Unknown display data value state!")
-                }
-
-                return wrappedData;
+                return displayDataHelper.getStandardWrappedMemberData(member);
             },
 
             //below - custom methods for HtmlJsDataDisplay
