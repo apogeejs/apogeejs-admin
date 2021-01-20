@@ -4,7 +4,6 @@ import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.j
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
-import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 
 /** This is a custom resource component. 
@@ -104,7 +103,7 @@ export default class DataFormComponentView extends ComponentView {
 
                 //load the layout
                 let inputMember = component.getField("member.input");
-                let {abnormalWrappedData,inputData} = displayDataHelper.getProcessedMemberDisplayData(inputMember);
+                let {abnormalWrappedData,inputData} = dataDisplayHelper.getProcessedMemberDisplayData(inputMember);
                 if(abnormalWrappedData) {
                     return abnormalWrappedData;
                 }
@@ -130,7 +129,7 @@ export default class DataFormComponentView extends ComponentView {
 
             getData: () => {
                 let valueMember = this.getComponent().getField("member.value");
-                return displayDataHelper.getStandardWrappedMemberData(valueMember,true);
+                return dataDisplayHelper.getStandardWrappedMemberData(valueMember,true);
             },
 
             getEditOk: () => true,

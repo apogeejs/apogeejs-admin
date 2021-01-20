@@ -34,7 +34,7 @@ export default class ActionFormComponent extends Component {
         if((formCodeText !== undefined)&&(formCodeText !== null)) {
             try {
                 //create the layout function
-                formLayoutFunction = new Function("admin","inputData",formCodeText);
+                formLayoutFunction = new Function("commandMessenger","inputData",formCodeText);
             }
             catch(error) {
                 errorMessage = "Error parsing uiGenerator code: " + error.toString()

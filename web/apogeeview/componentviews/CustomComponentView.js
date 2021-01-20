@@ -114,7 +114,7 @@ export default class CustomComponentView extends ComponentView {
 
             getData: () => {
                 let member = this.getComponent().getMember();
-                return displayDataHelper.getStandardWrappedMemberData(member);
+                return dataDisplayHelper.getStandardWrappedMemberData(member);
             },
 
             //below - custom methods for HtmlJsDataDisplay

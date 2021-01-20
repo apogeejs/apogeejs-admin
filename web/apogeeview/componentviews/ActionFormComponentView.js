@@ -89,7 +89,7 @@ export default class ActionFormComponentView extends ComponentView {
                 //load the layout
                 //read the input data (checking for non-normal state)
                 let member = this.getComponent().getMember();
-                let {abnormalWrappedData,inputData} = displayDataHelper.getProcessedMemberDisplayData(member);
+                let {abnormalWrappedData,inputData} = dataDisplayHelper.getProcessedMemberDisplayData(member);
                 if(abnormalWrappedData) {
                     return abnormalWrappedData;
                 }

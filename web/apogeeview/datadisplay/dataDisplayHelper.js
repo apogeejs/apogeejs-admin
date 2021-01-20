@@ -29,7 +29,7 @@ dataDisplayHelper.getMemberDataJsonDataSource = function(app,componentView,membe
 
         getData: function() {
             let member = _getDataMember();
-            return displayDataHelper.getStandardWrappedMemberData(member);
+            return dataDisplayHelper.getStandardWrappedMemberData(member);
         },
 
         getEditOk: doReadOnly ? 
@@ -104,7 +104,7 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
                 if(data == apogeeutil.INVALID_VALUE) {
                     textData = apogeeutil.INVALID_VALUE;
                 }
-                else if(json === undefined) {
+                else if(data === undefined) {
                     textData = "undefined";
                 }
                 else {
@@ -112,6 +112,8 @@ dataDisplayHelper.getMemberDataTextDataSource = function(app,componentView,membe
                 }
                 wrappedData.data = textData;
             }
+
+            return wrappedData;
         },
 
         getEditOk: doReadOnly ? 
@@ -287,7 +289,7 @@ dataDisplayHelper.getStandardErrorDataSource = function(app,componentView) {
  * getData function in a data source (not getDataDisplay though) 
  * There is one option - if optionalShowDispalyForInvalidData = true
  * the display will not be hidden if the data value is INVALID_VALUE. */
-displayDataHelper.getStandardWrappedMemberData = function(member,optionalShowDispalyForInvalidData) {
+dataDisplayHelper.getStandardWrappedMemberData = function(member,optionalShowDispalyForInvalidData) {
     let wrappedData = dataDisplayHelper.getEmptyWrappedData();
     if(member.getState() != apogeeutil.STATE_NORMAL) {
         wrappedData.data = apogeeutil.INVALID_VALUE;
@@ -326,7 +328,7 @@ displayDataHelper.getStandardWrappedMemberData = function(member,optionalShowDis
  * If the member state is normal, the data will be returned and abnomrlaWrappedData 
  * will be undefined. If the state is not normal, abnormalWrappedData will be
  * defined and data will be undefined. */
-displayDataHelper.getProcessedMemberDisplayData = function(member) {
+dataDisplayHelper.getProcessedMemberDisplayData = function(member) {
     let abnormalWrappedData,inputData;
 
     if(member.getState() != apogeeutil.STATE_NORMAL) {

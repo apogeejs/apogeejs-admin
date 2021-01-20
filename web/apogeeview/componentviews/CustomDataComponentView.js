@@ -125,7 +125,7 @@ export default class CustomDataComponentView extends ComponentView {
 
             getDisplayData: () => {
                 let inputMember = this.getComponent().getField("member.input");
-                let {abnormalWrappedData,inputData} = displayDataHelper.getProcessedMemberDisplayData(inputMember);
+                let {abnormalWrappedData,inputData} = dataDisplayHelper.getProcessedMemberDisplayData(inputMember);
                 if(abnormalWrappedData) {
                     return abnormalWrappedData;
                 }
@@ -135,7 +135,7 @@ export default class CustomDataComponentView extends ComponentView {
 
             getData: () => {
                 let member = this.getComponent().getField("member.data");
-                return displayDataHelper.getStandardWrappedMemberData(member);
+                return dataDisplayHelper.getStandardWrappedMemberData(member);
             },
 
             //edit ok - always true
