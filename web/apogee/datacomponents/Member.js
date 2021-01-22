@@ -414,7 +414,7 @@ export default class Member extends FieldObject {
                 name: impactor.getFullName(model)
             }
         });
-        let msgPrefix = dependsOnErrorList.length ? "Error in dependency: " : "Error in dependencies: ";
+        let msgPrefix = (dependsOnErrorList.length === 1) ? "Error in dependency: " : "Error in dependencies: ";
         let errorMsg = msgPrefix + dependsOnErrorList.map(dependsOnEntry => dependsOnEntry.name).join(", ")
         let dependsOnErrorInfo = {
             type: "dependency",

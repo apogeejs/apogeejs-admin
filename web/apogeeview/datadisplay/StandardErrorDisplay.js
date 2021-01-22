@@ -94,15 +94,19 @@ function _addRuntimeError(errorInfoDiv,errorInfo) {
 
 function _addMultiMemberError(errorInfoDiv,errorInfo) {
     if(errorInfo.memberEntries) errorInfo.memberEntries.forEach( memberData => {
-        _addMemberTitle(errorInfoDiv,memberData.name);
-        _processList(errorInfoDiv,memberData.errorInfoList) 
+        if(memberData.name) {
+            _addMemberTitle(errorInfoDiv,memberData.name);
+            if(memberData.errorInfoList) _processList(errorInfoDiv,memberData.errorInfoList);
+            else _addMainDescription(errorInfoDiv,"Error in member");
+        } 
     });
 }
 
 function _addDependencyError(errorInfoDiv,errorInfo) {
     if((errorInfo.dependsOnErrorList)&&(errorInfo.dependsOnErrorList.length > 0)) {
+        let msgPrefix = (errorInfo.dependsOnErrorList.length === 1) ? "Error in dependency: " : "Error in dependencies: ";
         let dependencyNameString = errorInfo.dependsOnErrorList.map( dependsOnEntry => dependsOnEntry.name).join(", "); 
-        _addSectionHeading(errorInfoDiv,"Error in dependencies: " + dependencyNameString,1);
+        _addSectionHeading(errorInfoDiv,msgPrefix + dependencyNameString,1);
     }
 }
 

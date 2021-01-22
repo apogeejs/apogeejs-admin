@@ -642,7 +642,7 @@ export default class ComponentView {
                     //to modify this to be more general.
                     errorInfoList = [newErrorInfo];
                     //update message to give depends on members in error
-                    let msgPrefix = newDependsOnErrorList.length ? "Error in dependency: " : "Error in dependencies: ";
+                    let msgPrefix = (newDependsOnErrorList.length === 1) ? "Error in dependency: " : "Error in dependencies: ";
                     msg = msgPrefix + newDependsOnErrorList.map(dependsOnEntry => dependsOnEntry.name).join(", ")
                 }
             }
