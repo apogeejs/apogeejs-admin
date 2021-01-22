@@ -115,14 +115,17 @@ export default class HtmlJsDataDisplay extends DataDisplay {
 
             if(resource.onLoad) {
                 this.onLoad = () => {
+                    let progress = 0;
                     try {
                         resource.onLoad.call(resource,this.outputElement,admin);
                         this.isLoaded = true;
+                        progress = 1;
 
                         //set the display data if we have any
                         if((displayData !== undefined)&&(resource.setDisplayData)) {
                             resource.setDisplayData(displayData);
                         }
+                        progress = 2;
                         
                         //handle the case the data loaded before the html (which we don't want)
                         if(this.cachedData != undefined) {
@@ -132,7 +135,28 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                     }
                     catch(error) {
                         //hide dispay and show error message
-                        let errorMsg = "Error in onload of display: " + error.toString();
+                        //use "progress" to figure uot where the error occurred to set the message
+                        let errorPrefix;
+                        switch(progress) {
+                            case 0:
+                                errorPrefix = "Error in onLoad of display: ";
+                                break;
+
+                            case 1:
+                                errorPrefix = "Error in setDisplayData of display: ";
+                                break;
+
+                            case 2:
+                                errorPrefix = "Error in setData: ";
+                                break;
+
+                            default:
+                                errorPrefix = "Unknown error in loading display: ";
+                                break;
+                        }
+
+
+                        let errorMsg = errorPrefix + error.toString();
                         displayContainer.setHideDisplay(true);
                         displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
                         //set display invalid because this is part of creating the display
@@ -182,7 +206,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
                 }
                 catch(error) {
                     //hide dispay and show error message
-                    let errorMsg = "Error set data in display: " + error.toString();
+                    let errorMsg = "Error in setData in display: " + error.toString();
                     displayContainer.setHideDisplay(true);
                     displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
                     //note - do not set display invalid here because this is part of data loading, not display loading
@@ -239,7 +263,19 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             //-------------------
 
             if(resource.init) {
-                resource.init.call(resource,this.outputElement,admin);
+                try {
+                    resource.init.call(resource,this.outputElement,admin);
+                }
+                catch(error) {
+                    let errorMsg = "Error in init of display: " + error.toString();
+                    displayContainer.setHideDisplay(true);
+                    displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
+                    //set display invalid because this is part of creating the display
+                    this.setDisplayValid(false);
+
+                    if(error.stack) console.error(error.stack);
+                    return;
+                }
             }
 
             displayValid = true;

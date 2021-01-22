@@ -2,6 +2,7 @@ import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 
 export default class JsonPlusTableComponentView extends ComponentView {
 
