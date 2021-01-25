@@ -94,10 +94,9 @@ function _addRuntimeError(errorInfoDiv,errorInfo) {
 
 function _addMultiMemberError(errorInfoDiv,errorInfo) {
     if(errorInfo.memberEntries) errorInfo.memberEntries.forEach( memberData => {
-        if(memberData.name) {
+        if((memberData.name)&&(memberData.errorInfoList)&&(memberData.errorInfoList.length > 0)) {
             _addMemberTitle(errorInfoDiv,memberData.name);
-            if(memberData.errorInfoList) _processList(errorInfoDiv,memberData.errorInfoList);
-            else _addMainDescription(errorInfoDiv,"Error in member");
+            _processList(errorInfoDiv,memberData.errorInfoList);
         } 
     });
 }
