@@ -35,7 +35,8 @@ export function wrapWithTooltip(contentElement,text,options) {
  /** This function creates a help image with a tooltip.  
   * Argments:
   * - text - the help text
-  * - options - These are the same options as in the function wrapWithTooltip 
+  * - options - These are the same options as in the function wrapWithTooltip with one added entry:
+  * -- imageAddonClass - This is a class to add to the image element
   * Return Value:
   * An object with the following keys:
   * - wrapperElement - The outside element
@@ -46,6 +47,9 @@ export function getHelpElement(helpText,options) {
     let helpIconUrl = uiutil.getResourcePath(HELP_ICON_PATH);
     let helpImgElement = document.createElement("img");
     helpImgElement.className = "apogee_tooltip_help_image"
+    if(options) {
+        if(options.imageAddonClass) helpImgElement.classList.add(options.imageAddonClass);
+    }
     helpImgElement.src = helpIconUrl;
     let elements = wrapWithTooltip(helpImgElement,helpText,options);
     elements.imgElement = helpImgElement;

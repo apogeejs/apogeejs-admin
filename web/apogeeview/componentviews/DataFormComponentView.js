@@ -246,12 +246,14 @@ DataFormComponentView.VIEW_FORM_VALUE = "value";
 
 DataFormComponentView.VIEW_MODES = [
     ComponentView.VIEW_INFO_MODE_ENTRY,
-    {name: DataFormComponentView.VIEW_FORM, label: "Form", isActive: true},
-    {name: DataFormComponentView.VIEW_LAYOUT_CODE, label: "Layout Code(inputData)", isActive: false},
-    {name: DataFormComponentView.VIEW_INPUT_CODE, label: "Input Data Code()", isActive: false},
-    {name: DataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE, label: "Input Data Private", isActive: false},
-    {name: DataFormComponentView.VIEW_VALIDATOR_CODE, label: "Validator Code(formValue,inputData)", isActive: false},
-    {name: DataFormComponentView.VIEW_FORM_VALUE, label: "Value", isActive: false}
+    {name: DataFormComponentView.VIEW_FORM, label: "Form", sourceLayer: "model", sourceType: "data", suffix: ".data", isActive: true},
+    {name: DataFormComponentView.VIEW_LAYOUT_CODE, label: "Layout Code", sourceLayer: "app", sourceType: "function", argList: "commandMessenger,inputData", isActive: true,
+        description: "This is a test of the description!"
+    },
+    {name: DataFormComponentView.VIEW_VALIDATOR_CODE, label: "Validator Code", sourceLayer: "app", sourceType: "function", argList: "formValue,inputData", isActive: false},
+    {name: DataFormComponentView.VIEW_INPUT_CODE, label: "Input Data Code", sourceLayer: "model", sourceType: "function", suffix: ".input", isActive: false},
+    {name: DataFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE, label: "Input Data Private", sourceLayer: "model", sourceType: "private code", suffix: ".input", isActive: false},
+    {name: DataFormComponentView.VIEW_FORM_VALUE, label: "Value", sourceLayer: "model", sourceType: "data", suffix: ".data", isActive: false},
 ];
 
 DataFormComponentView.TABLE_EDIT_SETTINGS = {

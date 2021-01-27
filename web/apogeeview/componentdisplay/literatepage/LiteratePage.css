@@ -144,17 +144,57 @@
 .visiui_displayContainer_viewToolbarClass {
     position: relative;
 }
-.visiui_displayContainer_viewLabelClass {
+.visiui_displayContainer_viewHeadingClass {
     display: inline;
     margin-left: 1px;
     margin-right: 1px;
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 0px;
+}
+.visiui_displayContainer_viewTitleClass {
     font-size: smaller;
     color:rgb(0,0,0);
     font-weight: bold;
     user-select: none;
+    margin-right: 15px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_viewSourceClass {
+    font-size: smaller;
+    color: darkblue;
+    font-weight: bold;
+    user-select: none;
+    margin-right: 5px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_viewTypeModelClass {
+    font-size: smaller;
+    color:rgb(0,0,0);
+    font-style: italic;
+    user-select: none;
+    margin-right: 5px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_viewTypeAppClass {
+    font-size: smaller;
+    color:rgb(0,0,0);
+    font-style: italic;
+    user-select: none;
+    margin-right: 5px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_HelpWrapperAddon {
+    vertical-align: middle;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+.visiui_displayContainer_HelpImageAddon {
+    height: 12px;
+    width: 12px;
+}
+.visiui_displayContainer_HelpTextAddon {
+    text-align: left;
 }
 .visiui_displayContainer_viewSelectorContainerClass {
     display: inline;

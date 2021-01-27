@@ -37,3 +37,13 @@ DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO = "info";
 // - removed - this is set to true if we want to display removed, or false otherwise (optional) 
 DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_KEY = "wrapped_data";
 DATA_DISPLAY_CONSTANTS.WRAPPED_DATA_VALUE = {}; //must use this exactly, not a copy
+
+//These are used in ata view definition settings
+DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_FUNCTION = "function";
+DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_DATA = "data";
+DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_PRIVATE_CODE = "private code";
+DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_OTHER_CODE = "other code";
+
+//These are used in ata view definition settings
+DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_LAYER_MODEL = "model";
+DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_LAYER_APP = "app";

@@ -1,6 +1,6 @@
 import {getSaveBar} from "/apogeeview/componentdisplay/toolbar.js";
 import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
-import {uiutil} from "/apogeeui/apogeeUiLib.js";
+import {uiutil,getHelpElement} from "/apogeeui/apogeeUiLib.js";
 
 /** This is a standin for the display conatiner for the literate page
  * 
@@ -15,7 +15,7 @@ export default class PageDisplayContainer {
         
         this.mainElement = null;
         this.viewToolbarElement = null;
-        this.viewLabelElement = null;
+        this.viewHeadingElement = null;
         this.headerContainer = null;
         this.messageContainer = null;
         this.viewContainer = null;
@@ -24,6 +24,9 @@ export default class PageDisplayContainer {
         this.viewSelectorContainer = null;
         this.viewActiveElement = null;
         this.viewNameElement = null;
+
+        this.hasViewSourceText = false;
+        this.viewSource = null;
         
         this.isComponentShowing = false;
         this.isViewActive = viewModeInfo.isActive;
@@ -182,6 +185,11 @@ export default class PageDisplayContainer {
                 this._updateDataDisplay();
             }
         }
+
+        //update name label on view heading if needed
+        if((this.hasViewSourceText)&&(this.componentView.getComponent().isMemberFieldUpdated("member","name"))) {
+            this.viewSource.innerHTML = this._getViewSourceText();
+        }
     }
 
 
@@ -303,9 +311,38 @@ export default class PageDisplayContainer {
 
         //create the view header
         this.viewToolbarElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewToolbarClass",this.mainElement);
+        
+        //create the heading element and its content
+        this.viewHeadingElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewHeadingClass",this.viewToolbarElement);
+        let {viewTitleText,hasViewSourceText,viewTypeText,viewTypeClassName,viewDescText} = this._getViewHeadingInfo();
 
-        this.viewLabelElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewLabelClass visiui_hideSelection",this.viewToolbarElement);
-        this.viewLabelElement.innerHTML = this.viewTypeLabel;
+        let viewTitleElement = uiutil.createElementWithClass("span","visiui_displayContainer_viewTitleClass",this.viewHeadingElement);
+        viewTitleElement.innerHTML = viewTitleText;
+
+        this.hasViewSourceText = hasViewSourceText;
+        if(hasViewSourceText) {
+            //this is saved so we can update the name if it changes
+            this.viewSource = uiutil.createElementWithClass("span","visiui_displayContainer_viewSourceClass",this.viewHeadingElement);
+            this.viewSource.innerHTML = this._getViewSourceText();
+        }
+        if(viewTypeText) {
+            let viewType = uiutil.createElementWithClass("span",viewTypeClassName,this.viewHeadingElement);
+            viewType.innerHTML = viewTypeText;
+        }
+        if(viewDescText) {
+            //NOTE - I probably need to add some options!!!
+            let options = {
+                wrapperAddonClass: "visiui_displayContainer_HelpWrapperAddon",
+                imageAddonClass: "visiui_displayContainer_HelpImageAddon",
+                textAddonClass: "visiui_displayContainer_HelpTextAddon",
+            };
+            if(viewDescText.length > 24) {
+                options.textWidth = "300px";
+            }
+            let helpElements = getHelpElement(viewDescText,options);
+            this.viewHeadingElement.appendChild(helpElements.wrapperElement);
+        }
+
         this.sizingElement = uiutil.createElementWithClass("div","visiui_displayContainer_viewSizingElementClass",this.viewToolbarElement);
 
         //create the view display
@@ -356,7 +393,7 @@ export default class PageDisplayContainer {
             }
             this.mainElement = null;
             this.viewToolbarElement = null;
-            this.viewLabelElement = null;
+            this.viewHeadingElement = null;
 
             if(this.showLessButton) {
                 this.showLessButton.onclick = null;
@@ -430,6 +467,62 @@ export default class PageDisplayContainer {
 
         //reload display
         this._updateDataDisplayLoadedState();
+    }
+
+    _getViewHeadingInfo() {
+        let viewTitleText = this.viewModeInfo.label;
+        if(this.viewModeInfo.sourceType == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_FUNCTION) {
+            let argList = (this.viewModeInfo.argList !== undefined) ? this.viewModeInfo.argList : "";
+            viewTitleText += "(" + argList + ")";
+        }
+
+        let hasViewSourceText = (this.viewModeInfo.sourceLayer == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_LAYER_MODEL);
+        
+        let viewTypeText;
+        let viewTypeClassName;
+        if(this.viewModeInfo.sourceLayer == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_LAYER_MODEL) {
+            if(this.viewModeInfo.sourceType == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_DATA) {
+                viewTypeText = SOURCE_TYPE_MODEL_DATA_LABEL;
+            }
+            else if(this.viewModeInfo.sourceType == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_FUNCTION) {
+                viewTypeText = SOURCE_TYPE_MODEL_CODE_LABEL;
+            }
+            else if(this.viewModeInfo.sourceType == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_PRIVATE_CODE) {
+                viewTypeText = SOURCE_TYPE_MODEL_PRIVATE_CODE_LABEL;
+            }
+            viewTypeClassName = "visiui_displayContainer_viewTypeModelClass";
+        }
+        else if(this.viewModeInfo.sourceLayer == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_LAYER_APP) {
+            if(this.viewModeInfo.sourceType == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_DATA) {
+                viewTypeText = SOURCE_TYPE_APP_DATA_LABEL;
+            }
+            else if(this.viewModeInfo.sourceType == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_FUNCTION) {
+                viewTypeText = SOURCE_TYPE_APP_CODE_LABEL;
+            }
+            else if(this.viewModeInfo.sourceType == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_TYPE_OTHER_CODE) {
+                viewTypeText = SOURCE_TYPE_APP_CODE_LABEL;
+            }
+            viewTypeClassName = "visiui_displayContainer_viewTypeAppClass";
+        }
+
+        let viewDescText;
+        if(this.viewModeInfo.description) {
+            viewDescText = this.viewModeInfo.description;
+        }
+
+        return {viewTitleText,hasViewSourceText,viewTypeText,viewTypeClassName,viewDescText};
+    }
+
+    _getViewSourceText() {
+        let viewSourceText;
+        if(this.viewModeInfo.sourceLayer == DATA_DISPLAY_CONSTANTS.VIEW_SOURCE_LAYER_MODEL) {
+            viewSourceText = this.componentView.getName();
+            if(this.viewModeInfo.suffix) viewSourceText += this.viewModeInfo.suffix;
+        }
+        else {
+            viewSourceText = "";
+        }
+        return viewSourceText;
     }
 
     /** This method configures the toolbar for the view display. */
@@ -640,6 +733,13 @@ const MESSAGE_TYPE_CLASS_MAP = {
     "warning": "visiui_displayContainer_messageWarning",
     "info": "visiui_displayContainer_messageInfo"
 }
+
+
+const SOURCE_TYPE_MODEL_DATA_LABEL = "data";
+const SOURCE_TYPE_MODEL_CODE_LABEL = "code";
+const SOURCE_TYPE_MODEL_PRIVATE_CODE_LABEL = "private code";
+const SOURCE_TYPE_APP_DATA_LABEL = "UI data";
+const SOURCE_TYPE_APP_CODE_LABEL = "UI code - no access to other cells";
 
 
 
