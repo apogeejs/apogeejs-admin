@@ -58,8 +58,20 @@ FunctionComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 FunctionComponentView.VIEW_MODES = [
     ComponentView.VIEW_INFO_MODE_ENTRY,
-    {name: FunctionComponentView.VIEW_CODE, label: "Code", isActive: true},
-    {name: FunctionComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false},
+    {
+        name: FunctionComponentView.VIEW_CODE,
+        label: "Code",
+        sourceLayer: "model",
+        sourceType: "function",
+        isActive: true
+    },
+    {
+        name: FunctionComponentView.VIEW_SUPPLEMENTAL_CODE,
+        label: "Private",
+        sourceLayer: "model",
+        sourceType: "private code",
+        isActive: false
+    },
 ];
 
 FunctionComponentView.TABLE_EDIT_SETTINGS = {

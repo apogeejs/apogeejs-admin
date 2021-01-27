@@ -97,12 +97,13 @@
     color:darkblue;
 }
 .visiui_pageChild_cellTypeLabelClass {
-    display: inline;
+    display: inline-block;
     padding-left: 25px;
     vertical-align: middle;
     font-size: smaller;
     color: gray;
     user-select: none;
+    white-space: nowrap;
 }
 .visiui-pageChild-icon-container {
     display:inline-block;
@@ -197,8 +198,9 @@
     text-align: left;
 }
 .visiui_displayContainer_viewSelectorContainerClass {
-    display: inline;
+    display: inline-block;
     margin-left: 6px;
+    white-space: nowrap;
 }
 .visiui_displayContainer_viewSelectorContainerClass_editMode {
     background-color: rgb(64,255,255);

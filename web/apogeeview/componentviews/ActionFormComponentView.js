@@ -156,13 +156,35 @@ ActionFormComponentView.VIEW_LAYOUT_CODE = "layout";
 ActionFormComponentView.VIEW_INPUT_CODE = "input";
 ActionFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE = "inputPrivate";
 
-
 ActionFormComponentView.VIEW_MODES = [
     ComponentView.VIEW_INFO_MODE_ENTRY,
-    {name: ActionFormComponentView.VIEW_FORM, label: "Form", isActive: true},
-    {name: ActionFormComponentView.VIEW_LAYOUT_CODE, label: "Layout Code", isActive: false},
-    {name: ActionFormComponentView.VIEW_INPUT_CODE, label: "Input Data Code", isActive: false},
-    {name: ActionFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE, label: "Input Data Private", isActive: false}
+    {
+        name: ActionFormComponentView.VIEW_FORM,
+        label: "Form",
+        isActive: true
+    },
+    {
+        name: ActionFormComponentView.VIEW_LAYOUT_CODE,
+        label: "Layout Code",
+        sourceLayer: "app",
+        sourceType: "function", 
+        argList: "commandMessenger,inputData",
+        isActive: true
+    },
+    {
+        name: ActionFormComponentView.VIEW_INPUT_CODE,
+        label: "Input Data Code",
+        sourceLayer: "model",
+        sourceType: "function", 
+        isActive: false
+    },
+    {   
+        name: ActionFormComponentView.VIEW_INPUT_SUPPLEMENTAL_CODE,
+        label: "Input Data Private",
+        sourceLayer: "model", 
+        sourceType: "private code",
+        isActive: false
+    }
 ];
 
 ActionFormComponentView.TABLE_EDIT_SETTINGS = {

@@ -175,12 +175,46 @@ CustomComponentView.VIEW_UI_CODE = "uiGenerator()";
 
 CustomComponentView.VIEW_MODES = [
     ComponentView.VIEW_INFO_MODE_ENTRY,
-    {name: CustomComponentView.VIEW_OUTPUT, label: "Display", isActive: true},
-    {name: CustomComponentView.VIEW_CODE, label: "Input Code", isActive: false},
-    {name: CustomComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Input Private", isActive: false},
-    {name: CustomComponentView.VIEW_HTML, label: "HTML", isActive: false},
-    {name: CustomComponentView.VIEW_CSS, label: "CSS", isActive: false},
-    {name: CustomComponentView.VIEW_UI_CODE, label: "uiGenerator()", isActive: false}
+    {
+        name: CustomComponentView.VIEW_OUTPUT, 
+        label: "Display", 
+        isActive: true
+    },
+    {
+        name: CustomComponentView.VIEW_HTML, 
+        label: "HTML",
+        sourceLayer: "app",
+        sourceType: "data",
+        isActive: false
+    },
+    {
+        name: CustomComponentView.VIEW_CSS, 
+        label: "CSS", 
+        sourceLayer: "app",
+        sourceType: "data",
+        isActive: false
+    },
+    {
+        name: CustomComponentView.VIEW_UI_CODE, 
+        label: "UI Generator", 
+        sourceLayer: "app",
+        sourceType: "function",
+        isActive: false
+    },
+    {
+        name: CustomComponentView.VIEW_CODE, 
+        label: "Input Code", 
+        sourceLayer: "model",
+        sourceType: "function",
+        isActive: false
+    },
+    {
+        name: CustomComponentView.VIEW_SUPPLEMENTAL_CODE,
+        label: "Input Private",
+        sourceLayer: "model", 
+        sourceType: "private code", 
+        isActive: false
+    },
 ];
 
 CustomComponentView.TABLE_EDIT_SETTINGS = {

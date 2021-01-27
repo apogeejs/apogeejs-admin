@@ -234,13 +234,59 @@ CustomDataComponentView.VIEW_UI_CODE = "uiGenerator(mode)";
 
 CustomDataComponentView.VIEW_MODES = [
     ComponentView.VIEW_INFO_MODE_ENTRY,
-    {name: CustomDataComponentView.VIEW_OUTPUT, label: "Display", isActive: true},
-    {name: CustomDataComponentView.VIEW_VALUE, label: "Data Value", isActive: false},
-    {name: CustomDataComponentView.VIEW_CODE, label: "Input Code", isActive: false},
-    {name: CustomDataComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Input Private", isActive: false},
-    {name: CustomDataComponentView.VIEW_HTML, label: "HTML", isActive: false},
-    {name: CustomDataComponentView.VIEW_CSS, label: "CSS", isActive: false},
-    {name: CustomDataComponentView.VIEW_UI_CODE, label: "uiGenerator()", isActive: false}
+    {
+        name: CustomDataComponentView.VIEW_OUTPUT,
+        label: "Display",
+        sourceLayer: "model",
+        sourceType: "data",
+        suffix: ".data", 
+        isActive: true
+    },
+    {
+        name: CustomDataComponentView.VIEW_HTML,
+        label: "HTML",
+        sourceLayer: "app",
+        sourceType: "data", 
+        isActive: false
+    },
+    {
+        name: CustomDataComponentView.VIEW_CSS,
+        label: "CSS",
+        sourceLayer: "app",
+        sourceType: "data", 
+        isActive: false
+    },
+    {
+        name: CustomDataComponentView.VIEW_UI_CODE,
+        label: "UI Generator",
+        sourceLayer: "app",
+        sourceType: "function",
+        isActive: false
+    },
+    {
+        name: CustomDataComponentView.VIEW_CODE,
+        label: "Input Code",
+        sourceLayer: "model", 
+        sourceType: "function",
+        suffix: ".input",
+        isActive: false
+    },
+    {
+        name: CustomDataComponentView.VIEW_SUPPLEMENTAL_CODE,
+        label: "Input Private",
+        sourceLayer: "model", 
+        sourceType: "private code",
+        suffix: ".input",
+        isActive: false
+    },
+    {
+        name: CustomDataComponentView.VIEW_VALUE,
+        label: "Data Value",
+        sourceLayer: "model",
+        sourceType: "data",
+        suffix: ".data", 
+        isActive: false
+    }
 ];
 
 CustomDataComponentView.TABLE_EDIT_SETTINGS = {

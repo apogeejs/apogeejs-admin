@@ -184,9 +184,27 @@ JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 JsonPlusTableComponentView.VIEW_MODES = [
     ComponentView.VIEW_INFO_MODE_ENTRY,
-    {name: JsonPlusTableComponentView.VIEW_DATA, label: "Data", isActive: true},
-    {name: JsonPlusTableComponentView.VIEW_CODE, label: "Formula", isActive: false},
-    {name: JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false}
+    {
+        name: JsonPlusTableComponentView.VIEW_DATA,
+        label: "Data",
+        sourceLayer: "model",
+        sourceType: "data",
+        isActive: true
+    },
+    {
+        name: JsonPlusTableComponentView.VIEW_CODE,
+        label: "Formula",
+        sourceLayer: "model",
+        sourceType: "function",
+        isActive: false
+    },
+    {
+        name: JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE,
+        label: "Private",
+        sourceLayer: "model",
+        sourceType: "private code",
+        isActive: false
+    }
 ];
 
 JsonPlusTableComponentView.TABLE_EDIT_SETTINGS = {

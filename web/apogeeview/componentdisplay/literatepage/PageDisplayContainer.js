@@ -334,7 +334,7 @@ export default class PageDisplayContainer {
             let options = {
                 wrapperAddonClass: "visiui_displayContainer_HelpWrapperAddon",
                 imageAddonClass: "visiui_displayContainer_HelpImageAddon",
-                textAddonClass: "visiui_displayContainer_HelpTextAddon",
+                textAddonClass: "visiui_displayContainer_HelpTextAddon"
             };
             if(viewDescText.length > 24) {
                 options.textWidth = "300px";
