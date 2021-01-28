@@ -8,6 +8,9 @@ import CustomComponent from "/apogeeapp/components/CustomComponent.js";
 import CustomDataComponent from "/apogeeapp/components/CustomDataComponent.js";
 import ErrorComponent from "/apogeeapp/components/ErrorComponent.js";
 
+import ActionFormComponent from "/apogeeapp/components/ActionFormComponent.js";
+import DataFormComponent from "/apogeeapp/components/DataFormComponent.js";
+
 //JSON PLUS COMPONENT
 import JsonPlusTableComponent from "/apogeeapp/components/JsonPlusTableComponent.js";
 
@@ -105,6 +108,9 @@ componentInfo.registerPageComponent(FolderFunctionComponent);
 componentInfo.FOLDER_COMPONENT_CLASS = FolderComponent;
 componentInfo.ERROR_COMPONENT_CLASS = ErrorComponent;
 
+//test for new formS
+componentInfo.registerComponent(ActionFormComponent);
+componentInfo.registerComponent(DataFormComponent);
 
 //JSON PLUS COMPONENT
 componentInfo.registerComponent(JsonPlusTableComponent);

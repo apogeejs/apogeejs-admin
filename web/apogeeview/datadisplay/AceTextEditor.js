@@ -130,15 +130,19 @@ export default class AceTextEditor extends DataDisplay {
         //The data source should give a text value "" if the data in invalid rather than sending
         //in a json, but we will do this check anyway.
         if(text == apogeeutil.INVALID_VALUE) {
-            var errorMsg = "ERROR: Data value is not valid"
+            //clear the display
             this.cachedDisplayData = "";
+            //the dispaly shoudl be hidden, but do it again anyway
+            let displayContainer = this.getDisplayContainer();
+            displayContainer.setHideDisplay(true);
             this.dataError = true;
         }
-
-        //check data is valid
-        if(!apogeeutil.isString(text)) {
-            var errorMsg = "ERROR: Data value is not text";
-            this.cachedDisplayData = errorMsg;
+        else if(!apogeeutil.isString(text)) {
+            let displayContainer = this.getDisplayContainer();
+            displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO, "Data cannot be shown in editor: value is not text")
+            displayContainer.setHideDisplay(true);
+            //clear the display
+            this.cachedDisplayData = "";
             this.dataError = true;
         }
         
@@ -252,100 +256,86 @@ export default class AceTextEditor extends DataDisplay {
     // following API to interact with the display
     //----------------------------
 
-    /** This method gets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
-     */
-    getResizeHeightMode() {
-        return this.resizeHeightMode;
-    }
+    /** This is called if the show less button is pressed */
+    showLess() {
+        if((this.destroyed)||(!this.editor)) return;
 
-    /** This method sets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
-     */
-    setResizeHeightMode(resizeHeightMode) {
-        if(this.destroyed) return;
-
-        if(resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
-            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
-            this.editorOptions.maxLines = this.showSomeMaxLines;
-        }
-        else if(resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX) {
-            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
-            this.editorOptions.maxLines = MAX_MAX_LINES;
-        }
-        else {
-            //ignore unknown value
-            return;
-        }
-
-        if(this.editor) {
-            this.editor.setOptions(this.editorOptions);
-        }
-    }
-
-    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS;
-    */
-    adjustHeight(adjustment) {
-        if(this.destroyed) return;
-
+        let newMaxLines;
         if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
-            if(this.editor) {
-                let newMaxLines;
-                if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS) {
-                    //decrease size by 1 line - except if our size is 
-                    //larger than the current doc, then shrink it to 
-                    //one line smaller than current doc.
-                    let docLines = this.editor.getSession().getLength();
-                    if(docLines < this.showSomeMaxLines) {
-                        this.showSomeMaxLines = docLines;
-                    }
-                    newMaxLines = this.showSomeMaxLines - 1;
-                    if(newMaxLines <  DEFAULT_MIN_LINES) {
-                        newMaxLines = DEFAULT_MIN_LINES;
-                    }
-                }
-                else if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE) {
-                    //just grow size by 1 line
-                    newMaxLines = this.showSomeMaxLines + 1;
-                    if(newMaxLines >  MAX_MAX_LINES) {
-                        newMaxLines = MAX_MAX_LINES;
-                    }
-                }
-                else {
-                    //ignore an unknown command
-                    return;
-                }
-
-                //update the lines options
-                this.showSomeMaxLines = newMaxLines;
-                this.editorOptions.maxLines = this.showSomeMaxLines;
-                this.editor.setOptions(this.editorOptions);
+            //decrease size by 1 line - except if our size is 
+            //larger than the current doc, then shrink it to 
+            //one line smaller than current doc.
+            let docLines = this.editor.getSession().getLength();
+            if(docLines < this.showSomeMaxLines) {
+                this.showSomeMaxLines = docLines;
+            }
+            newMaxLines = this.showSomeMaxLines - 1;
+            if(newMaxLines <  DEFAULT_MIN_LINES) {
+                newMaxLines = DEFAULT_MIN_LINES;
             }
         }
+        else {
+            //set lines to the most recent "some" mode size
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+            newMaxLines = this.showSomeMaxLines;
+        }
+
+        this._setSomeMaxLines(newMaxLines);
+
     }
 
-    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Flags:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS = 1;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE = 2;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_NONE = 0;
-     * These flags should be or'ed togethder to give the allowed options.
-    */
+    /** This is called if the show more button is pressed */
+    showMore() {
+        if((this.destroyed)||(!this.editor)) return;
+
+        let newMaxLines;
+        if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
+            //just grow size by 1 line
+            newMaxLines = this.showSomeMaxLines + 1;
+            if(newMaxLines >  MAX_MAX_LINES) {
+                newMaxLines = MAX_MAX_LINES;
+            }
+        }
+        else {
+            //put in some mode and keep max lines the same (the UI probably won't allow this command though)
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+            newMaxLines = MAX_MAX_LINES;
+        }
+
+        this._setSomeMaxLines(newMaxLines);
+    }
+
+    /** This is called if the show max button is pressed */
+    showMax() {
+        if((this.destroyed)||(!this.editor)) return;
+
+        if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
+            //set the max number of lines
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
+            this.editorOptions.maxLines = MAX_MAX_LINES;
+            this.editor.setOptions(this.editorOptions);
+        }
+
+    }
+
+    /** This sets the number of lines to display (if the display is this big) */
+    _setSomeMaxLines(maxLines) {
+        //update the lines options
+        this.showSomeMaxLines = maxLines;
+        this.editorOptions.maxLines = this.showSomeMaxLines;
+        this.editor.setOptions(this.editorOptions);
+    }
+
+    /** This method controlsthe visibility options for the resize buttons. These will only work if 
+     * resize is enabled for this data display. */
     getHeightAdjustFlags() {
-        //We won't dynamically figufre out if we can add or remove lines based on current content. If
-        //we add this we will have to track if it changes. 
-        //So they user may push these buttons and nothing will happen.
-        //We will set the flags based on our absolute limits.
         let flags = 0;
-        if(this.showSomeMaxLines < MAX_MAX_LINES) {
-            flags = flags | DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
+        flags |= DATA_DISPLAY_CONSTANTS.RESIZE_SHOW_FLAG;
+        if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX) {
+            flags |= DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX_FLAG;
         }
-        if(this.showSomeMaxLines > DEFAULT_MIN_LINES) {
-            flags = flags | DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS;
-        }
+
+        //for now we won't disable any buttons - pressing them will just do nothing
         return flags;
     }
 }

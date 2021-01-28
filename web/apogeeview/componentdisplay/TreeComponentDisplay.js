@@ -75,19 +75,18 @@ export default class TreeComponentDisplay {
             }
 
             var component = this.componentView.getComponent();
-            var modelView = this.componentView.getModelView();
 
             //add child folder menu item
             if(this.componentView.usesTabDisplay()) {
-                let app = modelView.getApp();
-                let appView = modelView.getAppView();
+                let app = this.componentView.getApp();
+                var modelView = this.componentView.getModelView();
                 let initialValues = {parentId: component.getMemberId()};
                 let pageComponents = componentInfo.getPageComponentNames();
                 pageComponents.forEach(pageComponentName => {
                     let childMenuItem = {};
                     let pageComponentClass = componentInfo.getComponentClass(pageComponentName);
                     childMenuItem.title = "Add Child " + pageComponentClass.displayName;
-                    childMenuItem.callback = () => addComponent(appView,app,pageComponentClass,initialValues);
+                    childMenuItem.callback = () => addComponent(modelView,app,pageComponentClass,initialValues);
                     menuItemList.push(childMenuItem);
                 })
             }
@@ -99,10 +98,10 @@ export default class TreeComponentDisplay {
         var openCallback = this.componentView.createOpenCallback();
         
         var component = this.componentView.getComponent();
-        var modelView = this.componentView.getModelView();
+        var modelManager = this.componentView.getApp().getModelManager();
         var labelText = this.componentView.getName();
         var iconUrl = this.componentView.getIconUrl();
-        var isRoot = component.getParentComponent(modelView.getModelManager()) ? true : false;
+        var isRoot = component.getParentComponent(modelManager) ? true : false;
         return new TreeEntry(labelText, iconUrl, openCallback, menuItemCallback,isRoot);
     }
 

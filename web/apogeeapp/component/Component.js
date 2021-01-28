@@ -112,9 +112,15 @@ export default class Component extends FieldObject {
         return this.isMemberFieldUpdated("member","name");
     }
 
-    /** This can be used to see if the component state has been updated. It checks both the state and the state msg. */
+    /** This can be used to see if the component state has been updated. */
     isStateUpdated() {
-        return ((this.isMemberFieldUpdated("member","state"))||(this.isMemberFieldUpdated("member","stateMsg")));
+        return this.isMemberFieldUpdated("member","state");
+    }
+
+    /** This gets the map of members in this component. The key is the member ID and
+     * the value is the stored name for the component. */
+    getMemberFieldMap() {
+        return this.getField("memberFieldMap");
     }
 
     getParentComponent(modelManager) {
@@ -225,7 +231,6 @@ export default class Component extends FieldObject {
     /** This method extends the member udpated function from the base.
      * @protected */    
     memberUpdated(updatedMember) {
-//console.log("component member updated: " + updatedMember.getName() + ", " + updatedMember.getId() + ", " + updatedMember.instanceNumber);
         let memberFieldMap = this.getField("memberFieldMap");
         let fieldName = memberFieldMap[updatedMember.getId()];
 

@@ -25,6 +25,12 @@ export default class ComponentView {
         this.treeState = null;
 
         this.component.setViewStateCallback(() => this.getViewState());
+
+        //state info
+        this.stateUpdated = false;
+        this.state = null;
+        this.bannerMessage = null;
+        this.errorInfoList = null;
     }
 
     //==============================
@@ -34,6 +40,10 @@ export default class ComponentView {
     /** This method returns the base member for this component. */
     getComponent() {
         return this.component;
+    }
+
+    getApp() {
+        return this.modelView.getApp();
     }
 
     getName() {
@@ -55,53 +65,43 @@ export default class ComponentView {
         return this.component.isDisplayNameUpdated();
     }
 
+    /** This method returns true if the component state was updated in the last component update. */
+    isStateUpdated() {
+        return this.isStateUpdated;
+    }
+
+    /** This gets the state for the component. */
     getBannerState() {
-        let member = this.component.getMember();
-        return member.getState();
+        if(this.state == null) this._createMemberStateInfo();
+        return this.state;
     }
 
+    /** This gets the state message for the component. */
     getBannerMessage() {
-        let member = this.component.getMember();
-        let state =  member.getState();
-        switch(state) {
-            case apogeeutil.STATE_NORMAL:
-                return "";
-
-            case apogeeutil.STATE_PENDING:
-                return bannerConstants.PENDING_MESSAGE;
-
-            case apogeeutil.STATE_INVALID:
-                return bannerConstants.INVALID_MESSAGE;
-
-            case apogeeutil.STATE_ERROR:
-                return this.getBannerErrorMessage(member);
-
-            default:
-                return "Unknown state: " + state; 
-        }
+        if(this.state == null) this._createMemberStateInfo();
+        return this.bannerMessage;
     }
 
-    /** This gets the banner error message for the component. It is separated so it can be overwritten 
-     * for compound components. These have the member being a folder. They will just have dependency
-     * errors for the child members. */
-    getBannerErrorMessage(member) {
-        return member.getErrorMsg();
+    /** This gets the error info for the component. */
+    getErrorInfoList() {
+        if(this.state == null) this._createMemberStateInfo();
+        return this.errorInfoList;
     }
 
     /** This method gets the parent component view of the current component view. 
      * This method does not depends only on the relation between the components, 
      * rather than any relationship established between the component views. This should give the
-     * same result getLastAssignedParentComponentView except during a delete or move operation. */
+     * same result getLastAssignedParentComponentView except during a delete or move operation. 
+     * This may return null if there is no parent component view. */
     getParentComponentView() {
-
-        let parentComponent = this.component.getParentComponent(this.modelView.getModelManager());
-        if((parentComponent)&&(this.modelView)) {
-            return this.modelView.getComponentViewByComponentId(parentComponent.getId());
+        if(this.modelView) {
+            let parentComponent = this.component.getParentComponent(this.modelView.getModelManager());
+            if(parentComponent) {
+                return this.modelView.getComponentViewByComponentId(parentComponent.getId());
+            }
         }
-        else {
-            return null;
-        }
-
+        //if we get here, no parent component view looked up
+        return null;
     }
 
     /** This sets the assigned parent component view. This should be done for
@@ -414,6 +414,12 @@ export default class ComponentView {
         this.component = component;
         this.component.setViewStateCallback(() => this.getViewState());
 
+        //clear the locally stored member state info, It will be reconstructed on demand
+        this.stateUpdated = this.component.isStateUpdated();
+        if(this.stateUpdated) {
+            this._clearMemberStateInfo();
+        }
+
         //check for parent change
         if(component.isFieldUpdated("member")) {
             let member = component.getMember();
@@ -505,7 +511,7 @@ export default class ComponentView {
 
                     //execute command to select child
                     let command = parentComponentView.getSelectApogeeNodeCommand(this.getName());
-                    this.getModelView().getApp().executeCommand(command);
+                    this.getApp().executeCommand(command);
 
                     //open the parent and bring this child to the front
                     makeTabActive(parentComponentView);
@@ -515,6 +521,143 @@ export default class ComponentView {
         }
         
         return openCallback;
+    }
+
+    //---------------------------
+    // Member (model) state
+    //---------------------------
+
+
+    /** THis clears the member state info */
+    _clearMemberStateInfo() {
+        this.state = null;
+        this.bannerMessage = null;
+        this.errorInfoList = null;
+    }
+
+    _createMemberStateInfo() {
+        //state matches state of main member
+        let member = this.component.getMember();
+        this.state = member.getState();
+
+        switch(this.state) {
+            case apogeeutil.STATE_NORMAL:
+                this.bannerMessage = "";
+                this.errorInfoList = null;
+                break;
+
+            case apogeeutil.STATE_PENDING:
+                this.bannerMessage = bannerConstants.PENDING_MESSAGE;
+                this.errorInfoList = null;
+                break;
+
+            case apogeeutil.STATE_INVALID:
+                this.bannerMessage = bannerConstants.INVALID_MESSAGE;
+                this.errorInfoList = null;
+                break;
+
+            case apogeeutil.STATE_ERROR:
+                this._constructErrorInfo();
+                break;
+
+            default:
+                this.bannerMessage = "Unknown state: " + state;
+                this.errorInfoList = null;
+                break; 
+        }
+    }
+
+    /** This constructs the error info for the component. It should be called when 
+     * the component is in the error state. */
+    _constructErrorInfo() {
+        let memberFieldMap = this.component.getMemberFieldMap();
+        let memberDataList = [];
+        let memberCount = 0;
+        //get the error info for the member(s) for their component
+        for(let id in memberFieldMap) {
+            let lookupName = memberFieldMap[id];
+            let member = this.component.getField(lookupName);
+            memberCount++;
+            let memberError = member.getError();
+            if(memberError) {
+                let memberData = {};
+                let saveError;
+                memberData.name = member.getName();
+                if(memberError.isDependsOnError) {
+                    //for a dependency error, we remove mention of depends on error that are internal
+                    //to the component, keeping only depends on errors from external member
+                    let {hasError, msg, errorInfoList} = this._processDependencyError(memberError, memberFieldMap);
+                    saveError = hasError;
+                    memberData.msg = msg;
+                    if(errorInfoList) memberData.errorInfoList = errorInfoList;
+                }
+                else {
+                    memberData.msg = memberError.toString();
+                    if(memberError.errorInfoList) memberData.errorInfoList = memberError.errorInfoList;
+                    saveError = true;
+                }
+                
+                if(saveError) memberDataList.push(memberData);
+            }   
+        }
+
+        if(memberDataList.length > 0) {
+            if(memberCount == 1) {
+                //single member component
+                let memberData = memberDataList[0];
+                this.bannerMessage = memberData.msg;
+                this.errorInfoList = memberData.errorInfoList ? memberData.errorInfoList : [];
+            }
+            else {
+                //compond component (multi member)
+                this.bannerMessage = memberDataList.map( memberData => memberData.name + ": " + memberData.msg).join("; ");
+                let multiMemberErrorInfo = {};
+                multiMemberErrorInfo.type = "multiMember";
+                multiMemberErrorInfo.memberEntries = [];
+                //collect existing error info lists
+                memberDataList.forEach( memberData => {
+                    if((memberData.errorInfoList)&&(memberData.errorInfoList.length > 0)) {
+                        multiMemberErrorInfo.memberEntries.push({
+                            name: memberData.name,
+                            errorInfoList: memberData.errorInfoList
+                        })
+                    }
+                })
+                if(multiMemberErrorInfo.memberEntries.length > 0) this.errorInfoList = [multiMemberErrorInfo]
+                else this.errorInfoList = [];
+            }
+        }
+        else {
+            this.bannerMessage = "Unknown Error";
+        }
+
+    }
+
+    /** For dependency errors, we will get rid of an error reference where the dependency is on another
+     * member that is in this same component. We want our error display to only show external errors */
+    _processDependencyError(memberError, memberFieldMap) {
+        let msg, errorInfoList;
+        let hasError = false;
+        if(memberError.errorInfoList){
+            let dependencyErrorInfo = memberError.errorInfoList.find(entry => entry.type == "dependency");
+            if(dependencyErrorInfo) {
+                //dependency error info - keep any member reference that is not an internal member
+                let newDependsOnErrorList = dependencyErrorInfo.dependsOnErrorList.filter( dependsOnEntry => (memberFieldMap[dependsOnEntry.id] === undefined) );
+                let newErrorInfo = {
+                    type: "dependency",
+                    dependsOnErrorList: newDependsOnErrorList
+                }
+                if(newDependsOnErrorList.length > 0) {
+                    hasError = true;
+                    //update message to give depends on members in error
+                    let msgPrefix = (newDependsOnErrorList.length === 1) ? "Error in dependency: " : "Error in dependencies: ";
+                    msg = msgPrefix + newDependsOnErrorList.map(dependsOnEntry => dependsOnEntry.name).join(", ")
+                }
+            }
+        }
+        //we do not keep the error info list. All data is shown in the message.
+        errorInfoList = [];
+        return {hasError, msg, errorInfoList};
     }
 }
 
@@ -526,4 +669,12 @@ ComponentView.DEFAULT_CELL_ICON = "/icons3/genericCellIcon.png";
 ComponentView.DEFAULT_CELL_ICON = "/icons3/pageIcon.png";
 
 ComponentView.MENU_ITEM_OPEN = 0x01;
+
+/** this is the name for the info data view, a standard data view for components. */
+ComponentView.VIEW_INFO = "Info";
+
+ComponentView.VIEW_INFO_MODE_ENTRY = {name: ComponentView.VIEW_INFO, label: "Info", isActive: true, isTransient: true, isInfoView: true}
+//ComponentView.VIEW_INFO_MODE_ENTRY = {name: ComponentView.VIEW_INFO, label: "<span style='background-color: rgba(255,0,0,.7); color: white; border:2px solid rgba(255,0,0,.7);'>Info</span>", isActive: true, isTransient: true, isInfoView: true}
+//ComponentView.VIEW_INFO_MODE_ENTRY = {name: ComponentView.VIEW_INFO, label: "<span style='color: red;'>Info</span>", isActive: true, isTransient: true, isInfoView: true}
+
 

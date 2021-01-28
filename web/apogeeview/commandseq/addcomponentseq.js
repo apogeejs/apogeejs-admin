@@ -5,7 +5,6 @@ import {getPropertiesDialogLayout} from "/apogeeview/commandseq/updatecomponents
 import {Component,componentInfo} from "/apogeeapp/apogeeAppLib.js";
 import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
 import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog.js";
-import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 
 //=====================================
@@ -17,10 +16,9 @@ import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
  * property values in optionalBaseComponentValues, overridden by the user input properties where applicable. The member
  * created will be made using the optionalBaseMemberValues, agagin overidden by any user input values.  */   
 //piggybackCommand is a temporary test!!!
-export function addComponent(appView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+export function addComponent(modelView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
 
         let componentViewClass = getComponentViewClass(componentClass.uniqueName);
-        let modelView = appView.getWorkspaceView().getModelView();
 
         //get the active workspace
         var workspaceManager = app.getWorkspaceManager();
@@ -67,7 +65,6 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
             //other validation of inputs?
 
 //we should do this cleaner - by storing parent id in the submit input
-            let modelManager = modelView.getModelManager();
             let parentMemberId = userInputProperties.parentId;
 
             let commandsDeleteComponent = false;
@@ -169,12 +166,12 @@ export function addComponent(appView,app,componentClass,optionalInitialPropertie
 
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */
-export function addAdditionalComponent(appView,app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+export function addAdditionalComponent(modelView,app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
         
     var onSelect = function(componentUniqueName) {
         let componentClass = componentInfo.getComponentClass(componentUniqueName);
         if(componentClass) {
-            addComponent(appView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
+            addComponent(modelView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
         }
         else {
             apogeeUserAlert("Unknown component type: " + componentType);

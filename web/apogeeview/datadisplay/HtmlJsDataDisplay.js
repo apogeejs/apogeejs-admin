@@ -1,6 +1,8 @@
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 
 /** HtmlJsDataDisplay
  * This is the data display for a custom control where the display is generated from
@@ -8,7 +10,9 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
  * fields defined for it: 
  * 
  * - html = dataSource.getHtml(); REQUIRED - This retrieves the HTML for the display
- * - resource = dataSource.getResource(); REQUIRED - This retrieves the "resource" object to run the display
+ * - resource = dataSource.getResource(); REQUIRED - This retrieves the "resource" object to run the display (This is similar to
+ *              getDisplayData listed below in that it is used during the construction of the display, however this returns an 
+ *              object generated at the app layer for constructing the UI.)
  * - member = dataSource.getContextMember(); REQUIRED - This retrieves a member to use as a context reference
  * - displayData = dataSource.getDisplayData(); OPTIONAL - This returns model data to _construct_ the form
  *              whereas the standard getData() method returns data to _populate_ the form. If the display data is
@@ -47,7 +51,7 @@ export default class HtmlJsDataDisplay extends DataDisplay {
             "position":"relative"
         });
 
-        this._constructDisplay();
+        this._constructDisplay(displayContainer,dataSource);
     }
 
     getContent() {
@@ -56,154 +60,237 @@ export default class HtmlJsDataDisplay extends DataDisplay {
 
     /** This method implements the methods needed for the display interface from the data source */
     _constructDisplay() {
-
+        let displayContainer = this.getDisplayContainer();
         let dataSource = this.getDataSource();
-        let html = dataSource.getHtml();
-        let resource = dataSource.getResource();
-        let componentView = this.getComponentView();
-        let member = dataSource.getContextMember();
 
-        let displayData = dataSource.getDisplayData ? dataSource.getDisplayData() : undefined;
+        let displayValid;
+        try {
+            let componentView = this.getComponentView();
+            let contextMember = dataSource.getContextMember ? dataSource.getContextMember() : componentView.getComponent().getMember();
+            let contextMemberId = contextMember.getId();
 
-        //content
-        if(html) {
-            this.outputElement.innerHTML = html;
-        }
-        
-        //this gives the ui code access to some data display functions
-        var admin = {
-            getCommandMessenger: () => new UiCommandMessenger(componentView,member.getId()),
-            startEditMode: () => this.startEditMode(),
-            endEditMode: () => this.endEditMode()
-        }
-
-        if(resource.onLoad) {
-            this.onLoad = () => {
-                try {
-                    resource.onLoad.call(resource,this.outputElement,admin);
-                    this.isLoaded = true;
-
-                    //set the display data if we have any
-                    if((displayData !== undefined)&&(resource.setDisplayData)) {
-                        resource.setDisplayData(displayData);
-                        displayData = undefined;
-                    }
-                    
-                    //handle the case the data loaded before the html (which we don't want)
-                    if(this.cachedData != undefined) {
-                        this.setData(this.cachedData);
-                        this.cachedData = undefined;
-                    }
-                }
-                catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    
-                    apogeeUserAlert("Error in " + member.getName() + " onLoad function: " + error.message);
-                }
-            };
-        }
-        else {
-            this.isLoaded = true;
-        }
-
-        if(resource.onUnload) {   
-            this.onUnload = () => {
-                try {
-                    
-                    this.isLoaded = false;
-                    this.cachedData = undefined;
-                    
-                    resource.onUnload.call(resource,this.outputElement,admin);
-                }
-                catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    
-                    apogeeUserAlert("Error in " + member.getName()+ " onUnload function: " + error.message);
-                }
+            //get html
+            let html = dataSource.getHtml ? dataSource.getHtml() : "";
+            
+            //get resource and handle invalid resource
+            let resource = dataSource.getResource();
+            if(resource.displayInvalid) {
+                let messageType = (resource.messageType !== undefined) ? resource.messageType : DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                let message = (resource.message !== undefined) ? resource.message : "Display unavailable";
+                this.displayContainer.setHideDisplay(true);
+                this.displayContainer.setMessage(messageType,message);
+                this.setDisplayValid(false);
+                return;
             }
-        }
 
-        this.setData = (data) => {
-            try {
-                if(resource.setData) {
-                    if(!this.isLoaded) {
-                        this.cachedData = data;
-                        return;
-                    }
-                    
-                    resource.setData.call(resource,data,this.outputElement,admin);
+            //get display data and handle invalid display data
+            let displayData;
+            if(dataSource.getDisplayData) {
+                let dataResult = dataDisplayHelper.readWrappedDisplayData(dataSource.getDisplayData,"Error loading display input data: ");
+                if(dataResult.displayInvalid) {
+                    //display invalid! hide display and show message
+                    this.displayContainer.setHideDisplay(dataResult.hideDisplay);
+                    this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
+                    this.setDisplayValid(false);
+                    return
                 }
                 else {
-                     //we must include a function here
-                     this.setData = () => {};
+                    //display display valid
+                    displayData = dataResult.data;
+                    this.setDisplayValid(true);
                 }
             }
-            catch(error) {
-                if(error.stack) console.error(error.stack);
-                
-                apogeeUserAlert("Error in " + member.getName() + " setData function: " + error.message);
+
+            //content
+            if(html) {
+                this.outputElement.innerHTML = html;
             }
-        }
-        
-        if(resource.getData) {
-            this.getData = () => {
+            
+            //this gives the ui code access to some data display functions
+            var admin = {
+                getCommandMessenger: () => new UiCommandMessenger(componentView,contextMemberId),
+                startEditMode: () => this.startEditMode(),
+                endEditMode: () => this.endEditMode()
+            }
+
+            if(resource.onLoad) {
+                this.onLoad = () => {
+                    let progress = 0;
+                    try {
+                        resource.onLoad.call(resource,this.outputElement,admin);
+                        this.isLoaded = true;
+                        progress = 1;
+
+                        //set the display data if we have any
+                        if((displayData !== undefined)&&(resource.setDisplayData)) {
+                            resource.setDisplayData(displayData);
+                        }
+                        progress = 2;
+                        
+                        //handle the case the data loaded before the html (which we don't want)
+                        if(this.cachedData != undefined) {
+                            this.setData(this.cachedData);
+                            this.cachedData = undefined;
+                        }
+                    }
+                    catch(error) {
+                        //hide dispay and show error message
+                        //use "progress" to figure uot where the error occurred to set the message
+                        let errorPrefix;
+                        switch(progress) {
+                            case 0:
+                                errorPrefix = "Error in onLoad of display: ";
+                                break;
+
+                            case 1:
+                                errorPrefix = "Error in setDisplayData of display: ";
+                                break;
+
+                            case 2:
+                                errorPrefix = "Error in setData: ";
+                                break;
+
+                            default:
+                                errorPrefix = "Unknown error in loading display: ";
+                                break;
+                        }
+
+
+                        let errorMsg = errorPrefix + error.toString();
+                        displayContainer.setHideDisplay(true);
+                        displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
+                        //set display invalid because this is part of creating the display
+                        this.setDisplayValid(false);
+
+                        if(error.stack) console.error(error.stack);
+                    }
+                };
+            }
+            else {
+                this.isLoaded = true;
+            }
+
+            if(resource.onUnload) {   
+                this.onUnload = () => {
+                    try {
+                        
+                        this.isLoaded = false;
+                        this.cachedData = undefined;
+                        
+                        resource.onUnload.call(resource,this.outputElement,admin);
+                    }
+                    catch(error) {
+                        if(error.stack) console.error(error.stack);
+                        
+                        //display message for user
+                        let member = componentView.getComponent().getMember();
+                        apogeeUserAlert("Error in '" + member.getName() + "' onUnload function: " + error.message);
+                    }
+                }
+            }
+
+            this.setData = (data) => {
                 try {
+                    if(resource.setData) {
+                        if(!this.isLoaded) {
+                            this.cachedData = data;
+                            return;
+                        }
+                        
+                        resource.setData.call(resource,data,this.outputElement,admin);
+                    }
+                    else {
+                        //we must include a function here
+                        this.setData = () => {};
+                    }
+                }
+                catch(error) {
+                    //hide dispay and show error message
+                    let errorMsg = "Error in setData in display: " + error.toString();
+                    displayContainer.setHideDisplay(true);
+                    displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
+                    //note - do not set display invalid here because this is part of data loading, not display loading
+
+                    if(error.stack) console.error(error.stack);
+                }
+            }
+            
+            if(resource.getData) {
+                this.getData = () => {
+                    //here we let data display handle any failure to get data.
                     return resource.getData.call(resource,this.outputElement,admin);
                 }
-                catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    
-                    apogeeUserAlert("Error in " + member.getName() + " getData function: " + error.message);
+            }
+            else {
+                //we must include a function here
+                //WHY RETURN A DUMMY OBJECT? WHY NOT NULL? OR INVALID?
+                this.getData = () => {};
+            }
+
+            if(resource.isCloseOk) {     
+                this.isCloseOk = () => {
+                    try {
+                        return resource.isCloseOk.call(resource,this.outputElement,admin);
+                    }
+                    catch(error) {
+                        //allow close if we have an error
+                        if(error.stack) console.error(error.stack);
+
+                        let member = componentView.getComponent().getMember();
+                        apogeeUserAlert("Error in '" + member.getName()+ "' isCloseOk function: " + error.message);
+                        return true;
+                    }
                 }
             }
-        }
-        else {
-            //we must include a function here
-            //WHY RETURN A DUMMY OBJECT? WHY NOT NULL? OR INVALID?
-            this.getData = () => {};
-        }
 
+            if(resource.destroy) {
+                this.destroy = () => {
+                    try {
+                        resource.destroy.call(resource,this.outputElement,admin);
+                    }
+                    catch(error) {
+                        if(error.stack) console.error(error.stack);
+                        
+                        //display message for user
+                        let member = componentView.getComponent().getMember();
+                        apogeeUserAlert("Error in '" + member.getName() + "' destroy function: " + error.message);
+                    }
+                }
+            }
 
-        if(resource.isCloseOk) {     
-            this.isCloseOk = () => {
+            //-------------------
+            //initialization
+            //-------------------
+
+            if(resource.init) {
                 try {
-                    return resource.isCloseOk.call(resource,this.outputElement,admin);
+                    resource.init.call(resource,this.outputElement,admin);
                 }
                 catch(error) {
+                    let errorMsg = "Error in init of display: " + error.toString();
+                    displayContainer.setHideDisplay(true);
+                    displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
+                    //set display invalid because this is part of creating the display
+                    this.setDisplayValid(false);
+
                     if(error.stack) console.error(error.stack);
-                    
-                    apogeeUserAlert("Error in " + member.getName() + " isCloseOk function: " + error.message);
+                    return;
                 }
             }
+
+            displayValid = true;
+        }
+        catch(error) {
+            let errorMsg = "Error loading display: " + error.toString();
+            displayContainer.setHideDisplay(true);
+            displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR,errorMsg);
+
+            if(error.stack) console.error(error.stack);
+
+            displayValid = false;
         }
 
-        if(resource.destroy) {
-            this.destroy = () => {
-                try {
-                    resource.destroy.call(resource,this.outputElement,admin);
-                }
-                catch(error) {
-                    if(error.stack) console.error(error.stack);
-                    
-                    apogeeUserAlert("Error in " + member.getName() + " destroy function: " + error.message);
-                }
-            }
-        }
-
-        //-------------------
-        //initialization
-        //-------------------
-
-        if(resource.init) {
-            try {
-                resource.init.call(resource,this.outputElement,admin);
-            }
-            catch(error) {
-                if(error.stack) console.error(error.stack);
-                
-                apogeeUserAlert("Error in " + member.getName() + " init function: " + error.message);
-            }
-        }
+        this.setDisplayValid(displayValid);
     }
 }
 

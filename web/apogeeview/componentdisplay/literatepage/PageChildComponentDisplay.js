@@ -205,10 +205,12 @@ export default class PageChildComponentDisplay {
         this.mainElement.onclick = () => {
             let name = this.componentView.getName();
             let parentComponentView = this.componentView.getParentComponentView();
-            let command = parentComponentView.getSelectApogeeNodeCommand(name);
-            if(command) {
-                let app = this.componentView.getModelView().getApp();
-                app.executeCommand(command);
+            if(parentComponentView) {
+                let command = parentComponentView.getSelectApogeeNodeCommand(name);
+                if(command) {
+                    let app = this.componentView.getApp();
+                    app.executeCommand(command);
+                }
             }
         }
         

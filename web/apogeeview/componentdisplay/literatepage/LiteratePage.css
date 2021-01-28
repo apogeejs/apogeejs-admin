@@ -5,7 +5,7 @@
     
 }
 .visiui_litPage_editNotice {
-    background-color: rgb(0,255,255);
+    background-color: rgb(64,255,255);
 }
 .visiui_litPage_editorToolbar {
     border: 1px solid #ccc;
@@ -97,12 +97,13 @@
     color:darkblue;
 }
 .visiui_pageChild_cellTypeLabelClass {
-    display: inline;
+    display: inline-block;
     padding-left: 25px;
     vertical-align: middle;
     font-size: smaller;
     color: gray;
     user-select: none;
+    white-space: nowrap;
 }
 .visiui-pageChild-icon-container {
     display:inline-block;
@@ -138,33 +139,76 @@
     position: relative;
 }
 .visiui_displayContainer_editMode {
-    border: 2px solid rgb(0,255,255);
-    background-color: rgb(0,255,255);
+    border: 2px solid rgb(64,255,255);
+    background-color: rgb(64,255,255);
 }
 .visiui_displayContainer_viewToolbarClass {
     position: relative;
 }
-.visiui_displayContainer_viewLabelClass {
+.visiui_displayContainer_viewHeadingClass {
     display: inline;
     margin-left: 1px;
     margin-right: 1px;
     margin-top: 0px;
     margin-bottom: 0px;
     padding: 0px;
+}
+.visiui_displayContainer_viewTitleClass {
     font-size: smaller;
     color:rgb(0,0,0);
     font-weight: bold;
     user-select: none;
+    margin-right: 15px;
+    margin-left: 0px;
 }
-
-
+.visiui_displayContainer_viewSourceClass {
+    font-size: smaller;
+    color: darkblue;
+    font-weight: bold;
+    user-select: none;
+    margin-right: 5px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_viewTypeModelClass {
+    font-size: smaller;
+    color:rgb(0,0,0);
+    font-style: italic;
+    user-select: none;
+    margin-right: 5px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_viewTypeAppClass {
+    font-size: smaller;
+    color:rgb(0,0,0);
+    font-style: italic;
+    user-select: none;
+    margin-right: 5px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_HelpWrapperAddon {
+    vertical-align: middle;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+.visiui_displayContainer_HelpImageAddon {
+    height: 12px;
+    width: 12px;
+}
+.visiui_displayContainer_HelpTextAddon {
+    text-align: left;
+}
 .visiui_displayContainer_viewSelectorContainerClass {
-    display: inline;
-    margin-left: 10px;
+    display: inline-block;
+    margin-left: 6px;
+    white-space: nowrap;
 }
 .visiui_displayContainer_viewSelectorContainerClass_editMode {
-    background-color: rgb(0,255,255);
-    border: 2px solid rgb(0,255,255);
+    background-color: rgb(64,255,255);
+    border: 2px solid rgb(64,255,255);
+}
+.visiui_displayContainer_viewSelectorContainerClass_info {
+    background-color: rgb(255,160,160);
+    border: 2px solid rgb(255,160,160);
 }
 .visiui_displayContainer_viewSelectorContainerClass:hover {
     background-color: rgba(128,128,144,.35);
@@ -173,6 +217,7 @@
     text-decoration:none;
     display: inline;
     user-select: none;
+    padding-right: 4px;
 }
 .visiui_displayContainer_viewActiveElementClass {
     display: inline;
@@ -232,3 +277,118 @@
     z-index: 0;
     /*outline: .5px solid rgb(200,200,200);*/
 }
+.visiui_displayContainer_messageContainerClass {
+    position: relative;
+    padding: 5px;
+    z-index: 0;
+}
+.visiui_displayContainer_messageNone {
+    display: none;
+}
+.visiui_displayContainer_messageError {
+    color: red;
+    font-style: italic;
+}
+.visiui_displayContainer_messageWarning {
+    color: blue;
+    font-style: italic;
+    font-size: smaller;
+}
+.visiui_displayContainer_messageInfo {
+    color: rgb(96,96,96);
+    font-style: italic;
+    font-size: smaller;
+}
+
+.errorDisplay_main {
+    position: relative;
+    background-color: rgb(255,240,240);
+    padding: 0px;
+    margin: 0px;
+
+    max-height: 250px;
+    overflow: auto;
+    border: 1px solid rgb(196,196,196);
+}
+.errorDisplay_errorInfoDiv {
+    position: relative;
+    padding: 5px;
+
+}
+.errorDisplay_sectionDiv {
+    position: relative;
+    padding: 5px
+}
+.errorDisplay_descriptionSectionDiv {
+    padding: 5px;
+    color: red;
+    font-weight: bold;
+}
+.errorDisplay_stackTraceDiv {
+    padding: 2px;
+    color: red;
+}
+.errorDisplay_memberTitleDiv {
+    padding: 2px;
+    color: rgb(50,50,160);
+    font-weight: bold;
+}
+.errorDisplay_sectionHeadingDiv1 {
+    padding: 2px;
+    color: rgb(0,0,0);
+    font-weight: bold;
+}
+.errorDisplay_sectionHeadingDiv2 {
+    padding: 2px;
+    color: rgb(96,96,96);
+    font-weight: bold;
+}
+.errorDisplay_sectionHeadingDiv3 {
+    padding: 2px;
+    color: rgb(96,96,96);
+}
+.errorDisplay_sectionLabelLineDiv {
+    padding: 2px;
+}
+.errorDisplay_sectionLineLabelSpan {
+    color: rgb(96,96,96);
+    font-weight: bold;
+}
+.errorDisplay_sectionLineTextSpan {
+    color: rgb(96,96,96);
+}
+.errorDisplay_codeSection {
+    margin: 10px;
+    position: relative;
+    border: 1px solid gray;
+    background-color: rgb(240,240,250);
+    color: blue;
+    overflow: auto;
+    font-family: monospace;
+}
+pre.errorDisplay_codeSection {
+    white-space: pre-wrap;
+}
+pre.errorDisplay_codeSection:before {
+    counter-reset: listing;
+}
+pre.errorDisplay_codeSection code {
+    counter-increment: listing;
+}
+pre.errorDisplay_codeSection code::before {
+    background-color: white;
+    color: gray;
+    content: counter(listing);
+    display: inline-block;
+    width: 3ch;         
+    padding-left: auto; 
+    margin-left: auto; 
+    text-align: center;
+}
+pre.errorDisplay_longCode code::before {
+    width: 4ch;
+}
+pre.errorDisplay_veryLongCode code::before {
+    width: 5ch;
+}
+

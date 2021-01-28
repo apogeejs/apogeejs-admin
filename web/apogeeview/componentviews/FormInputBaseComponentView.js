@@ -11,28 +11,6 @@ export default class FormInputBaseComponentView extends ComponentView {
         super(modelView,component);
     }
 
-    /* The banner error message is overridden to show errors from the child members rather than from the 
-     * containing folder, which would just be dependency errors. */
-    getBannerErrorMessage(member) {
-        let msgList = [];
-
-        //we will ust print error messages from each internal components that can have errors
-        let dataMember = this.getComponent().getField("member.data");
-        if(dataMember.getState() == apogeeutil.STATE_ERROR) {
-            msgList.push("data: " + dataMember.getErrorMsg());
-        }
-        let formResultMember = this.getComponent().getField("member.formResult");
-        if(formResultMember.getState() == apogeeutil.STATE_ERROR) {
-            msgList.push("configuration: " + formResultMember.getErrorMsg());
-        }
-        let formDataMember = this.getComponent().getField("member.formData");
-        if(formDataMember.getState() == apogeeutil.STATE_ERROR) {
-            msgList.push("configuration input: " + formDataMember.getErrorMsg());
-        }
-
-        return msgList.join(";\n");
-    }
-
     getFormDataDisplay(displayContainer) {
         let dataDisplaySource = this._getInputFormDataSource();
         return new ConfigurableFormEditor(displayContainer,dataDisplaySource);
@@ -53,7 +31,10 @@ export default class FormInputBaseComponentView extends ComponentView {
                 return {reloadData,reloadDataDisplay};
             }, 
             getDisplayData: () => this.getFormLayout(),
-            getData: () => this.getComponent().getField("member.formData").getData(),
+            getData: () => {
+                let formMember = this.getComponent().getField("member.formData");
+                return dataDisplayHelper.getStandardWrappedMemberData(formMember);
+            },
             getEditOk: () => true,
             saveData: (formData) => this._onSubmit(formData)
         }
@@ -100,7 +81,7 @@ export default class FormInputBaseComponentView extends ComponentView {
             childCommands: [dataCommand,resultCommand]
         }
         
-        let app = this.getModelView().getApp();
+        let app = this.getApp();
         app.executeCommand(command);
 
         //if we got this far the form save should be accepted

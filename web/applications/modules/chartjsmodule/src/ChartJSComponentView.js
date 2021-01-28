@@ -1,7 +1,7 @@
 import Chart from "./chartjs.esm.js";
 
 //These are in lieue of the import statements
-let { DataDisplay,FormInputBaseComponentView} = apogeeview;
+let {DataDisplay,FormInputBaseComponentView,StandardErrorDisplay,dataDisplayHelper} = apogeeview;
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to
  * hold the generated chart data. The input is configured with a form, which gives multiple options
@@ -32,7 +32,11 @@ export default class ChartJSComponentView extends FormInputBaseComponentView {
                 return new ChartJSDisplay(displayContainer,dataSource);
 
             case ChartJSComponentView.VIEW_INPUT:
-                return this.getFormDataDisplay(displayContainer);
+				return this.getFormDataDisplay(displayContainer);
+				
+			case FormInputBaseComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
 
             default:
                 console.error("unrecognized view element: " + viewType);
@@ -69,14 +73,22 @@ export default class ChartJSComponentView extends FormInputBaseComponentView {
             },
 
             getData: () => {
-                let chartConfig = this.getComponent().getField("member.data").getData();
-                if(chartConfig != apogeeutil.INVALID_VALUE) {
-                    //this must be writable for the chart library
-                    return apogeeutil.jsonCopy(chartConfig);
-                }
-                else {
-                    return apogeeutil.INVALID_VALUE;
-                }
+				//if we return valid data, it must be MUTABLE for the chart library
+				//so in this case we will make a copy of the data.
+				//otherwise we return standard wrapped data (or invalid value)
+				let chartConfigMember = this.getComponent().getField("member.data");
+				if(chartConfigMember.getState() != apogeeutil.STATE_NORMAL) {
+					return displayDataHelper.getStandardWrappedMemberData(chartConfigMember);
+				}
+				else {
+					let data = chartConfigMember.getData();
+					if(data != apogeeutil.INVALID_VALUE) {
+						return apogeeutil.jsonCopy(data);
+					}
+					else {
+						return apogeeutil.INVALID_VALUE
+					}
+				}
             },
         }
     }
@@ -90,6 +102,7 @@ ChartJSComponentView.VIEW_CHART = "Chart";
 ChartJSComponentView.VIEW_INPUT = "Input";
 
 ChartJSComponentView.VIEW_MODES = [
+	FormInputBaseComponentView.VIEW_INFO_MODE_ENTRY,
 	{name: ChartJSComponentView.VIEW_CHART, label: "Chart", isActive: false},
     FormInputBaseComponentView.INPUT_VIEW_MODE_INFO
 ];

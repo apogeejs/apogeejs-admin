@@ -1,6 +1,7 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import DataDisplay from "/apogeeview/datadisplay/DataDisplay.js";
 import {ConfigurablePanel} from "/apogeeui/apogeeUiLib.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 
 /** This is an editor that displays a customized form for data input. */
 export default class ConfigurableFormEditor extends DataDisplay {
@@ -13,7 +14,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
      *  - getData - returns the desired form value,
      *  - getEditOk - gets if form is editable (optional)
      *  - setData - called when data is saved, with the form value (optional)
-     *  - getLayout - This returns the layour for the configurable form.
+     *  - getDisplayData - This returns the layout for the configurable form.
      *  }
      */
     constructor(displayContainer,dataSource) {
@@ -27,11 +28,23 @@ export default class ConfigurableFormEditor extends DataDisplay {
         
         //construct the display
         this.panel = new ConfigurablePanel();
-        if(dataSource.getDisplayData) {
-            this.panel.configureForm(dataSource.getDisplayData());
-        }
 
-        this.panel.addOnInput( formValue => this.onFormInput(formValue));
+        //get data and handle invalid display
+        if(this.dataSource.getDisplayData) {
+            let dataResult = dataDisplayHelper.readWrappedDisplayData(this.dataSource.getDisplayData,"Error loading form layout: ");
+            if(dataResult.displayInvalid) {
+                //display invalid! hide display and show message
+                this.displayContainer.setHideDisplay(dataResult.hideDisplay);
+                this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
+                this.setDisplayValid(false);
+            }
+            else {
+                //display display valid
+                this.panel.configureForm(dataResult.data);
+                this.panel.addOnInput( formValue => this.onFormInput(formValue));
+                this.setDisplayValid(true);
+            }
+        }
     }
 
     /** This method will return undefined until showData is called. */
@@ -70,7 +83,7 @@ export default class ConfigurableFormEditor extends DataDisplay {
     }
 
     onFormInput(formValue) {
-        //set change to enable save bar is form value differs from initial data
+        //set change to enable save bar if form value differs from initial data
         let dataSource = this.getDataSource();
         let editOk = (dataSource.getEditOk)&&(dataSource.getEditOk()); 
         if(editOk) {

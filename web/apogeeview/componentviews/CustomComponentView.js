@@ -1,7 +1,9 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
+import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 /** This is a custom resource component. 
@@ -56,7 +58,7 @@ export default class CustomComponentView extends ComponentView {
     getDataDisplay(displayContainer,viewType) {
         
         var dataDisplaySource;
-        var app = this.getModelView().getApp();
+        var app = this.getApp();
         
         //create the new view element;
         switch(viewType) {
@@ -86,6 +88,10 @@ export default class CustomComponentView extends ComponentView {
             case CustomComponentView.VIEW_UI_CODE:
                 dataDisplaySource = this.getUiDataDisplaySource("uiCode");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case ComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
     //temporary error handling...
@@ -108,7 +114,7 @@ export default class CustomComponentView extends ComponentView {
 
             getData: () => {
                 let member = this.getComponent().getMember();
-                return member.getData();
+                return dataDisplayHelper.getStandardWrappedMemberData(member);
             },
 
             //below - custom methods for HtmlJsDataDisplay
@@ -152,7 +158,7 @@ export default class CustomComponentView extends ComponentView {
             },
             
             saveData: (text) => {
-                let app = this.getModelView().getApp();
+                let app = this.getApp();
                 this.getComponent().doCodeFieldUpdate(app,codeFieldName,text);
                 return true;
             }
@@ -168,17 +174,51 @@ CustomComponentView.VIEW_CSS = "CSS";
 CustomComponentView.VIEW_UI_CODE = "uiGenerator()";
 
 CustomComponentView.VIEW_MODES = [
-    CustomComponentView.VIEW_OUTPUT,
-    CustomComponentView.VIEW_CODE,
-    CustomComponentView.VIEW_SUPPLEMENTAL_CODE,
-    CustomComponentView.VIEW_HTML,
-    CustomComponentView.VIEW_CSS,
-    CustomComponentView.VIEW_UI_CODE
+    ComponentView.VIEW_INFO_MODE_ENTRY,
+    {
+        name: CustomComponentView.VIEW_OUTPUT, 
+        label: "Display", 
+        isActive: true
+    },
+    {
+        name: CustomComponentView.VIEW_HTML, 
+        label: "HTML",
+        sourceLayer: "app",
+        sourceType: "data",
+        isActive: false
+    },
+    {
+        name: CustomComponentView.VIEW_CSS, 
+        label: "CSS", 
+        sourceLayer: "app",
+        sourceType: "data",
+        isActive: false
+    },
+    {
+        name: CustomComponentView.VIEW_UI_CODE, 
+        label: "UI Generator", 
+        sourceLayer: "app",
+        sourceType: "function",
+        isActive: false
+    },
+    {
+        name: CustomComponentView.VIEW_CODE, 
+        label: "Input Code", 
+        sourceLayer: "model",
+        sourceType: "function",
+        isActive: false
+    },
+    {
+        name: CustomComponentView.VIEW_SUPPLEMENTAL_CODE,
+        label: "Input Private",
+        sourceLayer: "model", 
+        sourceType: "private code", 
+        isActive: false
+    },
 ];
 
 CustomComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": CustomComponentView.VIEW_MODES,
-    "defaultView": CustomComponentView.VIEW_OUTPUT
+    "viewModes": CustomComponentView.VIEW_MODES
 }
 
 /** This is the format string to create the code body for updateing the member

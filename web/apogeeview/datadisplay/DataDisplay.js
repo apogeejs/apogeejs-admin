@@ -1,3 +1,5 @@
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+
 /** This is the base class for data displays, which show individual edit/display fields for a component. For example, a standard JSON
  * data component has three data displays, for the component value, the function body and the supplemental code.
  * 
@@ -7,12 +9,12 @@
  *      held by the data source and it returns to boolean values, "reloadDataDisplay", which indicates is the data display should 
  *      be reloaded (such as if it is replaced with a new data display or if the UI elements for it have been updated) and
  *      "reloadData" which indicates the data value displayed in the data display should be reloaded.  
- *  - data = getData() - Requiried - This returns the data that should be displayed. The format of the data depends on the 
+ *  - data = getData() - Required - This returns model data that should be displayed. The format of the data depends on the 
  *      data display. If the data is not valid, then the value apogeeutil.INVALID_VALUE should be returned.
  *  - editOk = getEditOk() - Optional - If present, this indicates if the data display edit mode should be used. If it is not present
  *      it is assumed to be false.
  *  - closeDialog = saveData(data) - Optional This is used if the data display edit mode is used. It should save the data. The return value
- *      should be true if the edit operation should be concluded. It shoudl return false if there is a save failure such that you want to 
+ *      should be true if the edit operation should be concluded. It should return false if there is a save failure such that you want to 
  *      stay in edit mode.
  *  - (other) - Optional - Data displays may define additional functions as needed for their implmentations. Examples where this is done in in the custom
  *      components to pass non-model data (like the HTML or the UI generator code) into the data display.
@@ -20,8 +22,9 @@
 export default class DataDisplay {
     constructor(displayContainer,dataSource) {
         this.displayContainer = displayContainer;
-        this.dataSource = dataSource;
+        this.dataSource = dataSource ? dataSource : {};
         this.editOk = false;
+        this.displayValid = true; //default this to true, so simple displays don't need to use it
 
         //defaults for container sizing logic
         this.useContainerHeightUi = false;
@@ -39,25 +42,45 @@ export default class DataDisplay {
     }
     
     save() {
-        var data = this.getData();
-        var saveComplete;
-        
-        //figure out if there is a problem with this - we hav to end edit mode before
-        //we save because in edit mode it will not overwrite the data in the display
-        //if we fail, we restart edit mode below
-        this.endEditMode();
-
-        if((this.dataSource)&&(this.dataSource.saveData)) {
-            saveComplete = this.dataSource.saveData(data);
+        var data;
+        var dataValid = false;
+        try {
+            data = this.getData();
+            dataValid = true;
         }
-        else {
-            apogeeUserAlert("Error: Data not saved: save callback not set!");
-            saveComplete = true;
+        catch(error) {
+            if(error.stack) console.error(error.stack);
+            apogeeUserAlert("Error loading data from data display: " + error.message);
         }
 
-        //end edit mode if we entered it
-        if(!saveComplete) {
-            this.startEditMode();
+        //save data if we read it out
+        if(dataValid) {
+            var saveComplete;
+
+            //figure out if there is a problem with this - we hav to end edit mode before
+            //we save because in edit mode it will not overwrite the data in the display
+            //if we fail, we restart edit mode below
+            this.endEditMode();
+
+            if(this.dataSource.saveData) {
+                try {
+                    saveComplete = this.dataSource.saveData(data);
+                }
+                catch(error) {
+                    if(error.stack) console.error(error.stack);
+                    apogeeUserAlert("Error saving data: " + error.message);
+                    saveComplete = false;
+                }
+            }
+            else {
+                apogeeUserAlert("Error: Data not saved: save callback not set!");
+                saveComplete = false;
+            }
+
+            //end edit mode if we entered it
+            if(!saveComplete) {
+                this.startEditMode();
+            }
         }
     }
 
@@ -69,12 +92,24 @@ export default class DataDisplay {
             this.endEditMode();
         }
     }
+
+    getDisplayContainer() {
+        return this.displayContainer;
+    }
+
+    getDataSource() {
+        return this.dataSource;
+    }
+
+    getComponentView() {
+        return this.displayContainer.getComponentView();
+    }
     
     //=============================
     // Implemement in extending class
     //=============================
     
-    //This method gets the data from the editor. OPTIONAL. Required id editing is enabled.
+    //This method gets the data from the editor. OPTIONAL. Required if editing is enabled.
     //getData() {}
     
     //this sets the data into the editor display. REQUIRED if edit mode or save is used
@@ -124,28 +159,23 @@ export default class DataDisplay {
         this.useContainerHeightUi = useContainerHeightUi;
     }
 
-    /** This method gets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
-     */
-    //getResizeHeightMode();
+    /** This is called if the show less button is pressed, if container height UI is in use */
+    //showLess();
 
-    /** This method sets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
-     */
-    //setResizeHeightMode(resizeMode);
+    /** This is called if the show more button is pressed, if container height UI is in use */
+    //showMore();
 
-    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS;
-    */
-    //adjustHeight(adjustment);
+    /** This is called if the show max button is pressed, if container height UI is in use */
+    //showMax();
 
-    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Flags:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS = 1;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE = 2;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_NONE = 0;
+    /** This method controlsthe visibility options for the resize buttons. These will only be called if 
+     * resize is enabled for this data display (if container height UI is in use)
+     * Flags:
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_SHOW_FLAG = 1; (if not set this hides all buttons)
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX_FLAG = 2; (if not set the mode is SOME, if set the mode is MAX)
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_DISABLE_LESS_FLAG = 4; (disables the less button, if it is showing)
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_DISABLE_MORE_FLAG = 8; (disables the more button, if it is showing)
+     * - DATA_DISPLAY_CONSTANTS.RESIZE_DISABLE_MAX_FLAG = 16; (disables the max button, if it is showing)
      * These flags should be or'ed togethder to give the allowed options.
     */
     //getHeightAdjustFlags();
@@ -153,30 +183,36 @@ export default class DataDisplay {
     //=============================
     // protected, package and private Methods
     //=============================
+
+    /** This method should be called when the underlying display is loaded, indicating if it is 
+     * valid or if it should not be used. */
+    setDisplayValid(displayValid) {
+        this.displayValid = displayValid;
+    }
 	
     showData() {
-        var data;
-        var editOk;
-        if(this.dataSource) {
-            if(this.dataSource.getData) {
-                data = this.dataSource.getData();
-            }
-            if(this.dataSource.getEditOk) {
-                editOk = this.dataSource.getEditOk();
-            }
-        }
-        if(data === undefined) {
-            data = "DATA UNAVAILABLE";
-            this.editOK = false;
-        }
-        else if(editOk === undefined) {
-            this.editOk = false;
+        if(!this.displayValid) return;
+
+        //get edit ok
+        if(this.dataSource.getEditOk) {
+            this.editOk = this.dataSource.getEditOk()
         }
         else {
-            this.editOk = editOk;
+            this.editOk = false;
         }
-        
-        this.setData(data);
+
+        //get data
+        let dataResult = dataDisplayHelper.readWrappedData(this.dataSource.getData,"Error loading display data: ");
+
+        //configure view
+        this.displayContainer.setRemoveView(dataResult.removeView);
+        if(!dataResult.removeView) {
+            //only hide view and show message if view is not removed
+            //we will set data either way to clear old date
+            this.displayContainer.setHideDisplay(dataResult.hideDisplay);
+            this.displayContainer.setMessage(dataResult.messageType,dataResult.message);
+        }
+        this.setData(dataResult.data);
     }
 
     /** @protected */
@@ -199,13 +235,4 @@ export default class DataDisplay {
             this.startEditMode();
         }
     }
-
-    /** This method retrieves the data source for the data display */
-    getDataSource() {
-        return this.dataSource;
-    }
-
-    getComponentView() {
-        return this.displayContainer.getComponentView();
-    }
-}
+} 

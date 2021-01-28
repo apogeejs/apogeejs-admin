@@ -1,5 +1,6 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
+import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
@@ -27,7 +28,7 @@ export default class DynamicFormView extends ComponentView {
     getDataDisplay(displayContainer,viewType) {
         
         var dataDisplaySource;
-        var app = this.getModelView().getApp();
+        var app = this.getApp();
         
         //create the new view element;
         switch(viewType) {
@@ -43,6 +44,10 @@ export default class DynamicFormView extends ComponentView {
             case DynamicFormView.VIEW_SUPPLEMENTAL_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case ComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
     //temporary error handling...
@@ -104,14 +109,14 @@ DynamicFormView.VIEW_CODE = "Code";
 DynamicFormView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 DynamicFormView.VIEW_MODES = [
-    DynamicFormView.VIEW_FORM,
-    DynamicFormView.VIEW_CODE,
-    DynamicFormView.VIEW_SUPPLEMENTAL_CODE
+    ComponentView.VIEW_INFO_MODE_ENTRY,
+    {name: DynamicFormView.VIEW_FORM, label: "Form", isActive: true},
+    {name: DynamicFormView.VIEW_CODE, label: "Code", isActive: false},
+    {name: DynamicFormView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false},
 ];
 
 DynamicFormView.TABLE_EDIT_SETTINGS = {
-    "viewModes": DynamicFormView.VIEW_MODES,
-    "defaultView": DynamicFormView.VIEW_FORM
+    "viewModes": DynamicFormView.VIEW_MODES
 }
 
 //======================================

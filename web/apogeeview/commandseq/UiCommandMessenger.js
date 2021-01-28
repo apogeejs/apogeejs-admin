@@ -5,7 +5,7 @@ export default class UiCommandMessenger {
     constructor(componentView,fromMemberId) {
         this.componentView = componentView;
         this.fromMemberId = fromMemberId;
-        this.app = componentView.getModelView().getApp();
+        this.app = componentView.getApp();
     }
     
     /** This method sents a command to update the given member, as specified by the
@@ -46,7 +46,7 @@ export default class UiCommandMessenger {
     /** This method returns the member instance for a given local member name,
      * as defined from the source object context. */
     _getLocalMemberId(localMemberName) { 
-        let model = this.componentView.getModelView().getModelManager().getModel();
+        let model = this.app.getModel();
         let fromMember = model.lookupMemberById(this.fromMemberId);
         let contextManager = fromMember.getContextManager();
 

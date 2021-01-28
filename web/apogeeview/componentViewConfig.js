@@ -22,6 +22,11 @@ registerComponentView(CustomDataComponentView);
 
 setErrorComponentView(ErrorComponentView);
 
+//JSON PLUS COMPONENT
+import ActionFormComponentView from "/apogeeview/componentviews/ActionFormComponentView.js";
+registerComponentView(ActionFormComponentView);
+import DataFormComponentView from "/apogeeview/componentviews/DataFormComponentView.js";
+registerComponentView(DataFormComponentView);
 
 //JSON PLUS COMPONENT
 import JsonPlusTableComponentView from "/apogeeview/componentviews/JsonPlusTableComponentView.js";

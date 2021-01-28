@@ -107,6 +107,16 @@ export default class Apogee {
     }
 
     /** This method returns the active model object. */
+    getModelManager() {
+        if(this.workspaceManager) {
+            return this.workspaceManager.getModelManager();
+        }
+        else {
+            return null;
+        }
+    }
+
+    /** This method returns the active model object. */
     getModel() {
         if(this.workspaceManager) {
             return this.workspaceManager.getModelManager().getModel();

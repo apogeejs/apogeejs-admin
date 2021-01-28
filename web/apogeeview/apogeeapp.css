@@ -83,11 +83,4 @@ input[type=text] focus {
 }
 .handsontable td {
     background-color: rgba(255,255,255,0);
-  }
-  /* Needed for Safari */
-  /*
-  [contenteditable] {
-    -webkit-user-select: text;
-    user-select: text;
 }
-*/

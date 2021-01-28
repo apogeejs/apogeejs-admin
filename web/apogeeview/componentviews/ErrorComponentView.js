@@ -39,7 +39,6 @@ ErrorComponentView.VIEW_MODES = [
 
 ErrorComponentView.TABLE_EDIT_SETTINGS = {
     "viewModes": ErrorComponentView.VIEW_MODES,
-    "defaultView": ErrorComponentView.EMPTY_VIEW,
     "emptyDataValue": ""
 }
 

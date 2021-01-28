@@ -70,7 +70,7 @@ import {addToRecalculateList,addDependsOnToRecalculateList,callRecalculateList} 
  *                  there is no member listed because the action result does not corrspond to an action on a member of 
  *                  the model. This is true on the top level result of a compound action.)
  *   "event": (This is the event that should be fired as a result of this action/actionResult. The options are:
- *                  "created", "updated" and "deleted".)
+ *                  "created", "updated" and "deleted", prefixed by the object acted upon, "member_" or "model_")
  *   "errorMsg": (This is the error message for is the actionDone is false)
  *   "childActionResults" - (This is a list of action results if there are additional child actions done with this
  *                  action. Examples where this is used are on creating, moving or deleting a folder that has chilren.)

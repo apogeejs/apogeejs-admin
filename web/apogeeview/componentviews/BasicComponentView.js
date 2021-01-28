@@ -35,7 +35,7 @@ export default class BasicComponentView extends ComponentView {
     getDataDisplay(displayContainer,viewType) {
 
         var callbacks;
-        var app = this.getModelView().getApp();
+        var app = this.getApp();
 
         //create the new view element;
         switch(viewType) {
@@ -74,8 +74,7 @@ BasicComponentView.VIEW_MODES = [
 ];
 
 BasicComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": BasicComponentView.VIEW_MODES,
-    "defaultView": BasicComponentView.VIEW_OUTPUT
+    "viewModes": BasicComponentView.VIEW_MODES
 }
 
 //===============================

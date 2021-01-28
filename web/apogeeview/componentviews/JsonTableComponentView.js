@@ -1,6 +1,7 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HandsonGridEditor from "/apogeeview/datadisplay/HandsonGridEditor.js";
+import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
@@ -25,8 +26,7 @@ export default class JsonTableComponentView extends ComponentView {
     getDataDisplay(displayContainer,viewType) {
         
         var dataDisplaySource;
-        var app = this.getModelView().getApp();
-        
+        var app = this.getApp();
         
         //create the new view element;
         switch(viewType) {
@@ -48,11 +48,6 @@ export default class JsonTableComponentView extends ComponentView {
                     case JsonTableComponentView.GRID_DATA_VEW:
                         dataDisplaySource = this._wrapSourceForViewChange(dataDisplayHelper.getMemberDataJsonDataSource(app,this,"member"));
                         return new HandsonGridEditor(displayContainer,dataDisplaySource);
-                        
-                    // case JsonTableComponentView.PLAIN_DATA_VEW:
-                    // default:
-                    //     callbacks = dataDisplayHelper.getMemberDataTextCallbacks(app,this.member);
-                    //     return new AceTextEditor(displayContainer,callbacks,"ace/mode/text",AceTextEditor.OPTION_SET_DISPLAY_MAX);
                 }
                 
             case JsonTableComponentView.VIEW_CODE:
@@ -62,6 +57,10 @@ export default class JsonTableComponentView extends ComponentView {
             case JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member",DEFAULT_DATA_VALUE);
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case ComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
     //temporary error handling...
@@ -111,14 +110,32 @@ JsonTableComponentView.VIEW_CODE = "Formula";
 JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 JsonTableComponentView.VIEW_MODES = [
-    {name: JsonTableComponentView.VIEW_DATA, label: "Data", isActive: true},
-    {name: JsonTableComponentView.VIEW_CODE, label: "Formula", isActive: false},
-    {name: JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE, label: "Private", isActive: false},
+    ComponentView.VIEW_INFO_MODE_ENTRY,
+    {
+        name: JsonTableComponentView.VIEW_DATA,
+        label: "Data",
+        sourceLayer: "model",
+        sourceType: "data",
+        isActive: true
+    },
+    {
+        name: JsonTableComponentView.VIEW_CODE,
+        label: "Formula",
+        sourceLayer: "model",
+        sourceType: "function",
+        isActive: false
+    },
+    {
+        name: JsonTableComponentView.VIEW_SUPPLEMENTAL_CODE,
+        label: "Private",
+        sourceLayer: "model",
+        sourceType: "private code",
+        isActive: false
+    }   
 ];
 
 JsonTableComponentView.TABLE_EDIT_SETTINGS = {
     "viewModes": JsonTableComponentView.VIEW_MODES,
-    "defaultView": JsonTableComponentView.VIEW_DATA,
     "emptyDataValue": ""
 }
 

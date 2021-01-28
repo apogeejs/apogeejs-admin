@@ -48,44 +48,46 @@ export default class CustomComponent extends Component {
     }
 
 
+    /** This method creates the resource. */
     createResource() {
-        try {
-            var uiGeneratorBody = this.getField("uiCode");
-            
-            var resource;
-            if((uiGeneratorBody)&&(uiGeneratorBody.length > 0)) {
+        var uiGeneratorBody = this.getField("uiCode");
+        
+        var resource;
+        if((uiGeneratorBody)&&(uiGeneratorBody.length > 0)) {
+            //compile the user code for the generator
+            var generatorFunction;
+            try {
+                generatorFunction = new Function(uiGeneratorBody);
+            }
+            catch(error) {
+                resource = {
+                    displayInvalid: true,
+                    message: "Error parsing uiGenerator code: " + error.toString()
+                }
+                if(error.stack) console.error(error.stack);
+                generatorFunction = null;
+            }
+
+            //execute the generator function
+            if(generatorFunction) {
                 try {
-
-                    //create the resource generator wrapped with its closure
-                    var generatorFunctionBody = apogeeutil.formatString(
-                        CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT,
-                        uiGeneratorBody
-                    );
-
-                    //create the function generator, with the aliased variables in the closure
-                    var generatorFunction = new Function(generatorFunctionBody);
-                    var resourceFunction = generatorFunction();
-                    
-                    resource = resourceFunction();
+                    resource = generatorFunction();
                 }
-                catch(err) {
+                catch(error) {
+                    resource = {
+                        displayInvalid: true,
+                        message: "Error executing uiGenerator code: " + error.toString()
+                    }
                     if(error.stack) console.error(error.stack);
-                    console.log("bad ui generator function");
                 }
             }
-                
-            //create a dummy
-            if(!resource) {
-                resource = {};
-            }
+        }
+        else {
+            //generator not yet present
+            resource = {};
+        }
 
-            return resource;
-        }
-        catch(error) {
-            if(error.stack) console.error(error.stack);
-            
-            apogeeUserAlert("Error creating custom control: " + error.message);
-        }
+        return resource;
     }
 
 
@@ -161,24 +163,6 @@ export default class CustomComponent extends Component {
         }
     }
 }
-
-/** This is the format string to create the code body for updateing the member
- * Input indices:
- * 0: resouce methods code
- * 1: uiPrivate
- * @private
- */
-CustomComponent.GENERATOR_FUNCTION_FORMAT_TEXT = [
-    "//member functions",
-    "var resourceFunction = function(component) {",
-    "{0}",
-    "}",
-    "//end member functions",
-    "return resourceFunction;",
-    ""
-       ].join("\n");
-    
-
 
 //======================================
 // This is the control generator, to register the control

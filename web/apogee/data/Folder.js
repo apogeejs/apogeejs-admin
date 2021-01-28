@@ -32,10 +32,10 @@ export default class Folder extends DependentMember {
         let name = child.getName();
         let data = child.getData();
         let newDataMap = this._getSplicedDataMap(model,name,data);
-        let {state, errorList} = this.calculateDependentState(model,false);
+        let {state, error} = this.calculateDependentState(model,false);
 
         //set the new state and data
-        this.setStateAndData(model,state,newDataMap,errorList,true)
+        this.setStateAndData(model,state,newDataMap,error,true)
     }
 
     /** In this implementation updates the dependencies and updates the data value for the folder. See notes on why the update is
@@ -48,10 +48,10 @@ export default class Folder extends DependentMember {
         //recalculate data and state
         let name = child.getName();
         let newDataMap = this._getSplicedDataMap(model,name);
-        let {state, errorList} = this.calculateDependentState(model,false);
+        let {state, error} = this.calculateDependentState(model,false);
 
         //set the new state and data
-        this.setStateAndData(model,state,newDataMap,errorList,true);
+        this.setStateAndData(model,state,newDataMap,error,true);
     }
 
     /** In this implementation we update the data value for the folder. See notes on why this is
@@ -69,10 +69,10 @@ export default class Folder extends DependentMember {
         let data = child.getData();
         let newDataMap = this._getSplicedDataMap(model,name,data);
         //calculate dependent state but do not set it yet
-        let {state, errorList} = this.calculateDependentState(model,false);
+        let {state, error} = this.calculateDependentState(model,false);
 
         //here we will always set the data whether or not there are any issues in dependents
-        this.setStateAndData(model,state,newDataMap,errorList,true);
+        this.setStateAndData(model,state,newDataMap,error,true);
     }
 
     /** this method gets the hame the children inherit for the full name. */
@@ -103,11 +103,11 @@ export default class Folder extends DependentMember {
         if(this.getState() == apogeeutil.STATE_NONE) {
             //get new data
             let data = this.getData();
-            let {state, errorList} = this.calculateDependentState(model,false);
+            let {state, error} = this.calculateDependentState(model,false);
             if(state == apogeeutil.STATE_NONE) state = apogeeutil.STATE_NORMAL;
 
             //here we will always set the data whether or not there are any issues in dependents
-            this.setStateAndData(model,state,data,errorList,true);
+            this.setStateAndData(model,state,data,error,true);
         }
 
         //clear calc pending flag

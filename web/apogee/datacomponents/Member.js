@@ -150,12 +150,42 @@ export default class Member extends FieldObject {
         return this.constructor.generator.setDataOk;
     }
 
+    /** This returns the error object for this member. The entries can be javscript Error objects or other objects with a
+     * toString() method. See documentation for some additional properties of these errors. */
+    getError() {
+        let stateStruct = this.getField("state");
+        if(stateStruct) return stateStruct.error;
+        else return null;
+    }
+
+    /** This method returns a simple error message for this member, if the member is in
+     * the error state. Additional information can be obtained by getting the actual error object. */
+    getErrorMsg() {
+        let stateStruct = this.getField("state");
+        if((stateStruct)&&(stateStruct.error)) {
+            return stateStruct.error.toString();
+        }
+        else {
+            //this shouldn't happen if the state is actually an error state
+            return "";
+        }
+    }
+
+    /** This method returns the list of error info objects for this member. It should be
+     * called only when the state is error. */
+    getErrorInfo() {
+        let stateStruct = this.getField("state");
+        if((stateStruct)&&(stateStruct.error)) return stateStruct.error.errorInfoList;
+        else return [];
+    }
+
     /** This returns the list of errors. The entries can be javscript Error objects, members (signifying a
-     * dependency error), strings or other objects (which should be converted to strings). */
+     * dependency error), strings or other objects (which should be converted to strings). 
+     * @deprecated*/
     getErrors() {
         let stateStruct = this.getField("state");
         if(stateStruct) {
-            return stateStruct.errorList;
+            return [stateStruct.error];
         }
         else {
             //this shouldn't happen if the state is actually an error state
@@ -163,37 +193,7 @@ export default class Member extends FieldObject {
         }
     }
 
-    getErrorMsg() {
-        let errorList = this.getErrors();
-        let errorMsgs = [];
-        let dependentMemberNames = [];
-        errorList.forEach( errorEntry => {
-            if(errorEntry.isDependsOnError) {
-                dependentMemberNames.push(errorEntry.name);
-            }
-            else errorMsgs.push(errorEntry.toString());
-        })
-        if(dependentMemberNames.length > 0) {
-            errorMsgs.push( "Error in dependency: " + dependentMemberNames.join(", "));
-        }
-        
-        let errorMsg = errorMsgs.join("; ");
-        return errorMsg;
-    }
-
-    getDependsOnError() {
-        let stateStruct = this.getField("state");
-        if(stateStruct) {
-            return stateStruct.dependsOnError;
-        }
-        else {
-            //this shouldn't happen if the state is actually an error state
-            return {};
-        }
-    }
-
-    /** This returns true if the member is not up to date, typically
-     * do to waiting on an asynchronous operation. */
+    /** This returns the promise that is pending. */
     getPendingPromise() {
         return this.getField("pendingPromise");
     }
@@ -223,12 +223,17 @@ export default class Member extends FieldObject {
      * this member. The error should be a javascript Error object, an apogee Member (signifying a dependnecy
      * error), a string, or another type, which will be interpretted as a string. */
     setError(model,error) {
-        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,[error]);
+        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,error);
     }
 
-    /** This method adds the following errors for this member. See setError for more details. */
+    /** This method adds the following errors for this member. See setError for more details.
+     * @deprecated
+    */
     setErrors(model,errorList) {
-        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,errorList);
+        //this is probably not used anywhere. If it is we will just keep the first error
+        let error;
+        if((errorList)&&(errorList.length >= 1)) error = errorList[0];
+        this.setStateAndData(model,apogeeutil.STATE_ERROR,apogeeutil.INVALID_VALUE,error);
     }
 
     /** This sets the result pending flag. The promise triggering the pending state should also be passed if there
@@ -248,18 +253,14 @@ export default class Member extends FieldObject {
     }
 
     /** This methos sets the data, where the data can be a generalized value
-     *  include data, apogeeutil.INVALID_VALUE, a Promis or an Error. Also, an explitict
-     * errorList can be passed in, includgin either Error or String objects. 
+     *  include data, apogeeutil.INVALID_VALUE, a Promis or an Error.
      * This method does not however apply the asynchrnous data, it only flags the member as pending.
      * the asynchronous data is set separately (also) using applyAsynchFutureValue, whcih requires access
      * to the model object. */
-    applyData(model,data,errorList) {
+    applyData(model,data) {
 
         //handle four types of data inputs
-        if((errorList)&&(errorList.length > 0)) {
-            this.setErrors(model,errorList);
-        }
-        else if(data instanceof Promise) {
+        if(data instanceof Promise) {
             //data is a promise - flag this a pending
             this.setResultPending(model,data);
         }
@@ -308,14 +309,7 @@ export default class Member extends FieldObject {
     /** This method updates the state and data. This should not typically be called directly instead the individual
      * data and state setters should be called.
      * The data value will be applied regardless of the state. The error list is applied only if the state is ERROR. */
-    setStateAndData(model,state,data,errorList) {
-        //set data as specified
-        if(data === undefined) {
-            this.clearField("data");
-        }
-        else {
-            this.setField("data",data);
-        }
+    setStateAndData(model,state,data,error) {
 
         //set the state if it is error or if it changes
         let oldStateStruct = this.getField("state");
@@ -323,41 +317,19 @@ export default class Member extends FieldObject {
             //update the state
             let newStateStruct = {};
 
-            //do some safety checks on the error list
+            newStateStruct.state = state;
             if(state == apogeeutil.STATE_ERROR) {
-                //make sure there is an error list
-                if(!errorList) errorList = [];
-
-                let newErrorList;
-                let dependsOnError;
-                if(oldStateStruct.state == apogeeutil.STATE_ERROR) {
-                    newErrorList = this._getMergedErrorList(oldStateStruct.errorList,errorList);
-                    //keep the old depends on error, because some people might already have a copy of it
-                    //but update it for new error list
-                    //this is cheating because this should be immutable if we store it as a field
-                    //I'm not sure what better to do right now.
-                    dependsOnError = oldStateStruct.dependsOnError;
-                    dependsOnError.errorList = newErrorList;
-                }
-                else {
-                    newErrorList = errorList;
-                    //instantiate the "depends on error"
-                    dependsOnError = new Error("Error in dependency: " + this.getName());
-                    dependsOnError.isDependsOnError = true;
-                    dependsOnError.errorList = newErrorList;
-                    dependsOnError.id = this.getId();
-                    //note - name can change, but if it does this should be recalculated
-                    dependsOnError.name = this.getName(); 
-                }
-
-                newStateStruct.state = apogeeutil.STATE_ERROR;
-                newStateStruct.errorList = newErrorList;
-                newStateStruct.dependsOnError = dependsOnError;
-            }
-            else {
-                newStateStruct.state = state;
+                newStateStruct.error = error;
             }
             this.setField("state",newStateStruct);
+        }
+
+        //set data as specified
+        if(data === undefined) {
+            this.clearField("data");
+        }
+        else {
+            this.setField("data",data);
         }
 
         //clear the pending promise
@@ -431,24 +403,39 @@ export default class Member extends FieldObject {
     //}
 
     //----------------------------------
-    // State setting methods
+    // Error methods
     //----------------------------------
 
-
-    /** This method adds any errors from the new addedErrorList to the oldErrorList if
-     * they are not already present. */
-    _getMergedErrorList(oldErrorList,addedErrorList) {
-        let errorsToAdd = []
-        addedErrorList.forEach( element => {
-            if(oldErrorList.indexOf(element) < 0) errorsToAdd.push(element);
-        })
-        return oldErrorList.concat(errorsToAdd);
+    /** This methos created a depends on error, with a dependency on all members in the passed list. */
+    static createDependsOnError(model,errorImpactorList) {
+        let dependsOnErrorList = errorImpactorList.map(impactor => {
+            return {
+                id: impactor.getId(),
+                name: impactor.getFullName(model)
+            }
+        });
+        let msgPrefix = (dependsOnErrorList.length === 1) ? "Error in dependency: " : "Error in dependencies: ";
+        let errorMsg = msgPrefix + dependsOnErrorList.map(dependsOnEntry => dependsOnEntry.name).join(", ")
+        let dependsOnErrorInfo = {
+            type: "dependency",
+            dependsOnErrorList: dependsOnErrorList
+        }
+        let dependsOnError = new Error(errorMsg);
+        dependsOnError.isDependsOnError = true;
+        Member.appendErrorInfo(dependsOnError,dependsOnErrorInfo);
+        return dependsOnError;
     }
 
+    /** This method adds the extended info to the error. It allows for multiple
+     * error infos to be added. */
+    static appendErrorInfo(error,errorInfo) {
+        if(!error.errorInfoList) {
+            error.errorInfoList = [];
+        }
+        error.errorInfoList.push(errorInfo);
+    }
 }
 
 //add mixins to this class
 apogeeutil.mixin(Member,FieldObject);
-
-let UNKNOWN_ERROR_MSG_PREFIX = "Unknown error in member ";
 

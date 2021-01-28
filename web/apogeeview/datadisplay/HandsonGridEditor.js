@@ -12,6 +12,7 @@ export default class HandsonGridEditor extends DataDisplay {
 
         this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
         this.savedPixelHeight = DEFAULT_PIXEL_HEIGHT;
+        this.cachedSomeModePixelHeight = this.savedPixelHeight;
 
         this.gridDiv = uiutil.createElement("div",null,{
             "width": "100%",
@@ -35,7 +36,7 @@ export default class HandsonGridEditor extends DataDisplay {
         this.setUseContainerHeightUi(true)
 
         //we will use a listener to see when the page is resized
-        let app = this.displayContainer.getComponentView().getModelView().getApp();
+        let app = this.displayContainer.getComponentView().getApp();
         this.frameWidthListener = () => this.onFrameWidthResize();
         app.addListener("frameWidthResize",this.frameWidthListener);
 
@@ -73,15 +74,19 @@ export default class HandsonGridEditor extends DataDisplay {
         this.dataError = false;
 
         if(json == apogeeutil.INVALID_VALUE) {
-            var errorMsg = "ERROR: Data value is not valid"
-            this.cachedDisplayData = [[errorMsg]];
+            //clear the display
+            this.cachedDisplayData = [[]];
+            //the displaly shoudl be hidden, but do it again anyway
+            let displayContainer = this.getDisplayContainer();
+            displayContainer.setHideDisplay(true);
             this.dataError = true;
         }
-        
-        //verify data is the proper format
-        if(!this.dataIsValidFormat(json)) {
-            var errorMsg = "ERROR: Data value is not an array of arrays"
-            this.cachedDisplayData = [[errorMsg]];
+        else if(!this.dataIsValidFormat(json)) {
+            let displayContainer = this.getDisplayContainer();
+            displayContainer.setMessage(DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO, "Data cannot be shown in grid: value is not an array of arrays")
+            displayContainer.setHideDisplay(true);
+            //clear the display
+            this.cachedDisplayData = [[]];
             this.dataError = true;
         }
 
@@ -113,7 +118,7 @@ export default class HandsonGridEditor extends DataDisplay {
         }
         //remove the frame width listener
         if(this.frameWidthListener) {
-            let app = this.displayContainer.getComponentView().getModelView().getApp();
+            let app = this.displayContainer.getComponentView().getApp();
             app.removeListener("frameWidthResize",this.frameWidthListener);
             this.frameWidthListener = null;
         }
@@ -175,71 +180,65 @@ export default class HandsonGridEditor extends DataDisplay {
     // following API to interact with the display
     //----------------------------
 
-    /** This method gets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
-     */
-    getResizeHeightMode() {
-        return this.resizeHeightMode;
-    }
+    /** This is called if the show less button is pressed */
+    showLess() {
+        if((this.destroyed)||(!this.gridControl)) return;
 
-    /** This method sets the resize mode. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
-     */
-    setResizeHeightMode(resizeHeightMode) {
         let newPixelHeight;
-        if(resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
-            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
-            newPixelHeight = this.savedPixelHeight;
-        }
-        else if(resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX) {
-            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
-            newPixelHeight = MAX_PIXEL_HEIGHT;
+        if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
+            //decrease up to the min size
+            newPixelHeight = this.savedPixelHeight - DELTA_PIXEL_HEIGHT;
+            if(newPixelHeight < MIN_PIXEL_HEIGHT) newPixelHeight = MIN_PIXEL_HEIGHT;   
         }
         else {
-            //ignore unknown value
-            return;
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+            newPixelHeight = this.cachedSomeModePixelHeight;
         }
 
+        this.cachedSomeModePixelHeight = newPixelHeight;
         this.updateHeight(newPixelHeight);
     }
 
-    /** This method adjusts the size when the resize mode is DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Options:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS;
-    */
-    adjustHeight(adjustment) {
-        if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
-            let newPixelHeight;
-            if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS) {
-                //decrease up to the min size
-                newPixelHeight = this.savedPixelHeight - DELTA_PIXEL_HEIGHT;
-                if(newPixelHeight < MIN_PIXEL_HEIGHT) newPixelHeight = MIN_PIXEL_HEIGHT;
+    /** This is called if the show more button is pressed */
+    showMore() {
+        if((this.destroyed)||(!this.gridControl)) return;
 
-            }
-            else if(adjustment == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE) {
-                //decrease up to the min size
-                newPixelHeight = this.savedPixelHeight + DELTA_PIXEL_HEIGHT;
-                if(newPixelHeight > MAX_PIXEL_HEIGHT) newPixelHeight = MAX_PIXEL_HEIGHT;
-            }
-            else {
-                //ignore an unknown command
-                return;
-            }
-            
-            this.updateHeight(newPixelHeight);
+        let newPixelHeight;
+        if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
+            ///decrease up to the min size
+            newPixelHeight = this.savedPixelHeight + DELTA_PIXEL_HEIGHT;
+            if(newPixelHeight > MAX_PIXEL_HEIGHT) newPixelHeight = MAX_PIXEL_HEIGHT;
+        }
+        else {
+            //put in some mode and keep max lines the same (the UI probably won't allow this command though)
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME;
+            newPixelHeight = MAX_PIXEL_HEIGHT;
+        }
+
+        this.cachedSomeModePixelHeight = newPixelHeight;
+        this.updateHeight(newPixelHeight);
+    }
+
+    /** This is called if the show max button is pressed */
+    showMax() {
+        if((this.destroyed)||(!this.gridControl)) return;
+
+        if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME) {
+            this.resizeHeightMode = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX;
+            this.updateHeight(MAX_PIXEL_HEIGHT);
         }
     }
 
-    /** This method returns the possible resize options, for use in the mode DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_SOME. Flags:
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS = 1;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE = 2;
-     * - DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_NONE = 0;
-     * These flags should be or'ed togethder to give the allowed options.
-    */
+    /** This method controlsthe visibility options for the resize buttons. These will only work if 
+     * resize is enabled for this data display. */
     getHeightAdjustFlags() {
-        let flags = DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_LESS | DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MORE;
+        let flags = 0;
+        flags |= DATA_DISPLAY_CONSTANTS.RESIZE_SHOW_FLAG;
+        if(this.resizeHeightMode == DATA_DISPLAY_CONSTANTS.RESIZE_HEIGHT_MODE_MAX) {
+            flags |= DATA_DISPLAY_CONSTANTS.RESIZE_MODE_MAX_FLAG;
+        }
+
+        //for now we won't disable any buttons - pressing them will just do nothing
         return flags;
     }
 
@@ -277,6 +276,11 @@ export default class HandsonGridEditor extends DataDisplay {
             Handsontable.hooks.add("afterCreateRow",() => this.gridEdited(),this.gridControl);
             Handsontable.hooks.add("afterRemoveCol",() => this.gridEdited(),this.gridControl);
             Handsontable.hooks.add("afterRemoveRow",() => this.gridEdited(),this.gridControl);
+
+            Handsontable.hooks.add("afterRender",() => {
+                //this is when the control is finished
+                let x = this.gridControl;
+            },this.gridControl)
         }
 
         this.updateWidth();

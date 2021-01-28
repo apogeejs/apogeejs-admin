@@ -1,9 +1,12 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
 import HtmlJsDataDisplay from "/apogeeview/datadisplay/HtmlJsDataDisplay.js";
+import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 import {uiutil} from "/apogeeui/apogeeUiLib.js";
+
 
 /** This attempt has a single form edit page which returns an object. */
 // To add - I should make it so it does not call set data until after it is initialized. I will cache it rather 
@@ -43,24 +46,6 @@ export default class CustomDataComponentView extends ComponentView {
     // Protected and Private Instance Methods
     //==============================
 
-    /* The banner error message is overwridden to show errors from the child members rather than from the 
-     * containing folder, which will just be dependency errors. */
-    getBannerErrorMessage(member) {
-        let msgList = [];
-
-        //there is ust one user code member
-        //note the data member does not have code
-        let inputMember = this.getComponent().getField("member.input");
-        if(inputMember.getState() == apogeeutil.STATE_ERROR) {
-            msgList.push("input: " + inputMember.getErrorMsg());
-        }
-
-        //note - the input field uiGenerator can also have errors, howver that is not covered by state for now since it is UI code
-        //and not model code.
-
-        return msgList.join(";\n");
-    }
-
     /** This component extends the on delete method to get rid of any css data for this component. */
     onDelete() {
         //remove the css data for this component
@@ -81,12 +66,12 @@ export default class CustomDataComponentView extends ComponentView {
     getDataDisplay(displayContainer,viewType) {
         
         var dataDisplaySource;
-        var app = this.getModelView().getApp();
+        var app = this.getApp();
         
         //create the new view element;
         switch(viewType) {
             
-            case CustomDataComponentView.VIEW_FORM:
+            case CustomDataComponentView.VIEW_OUTPUT:
                 displayContainer.setDestroyViewOnInactive(this.getComponent().getDestroyOnInactive());
                 var dataDisplaySource = this.getOutputDataDisplaySource();
                 var dataDisplay = new HtmlJsDataDisplay(displayContainer,dataDisplaySource);
@@ -115,6 +100,10 @@ export default class CustomDataComponentView extends ComponentView {
             case CustomDataComponentView.VIEW_UI_CODE:
                 dataDisplaySource = this.getUiDataDisplaySource("uiCode");
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case ComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
     //temporary error handling...
@@ -136,12 +125,17 @@ export default class CustomDataComponentView extends ComponentView {
 
             getDisplayData: () => {
                 let inputMember = this.getComponent().getField("member.input");
-                return inputMember.getData();
+                let {abnormalWrappedData,inputData} = dataDisplayHelper.getProcessedMemberDisplayData(inputMember);
+                if(abnormalWrappedData) {
+                    return abnormalWrappedData;
+                }
+                //data is just the member data, return as unwrapped 
+                return inputData;
             },
 
             getData: () => {
-                let dataMember = this.getComponent().getField("member.data");
-                return dataMember.getData();
+                let member = this.getComponent().getField("member.data");
+                return dataDisplayHelper.getStandardWrappedMemberData(member);
             },
 
             //edit ok - always true
@@ -200,7 +194,7 @@ export default class CustomDataComponentView extends ComponentView {
             },
             
             saveData: (text) => {
-                let app = this.getModelView().getApp();
+                let app = this.getApp();
                 this.getComponent().doCodeFieldUpdate(app,codeFieldName,text);
                 return true;
             }
@@ -230,7 +224,7 @@ CustomDataComponentView.propertyDialogLines = [
     }
 ];
 
-CustomDataComponentView.VIEW_FORM = "Form";
+CustomDataComponentView.VIEW_OUTPUT = "Form"; //oops! this was a mistake, from copying from form data component
 CustomDataComponentView.VIEW_VALUE = "Data Value";
 CustomDataComponentView.VIEW_CODE = "Input Code";
 CustomDataComponentView.VIEW_SUPPLEMENTAL_CODE = "Input Private";
@@ -239,18 +233,64 @@ CustomDataComponentView.VIEW_CSS = "CSS";
 CustomDataComponentView.VIEW_UI_CODE = "uiGenerator(mode)";
 
 CustomDataComponentView.VIEW_MODES = [
-    CustomDataComponentView.VIEW_FORM,
-    CustomDataComponentView.VIEW_VALUE,
-    CustomDataComponentView.VIEW_CODE,
-    CustomDataComponentView.VIEW_SUPPLEMENTAL_CODE,
-    CustomDataComponentView.VIEW_HTML,
-    CustomDataComponentView.VIEW_CSS,
-    CustomDataComponentView.VIEW_UI_CODE
+    ComponentView.VIEW_INFO_MODE_ENTRY,
+    {
+        name: CustomDataComponentView.VIEW_OUTPUT,
+        label: "Display",
+        sourceLayer: "model",
+        sourceType: "data",
+        suffix: ".data", 
+        isActive: true
+    },
+    {
+        name: CustomDataComponentView.VIEW_HTML,
+        label: "HTML",
+        sourceLayer: "app",
+        sourceType: "data", 
+        isActive: false
+    },
+    {
+        name: CustomDataComponentView.VIEW_CSS,
+        label: "CSS",
+        sourceLayer: "app",
+        sourceType: "data", 
+        isActive: false
+    },
+    {
+        name: CustomDataComponentView.VIEW_UI_CODE,
+        label: "UI Generator",
+        sourceLayer: "app",
+        sourceType: "function",
+        isActive: false
+    },
+    {
+        name: CustomDataComponentView.VIEW_CODE,
+        label: "Input Code",
+        sourceLayer: "model", 
+        sourceType: "function",
+        suffix: ".input",
+        isActive: false
+    },
+    {
+        name: CustomDataComponentView.VIEW_SUPPLEMENTAL_CODE,
+        label: "Input Private",
+        sourceLayer: "model", 
+        sourceType: "private code",
+        suffix: ".input",
+        isActive: false
+    },
+    {
+        name: CustomDataComponentView.VIEW_VALUE,
+        label: "Data Value",
+        sourceLayer: "model",
+        sourceType: "data",
+        suffix: ".data", 
+        isActive: false
+    }
 ];
 
 CustomDataComponentView.TABLE_EDIT_SETTINGS = {
-    "viewModes": CustomDataComponentView.VIEW_MODES,
-    "defaultView": CustomDataComponentView.VIEW_FORM
+    "viewModes": CustomDataComponentView.VIEW_MODES
 }
 
 

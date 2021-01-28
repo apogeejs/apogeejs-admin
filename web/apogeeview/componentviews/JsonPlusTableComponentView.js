@@ -1,6 +1,8 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import AceTextEditor from "/apogeeview/datadisplay/AceTextEditor.js";
+import StandardErrorDisplay from "/apogeeview/datadisplay/StandardErrorDisplay.js";
 import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
+import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants.js";
 
 export default class JsonPlusTableComponentView extends ComponentView {
 
@@ -23,7 +25,7 @@ export default class JsonPlusTableComponentView extends ComponentView {
     getDataDisplay(displayContainer,viewType) {
         
         var dataDisplaySource;
-        var app = this.getModelView().getApp();
+        var app = this.getApp();
         
         
         //create the new view element;
@@ -39,6 +41,10 @@ export default class JsonPlusTableComponentView extends ComponentView {
             case JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE:
                 dataDisplaySource = dataDisplayHelper.getMemberSupplementalDataSource(app,this,"member",DEFAULT_DATA_VALUE);
                 return new AceTextEditor(displayContainer,dataDisplaySource,"ace/mode/javascript",AceTextEditor.OPTION_SET_DISPLAY_MAX);
+
+            case ComponentView.VIEW_INFO: 
+                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
+                return new StandardErrorDisplay(displayContainer,dataDisplaySource);
                 
             default:
     //temporary error handling...
@@ -62,15 +68,40 @@ export default class JsonPlusTableComponentView extends ComponentView {
 
             getData: () => {
                 let member = this.getComponent().getMember();
+                let state = member.getState();
+                if(state != apogeeutil.STATE_NORMAL) {
+                    //handle non-normal state returning wrapped data
+                    let wrappedData = dataDisplayHelper.getEmptyWrappedData();
+                    wrappedData.hideDisplay = true;
+                    wrappedData.data = apogeeutil.INVALID_VALUE;
+                    switch(member.getState()) {
+                        case apogeeutil.STATE_ERROR: 
+                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_ERROR;
+                            wrappedData.message = "Error in value: " + member.getErrorMsg();
+                            break;
+
+                        case apogeeutil.STATE_PENDING:
+                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                            wrappedData.message = "Value pending!";
+                            break;
+
+                        case apogeeutil.STATE_INVALID:
+                            wrappedData.messageType = DATA_DISPLAY_CONSTANTS.MESSAGE_TYPE_INFO;
+                            wrappedData.message = "Value invalid!";
+                            break;
+
+                        default:
+                            throw new Error("Unknown display data value state!")
+                    }
+                    return wrappedData;
+                }
+
                 let jsonPlus = member.getData();
 
                 var textData;
                 if(jsonPlus == apogeeutil.INVALID_VALUE) {
                     //for invalid input, convert to display an empty string
                     textData = "";
-                }
-                else if(jsonPlus === null) {
-                    textData = "null";
                 }
                 else if(jsonPlus === undefined) {
                     textData = "undefined";
@@ -152,14 +183,32 @@ JsonPlusTableComponentView.VIEW_CODE = "Formula";
 JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE = "Private";
 
 JsonPlusTableComponentView.VIEW_MODES = [
-    JsonPlusTableComponentView.VIEW_DATA,
-    JsonPlusTableComponentView.VIEW_CODE,
-    JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE
+    ComponentView.VIEW_INFO_MODE_ENTRY,
+    {
+        name: JsonPlusTableComponentView.VIEW_DATA,
+        label: "Data",
+        sourceLayer: "model",
+        sourceType: "data",
+        isActive: true
+    },
+    {
+        name: JsonPlusTableComponentView.VIEW_CODE,
+        label: "Formula",
+        sourceLayer: "model",
+        sourceType: "function",
+        isActive: false
+    },
+    {
+        name: JsonPlusTableComponentView.VIEW_SUPPLEMENTAL_CODE,
+        label: "Private",
+        sourceLayer: "model",
+        sourceType: "private code",
+        isActive: false
+    }
 ];
 
 JsonPlusTableComponentView.TABLE_EDIT_SETTINGS = {
     "viewModes": JsonPlusTableComponentView.VIEW_MODES,
-    "defaultView": JsonPlusTableComponentView.VIEW_DATA,
     "emptyDataValue": ""
 }
 

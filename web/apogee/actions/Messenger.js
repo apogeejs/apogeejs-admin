@@ -57,7 +57,7 @@ export default class Messenger {
             
             let member = this._getMemberObject(updateEntry[0]);
             if(!member) {
-                throw new Error("Error calling messenger - member not fond: " + updateMemberName);
+                throw new Error("Error calling messenger - member not fond: " + updateEntry[0]);
             }
             let data = updateEntry[1];
             

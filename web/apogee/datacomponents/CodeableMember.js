@@ -83,6 +83,14 @@ export default class CodeableMember extends DependentMember {
         return this.getField("supplementalCode");
     }
 
+    /** This method returns the actual code that is executed. It will only return a valid result when there
+     * is code that has been compiled for the member. */
+    getCodeText() {
+        let compiledInfo = this.getField("compiledInfo");
+        if((compiledInfo)&&(compiledInfo.generatorFunction)) return compiledInfo.generatorFunction.toString();
+        else return null;
+    }
+
     /** This is a helper method that compiles the code as needed for setCodeInfo.*/
     applyCode(argList,functionBody,supplementalCode) {
 
@@ -100,8 +108,7 @@ export default class CodeableMember extends DependentMember {
         }
         
         //process the code text into javascript code
-        var codeLabel = this.getName();
-        var compiledInfo = processCode(argList,functionBody,supplementalCode,codeLabel);
+        var compiledInfo = processCode(argList,functionBody,supplementalCode,this.getName());
         this.setField("compiledInfo",compiledInfo);
     }
 
@@ -177,7 +184,9 @@ export default class CodeableMember extends DependentMember {
             return;
         }
         else if(!compiledInfo.valid) {
-            this.setErrors(model,compiledInfo.errors);
+            let error = new Error(compiledInfo.errorMsg ? compiledInfo.errorMsg : "Unknown error parsing user code");
+            if(compiledInfo.errorInfo) CodeableMember.appendErrorInfo(error,compiledInfo.errorInfo);
+            this.setError(model,error);
             this.clearCalcPending();
             return;
         }
@@ -199,15 +208,28 @@ export default class CodeableMember extends DependentMember {
                 //to do this. See notes where this is thrown.
                 this.setResultPending(model);
             }
+            else if(error.isDependsOnError) {
+                //this is a depends on error from a member (presumably a fucntion table) we are calling
+                this.setError(model,error);
+            }
             //--------------------------------------
-            else {
-                //normal error in member function execution
-            
+            else {            
                 //this is an error in the code
                 if(error.stack) {
                     console.error("Error calculating member " + this.getFullName(model));
                     console.error(error.stack);
                 }
+
+                //create the extended error info
+                CodeableMember.storeMemberTraceInfo(model,error,this);
+
+                let errorInfo = {};
+                errorInfo.type = "runtimeError";
+                errorInfo.description = "Error in code evaluating member: " + this.getFullName(model);
+                if(error.stack) errorInfo.stack = error.stack;
+                errorInfo.memberTrace = CodeableMember.recallMemberTraceInfo(error);
+
+                CodeableMember.appendErrorInfo(error,errorInfo);
 
                 this.setError(model,error);
             }
@@ -243,8 +265,15 @@ export default class CodeableMember extends DependentMember {
                 updateData.data = "<unknown pending value>";
             }
             else if(state == apogeeutil.STATE_ERROR) {
-                //save a single error
-                updateData.errorList = [this.getErrorMsg()];
+                //save the error - this is a non-code/explicitly set error
+                let error = this.getError();
+                if(error) {
+                    updateData.error = error.toString();
+                    updateData.errorInfoList = error.errorInfoList;
+                }
+                else {
+                    updateData.error = "Unknown Error"; //unknonwn error
+                }
             }
             else {
                 //save the data value
@@ -270,8 +299,19 @@ export default class CodeableMember extends DependentMember {
         }
         else {
             //set initial data
-            if(initialData.errorList) {
-                this.setErrors(model,initialData.errorList);
+            if(initialData.error) {
+                //reconstruct the error
+                let error = new Error(initialData.error);
+                if(initialData.errorInfoList) {
+                    initialData.errorInfoList.forEach(errorInfo => CodeableMember.appendErrorInfo(errorInfo));
+                }
+                this.setError(model,error);
+            }
+            else if(initialData.errorList) {
+                //depracated!!! replaced with initialData.error and initialData.errorInfoList
+                //this feature was seldom if ever used, so we will just take the first if there is more than one
+                let error = (errorList.length >= 1) ? errorList[0] : new Error("Error!");
+                this.setError(model,error);
             }
             else if(initialData.invalidValue) {
                 this.setResultInvalid(model);
@@ -402,7 +442,10 @@ export default class CodeableMember extends DependentMember {
                 functionInitializedSuccess = true;
             }
             catch(error) {
-                //this is an error in the code
+                //LATER NOTE - I think this is an internal error if we get an error here
+                //initializeImpactor will catch errors in user code of other members.
+                //the other function calls above should not throw errors, in theory
+                //investigate this more...
                 if(error.stack) {
                     console.error(error.stack);
                 }
@@ -420,6 +463,25 @@ export default class CodeableMember extends DependentMember {
 
     }
 
+    //============================
+    // Static
+    //============================
+
+    /** This method is used to add trace of members whose code was called */
+    static storeMemberTraceInfo(model,error,member) {
+        if(!error.memberTrace) {
+            error.memberTrace = [];
+        }
+        let memberInfo = {};
+        memberInfo.id = member.getId();
+        memberInfo.name = member.getFullName(model);
+        if(member.getCodeText) memberInfo.code = member.getCodeText();
+        error.memberTrace.push(memberInfo);
+    }
+
+    static recallMemberTraceInfo(error) {
+        return error.memberTrace;
+    }
 
 }
 

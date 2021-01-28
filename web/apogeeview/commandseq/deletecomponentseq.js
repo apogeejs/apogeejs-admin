@@ -1,5 +1,3 @@
-import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
-
 
 export function deleteComponent(componentView) {
 
@@ -24,7 +22,7 @@ function returnToEditor(componentView) {
 
 function deleteComponentImpl(componentView) {
 
-    var modelManager = componentView.getModelView().getModelManager(); 
+    var app = componentView.getApp(); 
     var component = componentView.getComponent();
 
     var member = component.getMember();
@@ -32,9 +30,10 @@ function deleteComponentImpl(componentView) {
 
     if(componentView.constructor.hasChildEntry) {
         let parentComponentView = componentView.getParentComponentView();
-
-        let editorCommand = parentComponentView.getRemoveApogeeNodeFromPageCommand(component.getName());
-        commands.push(editorCommand);
+        if(parentComponentView) {
+            let editorCommand = parentComponentView.getRemoveApogeeNodeFromPageCommand(component.getName());
+            commands.push(editorCommand);
+        }
     }
 
     //model command
@@ -57,5 +56,5 @@ function deleteComponentImpl(componentView) {
         return;
     }
 
-    modelManager.getApp().executeCommand(commandData);
+    app.executeCommand(commandData);
 }

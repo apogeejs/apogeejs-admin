@@ -1,8 +1,5 @@
-import {addComponent, addAdditionalComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 import {closeWorkspace} from "/apogeeview/commandseq/closeworkspaceseq.js";
 import {createWorkspace} from "/apogeeview/commandseq/createworkspaceseq.js";
-import {importWorkspace} from "/apogeeview/commandseq/importworkspaceseq.js";
-import {exportWorkspace} from "/apogeeview/commandseq/exportworkspaceseq.js";
 import {openWorkspace} from "/apogeeview/commandseq/openworkspaceseq.js";
 import {saveWorkspace} from "/apogeeview/commandseq/saveworkspaceseq.js";
 import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
@@ -11,7 +8,7 @@ import WorkspaceView from "/apogeeview/WorkspaceView.js";
 
 import {uiutil,TabFrame,Menu,SplitPane,TreeControl,DisplayAndHeader} from "/apogeeui/apogeeUiLib.js";
 
-import {Apogee,componentInfo} from "/apogeeapp/apogeeAppLib.js";
+import {Apogee} from "/apogeeapp/apogeeAppLib.js";
 
 export default class ApogeeView {
 
@@ -28,17 +25,10 @@ export default class ApogeeView {
         this.app = new Apogee(appConfigManager);
         
         if(containerId) {
-            this.loadUI(containerId);
+            this._loadUI(containerId);
         }
 
-        this.subscribeToAppEvents();
-    }
-
-    subscribeToAppEvents() {
-        //subscribe to events
-        this.app.addListener("workspaceManager_created",workspaceManager => this.onWorkspaceCreated(workspaceManager));
-        this.app.addListener("workspaceManager_deleted",workspaceManager => this.onWorkspaceClosed(workspaceManager));
-        this.app.addListener("component_updated",component => this.onComponentUpdated(component));
+        this._subscribeToAppEvents();
     }
 
     getTreePane() {
@@ -49,64 +39,24 @@ export default class ApogeeView {
         return this.tabFrame;
     }
 
-    getWorkspaceView() {
-        return this.workspaceView;
-    }
-
     getApp() {
         return this.app;
     }
 
-    //================================
-    // TargetEvent handlers
-    //================================
+    ///** This method should be implemented if custom menus or menu items are desired. */
+    //addToMenuBar(menuBar,menus);
 
-    onWorkspaceCreated(workspaceManager) {
-        if(this.workspaceView != null) {
-            //discard an old view if there is one
-            this.onWorkspaceClosed();
-        }
+    //==============================
+    // Private Methods
+    //==============================
 
-        //create the new workspace view
-        this.workspaceView = new WorkspaceView(workspaceManager,this);
-
-        //load the tree entry, if needed
-        if(this.containerId) {
-            let treeEntry = this.workspaceView.getTreeEntry();
-            this.tree.setRootEntry(treeEntry);
-        }
-    }
-
-    onWorkspaceClosed(workspaceManager) {
-        //close any old workspace view
-        if(this.workspaceView) {
-            this.workspaceView.close();
-            this.workspaceView = null;
-        }
-
-        //clear the tree
-        if(this.containerId) {
-            this.tree.clearRootEntry();
-        }
-
-        //rather than rely on people to clear their own workspace handlers from the app
-        //I clear them all here
-        //I haven't decided the best way to do this. In the app? Here? I see problems
-        //with all of them.
-        //for now I clear all here and then resubscribe to events here and in the app, since those
-        //objects live on.
-        this.app.clearListenersAndHandlers();
-        this.app.subscribeToAppEvents();
-        this.subscribeToAppEvents();
-    }
-
-    //=================================
+    //---------------------------------
     // User Interface Creation Methods
-    //=================================
+    //---------------------------------
 
     /** This method creates the app ui. 
      * @private */
-    loadUI(containerId) {
+    _loadUI(containerId) {
         
         var windowElements = uiutil.initWindows(containerId);
         var topContainer = windowElements.baseElement;
@@ -121,7 +71,7 @@ export default class ApogeeView {
         //-------------------
         //create menus
         //-------------------
-        var menuBar = this.createMenuBar();
+        var menuBar = this._createMenuBar();
         mainContainer.getHeader().appendChild(menuBar);
         
         //----------------------
@@ -153,15 +103,15 @@ export default class ApogeeView {
         this.splitPane.getRightPaneContainer().appendChild(this.tabFrame.getElement());
         
         //add listener for displaying the active tab
-        this.tabFrame.addListener(uiutil.SHOWN_EVENT,tab => this.onTabShown(tab));
-        this.tabFrame.addListener(uiutil.HIDDEN_EVENT,tab => this.onTabHidden(tab));
+        this.tabFrame.addListener(uiutil.SHOWN_EVENT,tab => this._onTabShown(tab));
+        this.tabFrame.addListener(uiutil.HIDDEN_EVENT,tab => this._onTabHidden(tab));
 
         //-----------------------
         // Create the width resize listener (for now I am putting it in app - refering to both panes)
         //-----------------------
 
-        this.splitPane.addListener("move",() => this.onSplitPaneResize());
-        window.addEventListener("resize",() => this.onWindowResize());
+        this.splitPane.addListener("move",() => this._onSplitPaneResize());
+        window.addEventListener("resize",() => this._onWindowResize());
 
         //-------------------------------
         // disable drag globally
@@ -174,45 +124,97 @@ export default class ApogeeView {
         window.addEventListener("dragstart",preventAction,true);
     }
 
-    //------------------------------
-    // Active Tab display name handling logic
-    // This is not good. I need to clean a few things up.
-    // - the id is the component id. If we geet tabs for other things we will need a more general id
-    // - by the same token, we should have a way of getting the display name from the tab itself, as part of the tab interface.
-    //------------------------------
-    onTabHidden(tab) {
-        this.activeTabIconDisplay.style.display = "none";
-        this.activeTabTitleDisplay.style.display = "none";
+    //-----------------------------------
+    // workspace event handling
+    //-----------------------------------
+
+    /** This method subscribes to workspace events to update the UI. It is called out as a separate method
+     * because we must reload it each time the app is created. */
+    _subscribeToAppEvents() {
+        //subscribe to events
+        this.app.addListener("workspaceManager_created",workspaceManager => this._onWorkspaceCreated(workspaceManager));
+        this.app.addListener("workspaceManager_deleted",workspaceManager => this._onWorkspaceClosed(workspaceManager));
+        this.app.addListener("component_updated",component => this._onComponentUpdated(component));
     }
 
-    onTabShown(tab) {
-        if(!this.workspaceView) return;
-
-        let modelView = this.workspaceView.getModelView();
-        let modelManager = modelView.getModelManager();
-        
-        var componentId = tab.getId();
-        let tabComponentView = modelView.getComponentViewByComponentId(componentId)
-        if(tabComponentView) {
-            this.activeTabIconDisplay.src = tabComponentView.getIconUrl();
-            this.activeTabTitleDisplay.innerHTML = tabComponentView.getDisplayName(true,modelManager);
-            this.activeTabIconDisplay.style.display = "";
-            this.activeTabTitleDisplay.style.display = "";
+    _onWorkspaceCreated(workspaceManager) {
+        if(this.workspaceView != null) {
+            //discard an old view if there is one
+            this.onWorkspaceClosed();
         }
+
+        //create the new workspace view
+        this.workspaceView = new WorkspaceView(workspaceManager,this);
+
+        //load the tree entry, if needed
+        if(this.containerId) {
+            let treeEntry = this.workspaceView.getTreeEntry();
+            this.tree.setRootEntry(treeEntry);
+        }
+    }
+
+    _onWorkspaceClosed(workspaceManager) {
+        //close any old workspace view
+        if(this.workspaceView) {
+            this.workspaceView.close();
+            this.workspaceView = null;
+        }
+
+        //clear the tree
+        if(this.containerId) {
+            this.tree.clearRootEntry();
+        }
+
+        //rather than rely on people to clear their own workspace handlers from the app
+        //I clear them all here
+        //I haven't decided the best way to do this. In the app? Here? I see problems
+        //with all of them.
+        //for now I clear all here and then resubscribe to events here and in the app, since those
+        //objects live on.
+        this.app.clearListenersAndHandlers();
+        this.app.subscribeToAppEvents();
+        this._subscribeToAppEvents();
     }
 
     /** This is called whenever a component in the model, or the model, changes. If the display name
      * of that component changes, we update the tab display name. This is also not very general. I should
      * clean it up to allow other things besides components to have tabs. I should probably make a tab event that
      * its title changes, or just that it was udpated. */
-    onComponentUpdated(component) {
+    _onComponentUpdated(component) {
         //tab id for components is the component id
         if((component.getId() == this.tabFrame.getActiveTab())) {
             //this is pretty messy too... 
-            let model = this.workspaceView.getModelView().getModelManager().getModel();
+            let model = this.app.getModel();
             if((component.isDisplayNameUpdated())||(component.getMember().isFullNameUpdated(model))) {
                 let tab = this.tabFrame.getTab(component.getId());
-                this.onTabShown(tab);
+                this._onTabShown(tab);
+            }
+        }
+    }
+
+
+    //------------------------------
+    // Active Tab display name handling logic
+    // This is not good. I need to clean a few things up.
+    // - the id is the component id. If we geet tabs for other things we will need a more general id
+    // - by the same token, we should have a way of getting the display name from the tab itself, as part of the tab interface.
+    //------------------------------
+    _onTabHidden(tab) {
+        this.activeTabIconDisplay.style.display = "none";
+        this.activeTabTitleDisplay.style.display = "none";
+    }
+
+    _onTabShown(tab) {
+        if(!this.workspaceView) return;
+        let modelView = this.workspaceView.getModelView();
+        if(modelView) {
+            var componentId = tab.getId();
+            let tabComponentView = modelView.getComponentViewByComponentId(componentId)
+            if(tabComponentView) {
+                this.activeTabIconDisplay.src = tabComponentView.getIconUrl();
+                this.activeTabTitleDisplay.innerHTML = tabComponentView.getDisplayName(true,modelView.getModelManager());
+                this.activeTabIconDisplay.style.display = "";
+                this.activeTabTitleDisplay.style.display = "";
             }
         }
     }
@@ -221,25 +223,25 @@ export default class ApogeeView {
     // Width resize events - for tab frame and tree frame
     //---------------------------------
 
-    onSplitPaneResize() {
-        this.triggerResizeWait();
+    _onSplitPaneResize() {
+        this._triggerResizeWait();
     }
 
-    onWindowResize() {
-        this.triggerResizeWait();
+    _onWindowResize() {
+        this._triggerResizeWait();
     }
 
-    triggerResizeWait() {
+    _triggerResizeWait() {
         //only do the slow resizde timer if we have listeners
         if(!this.app.hasListeners("frameWidthResize")) return;
 
         //create a new timer if we don't already have one
         if(!this.resizeWaitTimer) {
-            this.resizeWaitTimer =  setTimeout(() => this.resizeTimerExpired(),RESIZE_TIMER_PERIOD_MS);
+            this.resizeWaitTimer =  setTimeout(() => this._resizeTimerExpired(),RESIZE_TIMER_PERIOD_MS);
         }
     }
 
-    resizeTimerExpired() {
+    _resizeTimerExpired() {
         this.resizeWaitTimer = null;
         this.app.dispatchEvent("frameWidthResize",null);
     }
@@ -250,7 +252,7 @@ export default class ApogeeView {
 
     /** This method creates the creates the menu bar, with the attached functionality. 
      * @private */
-    createMenuBar() {
+    _createMenuBar() {
         
         //-------------------
         //create menus
@@ -288,7 +290,7 @@ export default class ApogeeView {
         menus[name] = this.workspaceMenu;
         
         //populate the workspace menu on the fly - depends on workspace state
-        var getWorkspaceMenuCallback = () => this.getWorkspaceMenuItems();
+        var getWorkspaceMenuCallback = () => this._getWorkspaceMenuItems();
         this.workspaceMenu.setAsOnTheFlyMenu(getWorkspaceMenuCallback);
         
         //Edit menu
@@ -304,7 +306,7 @@ export default class ApogeeView {
         menus[name] = this.editMenu;
         
         //populate the workspace menu on the fly - depends on workspace state
-        var getEditMenuCallback = () => this.getEditMenuItems();
+        var getEditMenuCallback = () => this._getEditMenuItems();
         this.editMenu.setAsOnTheFlyMenu(getEditMenuCallback);
 
         //Edit menu
@@ -320,33 +322,8 @@ export default class ApogeeView {
         menus[name] = this.helpMenu;
         
         //populate the workspace menu on the fly - depends on workspace state
-        var getHelpMenuCallback = () => this.getHelpMenuItems();
+        var getHelpMenuCallback = () => this._getHelpMenuItems();
         this.helpMenu.setAsOnTheFlyMenu(getHelpMenuCallback);
-        
-        //FOR NOW REMOVE GLOBAL COMPONENT AND IMPORT MENUS
-        // //Components Menu
-        // name = "Components";
-        // menu = Menu.createMenu(name);
-        // menuBarLeft.appendChild(menu.getElement());
-        // menus[name] = menu;
-        
-        // //add create child elements
-        // menu.setMenuItems(this.getAddChildMenuItems());
-        
-        // //libraries menu
-        // name = "Import/Export";
-        // menu = Menu.createMenu(name);
-        // menuBarLeft.appendChild(menu.getElement());
-        // menus[name] = menu;
-        
-        // var importCallback = () => importWorkspace(this,this.app,this.fileAccessObject,FolderComponent,FolderComponentView);
-        // menu.addCallbackMenuItem("Import as Folder",importCallback);
-        
-        // var import2Callback = () => importWorkspace(this,this.app,this.fileAccessObject,FolderFunctionComponent,FolderFunctionComponentView);
-        // menu.addCallbackMenuItem("Import as Folder Function",import2Callback);
-        
-        // var exportCallback = () => exportWorkspace(this,this.fileAccessObject);
-        // menu.addCallbackMenuItem("Export as Workspace",exportCallback);
         
         //allow the implementation to add more menus or menu items
         if(this.addToMenuBar) {
@@ -364,7 +341,7 @@ export default class ApogeeView {
 
     /** This method gets the workspace menu items. This is created on the fly because the
      * items will change depending on the state of the workspace. */
-    getWorkspaceMenuItems() {
+    _getWorkspaceMenuItems() {
         
         let menuItems = [];
         let menuItem;
@@ -408,7 +385,7 @@ export default class ApogeeView {
 
     /** This method gets the workspace menu items. This is created on the fly because the
      * items will change depending on the state of the workspace. */
-    getEditMenuItems() {
+    _getEditMenuItems() {
         
         var menuItems = [];
         var menuItem;
@@ -463,7 +440,7 @@ export default class ApogeeView {
         return menuItems;
     }
 
-    getHelpMenuItems() {
+    _getHelpMenuItems() {
         var menuItems = [];
         var menuItem;
 
@@ -481,35 +458,6 @@ export default class ApogeeView {
         
         return menuItems;
     }
-    
-    ///** This method should be implemented if custom menus or menu items are desired. */
-    //addToMenuBar(menuBar,menus);
-
-    getAddChildMenuItems(optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
-
-        let standardComponents = componentConfig.getStandardComponentNames();
-        
-        var menuItemList = [];
-        
-        for(var i = 0; i < standardComponents.length; i++) {
-            let componentName = standardComponents[i];
-            let componentClass = componentInfo.getComponentClass(componentName);
-            
-            let menuItem = {};
-            menuItem.title = "Add " + componentClass.displayName;
-            menuItem.callback = () => addComponent(this,this.app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
-            menuItemList.push(menuItem);
-        }
-
-        //add the additional component item
-        let menuItem = {};
-        menuItem.title = "Other Components...";
-        menuItem.callback = () => addAdditionalComponent(this,this.app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseMemberValues);
-        menuItemList.push(menuItem);
-
-        return menuItemList;
-    }
-
     
     //========================================
     // Static Functions
