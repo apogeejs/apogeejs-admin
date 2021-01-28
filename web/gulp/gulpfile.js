@@ -71,7 +71,7 @@ let copyReleaseInfoTask = parallel(
 
 const CSS_FILES = [
     "../apogeeview/apogeeapp.css",
-    "../apogeeview/componentdisplay/literatepage/LiteratePage.css",
+    "../apogeeview/componentdisplay/LiteratePage.css",
     "../apogeeview/editor/toolbar/ApogeeToolbar.css",
     "../apogeeui/window/dialog.css",
     "../apogeeui/displayandheader/DisplayAndHeader.css",

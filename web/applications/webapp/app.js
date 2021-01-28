@@ -3,8 +3,8 @@ import * as apogee from "/apogee/apogeeCoreLib.js";
 import * as apogeeapp from "/apogeeapp/apogeeAppLib.js";
 import * as apogeeui from "/apogeeui/apogeeUiLib.js";
 import * as apogeeview from "/apogeeview/apogeeViewLib.js";
-import { ApogeeView, initIncludePath } from "/apogeeview/apogeeViewLib.js";
-import CombinedFileAccessAppConfigManager from "/apogeeview/fileAccess/CombinedFileAccessAppConfigManager.js"
+import {ApogeeView} from "/apogeeappview/apogeeAppViewLib.js";
+import CombinedFileAccessAppConfigManager from "/applications/webapp/fileaccess/CombinedFileAccessAppConfigManager.js"
 
 //expose these apogee libraries globally so plugins can use them
 window.apogeeutil = apogeeutil;
@@ -15,15 +15,15 @@ window.apogeeview = apogeeview;
 
 //implementation of global alert functions
 //__globals__.apogeeLog = (msg) => console.log(message);
-__globals__.apogeeUserAlert = (msg) => apogeeview.showSimpleActionDialog(msg,null,["OK"]);
-__globals__.apogeeUserConfirm = (msg,okText,cancelText,okAction,cancelAction,defaultToOk) => apogeeview.showSimpleActionDialog(msg,null,[okText,cancelText],[okAction,cancelAction]);
+__globals__.apogeeUserAlert = (msg) => apogeeui.showSimpleActionDialog(msg,null,["OK"]);
+__globals__.apogeeUserConfirm = (msg,okText,cancelText,okAction,cancelAction,defaultToOk) => apogeeui.showSimpleActionDialog(msg,null,[okText,cancelText],[okAction,cancelAction]);
 __globals__.apogeeUserConfirmSynchronous = (msg,okText,cancelText,defaultToOk) => confirm(msg);
 
 let appView;
 
 window.init = function(includeBasePathInfo) {
     //initialize include directories
-    initIncludePath(includeBasePathInfo);
+    apogeeview.initIncludePath(includeBasePathInfo);
     
     //use cutnpaste file access
     let appConfigManager = new CombinedFileAccessAppConfigManager();

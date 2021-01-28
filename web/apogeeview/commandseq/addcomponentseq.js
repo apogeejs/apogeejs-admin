@@ -3,7 +3,7 @@ import {validateTableName} from "/apogee/apogeeCoreLib.js";
 
 import {getPropertiesDialogLayout} from "/apogeeview/commandseq/updatecomponentseq.js";
 import {Component,componentInfo} from "/apogeeapp/apogeeAppLib.js";
-import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
+import {showConfigurableDialog} from "/apogeeui/apogeeUiLib.js";
 import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog.js";
 import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 

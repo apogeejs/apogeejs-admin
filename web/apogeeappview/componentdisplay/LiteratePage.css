@@ -1,0 +1,300 @@
+.visiui_litPage_header {
+    
+}
+.visiui_litPage_banner {
+    
+}
+.visiui_litPage_editNotice {
+    background-color: rgb(64,255,255);
+}
+.visiui_litPage_editorToolbar {
+    border: 1px solid #ccc;
+    padding: 2px;
+    background-color: rgb(247,247,249);
+    font-family: 'Helvitica Neue', 'Helvitica', 'Ariel', sans-serif;
+    z-index: 1;
+}
+.visiui_litPage_componentToolbar {
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    /*box-sizing: border-box;*/
+    font-family: 'Helvitica Neue', 'Helvitica', 'Ariel', sans-serif;
+    padding: 2px;
+    background-color: rgb(247,247,249);
+    z-index: 1;
+}
+.visiui_litPage_body {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 0;
+    padding-bottom: 300px;
+}
+.visiui_litPage_componentButton {
+    position:relative;
+    display: inline-block;
+    margin:2px;
+    border: 1px solid #ccc;
+    white-space:nowrap;
+    text-align: center;
+}
+.visiui_litPage_componentButton:hover {
+    background-color: rgb(235,235,240);;
+}
+.visiui_litPage_componentButton:active {
+    background-color: rgb(220,220,228);;
+}
+.visiui_litPage_componentButtonIcon {
+    display:inline-block;
+    margin-top:0px;
+    margin-bottom:0px;
+    margin-right:0px;
+    margin-left:2px;
+}
+.visiui_litPage_componentButtonText {
+    display:inline-block;
+    margin-top:5px;
+    margin-bottom:2px;
+    margin-right:2px;
+    margin-left:2px;
+}
+
+.visiui_pageChild_mainClass {
+    position: relative;
+    background-color: rgb(235,235,240);
+    padding: 3px;
+    border: .5px solid rgb(230,230,235);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.visiui_pageChild_highlighted {
+    background-color: rgb(215, 222, 243);
+}
+.visiui_pageChild_editMode {
+}
+.visiui_pageChild_bannerContainerClass {
+    position: relative;
+}
+.visiui_pageChild_viewContainerClass {
+    position: relative;
+}
+.visiui_pageChild_titleBarClass {
+    position: relative;
+}
+.visiui_pageChild_titleBarNameClass {
+    display: inline;
+    padding: 2px;
+    font-weight:bold;
+    font-size: larger;
+    color:darkblue;
+}
+.visiui_pageChild_cellTypeLabelClass {
+    display: inline-block;
+    padding-left: 25px;
+    vertical-align: middle;
+    font-size: smaller;
+    color: gray;
+    user-select: none;
+    white-space: nowrap;
+}
+.visiui-pageChild-icon-container {
+    display:inline-block;
+    position: relative;
+    padding: 0px;
+    margin: 0px;
+    vertical-align: middle;
+    height: 16px;
+    width: 16px;
+}
+.visiui-pageChild-icon {
+    display:inline-block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 0px;
+    margin: 0px;
+    height: 16px;
+    width: 16px;
+    user-select: none;
+}
+.visiui_pageChild_icon_overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    user-select: none;
+}
+.visiui_pageChild_titleBarViewsClass {
+    display: inline;
+    padding-left: 15px;
+}
+.visiui_displayContainer_mainClass {
+    position: relative;
+}
+.visiui_displayContainer_editMode {
+    border: 2px solid rgb(64,255,255);
+    background-color: rgb(64,255,255);
+}
+.visiui_displayContainer_viewToolbarClass {
+    position: relative;
+}
+.visiui_displayContainer_viewHeadingClass {
+    display: inline;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0px;
+}
+.visiui_displayContainer_viewTitleClass {
+    font-size: smaller;
+    color:rgb(0,0,0);
+    font-weight: bold;
+    user-select: none;
+    margin-right: 15px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_viewSourceClass {
+    font-size: smaller;
+    color: darkblue;
+    font-weight: bold;
+    user-select: none;
+    margin-right: 5px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_viewTypeModelClass {
+    font-size: smaller;
+    color:rgb(0,0,0);
+    font-style: italic;
+    user-select: none;
+    margin-right: 5px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_viewTypeAppClass {
+    font-size: smaller;
+    color:rgb(0,0,0);
+    font-style: italic;
+    user-select: none;
+    margin-right: 5px;
+    margin-left: 0px;
+}
+.visiui_displayContainer_HelpWrapperAddon {
+    vertical-align: middle;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+.visiui_displayContainer_HelpImageAddon {
+    height: 12px;
+    width: 12px;
+}
+.visiui_displayContainer_HelpTextAddon {
+    text-align: left;
+}
+.visiui_displayContainer_viewSelectorContainerClass {
+    display: inline-block;
+    margin-left: 6px;
+    white-space: nowrap;
+}
+.visiui_displayContainer_viewSelectorContainerClass_editMode {
+    background-color: rgb(64,255,255);
+    border: 2px solid rgb(64,255,255);
+}
+.visiui_displayContainer_viewSelectorContainerClass_info {
+    background-color: rgb(255,160,160);
+    border: 2px solid rgb(255,160,160);
+}
+.visiui_displayContainer_viewSelectorContainerClass:hover {
+    background-color: rgba(128,128,144,.35);
+}
+.visiui_displayContainer_viewSelectorLinkClass {
+    text-decoration:none;
+    display: inline;
+    user-select: none;
+    padding-right: 4px;
+}
+.visiui_displayContainer_viewActiveElementClass {
+    display: inline;
+    padding: 0px;
+    margin: 0px;
+    vertical-align: middle;
+}
+.visiui_displayContainer_viewSelectorClass {
+    display: inline;
+    font-size: smaller;
+    color:rgb(0,0,0);
+    cursor: pointer;
+    vertical-align: middle;
+    font-weight: bold;
+    user-select: none;
+}
+.visiui_displayContainer_expandContractClass {
+    vertical-align: middle;
+    user-select: none;
+}
+.visiui_displayContainer_headerContainerClass {
+    position: relative;
+}
+.visiui_displayContainer_viewSizingElementClass {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.visiui_displayContainer_viewDisplayBarClass {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.visiui_displayContainer_viewDisplaySizeButtonClass {
+    display: inline;
+    margin-right: 5px;
+    font-size: smaller;
+    color:rgb(128,128,128);
+    cursor: pointer;
+    user-select: none;
+}
+.visiui_displayContainer_viewDisplaySizeButtonClass:hover {
+    background-color: rgba(128,128,144,.35);
+}
+.visiui_displayContainer_viewDisplaySizeButtonClass:active {
+    background-color: rgba(128,128,144,.35);
+}
+.visiui_displayContainer_viewContainerClass {
+    position: relative;
+    margin: 3px;
+    z-index: 0;
+    /*outline: .5px solid rgb(200,200,200);*/
+}
+.visiui_displayContainer_messageContainerClass {
+    position: relative;
+    padding: 5px;
+    z-index: 0;
+}
+.visiui_displayContainer_messageNone {
+    display: none;
+}
+.visiui_displayContainer_messageError {
+    color: red;
+    font-style: italic;
+}
+.visiui_displayContainer_messageWarning {
+    color: blue;
+    font-style: italic;
+    font-size: smaller;
+}
+.visiui_displayContainer_messageInfo {
+    color: rgb(96,96,96);
+    font-style: italic;
+    font-size: smaller;
+}
+
+
