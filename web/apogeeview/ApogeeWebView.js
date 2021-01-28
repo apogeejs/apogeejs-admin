@@ -25,10 +25,6 @@ export default class ApogeeWebView {
         window.addEventListener("resize",() => this.onWindowResize());
     }
 
-    getApp() {
-        return this.app;
-    }
-
     /** This method should be called to open the workspace once the display info has been initialized. */
     openWorkspace(url) {
         var openWorkspace = workspaceText => {
@@ -44,6 +40,55 @@ export default class ApogeeWebView {
 
         apogeeutil.textRequest(url).then(openWorkspace);
     }
+
+    //=======================================
+    // AppViewInterface Methods
+    // These methods are used to give the functionality
+    // of the modelView in the standard UI.
+    //=======================================
+
+    getApp() {
+        return this.app;
+    }
+
+    getModelManager() {
+        return this.app.getModelManager();
+    }
+
+    getComponentViewByComponentId(componentId) {
+        let componentInfo = this.componentByIdMap[componentId];
+        if(componentInfo) {
+            return componentInfo.componentView;
+        }
+        else {
+            return null;
+        }
+    }
+
+    getComponentViewByMemberId(memberId) {
+        let componentId = this.app.getModelManager().getComponentIdByMemberId(memberId);
+        return this.getComponentViewByComponentId(componentId);
+    }
+
+    //--------------------------------------
+    // The following methods show unsupported 
+    // functionality from the standard UI 
+    // in this implementation
+    //--------------------------------------
+
+    /** Parent displays are not present */
+    hasParentDisplays() {
+        return false;
+    }
+
+    /** TabFrame is nto present. */
+    getTabFrame() {
+        return null;
+    }
+
+    addChildToRoot() {}
+
+    removeChildFromRoot() {}
 
     //=======================================
     // View Management
@@ -144,15 +189,6 @@ export default class ApogeeWebView {
     //         displayViewInfo.componentDisplay.onResize();
     //     }
     // }
-
-    ///////////////////////////////////////////////////////////////////////////////////
-    // OOPS - this is here because for now componet views think this is the model view.
-    //I need to find out what problems this causes. One is that the ui messenger uses it
-    //to find the model manager. I am sure there are more.
-    getModelManager() {
-        return this.app.getWorkspaceManager().getModelManager();
-    }
-    /////////////////////////////////////////////////////////////////////////////////////
 
     //---------------------------------
     // Width resize events - for tab frame and tree frame

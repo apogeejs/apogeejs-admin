@@ -13,9 +13,9 @@ const MAX_SUFFIX_INDEX = 99999;
  * It extends the component class. */
 export default class ParentComponentView extends ComponentView {
 
-    constructor(modelView,component) {
+    constructor(appViewInterface,component) {
         //base constructor
-        super(modelView,component);
+        super(appViewInterface,component);
 
         //ccreate the editor manager
         this.editorManager = createProseMirrorManager(this.getApp(),component.getSchema());
@@ -27,14 +27,11 @@ export default class ParentComponentView extends ComponentView {
         //add any existing children to the tree entry
         var treeEntry = treeDisplay.getTreeEntry();
         var parentFolder = this.component.getParentFolderForChildren();
-        var modelView = this.getModelView();
-        var modelManager = modelView.getModelManager();
-
+        var appViewInterface = this.getAppViewInterface();
         var childIdMap = parentFolder.getChildIdMap();
         for(var childKey in childIdMap) {
             var childMemberId = childIdMap[childKey];
-            var childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
-            var childComponentView = modelView.getComponentViewByComponentId(childComponentId);
+            var childComponentView = appViewInterface.getComponentViewByMemberId(childMemberId);
             if(childComponentView) {
                 var childTreeEntry = childComponentView.getTreeEntry();
                 treeEntry.addChild(childTreeEntry);

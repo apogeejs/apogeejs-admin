@@ -9,8 +9,8 @@ let { getFormResultFunctionBody } = apogeeui;
  * for how to set the data. */
 export default class ChartJSComponentView extends ComponentView {
 
-    constructor(modelView,component) {
-        super(modelView,component);
+    constructor(appViewInterface,component) {
+        super(appViewInterface,component);
     };
 
     /**  This method retrieves the table edit settings for this component instance

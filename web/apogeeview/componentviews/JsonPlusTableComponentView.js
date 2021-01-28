@@ -6,8 +6,8 @@ import DATA_DISPLAY_CONSTANTS from "/apogeeview/datadisplay/dataDisplayConstants
 
 export default class JsonPlusTableComponentView extends ComponentView {
 
-    constructor(modelView,JsonPlusTableComponent) {
-        super(modelView,JsonPlusTableComponent);
+    constructor(appViewInterface,JsonPlusTableComponent) {
+        super(appViewInterface,JsonPlusTableComponent);
     }
 
     //==============================

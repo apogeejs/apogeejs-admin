@@ -40,6 +40,16 @@ export default class ModelView {
         return this.componentViewMap[componentId];
     }
 
+    getComponentViewByMemberId(memberId) {
+        let componentId = this.modelManager.getComponentIdByMemberId(memberId);
+        return this.getComponentViewByComponentId(componentId);
+    }
+
+    /** This method indicates that parent component displays are present in the UI. */
+    hasParentDisplays() {
+        return true;
+    }
+
     getApp() {
         return this.workspaceView.getApp();
     }
@@ -84,16 +94,18 @@ export default class ModelView {
 
             //find the parent
             let parentComponent = component.getParentComponent(this.modelManager);
-            if(parentComponent) {
-                let parentComponentView = this.getComponentViewByComponentId(parentComponent.getId());
-                if(parentComponentView) {
-                    parentComponentView.addChild(componentView);
-                    componentView.setLastAssignedParentComponentView(parentComponentView);
+            if(this.hasParentDisplays()) {
+                if(parentComponent) {
+                    let parentComponentView = this.getComponentViewByComponentId(parentComponent.getId());
+                    if(parentComponentView) {
+                        parentComponentView.addChild(componentView);
+                        componentView.setLastAssignedParentComponentView(parentComponentView);
+                    }
                 }
-            }
-            else { 
-                //this is a root component
-                this.addChildToRoot(componentView)
+                else { 
+                    //this is a root component
+                    this.addChildToRoot(componentView)
+                }
             }
 
             //do view state initialization
@@ -125,15 +137,17 @@ export default class ModelView {
             let componentView = this.componentViewMap[componentId];
             if(componentView) {
                 componentView.onDelete();
-        
-                //remove from the parent parent
-                let parentComponentView = componentView.getLastAssignedParentComponentView();
-                if(parentComponentView) {
-                    parentComponentView.removeChild(componentView);
-                }
-                else {
-                    //this is a root component
-                    this.removeChildFromRoot(componentView);
+
+                if(this.hasParentDisplays) {
+                    //remove from the parent parent
+                    let parentComponentView = componentView.getLastAssignedParentComponentView();
+                    if(parentComponentView) {
+                        parentComponentView.removeChild(componentView);
+                    }
+                    else {
+                        //this is a root component
+                        this.removeChildFromRoot(componentView);
+                    }
                 }
             }
 

@@ -7,8 +7,8 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 export default class JsonTableComponentView extends ComponentView {
 
-    constructor(modelView,jsonTableComponent) {
-        super(modelView,jsonTableComponent);
+    constructor(appViewInterface,jsonTableComponent) {
+        super(appViewInterface,jsonTableComponent);
     }
 
     //==============================

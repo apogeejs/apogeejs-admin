@@ -12,8 +12,8 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
  * confugred with initialization data from the model. */
 export default class CustomComponentView extends ComponentView {
 
-    constructor(modelView,component) {
-        super(modelView,component);
+    constructor(appViewInterface,component) {
+        super(appViewInterface,component);
 
         //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         //add css to page! I think this should go in a separate on create event, but until I 

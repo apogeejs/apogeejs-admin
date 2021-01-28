@@ -6,9 +6,9 @@ import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 /** This component represents a table object. */
 export default class FunctionComponentView extends ComponentView {
 
-    constructor(modelView,functionComponent) {
+    constructor(appViewInterface,functionComponent) {
         //extend edit component
-        super(modelView,functionComponent);
+        super(appViewInterface,functionComponent);
     };
 
     //==============================

@@ -5,8 +5,8 @@ import LiteratePageComponentDisplay from "/apogeeview/componentdisplay/literatep
 /** This component represents a table object. */
 export default class FolderComponentView extends ParentComponentView {
 
-    constructor(modelView,folderComponent) {
-        super(modelView,folderComponent);
+    constructor(appViewInterface,folderComponent) {
+        super(appViewInterface,folderComponent);
     }
 
     instantiateTabDisplay() {

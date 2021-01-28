@@ -7,8 +7,8 @@ import { getFormResultFunctionBody } from "/apogeeui/apogeeUiLib.js";
  * for how to set the data. */
 export default class FormInputBaseComponentView extends ComponentView {
 
-    constructor(modelView,component) {
-        super(modelView,component);
+    constructor(appViewInterface,component) {
+        super(appViewInterface,component);
     }
 
     getFormDataDisplay(displayContainer) {

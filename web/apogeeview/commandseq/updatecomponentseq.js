@@ -91,30 +91,32 @@ export function updateComponent(componentView) {
             //do the first stage of editor commands
             if(componentViewClass.hasChildEntry) {
                 //load model view, will be used for old parent and new parent
-                let modelView = componentView.getModelView();
+                let appViewInterface = componentView.getAppViewInterface();
 
-                //look up the old parent component
-                let oldParentComponent = component.getParentComponent(modelManager);
-                //remove the component from the parent component document.
-                //if there is no parent component, we wil assume this was in the root folder
-                if(oldParentComponent) {
-                    let oldParentComponentView = modelView.getComponentViewByComponentId(oldParentComponent.getId());
+                if(appViewInterface.hasParentDisplays()) {
+                    //look up the old parent component
+                    let oldParentComponent = component.getParentComponent(modelManager);
+                    //remove the component from the parent component document.
+                    //if there is no parent component, we wil assume this was in the root folder
+                    if(oldParentComponent) {
+                        let oldParentComponentView = appViewInterface.getComponentViewByComponentId(oldParentComponent.getId());
 
-                    if(newValues.parentId) {
-                        //----------------------------
-                        //move case
-                        //delete old node
-                        //----------------------------
-                        let oldParentEditorCommand = oldParentComponentView.getRemoveApogeeNodeFromPageCommand(oldName);
-                        commands.push(oldParentEditorCommand);
-                    }
-                    else if(newValues.name) {
-                        //---------------------------
-                        //rename case
-                        //get the rename editr comamnds, then apply the one to clear the component node name
-                        //----------------------------
-                        renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(component.getMemberId(),oldName,newValues.name);
-                        commands.push(renameEditorCommands.setupCommand);
+                        if(newValues.parentId) {
+                            //----------------------------
+                            //move case
+                            //delete old node
+                            //----------------------------
+                            let oldParentEditorCommand = oldParentComponentView.getRemoveApogeeNodeFromPageCommand(oldName);
+                            commands.push(oldParentEditorCommand);
+                        }
+                        else if(newValues.name) {
+                            //---------------------------
+                            //rename case
+                            //get the rename editr comamnds, then apply the one to clear the component node name
+                            //----------------------------
+                            renameEditorCommands = oldParentComponentView.getRenameApogeeNodeCommands(component.getMemberId(),oldName,newValues.name);
+                            commands.push(renameEditorCommands.setupCommand);
+                        }
                     }
                 }
             }
@@ -138,30 +140,32 @@ export function updateComponent(componentView) {
                     let newParentComponentId = modelManager.getComponentIdByMemberId(newValues.parentId);
                     //there will be no component id if we are putting this in the root folder
                     if(newParentComponentId) {
-                        let modelView = componentView.getModelView();
-                        let newParentComponentView = modelView.getComponentViewByComponentId(newParentComponentId);
+                        let appViewInterface = componentView.getAppViewInterface();
+                        if(appViewInterface.hasParentDisplays()) {
+                            let newParentComponentView = appViewInterface.getComponentViewByComponentId(newParentComponentId);
 
-                        if(newParentComponentView) {
-                            let newName = newValues.name ? newValues.name : oldName;
+                            if(newParentComponentView) {
+                                let newName = newValues.name ? newValues.name : oldName;
 
-                            //insert node add at end of new page
-                            let newParentCommands = newParentComponentView.getInsertApogeeNodeOnPageCommands(newName,true);
-                            //added the editor setup command
-                            if(newParentCommands.editorSetupCommand) commands.push(newParentCommands.editorSetupCommand);
-                            //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
-                            if(newParentCommands.deletedComponentCommands) {
-                                //flag a delete will be done
-                                commandsDeleteComponent = true
-                                deleteMsg = "This action deletes cells on the new page. Are you sure you want to do that? Deleted cells: " + deletedComponentNames;
-                                
-                                //return if user rejects
-                                if(!doDelete) return;
-                                
-                                commands.push(...newParentCommands.deletedComponentCommands);
+                                //insert node add at end of new page
+                                let newParentCommands = newParentComponentView.getInsertApogeeNodeOnPageCommands(newName,true);
+                                //added the editor setup command
+                                if(newParentCommands.editorSetupCommand) commands.push(newParentCommands.editorSetupCommand);
+                                //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
+                                if(newParentCommands.deletedComponentCommands) {
+                                    //flag a delete will be done
+                                    commandsDeleteComponent = true
+                                    deleteMsg = "This action deletes cells on the new page. Are you sure you want to do that? Deleted cells: " + deletedComponentNames;
+                                    
+                                    //return if user rejects
+                                    if(!doDelete) return;
+                                    
+                                    commands.push(...newParentCommands.deletedComponentCommands);
+                                }
+
+                                //add the editor insert command
+                                if(newParentCommands.editorAddCommand) commands.push(newParentCommands.editorAddCommand);
                             }
-
-                            //add the editor insert command
-                            if(newParentCommands.editorAddCommand) commands.push(newParentCommands.editorAddCommand);
                         }
                     }
                     else {

@@ -299,13 +299,11 @@ export default class LiteratePageComponentDisplay {
         let folder = pageComponent.getParentFolderForChildren();
 
         //show all children
-        var modelView = this.componentView.getModelView();
-        var modelManager = modelView.getModelManager();
+        var appViewInterface = this.componentView.getAppViewInterface();
         var childrenIds = folder.getChildIdMap();
         for(var childName in childrenIds) {
             var childMemberId = childrenIds[childName];
-            var childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
-            var childComponentView = modelView.getComponentViewByComponentId(childComponentId);
+            var childComponentView = appViewInterface.getComponentViewByMemberId(childMemberId);
             if(childComponentView) {
                 this.addChild(childComponentView);
             }
@@ -320,7 +318,7 @@ export default class LiteratePageComponentDisplay {
         //MAKE A WAY TO GET COMPONENT GENERATORS FOR BUTTONS RATHER THAN READING A PRIVATE VARIABLE FROM APP
         let pageComponent = this.componentView.getComponent();
         var app = this.componentView.getApp();
-        var modelView = this.componentView.getModelView();
+        var appViewInterface = this.componentView.getAppViewInterface();
         
 
         let standardComponentNames = componentInfo.getStandardComponentNames();
@@ -350,7 +348,7 @@ export default class LiteratePageComponentDisplay {
                     var parentMember = pageComponent.getParentFolderForChildren();
                     initialValues.parentId = parentMember.getId();
 
-                    addComponent(modelView,app,componentClass,initialValues,null,null);
+                    addComponent(appViewInterface,app,componentClass,initialValues,null,null);
                 }
 
                 //for cleanup
@@ -371,10 +369,10 @@ export default class LiteratePageComponentDisplay {
             var parentMember = pageComponent.getParentFolderForChildren();
             initialValues.parentId = parentMember.getId();
 
-            let modelView = this.componentView.getModelView();
+            let appViewInterface = this.componentView.getAppViewInterface();
 
             //I tacked on a piggyback for testing!!!
-            addAdditionalComponent(modelView,app,initialValues,null,null);
+            addAdditionalComponent(appViewInterface,app,initialValues,null,null);
         }
         //for cleanup
         this.elementsWithOnclick.push(buttonElement);
@@ -468,12 +466,10 @@ export default class LiteratePageComponentDisplay {
         let pageComponent = this.componentView.getComponent();
         let folder = pageComponent.getParentFolderForChildren();
         var childIdMap = folder.getChildIdMap();
-        var modelView = this.componentView.getModelView();
-        var modelManager = modelView.getModelManager();
+        var appViewInterface = this.componentView.getAppViewInterface();
         for(var childName in childIdMap) {
             var childMemberId = childIdMap[childName];
-            var childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
-            var childComponentView = modelView.getComponentViewByComponentId(childComponentId);
+            var childComponentView = appViewInterface.getComponentViewByMemberId(childMemberId);
             if(childComponentView) {
                 childComponentView.closeComponentDisplay();
             }
@@ -493,7 +489,7 @@ export default class LiteratePageComponentDisplay {
         command.plugins = [];
         
         //execute the command asynchronously - this may be triggered by another command (such as close workspace)
-        setTimeout(() => modelView.getApp().executeCommand(command));
+        setTimeout(() => this.componentView.getApp().executeCommand(command));
         
         //editor view
         if(this.editorView) {

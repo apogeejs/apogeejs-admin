@@ -6,8 +6,8 @@ let {FormInputBaseComponentView,HandsonGridEditor,AceTextEditor,StandardErrorDis
  * for how to set the data. */
 export default class CSVComponentView extends FormInputBaseComponentView {
 
-    constructor(modelView,component) {
-        super(modelView,component);
+    constructor(appViewInterface,component) {
+        super(appViewInterface,component);
     };
 
     //=================================
