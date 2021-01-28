@@ -42,6 +42,10 @@ export default class ComponentView {
         return this.component;
     }
 
+    getApp() {
+        return this.modelView.getApp();
+    }
+
     getName() {
         return this.component.getName();
     }
@@ -87,17 +91,17 @@ export default class ComponentView {
     /** This method gets the parent component view of the current component view. 
      * This method does not depends only on the relation between the components, 
      * rather than any relationship established between the component views. This should give the
-     * same result getLastAssignedParentComponentView except during a delete or move operation. */
+     * same result getLastAssignedParentComponentView except during a delete or move operation. 
+     * This may return null if there is no parent component view. */
     getParentComponentView() {
-
-        let parentComponent = this.component.getParentComponent(this.modelView.getModelManager());
-        if((parentComponent)&&(this.modelView)) {
-            return this.modelView.getComponentViewByComponentId(parentComponent.getId());
+        if(this.modelView) {
+            let parentComponent = this.component.getParentComponent(this.modelView.getModelManager());
+            if(parentComponent) {
+                return this.modelView.getComponentViewByComponentId(parentComponent.getId());
+            }
         }
-        else {
-            return null;
-        }
-
+        //if we get here, no parent component view looked up
+        return null;
     }
 
     /** This sets the assigned parent component view. This should be done for
@@ -507,7 +511,7 @@ export default class ComponentView {
 
                     //execute command to select child
                     let command = parentComponentView.getSelectApogeeNodeCommand(this.getName());
-                    this.getModelView().getApp().executeCommand(command);
+                    this.getApp().executeCommand(command);
 
                     //open the parent and bring this child to the front
                     makeTabActive(parentComponentView);

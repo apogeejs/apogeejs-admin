@@ -4,7 +4,6 @@ import { createProseMirrorManager } from "/apogeeview/componentdisplay/literatep
 
 import { TextSelection, NodeSelection, EditorState, Selection } from "/prosemirror/dist/prosemirror-state.es.js";
 import { Slice } from "/prosemirror/dist/prosemirror-model.es.js"
-import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 import { GapSelection } from "/apogeeview/editor/selection/GapSelection.js";
 
 //this constant is used (or hopefully not) in correctCreateInfoforRepeatedNames
@@ -19,7 +18,7 @@ export default class ParentComponentView extends ComponentView {
         super(modelView,component);
 
         //ccreate the editor manager
-        this.editorManager = createProseMirrorManager(modelView.getApp(),component.getSchema());
+        this.editorManager = createProseMirrorManager(this.getApp(),component.getSchema());
     }
 
     createTreeDisplay() {
@@ -329,7 +328,7 @@ export default class ParentComponentView extends ComponentView {
         if(apogeeCommand) {
 
             let doAction = () => {
-                this.getModelView().getApp().executeCommand(apogeeCommand);
+                this.getApp().executeCommand(apogeeCommand);
             }
 
             if(commandsDeleteComponent) {

@@ -2,7 +2,6 @@ import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import {validateTableName} from "/apogee/apogeeCoreLib.js"; 
 
 import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
-import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
 
 //=====================================
 // UI Entry Point
@@ -11,7 +10,8 @@ import {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js"
 /** This method gets a callback to update the properties of a component. */
 export function updateComponent(componentView) {
 
-    var modelManager = componentView.getModelView().getModelManager(); 
+    var app = componentView.getApp();
+    var modelManager = app.getModelManager(); 
     var component = componentView.getComponent();
     
     var componentClass = component.constructor;
@@ -85,14 +85,13 @@ export function updateComponent(componentView) {
             }
 
             let oldName = component.getName();
-            let modelView;
 
             let renameEditorCommands;
 
             //do the first stage of editor commands
             if(componentViewClass.hasChildEntry) {
                 //load model view, will be used for old parent and new parent
-                modelView = componentView.getModelView();
+                let modelView = componentView.getModelView();
 
                 //look up the old parent component
                 let oldParentComponent = component.getParentComponent(modelManager);
@@ -139,28 +138,31 @@ export function updateComponent(componentView) {
                     let newParentComponentId = modelManager.getComponentIdByMemberId(newValues.parentId);
                     //there will be no component id if we are putting this in the root folder
                     if(newParentComponentId) {
+                        let modelView = componentView.getModelView();
                         let newParentComponentView = modelView.getComponentViewByComponentId(newParentComponentId);
 
-                        let newName = newValues.name ? newValues.name : oldName;
+                        if(newParentComponentView) {
+                            let newName = newValues.name ? newValues.name : oldName;
 
-                        //insert node add at end of new page
-                        let newParentCommands = newParentComponentView.getInsertApogeeNodeOnPageCommands(newName,true);
-                        //added the editor setup command
-                        if(newParentCommands.editorSetupCommand) commands.push(newParentCommands.editorSetupCommand);
-                        //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
-                        if(newParentCommands.deletedComponentCommands) {
-                            //flag a delete will be done
-                            commandsDeleteComponent = true
-                            deleteMsg = "This action deletes cells on the new page. Are you sure you want to do that? Deleted cells: " + deletedComponentNames;
-                            
-                            //return if user rejects
-                            if(!doDelete) return;
-                            
-                            commands.push(...newParentCommands.deletedComponentCommands);
+                            //insert node add at end of new page
+                            let newParentCommands = newParentComponentView.getInsertApogeeNodeOnPageCommands(newName,true);
+                            //added the editor setup command
+                            if(newParentCommands.editorSetupCommand) commands.push(newParentCommands.editorSetupCommand);
+                            //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
+                            if(newParentCommands.deletedComponentCommands) {
+                                //flag a delete will be done
+                                commandsDeleteComponent = true
+                                deleteMsg = "This action deletes cells on the new page. Are you sure you want to do that? Deleted cells: " + deletedComponentNames;
+                                
+                                //return if user rejects
+                                if(!doDelete) return;
+                                
+                                commands.push(...newParentCommands.deletedComponentCommands);
+                            }
+
+                            //add the editor insert command
+                            if(newParentCommands.editorAddCommand) commands.push(newParentCommands.editorAddCommand);
                         }
-
-                        //add the editor insert command
-                        if(newParentCommands.editorAddCommand) commands.push(newParentCommands.editorAddCommand);
                     }
                     else {
                         if(!componentViewClass.hasTabEntry) {
@@ -202,7 +204,7 @@ export function updateComponent(componentView) {
         //command action
         let doAction = () => {
             if(command) {   
-                modelManager.getApp().executeCommand(command);
+                app.executeCommand(command);
             }
 
             returnToEditor(componentView,submittedValues.name);

@@ -34,7 +34,7 @@ export default class FormDataComponentView extends ComponentView {
     getDataDisplay(displayContainer,viewType) {
         
         var dataDisplaySource;
-        var app = this.getModelView().getApp();
+        var app = this.getApp();
         
         //create the new view element;
         switch(viewType) {

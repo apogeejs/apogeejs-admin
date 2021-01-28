@@ -280,9 +280,10 @@ export default class PageDisplayContainer {
         }
         //select the associated node in the document.
         let parentComponentView = this.componentView.getParentComponentView();
-
-        //give the editor focus
-        parentComponentView.giveEditorFocusIfShowing();
+        if(parentComponentView) {
+            //give the editor focus
+            parentComponentView.giveEditorFocusIfShowing();
+        }
 
     }
 

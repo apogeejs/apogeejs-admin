@@ -95,8 +95,7 @@ export default class LiteratePageComponentDisplay {
 
         //lookup component
         if (memberId) {
-            var modelView = this.componentView.getModelView();
-            var modelManager = modelView.getModelManager();
+            var modelManager = this.componentView.getApp().getModelManager();
             var childComponentId = modelManager.getComponentIdByMemberId(memberId);
             let childComponentDisplay = this.childDisplayMap[childComponentId];
             if((!childComponentDisplay)&&(createIfMissing)) {
@@ -320,8 +319,9 @@ export default class LiteratePageComponentDisplay {
         //THIS IS BAD - IT IS ONLY TO GET THIS WORKING AS A TRIAL
         //MAKE A WAY TO GET COMPONENT GENERATORS FOR BUTTONS RATHER THAN READING A PRIVATE VARIABLE FROM APP
         let pageComponent = this.componentView.getComponent();
-        var appView = this.componentView.getModelView().getWorkspaceView().getAppView();
-        var app = appView.getApp();
+        var app = this.componentView.getApp();
+        var modelView = this.componentView.getModelView();
+        
 
         let standardComponentNames = componentInfo.getStandardComponentNames();
         for(var i = 0; i < standardComponentNames.length; i++) {
@@ -350,7 +350,7 @@ export default class LiteratePageComponentDisplay {
                     var parentMember = pageComponent.getParentFolderForChildren();
                     initialValues.parentId = parentMember.getId();
 
-                    addComponent(appView,app,componentClass,initialValues,null,null);
+                    addComponent(modelView,app,componentClass,initialValues,null,null);
                 }
 
                 //for cleanup
@@ -371,10 +371,10 @@ export default class LiteratePageComponentDisplay {
             var parentMember = pageComponent.getParentFolderForChildren();
             initialValues.parentId = parentMember.getId();
 
-            let appView = this.componentView.getModelView().getWorkspaceView().getAppView();
+            let modelView = this.componentView.getModelView();
 
             //I tacked on a piggyback for testing!!!
-            addAdditionalComponent(appView,app,initialValues,null,null);
+            addAdditionalComponent(modelView,app,initialValues,null,null);
         }
         //for cleanup
         this.elementsWithOnclick.push(buttonElement);
@@ -400,17 +400,16 @@ export default class LiteratePageComponentDisplay {
 
         //we need to call a command to set the plugins on the editor state
         let pageComponent = this.componentView.getComponent();
-        var modelView = this.componentView.getModelView();
+        var app = this.componentView.getApp();
 
         //we need to initialize the components in the editor state for this component
         let command = {};
         command.type = "literatePagePlugins";
         command.componentId = pageComponent.getId();
         command.plugins = plugins;
-        let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
 
         //execute the command asynchronously - this may be triggered by another command (such as open workspace)
-        setTimeout(() => workspaceManager.getApp().executeCommand(command));
+        setTimeout(() => app.executeCommand(command));
         
         
     }
@@ -420,7 +419,7 @@ export default class LiteratePageComponentDisplay {
         if(event.target == this.contentElement) {
             this.componentView.giveEditorFocusIfShowing();
             let command = this.componentView.getSelectEndOfDocumentCommand();
-            let app = this.componentView.getModelView().getApp();
+            let app = this.componentView.getApp();
             app.executeCommand(command);
         }    
     }
@@ -492,10 +491,9 @@ export default class LiteratePageComponentDisplay {
         command.type = "literatePagePlugins";
         command.componentId = pageComponent.getId();
         command.plugins = [];
-        let workspaceManager = modelView.getWorkspaceView().getWorkspaceManager();
         
         //execute the command asynchronously - this may be triggered by another command (such as close workspace)
-        setTimeout(() => workspaceManager.getApp().executeCommand(command));
+        setTimeout(() => modelView.getApp().executeCommand(command));
         
         //editor view
         if(this.editorView) {

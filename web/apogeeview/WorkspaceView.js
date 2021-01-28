@@ -45,10 +45,6 @@ export default class WorkspaceView {
         return this.workspaceManager;
     }
 
-    getAppView() {
-        return this.appView;
-    }
-
     /** This sets the name label on the workspace. The name comes from the model, however, we will display it on the workspace object. */
     setName(name) {
         this.treeEntry.setLabel(name);

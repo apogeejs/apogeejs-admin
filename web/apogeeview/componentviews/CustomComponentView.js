@@ -58,7 +58,7 @@ export default class CustomComponentView extends ComponentView {
     getDataDisplay(displayContainer,viewType) {
         
         var dataDisplaySource;
-        var app = this.getModelView().getApp();
+        var app = this.getApp();
         
         //create the new view element;
         switch(viewType) {
@@ -158,7 +158,7 @@ export default class CustomComponentView extends ComponentView {
             },
             
             saveData: (text) => {
-                let app = this.getModelView().getApp();
+                let app = this.getApp();
                 this.getComponent().doCodeFieldUpdate(app,codeFieldName,text);
                 return true;
             }

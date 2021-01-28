@@ -81,7 +81,7 @@ export default class FormInputBaseComponentView extends ComponentView {
             childCommands: [dataCommand,resultCommand]
         }
         
-        let app = this.getModelView().getApp();
+        let app = this.getApp();
         app.executeCommand(command);
 
         //if we got this far the form save should be accepted

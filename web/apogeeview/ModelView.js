@@ -52,10 +52,6 @@ export default class ModelView {
         return this.modelManager;
     }
 
-    getAppView() {
-        return this.workspaceView.getAppView();
-    }
-
     closeWorkspace() {
         for(let viewId in this.componentViewMap) {
             let componentView = this.componentViewMap[viewId];
@@ -202,14 +198,13 @@ export default class ModelView {
             //open menu item
             var menuItemList = [];
             var app = this.getApp();
-            var appView = this.getAppView();
             let initialValues = {parentId: this.getModelManager().getModel().getId()};
             let pageComponents = componentInfo.getPageComponentNames();
             pageComponents.forEach(pageComponentName => {
                 let childMenuItem = {};
                 let pageComponentClass = componentInfo.getComponentClass(pageComponentName);
                 childMenuItem.title = "Add Child " + pageComponentClass.displayName;
-                childMenuItem.callback = () => addComponent(appView,app,pageComponentClass,initialValues);
+                childMenuItem.callback = () => addComponent(this,app,pageComponentClass,initialValues);
                 menuItemList.push(childMenuItem);
             })
 
