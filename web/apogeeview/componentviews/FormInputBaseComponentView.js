@@ -1,5 +1,6 @@
 import ComponentView from "/apogeeview/componentdisplay/ComponentView.js";
 import ConfigurableFormEditor from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
+import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
 import { getFormResultFunctionBody } from "/apogeeui/apogeeUiLib.js";
 
 /** This is a graphing component using ChartJS. It consists of a single data table that is set to

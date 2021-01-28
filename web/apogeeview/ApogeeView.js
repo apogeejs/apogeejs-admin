@@ -140,7 +140,7 @@ export default class ApogeeView {
     _onWorkspaceCreated(workspaceManager) {
         if(this.workspaceView != null) {
             //discard an old view if there is one
-            this.onWorkspaceClosed();
+            this._onWorkspaceClosed();
         }
 
         //create the new workspace view

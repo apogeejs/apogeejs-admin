@@ -2,7 +2,9 @@
 import {Apogee} from "/apogeeapp/apogeeAppLib.js";
 import WebComponentDisplay from "/apogeeview/componentdisplay/webpage/WebComponentDisplay.js";
 import {getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeeview/componentViewInfo.js";
+import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
 import WebAppConfigManager from "/applications/webclientlib/WebAppConfigManager.js";
+import {closeWorkspace} from "/apogeeview/commandseq/closeworkspaceseq.js";
 
 export default class ApogeeWebView {
 
@@ -17,9 +19,7 @@ export default class ApogeeWebView {
         this.componentByNameMap = {};
         this.componentByIdMap = {};
 
-        this.app.addListener("component_created",component => this._onComponentCreated(component));
-        this.app.addListener("component_updated",component => this._onComponentUpdated(component));
-        this.app.addListener("component_deleted",component => this._onComponentDeleted(component));
+        this._subscribeToAppEvents();
 
         //resize monitoring
         window.addEventListener("resize",() => this.onWindowResize());
@@ -27,18 +27,36 @@ export default class ApogeeWebView {
 
     /** This method should be called to open the workspace once the display info has been initialized. */
     openWorkspace(url) {
-        var openWorkspace = workspaceText => {
-            let workspaceJson = JSON.parse(workspaceText);
+        
+        apogeeutil.textRequest(url).then(workspaceText => {
+            //open workspace function
+            var openFromText = () => {
+                let workspaceJson = JSON.parse(workspaceText);
+    
+                //open workspace
+                var commandData = {};
+                commandData.type = "openWorkspace";
+                commandData.workspaceJson = workspaceJson;
+    
+                this.app.executeCommand(commandData);
+            };
 
-            //open workspace
-            var commandData = {};
-            commandData.type = "openWorkspace";
-            commandData.workspaceJson = workspaceJson;
+            //see if we need to close existing first
+            if(this.app.getWorkspaceManager()) {
+                //close existing workspace before open
+                closeWorkspace(this.app,openFromText);
+            }
+            else {
+                openFromText();
+            } 
+        });
+    }
 
-            this.app.executeCommand(commandData);
-        };
-
-        apogeeutil.textRequest(url).then(openWorkspace);
+    /** This method returns a command messenger. The send a command to a member using this
+     * command messenger, the members complete name must be used. */
+    getCommandMessenger() {
+        let model = this.app.getModel();
+        return new UiCommandMessenger(this,model.getId());
     }
 
     //=======================================
@@ -55,6 +73,9 @@ export default class ApogeeWebView {
         return this.app.getModelManager();
     }
 
+    /** This method returns the component view for the given component ID. This will only
+     * return a non-null value if the component view has been configured 
+     */
     getComponentViewByComponentId(componentId) {
         let componentInfo = this.componentByIdMap[componentId];
         if(componentInfo) {
@@ -217,10 +238,29 @@ export default class ApogeeWebView {
     //========================================
     // Private Functions
     //========================================
+
+    _subscribeToAppEvents() {
+        this.app.addListener("workspaceManager_deleted",workspaceManager => this._onWorkspaceClosed(workspaceManager));
+        this.app.addListener("component_created",component => this._onComponentCreated(component));
+        this.app.addListener("component_updated",component => this._onComponentUpdated(component));
+        this.app.addListener("component_deleted",component => this._onComponentDeleted(component));
+    }
     
     //--------------------------------
     // Event handlers
     //--------------------------------
+
+    _onWorkspaceClosed(workspaceManager) {
+        //rather than rely on people to clear their own workspace handlers from the app
+        //I clear them all here
+        //I haven't decided the best way to do this. In the app? Here? I see problems
+        //with all of them.
+        //for now I clear all here and then resubscribe to events here and in the app, since those
+        //objects live on.
+        this.app.clearListenersAndHandlers();
+        this.app.subscribeToAppEvents();
+        this._subscribeToAppEvents();
+    }
 
 
     /** This is called on component created events. We only 
@@ -240,29 +280,28 @@ export default class ApogeeWebView {
             //add this to the map indexed by id
             this.componentByIdMap[id] = componentInfo;
 
-            //create the component view
-            let componentViewClass = getComponentViewClass(component.constructor.uniqueName);
-            let componentView;
-            if(componentViewClass) {
-                componentView = new componentViewClass(this,component);
+            //create the component view if we have registered for any displays.
+            if(componentInfo.displayViews.length > 0) {
+
+                //create the component view
+                let componentViewClass = getComponentViewClass(component.constructor.uniqueName);
+                let componentView;
+                if(componentViewClass) {
+                    componentView = new componentViewClass(this,component);
+                }
+
+                if(!componentView) {
+                    componentView = new ERROR_COMPONENT_VIEW_CLASS(this,component);
+                }
+
+                componentInfo.componentView = componentView;
+
+                //initialize the display views
+                componentInfo.displayViews.forEach( displayViewInfo => {
+                    this._createComponentDisplay(componentInfo,displayViewInfo);
+                })
             }
-
-            if(!componentView) {
-                componentView = new ERROR_COMPONENT_VIEW_CLASS(this,component);
-            }
-
-            componentInfo.componentView = componentView;
-
-            //initialize the display views
-            componentInfo.displayViews.forEach( displayViewInfo => {
-                this._createComponentDisplay(componentInfo,displayViewInfo);
-            })
-
-            //--------------------------------------------
-            //leave out? TBD
-            //do view state initialization
-            //componentView.loadViewStateFromComponent();
-
+            
             //callback any listeners from the user
             if(componentInfo.listeners.length > 0) {
                 try {
@@ -371,5 +410,3 @@ export default class ApogeeWebView {
     }
 
 }
-
-let componentClassMap = {};

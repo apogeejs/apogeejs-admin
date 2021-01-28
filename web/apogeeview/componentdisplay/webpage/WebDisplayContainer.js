@@ -110,6 +110,23 @@ export default class WebDisplayContainer {
         return this.viewDisplayElement;
     }
 
+    setHideDisplay() {
+        //implement!
+    }
+
+    setRemoveView(removeView) {
+        //implement
+    }
+
+    setMessage(messageType,message) {
+        //implement
+    }
+
+    setDisplayValid(displayValid) {
+        //implement
+    }
+
+
     //====================================
     // Initialization Methods
     //====================================
