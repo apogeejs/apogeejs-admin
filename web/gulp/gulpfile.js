@@ -71,8 +71,10 @@ let copyReleaseInfoTask = parallel(
 
 const CSS_FILES = [
     "../apogeeview/apogeeapp.css",
-    "../apogeeview/componentdisplay/LiteratePage.css",
-    "../apogeeview/editor/toolbar/ApogeeToolbar.css",
+    "../apogeeappview/componentdisplay/LiteratePage.css",
+    "../apogeewebview/componentdisplay/WebView.css",
+    "../apogeeview/componentdisplay/ComponentDisplay.css",
+    "../apogeeappview/editor/toolbar/ApogeeToolbar.css",
     "../apogeeui/window/dialog.css",
     "../apogeeui/displayandheader/DisplayAndHeader.css",
     "../apogeeui/menu/Menu.css",
@@ -82,7 +84,7 @@ const CSS_FILES = [
     "../apogeeui/configurablepanel/ConfigurablePanel.css",
     "../apogeeui/configurablepanel/elements/listElement.css",
     "../apogeeui/tooltip/tooltip.css",  
-    "../apogeeview/fileaccess/combinedFileAccess.css",
+    "../applications/webapp/fileaccess/combinedFileAccess.css",
     "../prosemirror/compiledCss/editor.css",    
     "../ext/handsontable/handsontable_6.2.0/handsontable.full.min.css"
 ]
