@@ -1,5 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
+import {EventManager} from "/apogeebase/apogeeBaseLib.js";
 import DisplayAndHeader from "/apogeeui/displayandheader/DisplayAndHeader.js";
 import uiutil from "/apogeeui/uiutil.js";
 

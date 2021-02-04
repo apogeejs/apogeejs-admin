@@ -1,4 +1,4 @@
-import * as fileAccessConstants from "/applications/webapp/fileAccess/fileAccessConstants.js";
+import * as fileAccessConstants from "/webapp/fileAccess/fileAccessConstants.js";
 
 //This class manages access to microsoft one drive
 export default class OneDriveFileSystem {

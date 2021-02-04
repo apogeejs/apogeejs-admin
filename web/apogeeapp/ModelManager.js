@@ -1,5 +1,5 @@
 import { Model, doAction } from "/apogee/apogeeCoreLib.js";
-import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
+import {FieldObject} from "/apogeebase/apogeeBaseLib.js";
 import componentInfo from "/apogeeapp/componentConfig.js";
 
 /** This class manages the user interface for a model object. */

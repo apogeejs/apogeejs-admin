@@ -1,5 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
+import {EventManager} from "/apogeebase/apogeeBaseLib.js";
 import {componentInfo} from "/apogeeapp/apogeeAppLib.js";
 
 import {addComponent, addAdditionalComponent} from "/apogeeview/commandseq/addcomponentseq.js";

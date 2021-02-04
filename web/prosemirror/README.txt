@@ -47,3 +47,7 @@ to produce the modules in es module format.
 
 2) Also in the dist directory, for each prosemirror lib, a es module was placed that re-exports the module from the
 associated repo. This is to give it a better name.
+
+
+NOTE - on all repos, my first change was June 17, 2020. I don't have any of their changes after this date. (Note, I didn't check
+that I have all their changes up to that date. The cutoff may be a few days earlier.)

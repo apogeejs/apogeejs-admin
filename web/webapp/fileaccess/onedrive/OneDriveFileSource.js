@@ -1,5 +1,5 @@
 import OneDriveFileSystem from "./OneDriveFileSystem.js";
-import RemoteFileSource from "/applications/webapp/fileaccess/RemoteFileSource.js";
+import RemoteFileSource from "/webapp/fileaccess/RemoteFileSource.js";
 
 /** This source generator creates a One Drive file source to be used with CombinedFileAccess */
 let OneDriveFileSourceGenerator = {

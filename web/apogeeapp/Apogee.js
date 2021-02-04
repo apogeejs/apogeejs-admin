@@ -1,6 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
-import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
+import {EventManager} from "/apogeebase/apogeeBaseLib.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 import ReferenceManager from "/apogeeapp/references/ReferenceManager.js";
 import WorkspaceManager from "/apogeeapp/WorkspaceManager.js";

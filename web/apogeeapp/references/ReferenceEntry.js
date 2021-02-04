@@ -1,5 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
+import {FieldObject} from "/apogeebase/apogeeBaseLib.js";
 import CommandManager from "/apogeeapp/commands/CommandManager.js";
 
 /** This class manages references for the web page.*/

@@ -1,4 +1,4 @@
-import CombinedFileAccess from "/applications/webapp/fileaccess/CombinedFileAccess.js";
+import CombinedFileAccess from "/webapp/fileaccess/CombinedFileAccess.js";
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 
 /** 

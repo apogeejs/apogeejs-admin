@@ -207,7 +207,7 @@ function copyClientWebExampleWorkspace() {
 
 function prepareClientLibTask() {
 
-    return src('../applications/webclientlib/webClientLib.js')
+    return src('../webruntime/webRuntimeLib.js')
         .pipe(replace('INCLUDE_BASE_PATH = ""','INCLUDE_BASE_PATH = "' + CLIENT_LIB_ASSETS_BASE_URL + '";'))
         .pipe(rename(CLIENT_LIB_INTERMEDIATE_FILENAME))
         .pipe(dest(TEMP_FOLDER));
