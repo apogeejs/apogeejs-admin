@@ -1,6 +1,6 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
 import uiutil from "/apogeeui/uiutil.js";
-import {EventManager} from "/apogeeutil/apogeeBaseLib.js";
+import {EventManager} from "/apogeebase/apogeeBaseLib.js";
 
 /** This is a split pane, with a right and left pane. The types of pane are 
  * given by the constants defined below:

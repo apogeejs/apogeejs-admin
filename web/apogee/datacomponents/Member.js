@@ -1,5 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
+import {FieldObject} from "/apogeebase/apogeeBaseLib.js";
 
 /** This component encapsulates the member functionality for objects in the model.
  * 

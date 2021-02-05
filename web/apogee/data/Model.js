@@ -1,5 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {EventManager,FieldObject} from "/apogeeutil/apogeeBaseLib.js";
+import {EventManager,FieldObject} from "/apogeebase/apogeeBaseLib.js";
 import ContextManager from "/apogee/lib/ContextManager.js";
 import ContextHolder from "/apogee/datacomponents/ContextHolder.js";
 import Parent from "/apogee/datacomponents/Parent.js";

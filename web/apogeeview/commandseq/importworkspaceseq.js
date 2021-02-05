@@ -6,7 +6,7 @@ import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 //=====================================
 
 /** Call this withthe appropriate generator - folder or folder function, for the given import type. */
- export function importWorkspace(modelView,app,fileAccessObject,componentClass) {
+ export function importWorkspace(appViewInterface,app,fileAccessObject,componentClass) {
 
     //make sure there is not an open workspace
     if(!app.getWorkspaceManager()) {
@@ -21,7 +21,7 @@ import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
         }
         else if(workspaceData) {
             //open workspace
-            return openWorkspace(modelView,app,componentClass,workspaceData,fileMetadata);
+            return openWorkspace(appViewInterface,app,componentClass,workspaceData,fileMetadata);
         }
     }
 
@@ -37,7 +37,7 @@ import {addComponent} from "/apogeeview/commandseq/addcomponentseq.js";
 /** This method opens an workspace, from the text file. 
  * The result is returnd through the callback function rather than a return value,
  * since the function runs (or may run) asynchronously. */
-function openWorkspace(modelView,app,componentClass,workspaceText,fileMetadata) {
+function openWorkspace(appViewInterface,app,componentClass,workspaceText,fileMetadata) {
     
     try {
         //make sure there is not an open workspace
@@ -59,7 +59,7 @@ function openWorkspace(modelView,app,componentClass,workspaceText,fileMetadata) 
         var serializedMemberJson = getMemberJsonFromWorkspaceJson(workspaceJson,componentClass);
         var serializedComponentsJson = getComponentJsonFromWorkspaceJson(workspaceJson,componentClass);
         
-		var workspaceImportDialogFunction = () => addComponent(modelView,app,initialProperties,serializedMemberJson,serializedComponentsJson);
+		var workspaceImportDialogFunction = () => addComponent(appViewInterface,app,initialProperties,serializedMemberJson,serializedComponentsJson);
         
         var linkLoadError = function(errorMsg) {
             apogeeUserAlert("Error loading links: " + errorMsg);

@@ -7,9 +7,9 @@ import dataDisplayHelper from "/apogeeview/datadisplay/dataDisplayHelper.js";
  * and create a generator. */
 export default class BasicComponentView extends ComponentView {
 
-    constructor(modelView,component) {
+    constructor(appViewInterface,component) {
         //extend edit component
-        super(modelView,component);
+        super(appViewInterface,component);
     };
 
     //==============================

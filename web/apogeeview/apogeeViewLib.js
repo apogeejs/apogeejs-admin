@@ -3,14 +3,9 @@ import {uiutil} from "/apogeeui/apogeeUiLib.js";
 
 import ace from "/ext/ace/ace_1.4.3/ace.es.js";
 
-export {default as ApogeeView} from "/apogeeview/ApogeeView.js";
-export {default as ApogeeWebView} from "/apogeeview/ApogeeWebView.js";
 export {default as ComponentView} from "/apogeeview/componentdisplay/ComponentView.js";
 
 export {default as FormInputBaseComponentView} from "/apogeeview/componentviews/FormInputBaseComponentView.js";
-
-//needed just for web lib
-export {default as WebComponentDisplay} from "/apogeeview/componentdisplay/webpage/WebComponentDisplay.js";
 
 export {default as AceTextEditor} from "/apogeeview/datadisplay/AceTextEditor.js";
 export {default as ConfigurableFormEditor} from "/apogeeview/datadisplay/ConfigurableFormEditor.js";
@@ -24,14 +19,10 @@ export {default as StandardErrorDisplay} from "/apogeeview/datadisplay/StandardE
 
 export {registerComponentView,getComponentViewClass,ERROR_COMPONENT_VIEW_CLASS} from "/apogeeview/componentViewInfo.js";
 
-export {showLegacyConfigurableDialog} from "/apogeeview/dialogs/LegacyConfigurableDialog.js";
-export {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
-export {showSimpleActionDialog} from "/apogeeview/dialogs/SimpleActionDialog.js";
-
 export {default as UiCommandMessenger} from "/apogeeview/commandseq/UiCommandMessenger.js";
 
-//import the default component views
-import "/apogeeview/componentViewConfig.js";
+//import the default child component views
+import "/apogeeview/childComponentViewConfig.js";
 
 /** This function initializes the resources paths. Thuis covers the following paths
  * - "resources" folder - where the resource images are held

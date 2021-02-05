@@ -8,9 +8,14 @@ import TreeComponentDisplay from "/apogeeview/componentdisplay/TreeComponentDisp
 /** This is the base functionality for a component. */
 export default class ComponentView {
 
-    constructor(modelView,component) {
+    /** This takes the appViewInterface and the componnet view's assoicated component.
+     * In the full UI the appViewInterface is nominally the modelView. However, this 
+     * abstraction was added to allow use embedded in a web page as an alternate UI. 
+     */
+    constructor(appViewInterface,component) {
         
-        this.modelView = modelView;
+        this.app = appViewInterface.getApp();
+        this.appViewInterface = appViewInterface;
         this.component = component;
         //this is to record the latest parent view to which this was added
         this.lastAssignedParentComponentView = null;
@@ -43,7 +48,7 @@ export default class ComponentView {
     }
 
     getApp() {
-        return this.modelView.getApp();
+        return this.app;
     }
 
     getName() {
@@ -94,10 +99,10 @@ export default class ComponentView {
      * same result getLastAssignedParentComponentView except during a delete or move operation. 
      * This may return null if there is no parent component view. */
     getParentComponentView() {
-        if(this.modelView) {
-            let parentComponent = this.component.getParentComponent(this.modelView.getModelManager());
+        if(this.appViewInterface.hasParentDisplays()) {
+            let parentComponent = this.component.getParentComponent(this.appViewInterface.getModelManager());
             if(parentComponent) {
-                return this.modelView.getComponentViewByComponentId(parentComponent.getId());
+                return this.appViewInterface.getComponentViewByComponentId(parentComponent.getId());
             }
         }
         //if we get here, no parent component view looked up
@@ -138,9 +143,17 @@ export default class ComponentView {
         }
     }
 
-    /** This method returns the model manager for this component. */
+    /** The appViewInterface connects the component with the rest of the UI. THis is a base class
+     * for ModelView and has been pulled out to allow replacement of the UI by embedding component output
+     * in a web page. */
+    getAppViewInterface() {
+        return this.appViewInterface;
+    }
+
+    /** This returns the appViewInterface, which replaces and is a base class for the model view 
+     * @deprecated */
     getModelView() {
-        return this.modelView;
+        return this.appViewInterface;
     }
 
     /** This method is called when the workspace is closing */
@@ -332,16 +345,14 @@ export default class ComponentView {
 
     createTabDisplay(makeActive) {
         if((this.usesTabDisplay())&&(!this.tabDisplay)) {
-            if(this.modelView) { 
-                var tabFrame = this.modelView.getTabFrame();
-                if(tabFrame) {
+            var tabFrame = this.appViewInterface.getTabFrame();
+            if(tabFrame) {
 
-                    this.tabDisplay = this.instantiateTabDisplay();
+                this.tabDisplay = this.instantiateTabDisplay();
 
-                    //add the tab display to the tab frame
-                    let tab = this.tabDisplay.getTab();
-                    tabFrame.addTab(tab,makeActive);
-                }
+                //add the tab display to the tab frame
+                let tab = this.tabDisplay.getTab();
+                tabFrame.addTab(tab,makeActive);
             }
         }
     }
@@ -423,7 +434,7 @@ export default class ComponentView {
         //check for parent change
         if(component.isFieldUpdated("member")) {
             let member = component.getMember();
-            if(member.isFieldUpdated("parentId")) {
+            if((member.isFieldUpdated("parentId"))&&(this.appViewInterface.hasParentDisplays())) {
                 var oldParentComponentView = this.getLastAssignedParentComponentView();
                 var newParentComponentView = this.getParentComponentView();
 
@@ -437,9 +448,9 @@ export default class ComponentView {
                             this.childComponentDisplay = null;
                         }
                     }
-                    else if(this.modelView) {
+                    else {
                         //this was in the root folder
-                        this.modelView.removeChildFromRoot(this);
+                        this.appViewInterface.removeChildFromRoot(this);
                     }
 
                     //add to the new parent component
@@ -447,9 +458,9 @@ export default class ComponentView {
                         newParentComponentView.addChild(this);
                         this.setLastAssignedParentComponentView(newParentComponentView);
                     }
-                    else if(this.modelView) {
+                    else {
                         //this is placed in the root folder
-                        this.modelView.addChildToRoot(this);
+                        this.appViewInterface.addChildToRoot(this);
                         this.setLastAssignedParentComponentView(null);
                     }
                 }

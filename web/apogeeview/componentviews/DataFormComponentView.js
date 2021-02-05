@@ -12,8 +12,8 @@ import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
  * confugred with initialization data from the model. */
 export default class DataFormComponentView extends ComponentView {
 
-    constructor(modelView,component) {
-        super(modelView,component);
+    constructor(appViewInterface,component) {
+        super(appViewInterface,component);
     };
 
     //==============================

@@ -3,7 +3,7 @@ import {validateTableName} from "/apogee/apogeeCoreLib.js";
 
 import {getPropertiesDialogLayout} from "/apogeeview/commandseq/updatecomponentseq.js";
 import {Component,componentInfo} from "/apogeeapp/apogeeAppLib.js";
-import {showConfigurableDialog} from "/apogeeview/dialogs/ConfigurableDialog.js";
+import {showConfigurableDialog} from "/apogeeui/apogeeUiLib.js";
 import {showSelectComponentDialog} from "/apogeeview/dialogs/SelectControlDialog.js";
 import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
 
@@ -16,7 +16,7 @@ import {getComponentViewClass} from "/apogeeview/componentViewInfo.js";
  * property values in optionalBaseComponentValues, overridden by the user input properties where applicable. The member
  * created will be made using the optionalBaseMemberValues, agagin overidden by any user input values.  */   
 //piggybackCommand is a temporary test!!!
-export function addComponent(modelView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+export function addComponent(appViewInterface,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
 
         let componentViewClass = getComponentViewClass(componentClass.uniqueName);
 
@@ -83,8 +83,8 @@ export function addComponent(modelView,app,componentClass,optionalInitialPropert
             let parentComponentView;
             if(componentViewClass.hasChildEntry) {
                 let parentComponentId = modelManager.getComponentIdByMemberId(parentMemberId);
-                if(parentComponentId) {
-                    parentComponentView = modelView.getComponentViewByComponentId(parentComponentId);
+                if((parentComponentId)&&(appViewInterface.hasParentDisplays())) {
+                    parentComponentView = appViewInterface.getComponentViewByComponentId(parentComponentId);
                     if(!parentComponentView) throw new Error("Parent component not found!");
 
                     additionalCommandInfo = getAdditionalCommands(parentComponentView,userInputProperties.name);
@@ -166,12 +166,12 @@ export function addComponent(modelView,app,componentClass,optionalInitialPropert
 
 /** This gets a callback to add an "additional" component, menaing one that is not
  * in the main component menu. */
-export function addAdditionalComponent(modelView,app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
+export function addAdditionalComponent(appViewInterface,app,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues) {
         
     var onSelect = function(componentUniqueName) {
         let componentClass = componentInfo.getComponentClass(componentUniqueName);
         if(componentClass) {
-            addComponent(modelView,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
+            addComponent(appViewInterface,app,componentClass,optionalInitialProperties,optionalBaseMemberValues,optionalBaseComponentValues);
         }
         else {
             apogeeUserAlert("Unknown component type: " + componentType);

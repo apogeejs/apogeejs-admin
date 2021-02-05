@@ -1,5 +1,5 @@
 import apogeeutil from "/apogeeutil/apogeeUtilLib.js";
-import {FieldObject} from "/apogeeutil/apogeeBaseLib.js";
+import {FieldObject} from "/apogeebase/apogeeBaseLib.js";
 
 /** This is the base functionality for a component. */
 export default class Component extends FieldObject {

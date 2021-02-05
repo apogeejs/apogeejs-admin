@@ -6,8 +6,8 @@ let {FormInputBaseComponentView,HandsonGridEditor,AceTextEditor,StandardErrorDis
  * for how to set the data. */
 export default class CSVComponentView extends FormInputBaseComponentView {
 
-    constructor(modelView,component) {
-        super(modelView,component);
+    constructor(appViewInterface,component) {
+        super(appViewInterface,component);
     };
 
     //=================================
@@ -53,7 +53,7 @@ export default class CSVComponentView extends FormInputBaseComponentView {
                 return this.getFormDataDisplay(displayContainer);
 
             case FormInputBaseComponentView.VIEW_INFO: 
-                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
+                let dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(this.getApp(),this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
 
             default:
@@ -124,7 +124,7 @@ export default class CSVComponentView extends FormInputBaseComponentView {
                 //unwrapped data in that case.
                 let allDataMember = this.getComponent().getField("member.data");
 				if(allDataMember.getState() != apogeeutil.STATE_NORMAL) {
-					return displayDataHelper.getStandardWrappedMemberData(allDataMember);
+					return dataDisplayHelper.getStandardWrappedMemberData(allDataMember);
 				}
 				else {
 					let allData = allDataMember.getData();
@@ -166,7 +166,7 @@ export default class CSVComponentView extends FormInputBaseComponentView {
                 //unwrapped data in that case.
                 let allDataMember = this.getComponent().getField("member.data");
 				if(allDataMember.getState() != apogeeutil.STATE_NORMAL) {
-					return displayDataHelper.getStandardWrappedMemberData(allDataMember);
+					return dataDisplayHelper.getStandardWrappedMemberData(allDataMember);
 				}
 				else {
 					let allData = allDataMember.getData();

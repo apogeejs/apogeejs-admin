@@ -14,9 +14,9 @@ import UiCommandMessenger from "/apogeeview/commandseq/UiCommandMessenger.js";
  * data value, you can use the dynmaic form. */
 export default class FormDataComponentView extends ComponentView {
 
-    constructor(modelView,folderComponent) {
+    constructor(appViewInterface,folderComponent) {
         //extend edit component
-        super(modelView,folderComponent);
+        super(appViewInterface,folderComponent);
     };
 
     //==============================

@@ -22,7 +22,7 @@ export default class ChartJSComponentView extends FormInputBaseComponentView {
      * @protected. */
     getDataDisplay(displayContainer,viewType) {
 
-        var dataSource;
+		var dataSource;
 
         //create the new view element;
         switch(viewType) {
@@ -35,7 +35,7 @@ export default class ChartJSComponentView extends FormInputBaseComponentView {
 				return this.getFormDataDisplay(displayContainer);
 				
 			case FormInputBaseComponentView.VIEW_INFO: 
-                dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(app,this);
+                let dataDisplaySource = dataDisplayHelper.getStandardErrorDataSource(this.getApp(),this);
                 return new StandardErrorDisplay(displayContainer,dataDisplaySource);
 
             default:
@@ -78,7 +78,7 @@ export default class ChartJSComponentView extends FormInputBaseComponentView {
 				//otherwise we return standard wrapped data (or invalid value)
 				let chartConfigMember = this.getComponent().getField("member.data");
 				if(chartConfigMember.getState() != apogeeutil.STATE_NORMAL) {
-					return displayDataHelper.getStandardWrappedMemberData(chartConfigMember);
+					return dataDisplayHelper.getStandardWrappedMemberData(chartConfigMember);
 				}
 				else {
 					let data = chartConfigMember.getData();

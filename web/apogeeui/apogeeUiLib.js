@@ -14,5 +14,9 @@ export {default as ConfigurablePanel} from "/apogeeui/configurablepanel/Configur
 export {getFormResultFunctionBody} from "/apogeeui/configurablepanel/ConfigurablePanelUtil.js";
 export {wrapWithTooltip, getHelpElement} from "/apogeeui/tooltip/tooltip.js";
 
+export {showLegacyConfigurableDialog} from "/apogeeui/dialogs/LegacyConfigurableDialog.js";
+export {showConfigurableDialog} from "/apogeeui/dialogs/ConfigurableDialog.js";
+export {showSimpleActionDialog} from "/apogeeui/dialogs/SimpleActionDialog.js";
+
 //this loads the standard configurable panel elements
 import "/apogeeui/configurablepanel/ConfigurablePanelInit.js";

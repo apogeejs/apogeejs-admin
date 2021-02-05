@@ -79,14 +79,14 @@ export default class TreeComponentDisplay {
             //add child folder menu item
             if(this.componentView.usesTabDisplay()) {
                 let app = this.componentView.getApp();
-                var modelView = this.componentView.getModelView();
+                var appViewInterface = this.componentView.getAppViewInterface();
                 let initialValues = {parentId: component.getMemberId()};
                 let pageComponents = componentInfo.getPageComponentNames();
                 pageComponents.forEach(pageComponentName => {
                     let childMenuItem = {};
                     let pageComponentClass = componentInfo.getComponentClass(pageComponentName);
                     childMenuItem.title = "Add Child " + pageComponentClass.displayName;
-                    childMenuItem.callback = () => addComponent(modelView,app,pageComponentClass,initialValues);
+                    childMenuItem.callback = () => addComponent(appViewInterface,app,pageComponentClass,initialValues);
                     menuItemList.push(childMenuItem);
                 })
             }
