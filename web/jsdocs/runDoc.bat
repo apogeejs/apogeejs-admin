@@ -1,1 +1,0 @@
-./node_modules/.bin/jsdoc ../apogeeutil/apogeeUtilLib.js -c config.json -d ./doc_out
