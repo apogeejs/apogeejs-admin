@@ -1,0 +1,12 @@
+{
+  "name": "apogee-lib-build",
+  "version": "0.0.0",
+  "description": "Gulp release tool for Apogee libs",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "rollup": "^1.27.13",
+    "gulp-concat": "^2.6.1",
+    "gulp-replace": "^1.0.0"
+  },
+  "author": "Intransix"
+}

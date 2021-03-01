@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            .menuBar {
+                background-color: red;
+            }
+            
+            /* Dropdown Button */
+            .dropbtn {
+                background-color: #4CAF50;
+                color: white;
+                padding: 16px;
+                font-size: 16px;
+                border: none;
+                cursor: pointer;
+            }
+
+            /* Dropdown button on hover & focus */
+            .dropbtn:hover, .dropbtn:focus {
+                background-color: #3e8e41;
+            }
+
+            /* The container <div> - needed to position the dropdown content */
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+
+            /* Dropdown Content (Hidden by Default) */
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                background-color: #f9f9f9;
+                min-width: 160px;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            }
+
+            /* Links inside the dropdown */
+            .dropdown-content a {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+            }
+
+            /* Change color of dropdown links on hover */
+            .dropdown-content a:hover {background-color: #f1f1f1}
+
+            /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+            .show-menu {display:block;}
+        </style>
+        <script>
+            
+            ///////////////////////////////////////
+            // Menu Code
+            ///////////////////////////////////////
+            var nextInt = 0;
+            
+            var menuData = {};
+            
+            var createMenu = function(label,menuBar) {
+                //create menu
+                var menu = document.createElement("div");
+                menu.className = "dropdown";
+                var idInt = nextInt++;
+                
+                //create header
+                var header = document.createElement("button");
+                header.className = "dropbtn";
+                header.id = "menuHeader" + idInt;
+                header.innerHTML = label;
+                menu.appendChild(header);
+                
+                //create content div
+                var contentDiv = document.createElement("div");
+                contentDiv.className = "dropdown-content";
+                contentDiv.id = header.id + "_c";
+                menu.appendChild(contentDiv);
+                
+                header.onclick = function() {
+                    contentDiv.classList.toggle("show-menu");
+                }
+                
+                menuBar.appendChild(menu);
+                return menu;
+            }
+            
+            var addTextElement = function(text,callback,menu) {
+                var element = document.createElement("a");
+                element.innerHTML = text;
+                element.onclick = callback;
+                var contentElement = menu.lastChild;
+                contentElement.appendChild(element);                
+            }
+            
+            // Close the dropdown menu if the user clicks outside of it
+            window.onclick = function(event) {
+                var ignoreId;  
+                if(event.target.matches('.dropbtn')) {
+                    ignoreId = event.target.id + "_c";
+                }
+                else {
+                    ignoreId = null;
+                }
+
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                var i;
+                for (i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if((openDropdown.id !== ignoreId)&&(openDropdown.classList.contains('show-menu'))) {
+                        openDropdown.classList.remove('show-menu');
+                    }
+                }
+            }
+            
+            ///////////////////////////////////////////
+            // App Test Code
+            ///////////////////////////////////////////
+            
+            function getFunction(elementName) {
+                return function() {alert(elementName);};
+            }
+            
+            function onLoad() {
+                var menuBar = document.getElementById("menuBar");
+                var menu;
+                var elementName;
+
+                menu = createMenu("First",menuBar);
+
+                elementName = "entry 11";
+                addTextElement(elementName,getFunction(elementName),menu);
+                elementName = "entry 12";
+                addTextElement(elementName,getFunction(elementName),menu);
+                elementName = "entry 13";
+                addTextElement(elementName,getFunction(elementName),menu);
+
+                menu = createMenu("second",menuBar);
+
+                elementName = "entry 21";
+                addTextElement(elementName,getFunction(elementName),menu);
+                elementName = "entry 22";
+                addTextElement(elementName,getFunction(elementName),menu);
+                elementName = "entry 23";
+                addTextElement(elementName,getFunction(elementName),menu);
+
+                menu = createMenu("Third",menuBar);
+
+                elementName = "entry 31";
+                addTextElement(elementName,getFunction(elementName),menu);
+                elementName = "entry 32";
+                addTextElement(elementName,getFunction(elementName),menu);
+                elementName = "entry 33";
+                addTextElement(elementName,getFunction(elementName),menu); 
+            }
+          
+        </script>
+    </head>
+    <body onload = "onLoad()">
+        <div id="menuBar" class="menuBar"></div>
+
+<!--        
+        <div class="dropdown">
+            <button id="dd1" onclick="myFunction('dd1_c')" class="dropbtn">Dropdown</button>
+            <div id="dd1_c" class="dropdown-content">
+              <a href="#">Link 1</a>
+              <a href="#">Link 2</a>
+              <a href="#">Link 3</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button id="dd2" onclick="myFunction('dd2_c')" class="dropbtn">Dropdown</button>
+            <div id="dd2_c" class="dropdown-content">
+              <a href="#">Link 1</a>
+              <a href="#">Link 2</a>
+              <a href="#">Link 3</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button id="dd3" onclick="myFunction('dd3_c')" class="dropbtn">Dropdown</button>
+            <div id="dd3_c" class="dropdown-content">
+              <a href="#">Link 1</a>
+              <a href="#">Link 2</a>
+              <a href="#">Link 3</a>
+            </div>
+        </div>
+-->
+    </body>
+</html>

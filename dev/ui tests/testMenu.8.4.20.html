@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            /* Dropdown Button */
+            .dropbtn {
+                background-color: #4CAF50;
+                color: white;
+                padding: 16px;
+                font-size: 16px;
+                border: none;
+                cursor: pointer;
+            }
+
+            /* Dropdown button on hover & focus */
+            .dropbtn:hover {
+                background-color: #3e8e41;
+            }
+
+            .dropbtn:focus {
+                background-color: #8e3e6f;
+            }
+
+            /* The container <div> - needed to position the dropdown content */
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+
+            /* Dropdown Content (Hidden by Default) */
+            .dropdown-content {
+                position: relative;
+                display: none;
+                background-color: #f9f9f9;
+                min-width: 160px;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            }
+
+            /* Links inside the dropdown */
+            .dropdown-content a {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+            }
+
+            /* Change color of dropdown links on hover */
+            .dropdown-content a:hover {background-color: #f1f1f1}
+
+            /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+            .show {display:block;}
+        </style>
+        <script>
+            function showContent(id) {
+                document.getElementById(id).classList.add("show");
+            }
+
+            function hideContent(id) {
+                document.getElementById(id).classList.remove("show");
+            }   
+            
+            function testContent(id) {
+                let contentId = id + "_c";
+                let activeId = document.activeElement.id
+                if(activeId.startsWith(id)) document.getElementById(contentId).classList.add("show");
+                else document.getElementById(contentId).classList.remove("show");
+            }
+        </script>
+    </head>
+    <body>
+        <div class="dropdown">
+            <button id="dd1" onfocus="testContent('dd1')" onblur="testContent('dd1')" class="dropbtn">Dropdown</button>
+            <div id="dd1_c" class="dropdown-content">
+              <button id="dd1_c1" onfocus="testContent('dd1_c')" onblur="testContent('dd1_c')">Link 1</button><br>
+              <button id="dd1_c2" onfocus="testContent('dd1_c')" onblur="testContent('dd1_c')">Link 2</button><br>
+              <button id="dd1_c3" onfocus="testContent('dd1_c')" onblur="testContent('dd1_c')">Link 3</button><br>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button id="dd2" onfocus="showContent('dd2_c')" onblur="hideContent('dd2_c')" class="dropbtn">Dropdown</button>
+            <div id="dd2_c" class="dropdown-content">
+              <a href="#">Link 1</a>
+              <a href="#">Link 2</a>
+              <a href="#">Link 3</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button id="dd3" onfocus="showContent('dd3_c')" onblur="hideContent('dd3_c')" class="dropbtn">Dropdown</button>
+            <div id="dd3_c" class="dropdown-content">
+              <a href="#">Link 1</a>
+              <a href="#">Link 2</a>
+              <a href="#">Link 3</a>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,17 @@
+{
+    "pathMapping": {
+        "/releases/": "/apogeejs-releases/web/releases/",
+        "/releases-dev/": "/apogeejs-releases/web/releases-dev/"
+    },
+
+    "SCRAP_STUFF": {
+        "/apogeejs-util-lib/src/": "/apogeejs-admin/releases-dev/apogeejs-util-lib/v2.0.0-p1",
+        "/apogeejs-base-lib/src/": "/apogeejs-admin/releases-dev/apogeejs-base-lib/v2.0.0-p1",
+        "/apogeejs-model-lib/src/": "/apogeejs-admin/releases-dev/apogeejs-model-lib/v2.0.0-p1",
+        "/apogeejs-app-lib/src/": "/apogeejs-admin/releases-dev/apogeejs-app-lib/v2.0.0-p1",
+        "/apogeejs-ui-lib/src/": "/apogeejs-admin/releases-dev/apogeejs-ui-lib/v2.0.0-p1",
+        "/apogeejs-view-lib/src/": "/apogeejs-admin/releases-dev/apogeejs-view-lib/v2.0.0-p1",
+        "/apogeejs-app-bundle/src/": "/apogeejs-admin/releases-dev/apogeejs-app-bundle/v2.0.0-p1",
+        "/apogeejs-webview-lib/src/": "/apogeejs-admin/releases-dev/apogeejs-webview-lib/v2.0.0-p1"
+    }
+}

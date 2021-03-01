@@ -1,0 +1,243 @@
+{
+	"fileType": "apogee js web workspace",
+	"workspace": {
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "OsmToGeojsonNoRender",
+			"type": "apogee.Folder",
+			"children": {
+				"swneBoundingBox": {
+					"name": "swneBoundingBox",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": [
+							37.39303678804945,
+							-122.08008885383607,
+							37.39453272390984,
+							-122.0778250694275
+						],
+						"description": ""
+					}
+				},
+				"url": {
+					"name": "url",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": "http://overpass-api.de/api/interpreter",
+						"description": ""
+					}
+				},
+				"geojsonPointLookupTable": {
+					"name": "geojsonPointLookupTable",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var output = {};\n\nvar isNode = (element) => (element.type == \"node\");\nvar addToMap = (element) => output[element.id] = [element.lon,element.lat];\n\nosmData.elements.filter(isNode).forEach(addToMap);\n\nreturn output;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"geojson": {
+					"name": "geojson",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var output = {};\noutput.type = \"FeatureCollection\";\noutput.properties = {};\n\nvar hasTags = (element) => (element.tags !== undefined);\n\nvar toGeojsonFeature = (osmFeature) => {\n    var geojsonFeature = {};\n    geojsonFeature.type = \"Feature\";\n    geojsonFeature.id = osmFeature.id;\n    geojsonFeature.properties = osmFeature.tags;\n    geojsonFeature.geometry = getGeojsonGeometry(osmFeature);\n    return geojsonFeature;\n}\n\noutput.features = osmData.elements.filter(hasTags).map(toGeojsonFeature);\n\nreturn output;",
+						"supplementalCode": "function getGeojsonGeometry(osmFeature) {\n    var geometry = {};\n    if(osmFeature.type == \"node\") {\n        geometry.type = \"Point\";\n        geometry.coordinates = getPointCoordinates(osmFeature.id);\n    }\n    else if(osmFeature.type == \"way\") {\n        if(isPolygon(osmFeature)) {\n            geometry.type = \"Polygon\";\n            geometry.coordinates = getPolygonCoordinates(osmFeature.nodes)\n        }\n        else {\n            geometry.type = \"LineString\";\n            geometry.coordinates = getLineStringCoordinates(osmFeature.nodes);\n        }\n    }\n    else {\n        throw new Error(\"Unexpected osm type: \" + osmFeature.type);\n    }\n    return geometry;\n}\n\n/** Point - lookup lon lat point for given node id */\nfunction getPointCoordinates(nodeId) {\n    return geojsonPointLookupTable[nodeId];\n}\n\n/** Line String - list of lat lon points for a list of node ids */\nfunction getLineStringCoordinates(nodeIdList) {\n    return nodeIdList.map(getPointCoordinates);\n}\n\n/** Polygon - get a list o fline strings (with one entry - the outer loop)\n * We are not supporting interior rings for now. */\nfunction getPolygonCoordinates(nodeIdList) {\n    return [getLineStringCoordinates(nodeIdList)];\n}\n\n",
+						"description": ""
+					}
+				},
+				"osmData": {
+					"name": "osmData",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var options = {};\noptions.method = \"POST\";\noptions.body = getBody(swneBoundingBox);\n\nreturn .jsonRequest(url,options);",
+						"supplementalCode": "function getBody(boundingBoxArray) {\n    var bboxString = boundingBoxArray.join(\",\");\n    var body = apogeeutil.formatString(\"[out:json];(node({0});(way({0});>;););out;\",bboxString);\n    return body;\n}",
+						"description": ""
+					}
+				},
+				"readPropertyTree": {
+					"name": "readPropertyTree",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"tree",
+							"properties"
+						],
+						"functionBody": "for(var key in tree) {\n    \n    var featureValue = properties[key];\n    if(featureValue !== undefined) {\n        var treeEntry = tree[key];\n        //check the value specific entry\n        if(treeEntry.values) {\n            var payload = treeEntry.values[featureValue];\n            if(payload !== undefined) {\n                return payload;\n            }\n        }\n        \n        //check the default entry\n        if(treeEntry.default !== undefined) {\n            return treeEntry.default;\n        }\n    }\n}\n\n//none found\nreturn null;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"isPolygonPropertyTree": {
+					"name": "isPolygonPropertyTree",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": {
+							"building": {
+								"default": true
+							}
+						},
+						"description": "This tree indicates which keys and associated\nvalues are polygons (true) or linestrings (false\nor undefined).\n\nFORMAT:\n\n{\n    [key1]:{\n        \"values\":{\n            [value11]:true,\n            [value21]:true,\n            ...\n         },\n         \"default\":true,\n    },\n    [key2]:{\n        \"values\":{\n            [value21]:true,\n            [value22]:true,\n            ...\n         },\n         \"default\":true,\n    },\n    ...\n}\n             "
+					}
+				},
+				"isPolygon": {
+					"name": "isPolygon",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"osmFeature"
+						],
+						"functionBody": "return readPropertyTree(isPolygonPropertyTree,osmFeature.tags);",
+						"supplementalCode": "",
+						"description": ""
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"swneBoundingBox": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 276,
+						"height": 115
+					},
+					"posInfo": {
+						"x": 46,
+						"y": 27
+					},
+					"state": 0,
+					"viewType": "Data"
+				},
+				"dataView": "Colorized"
+			},
+			"url": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 367,
+						"height": 49
+					},
+					"posInfo": {
+						"x": 48,
+						"y": 184
+					},
+					"state": -1,
+					"viewType": "Data"
+				},
+				"dataView": "Colorized"
+			},
+			"geojsonPointLookupTable": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 588,
+						"height": 401
+					},
+					"posInfo": {
+						"x": 50,
+						"y": 405
+					},
+					"state": -1,
+					"viewType": "Formula"
+				},
+				"dataView": "Colorized"
+			},
+			"geojson": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 843,
+						"height": 766
+					},
+					"posInfo": {
+						"x": 51,
+						"y": 454
+					},
+					"state": -1,
+					"viewType": "Data"
+				},
+				"dataView": "Colorized"
+			},
+			"osmData": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 444,
+						"height": 502
+					},
+					"posInfo": {
+						"x": 49,
+						"y": 227
+					},
+					"state": -1,
+					"viewType": "Data"
+				},
+				"dataView": "Colorized"
+			},
+			"readPropertyTree": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 504,
+						"height": 400
+					},
+					"posInfo": {
+						"x": 48,
+						"y": 287
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			},
+			"isPolygonPropertyTree": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 374,
+						"height": 380
+					},
+					"posInfo": {
+						"x": 403,
+						"y": 24
+					},
+					"state": 0,
+					"viewType": "Notes"
+				},
+				"dataView": "Colorized"
+			},
+			"isPolygon": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 489,
+						"height": 400
+					},
+					"posInfo": {
+						"x": 49,
+						"y": 330
+					},
+					"state": -1,
+					"viewType": "Code"
+				}
+			}
+		}
+	},
+	"library": [
+		{
+			"url": "https://unpkg.com/leaflet@1.2.0/dist/leaflet.js",
+			"entryType": "js link"
+		},
+		{
+			"url": "https://unpkg.com/leaflet@1.2.0/dist/leaflet.css",
+			"entryType": "css link"
+		}
+	],
+	"version": 0.31
+}

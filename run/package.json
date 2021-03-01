@@ -1,0 +1,12 @@
+{
+  "name": "apogeejs-dev-server",
+  "version": "0.0.1",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "devDependencies": {
+    "express": "~4.17.1"
+  },
+  "author": "Dave Sutter"
+}

@@ -1,0 +1,75 @@
+<html>
+	<head>
+		<!-- This is a test of the trix editor -->
+		<script type="text/javascript"  src="https://cdnjs.cloudflare.com/ajax/libs/trix/1.0.0/trix.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/trix/1.0.0/trix.css">
+		<script>
+			function doAction() {
+				var element = document.querySelector("trix-editor")
+				var trixEditor = element.editor;
+				
+				//insert text
+				//trixEditor.setSelectedRange([0, 0])
+				//trixEditor.insertString("Hello")
+				
+				//insert attachment
+				var index = getIndex();
+				var content = createContent(index);
+				var attachment = new Trix.Attachment({ content: content, index: index })
+				trixEditor.insertLineBreak();
+				trixEditor.insertAttachment(attachment);
+				trixEditor.insertLineBreak();
+				
+				//print contents
+				var text = trixEditor.getDocument().toString();
+				console.log(text);
+			}
+			
+			var nextIndex = 0;
+			function getIndex() {
+				return nextIndex++;
+			}
+			
+			function createContent(index) {
+				//return '<div id="content-' + index + '"></div>'
+				return '<my-element data-index="' + index + '" id="234"></my-element>';
+			}
+			
+			function buttonAction() {
+				console.log("It worked!");
+			}
+			
+			function attachmentAdded(event) {
+				//var index = event.attachment.attachment.attributes.values.index;
+				//console.log("added: " + index);
+				//not actually loaded yet!
+				//setTimeout(() => loadContent(index),1000);
+			}
+			
+			function init() {
+				addEventListener("trix-attachment-add", attachmentAdded);
+			}
+			
+			var savedData = {};
+			function saveData(index,data) {
+				savedData[index] = data;
+			}
+			
+			function getData(index) {
+				return savedData[index];
+			}
+			
+			
+		</script>
+		<script src="MyElement.js"></script>
+		
+	</head>
+	<body onload="init()">
+		<button onclick="doAction()">Add Container</button><!--<button onclick="loadContent(0)">Add Content</button>-->
+		<trix-toolbar id="trix-toolbar-1"></trix-toolbar>
+		<h1>Number 1</h1>
+		<trix-editor input="content" class="trix-content" contenteditable role="textbox" trix-id="1" toolbar="trix-toolbar-1">xcvzxcvzxcv</trix-editor>
+		
+		
+	</body>
+<html>

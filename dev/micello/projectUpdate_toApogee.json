@@ -1,0 +1,148 @@
+{
+	"fileType": "apogee app js workspace",
+	"workspace": {
+		"fileType": "apogee workspace",
+		"version": 0.2,
+		"data": {
+			"name": "Model",
+			"type": "apogee.Folder",
+			"children": {
+				"inputProject": {
+					"name": "inputProject",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"data": "",
+						"description": ""
+					}
+				},
+				"replace": {
+					"name": "replace",
+					"type": "apogee.FunctionTable",
+					"updateData": {
+						"argList": [
+							"oldWord",
+							"newWord",
+							"body"
+						],
+						"functionBody": "var oldRegex = new RegExp(oldWord,\"g\");\nreturn body.replace(oldRegex,newWord);",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"stringsReplaced": {
+					"name": "stringsReplaced",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var projectText = JSON.stringify(inputProject)\nprojectText = replace(\"hax\",\"apogee\",projectText);\nprojectText = replace(\"apogee.Control\",\"apogee.JsonTable\",projectText);\n\nprojectJson = JSON.parse(projectText);\nreturn projectJson;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				},
+				"controlCodeSortOfFixed": {
+					"name": "controlCodeSortOfFixed",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "var projectJson = apogeeutil.jsonCopy(stringsReplaced);\n\nvar componentsJson = projectJson.components;\ncheckForControls(componentsJson);\n\nreturn projectJson;",
+						"supplementalCode": "function checkForControls(folderComponents) {\n    for(var tableName in folderComponents) {\n        var tableJson = folderComponents[tableName];\n        \n        if(tableJson.type == \"apogeeapp.app.CustomControlComponent\") {\n            var resource =  tableJson.resource;\n            var customizeScript = resource.customizeScript;\n            if(customizeScript !== undefined) {\n                delete resource.customizeScript;\n                resource.setData = customizeScript;\n            }\n            var supplementalCode = tableJson.resource.supplementalCode;\n            if(supplementalCode !== undefined) {\n                delete resource.supplementalCode;\n                resource.constructorAddition = supplementalCode;\n            }\n            alert(\"Custom control needs fixing: \" + tableName);\n        }\n        \n        if(tableJson.children) {\n            checkForControls(tableJson.children);\n        }\n    }\n}",
+						"description": ""
+					}
+				},
+				"outputProject": {
+					"name": "outputProject",
+					"type": "apogee.JsonTable",
+					"updateData": {
+						"argList": [],
+						"functionBody": "return controlCodeSortOfFixed;",
+						"supplementalCode": "",
+						"description": ""
+					}
+				}
+			}
+		},
+		"name": "projectUpdate_toApogee"
+	},
+	"components": {
+		"type": "apogeeapp.app.FolderComponent",
+		"children": {
+			"inputProject": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 505,
+						"height": 300
+					},
+					"posInfo": {
+						"x": 19,
+						"y": 40
+					},
+					"state": 0,
+					"viewType": "Text"
+				}
+			},
+			"replace": {
+				"type": "apogeeapp.app.FunctionComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 435,
+						"height": 116
+					},
+					"posInfo": {
+						"x": 563,
+						"y": 192
+					},
+					"state": 0,
+					"viewType": "Code"
+				}
+			},
+			"stringsReplaced": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 951,
+						"height": 617
+					},
+					"posInfo": {
+						"x": 1,
+						"y": 356
+					},
+					"state": -1,
+					"viewType": "JSON"
+				}
+			},
+			"controlCodeSortOfFixed": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 701,
+						"height": 474
+					},
+					"posInfo": {
+						"x": 75,
+						"y": 466
+					},
+					"state": -1,
+					"viewType": "Formula"
+				}
+			},
+			"outputProject": {
+				"type": "apogeeapp.app.JsonTableComponent",
+				"windowState": {
+					"sizeInfo": {
+						"width": 470,
+						"height": 300
+					},
+					"posInfo": {
+						"x": 385,
+						"y": 296
+					},
+					"state": 0,
+					"viewType": "Text"
+				}
+			}
+		}
+	},
+	"version": 0.4,
+	"references": []
+}

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <script>
+          if((window.opener)&&(window.opener.oneDriveAuthCallback)) {
+            window.opener.oneDriveAuthCallback(window);
+          }
+          else {
+              alert("Calback not found!")
+          }
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

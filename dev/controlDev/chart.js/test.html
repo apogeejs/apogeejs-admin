@@ -1,0 +1,91 @@
+<html>
+	<head>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+		<script>
+		
+			var container;
+			var containerWidth = 500;
+			var containerHeight = 300;
+			
+			var MAX_HEIGHT = 1000;
+			var MIN_HEIGHT = 100;
+			var MAX_WIDTH = 2000;
+			var MIN_WIDTH = 200;
+			
+			var myChart;
+			
+			function init() {
+			
+				container = document.getElementById("container");
+				setSize(containerHeight,containerWidth);
+			
+				var ctx = document.getElementById('myChart').getContext('2d');
+				myChart = new Chart(ctx, {
+					// The type of chart we want to create
+					type: 'line',
+
+					// The data for our dataset
+					data: {
+						labels: ["January", "February", "March", "April", "May", "June", "July"],
+						datasets: [{
+							label: "My First dataset",
+							backgroundColor: 'rgb(255, 99, 132)',
+							borderColor: 'rgb(255, 99, 132)',
+							data: [0, 10, 5, 2, 20, 30, 45],
+						}]
+					},
+
+					// Configuration options go here
+					options: {}
+				});
+			}
+			
+			function onClick() {
+				console.log("Before: " + containerHeight + ", " + containerWidth);
+				containerHeight = containerHeight * getRandomScaleFactor();
+				containerWidth = containerWidth * getRandomScaleFactor();
+				console.log("After: " + containerHeight + ", " + containerWidth);
+				
+				if(containerHeight > MAX_HEIGHT) containerHeight = MAX_HEIGHT;
+				if(containerHeight < MIN_HEIGHT) containerHeight = MIN_HEIGHT;
+				if(containerWidth > MAX_WIDTH) containerWidth = MAX_WIDTH;
+				if(containerWidth < MIN_WIDTH) containerWidth = MIN_WIDTH;
+				
+				setSize(containerHeight,containerWidth);
+				
+				myChart.resize();
+			}
+			
+			//this makes a random scale factor between .5 and 2
+			function getRandomScaleFactor() {
+				var baseFactor = Math.random();
+				var scaleFactor;
+				if(baseFactor <= .5) {
+					scaleFactor = 1/(1-baseFactor);
+				}
+				else {
+					scaleFactor = baseFactor;
+				}
+				console.log(scaleFactor);
+				return scaleFactor;
+			}
+			
+			function setSize(height,width) {
+				container.style.width = width + "px";
+				container.style.height = height + "px";
+			}
+		</script>
+		<style>
+			#container {
+				width: 500px;
+				height: 500px;
+			}
+		</style>
+	</head>
+	<body onload="init()">
+		<button onclick="onClick()">RESIZE</button>
+		<div id="container">
+			<canvas id="myChart"></canvas>
+		</div>
+	</body>
+</html>

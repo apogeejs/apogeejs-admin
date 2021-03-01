@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>One Drive auth redirect page</title>
+        <!-- This file should be placed in a "global access" directory, for production and localhost, so all instances run on the
+          respective server can access it. These urls must be registered with Microsoft.
+          
+          Hopefull this file won't change (at least not often) so we do not need to update the active copies. If it does change, we should
+          probably use a new file name to maintain backward comaptibility.
+        -->
+        <script>
+          if((window.opener)&&(window.opener.oneDriveAuthCallback)) {
+            window.opener.oneDriveAuthCallback(window);
+          }
+          else {
+              alert("Calback not found!")
+          }
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

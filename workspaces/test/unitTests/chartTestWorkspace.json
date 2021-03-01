@@ -1,0 +1,236 @@
+{
+	"fileType": "apogee app js workspace",
+	"version": "0.50",
+	"references": {
+		"refEntries": [
+					{
+						"url": "https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js",
+						"entryType": "js link"
+					}
+				]
+	},
+	"code": {
+		"model": {
+			"fileType": "apogee model",
+			"version": 0.2,
+			"name": "chartjsCustomComponent",
+			"children": {
+				"main": {
+					"name": "main",
+					"type": "apogee.Folder",
+					"children": {
+						"chart": {
+							"name": "chart",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"argList": [],
+								"functionBody": "return data;",
+								"supplementalCode": ""
+							}
+						},
+						"data": {
+							"name": "data",
+							"type": "apogee.JsonTable",
+							"updateData": {
+								"data": {
+									"type": "bar",
+									"data": {
+										"labels": [
+											"Red",
+											"Blue",
+											"Yellow",
+											"Green",
+											"Purple",
+											"Orange"
+										],
+										"datasets": [
+											{
+												"label": "# of Votes",
+												"data": [
+													12,
+													19,
+													3,
+													5,
+													8,
+													3
+												],
+												"backgroundColor": [
+													"rgba(255, 99, 132, 0.2)",
+													"rgba(54, 162, 235, 0.2)",
+													"rgba(255, 206, 86, 0.2)",
+													"rgba(75, 192, 192, 0.2)",
+													"rgba(153, 102, 255, 0.2)",
+													"rgba(255, 159, 64, 0.2)"
+												],
+												"borderColor": [
+													"rgba(255, 99, 132, 1)",
+													"rgba(54, 162, 235, 1)",
+													"rgba(255, 206, 86, 1)",
+													"rgba(75, 192, 192, 1)",
+													"rgba(153, 102, 255, 1)",
+													"rgba(255, 159, 64, 1)"
+												],
+												"borderWidth": 1
+											}
+										]
+									},
+									"options": {
+										"scales": {
+											"yAxes": [
+												{
+													"ticks": {
+														"beginAtZero": true
+													}
+												}
+											]
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"components": {
+			"main": {
+				"type": "apogeeapp.app.FolderComponent",
+				"data": {
+					"doc": {
+						"type": "doc",
+						"content": [
+							{
+								"type": "heading1",
+								"content": [
+									{
+										"type": "text",
+										"text": "Chart.js Test"
+									}
+								]
+							},
+							{
+								"type": "heading2",
+								"content": [
+									{
+										"type": "text",
+										"text": "Chart"
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "chart",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "heading2",
+								"content": [
+									{
+										"type": "text",
+										"text": "Data"
+									}
+								]
+							},
+							{
+								"type": "paragraph",
+								"content": [
+									{
+										"type": "text",
+										"text": "This is bulk data, including all settings."
+									}
+								]
+							},
+							{
+								"type": "apogeeComponent",
+								"attrs": {
+									"name": "data",
+									"id": 0,
+									"state": ""
+								}
+							},
+							{
+								"type": "paragraph"
+							},
+							{
+								"type": "paragraph"
+							}
+						]
+					}
+				},
+				"children": {
+					"chart": {
+						"type": "apogeeapp.app.CustomComponent",
+						"resource": {
+							"html": "<div class=\"chartContainer\"><canvas class=\"chartCanvas\" id=\"chart_chart\"></canvas></div>",
+							"css": ".chartContainer {\r\n    position: relative;\r\n    /*height: 300px;*/\r\n    width: 400px;\r\n    overflow: none;\r\n}\r\n\r\n.chartCanvas {\r\n    position: relative;\r\n}",
+							"uiCode": "let canvas;\nlet chart;\n \n__customControlDebugHook();\n\nreturn {\n    onLoad: function(outputElement,admin) {\n        canvas = document.getElementById(\"chart_chart\");\n    },\n    \n    setDisplayData: function(data) {\n        let dataCopy = apogeeutil.jsonCopy(data);\n        chart = new Chart(canvas,dataCopy);\n    },\n    \n    setData: function(data) {\n        //no data is set!\n    }\n} "
+						},
+						"destroyOnInactive": false,
+						"viewState": {
+							"childDisplayState": {
+								"views": {
+									"Display": {
+										"isViewActive": true
+									},
+									"Input Code": {
+										"isViewActive": false,
+										"height": 7000
+									},
+									"Input Private": {
+										"isViewActive": false
+									},
+									"HTML": {
+										"isViewActive": false,
+										"height": 7000
+									},
+									"CSS": {
+										"isViewActive": false,
+										"height": 7000
+									},
+									"uiGenerator()": {
+										"isViewActive": false,
+										"height": 7000
+									}
+								}
+							}
+						}
+					},
+					"data": {
+						"type": "apogeeapp.app.JsonTableComponent",
+						"dataView": "Colorized",
+						"viewState": {
+							"childDisplayState": {
+								"views": {
+									"Data": {
+										"isViewActive": true,
+										"height": 280
+									},
+									"Formula": {
+										"isViewActive": false
+									},
+									"Private": {
+										"isViewActive": false
+									}
+								}
+							}
+						}
+					}
+				},
+				"viewState": {
+					"childDisplayState": null,
+					"tabOpened": true,
+					"tabShowing": true
+				}
+			},
+			"viewState": {
+				"treeState": 1
+			}
+		}
+	},
+	"viewState": {
+		"treeState": 1
+	}
+}
