@@ -1,7 +1,0 @@
-{
-  "name": "apogee-dev-env",
-  "version": "0.0.0",
-  "description": "Apogee Dev Environment",
-  "main": "run/server.js",
-  "author": "Intransix"
-}

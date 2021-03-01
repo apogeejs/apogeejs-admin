@@ -1,1 +1,0 @@
-export * from "../repos/prosemirror-model/src/index.js"

@@ -1,1 +1,0 @@
-export * from "../repos/prosemirror-inputrules/src/index.js"

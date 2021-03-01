@@ -1,1 +1,0 @@
-export * from "../repos/prosemirror-schema-basic/src/schema-basic.js"

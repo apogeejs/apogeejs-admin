@@ -1,8 +1,0 @@
-{
-    "references": [
-        {
-          "url": "http://localhost:8383/lib/controls/simpleGeojsonControl/SimpleGeojsonControl.js",
-          "entryType": "amd module"
-        }
-    ]
-}
