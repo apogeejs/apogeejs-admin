@@ -31,6 +31,7 @@ const PATH_TO_ABSOLUTE_ROOT = "../..";
 let resolveAbsoluteUrl;
 let resolveId;
 let pathMapping;
+let suppressReleasePresentCheck;
 
 /** This function creates the releaese task for the given repository. */
 function createReleaseTask(versionInfoFilePath) {
@@ -38,6 +39,7 @@ function createReleaseTask(versionInfoFilePath) {
     //release version information
     const versionInfo = require(versionInfoFilePath);
     pathMapping = createPathMapping(versionInfo);
+    suppressReleasePresentCheck = versionInfo.suppressReleasePresentCheck;
 
     //conversions for absolute references - "urls" relative to parent directories holding repos
     //used to convert urls to paths
@@ -85,7 +87,7 @@ function createPathMapping(versionInfo) {
         let info = versionInfo.dependentVersions[repoName];
         let key = `/${repoName}/`;
         let releaseDirectory = info.isProductionRelease ? "releases" : "releases-dev";
-        let value = `/apogeejs-admin/${releaseDirectory}/es/${repoName}/v${info.version}/`;
+        let value = `/apogeejs-releases/web/${releaseDirectory}/${repoName}/v${info.version}/`;
         pathMapping[key] = value;
     }
     return pathMapping;
@@ -102,12 +104,6 @@ function createModuleTask(buildInfo,moduleBuildInfo,versionInfo,format) {
         ));
 
     let repoFolder = resolveAbsoluteUrl("/" + buildInfo.repoName);
-
-    //======================================
-    // Verify release not present
-    //======================================
-
-    let verifyReleaseNotPresent = () => buildUtils.makeSureReleaseNotPresent(outputFolder);
 
     //======================================
     // Generate Release Specific Tasks
@@ -166,11 +162,25 @@ function createModuleTask(buildInfo,moduleBuildInfo,versionInfo,format) {
         }
     })
 
-    //return the gulp task for the es module
-    return series(
-        verifyReleaseNotPresent,
-        parallel.apply(null,buildTaskList)
-    )
+    let releaseTasks = parallel.apply(null,buildTaskList);
+
+    
+    //return tasks
+    if(!suppressReleasePresentCheck) {
+        //======================================
+        // Verify release not present
+        //======================================
+        let verifyReleaseNotPresent = () => buildUtils.makeSureReleaseNotPresent(outputFolder);
+
+        //return the gulp task for the es module
+        return series(
+            verifyReleaseNotPresent,
+            releaseTasks
+        )
+    }
+    else {
+        return releaseTasks;
+    }
 
 }
 
@@ -330,4 +340,15 @@ exports.releaseWebApp = (cb) => createReleaseTask("../../apogeejs-web-app/versio
 exports.releaseElectronNode = (cb) => createReleaseTask("../../apogeejs-electron-node/versionInfo.json")(cb);
 exports.releaseElectronWeb = (cb) => createReleaseTask("../../apogeejs-electron-web/versionInfo.json")(cb);
 exports.releaseServer = (cb) => createReleaseTask("../../apogeejs-server/versionInfo.json")(cb);
+
+//"local" releases - These are for repos with npm modules that have dependencies on other repo npm modules
+//With these releases we will reference local copies of the releases and we will NOT require the release be not present,
+//so we don't have to reinstall the node_modules every time. (Note we are not cleaning the directory, only overwriting the 
+//content which we are copying to the release directory. Therfore if a file is removed from the repo it will not be removed from
+//the local release. In these cases some manual management may be needed.)
+exports.releaseModelLibLocal = (cb) => createReleaseTask("../../apogeejs-model-lib/versionInfoLocal.json")(cb);
+exports.releaseAppBundleLocal = (cb) => createReleaseTask("../../apogeejs-app-bundle/versionInfoLocal.json")(cb);
+exports.releaseElectronNodeLocal = (cb) => createReleaseTask("../../apogeejs-electron-node/versionInfoLocal.json")(cb);
+exports.releaseElectronWebLocal = (cb) => createReleaseTask("../../apogeejs-electron-web/versionInfoLocal.json")(cb);
+exports.releaseServerLocal = (cb) => createReleaseTask("../../apogeejs-server/versionInfoLocal.json")(cb);
 

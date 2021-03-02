@@ -14,7 +14,7 @@ const path = require("path");
  * - absUrlRemapping - This object allows folder remapping, such as to reposition a url to released codde rather than
  *      original source. The format of the key and value should be absolute urls with a leading and trailing "/". 
  *      If any urls are not in this format, an error will be thrown. 
- *      example: {"/apogeejs-model-lib.src/": "apogeejs-admin/releases/apogee-model-lib/v2.1.1/"}
+ *      example: {"/apogeejs-model-lib.src/": "apogeejs-releases/web/releases/apogee-model-lib/v2.1.1/"}
  * */
 exports.createResolveAbsoluteUrl = function(currentSystemDirectory,pathFromCurrentSystemDirToDesiredAbsoluteRoot,absUrlRemapping) {
 
