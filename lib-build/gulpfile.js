@@ -149,8 +149,7 @@ function createModuleTask(buildInfo,moduleBuildInfo,versionInfo,format) {
                 else {
                     externalLibMapping = taskInput.externalLibMapping;
                     if(!externalLibMapping) externalLibMapping = {};
-                    npmExternalLibVerify(externalLibs,externalLibMapping);
-                }
+                    npmExternalLibVerify(externalLibs,externalLibMapping);                }
 
                 let banner = buildUtils.getJsFileHeader(outFileName,versionInfo.version);
 
@@ -275,6 +274,16 @@ function copyAndReplaceTask(srcFile,destFolder,replacementList,versionInfo) {
             if(replacement.type =="version") {
                 value = repoInfo.version;
             }
+            else if(replacement.type == "npmVersion") {
+                if(repoInfo.isProductionRelease) {
+                    //for now exact version. Later add qualifier
+                    value = repoInfo.version;
+                }
+                else {
+                    //add a url to request version from the local server
+                    value = `http://localhost:8888/apogeejs-releases/node/releases-dev/${replacement.lib}/v${repoInfo.version}/${replacement.lib}-${repoInfo.version}.tgz`
+                }
+            }
             else if(replacement.type == "esReleasePath") {
                 value = buildUtils.getReleaseFolderUrl(replacement.lib,"es",repoInfo.version,repoInfo.isProductionRelease);
             }
@@ -342,12 +351,15 @@ exports.releaseElectronWeb = (cb) => createReleaseTask("../../apogeejs-electron-
 exports.releaseServer = (cb) => createReleaseTask("../../apogeejs-server/versionInfo.json")(cb);
 
 //"local" releases - These are for repos with npm modules that have dependencies on other repo npm modules
-//With these releases we will reference local copies of the releases and we will NOT require the release be not present,
-//so we don't have to reinstall the node_modules every time. (Note we are not cleaning the directory, only overwriting the 
-//content which we are copying to the release directory. Therfore if a file is removed from the repo it will not be removed from
-//the local release. In these cases some manual management may be needed.)
+//With these releases we will reference local copies of the releases, as served from the file server
+exports.releaseBaseLibLocal = (cb) => createReleaseTask("../../apogeejs-base-lib/versionInfoLocal.json")(cb);
+exports.releaseUtilLibLocal = (cb) => createReleaseTask("../../apogeejs-util-lib/versionInfoLocal.json")(cb);
 exports.releaseModelLibLocal = (cb) => createReleaseTask("../../apogeejs-model-lib/versionInfoLocal.json")(cb);
+exports.releaseAppLibLocal = (cb) => createReleaseTask("../../apogeejs-app-lib/versionInfoLocal.json")(cb);
+exports.releaseUiLibLocal = (cb) => createReleaseTask("../../apogeejs-ui-lib/versionInfoLocal.json")(cb);
+exports.releaseViewLibLocal = (cb) => createReleaseTask("../../apogeejs-view-lib/versionInfoLocal.json")(cb);
 exports.releaseAppBundleLocal = (cb) => createReleaseTask("../../apogeejs-app-bundle/versionInfoLocal.json")(cb);
+//these local releases also flag not checking if the releaese is present, so we don't have to reinstall the node modules
 exports.releaseElectronNodeLocal = (cb) => createReleaseTask("../../apogeejs-electron-node/versionInfoLocal.json")(cb);
 exports.releaseElectronWebLocal = (cb) => createReleaseTask("../../apogeejs-electron-web/versionInfoLocal.json")(cb);
 exports.releaseServerLocal = (cb) => createReleaseTask("../../apogeejs-server/versionInfoLocal.json")(cb);
