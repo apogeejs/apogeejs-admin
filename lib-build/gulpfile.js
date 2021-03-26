@@ -346,8 +346,8 @@ exports.releaseAppBundle = (cb) => createReleaseTask("../../apogeejs-app-bundle/
 exports.releaseWebRuntime = (cb) => createReleaseTask("../../apogeejs-web-runtime/versionInfo.json")(cb);
 
 exports.releaseWebApp = (cb) => createReleaseTask("../../apogeejs-web-app/versionInfo.json")(cb);
-exports.releaseElectronNode = (cb) => createReleaseTask("../../apogeejs-electron-node/versionInfo.json")(cb);
-exports.releaseElectronWeb = (cb) => createReleaseTask("../../apogeejs-electron-web/versionInfo.json")(cb);
+exports.releaseServerIde = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfo.json")(cb);
+exports.releaseNetIde = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfo.json")(cb);
 exports.releaseServer = (cb) => createReleaseTask("../../apogeejs-server/versionInfo.json")(cb);
 
 //"local" releases - These are for repos with npm modules that have dependencies on other repo npm modules
@@ -360,7 +360,7 @@ exports.releaseUiLibLocal = (cb) => createReleaseTask("../../apogeejs-ui-lib/ver
 exports.releaseViewLibLocal = (cb) => createReleaseTask("../../apogeejs-view-lib/versionInfoLocal.json")(cb);
 exports.releaseAppBundleLocal = (cb) => createReleaseTask("../../apogeejs-app-bundle/versionInfoLocal.json")(cb);
 //these local releases also flag not checking if the releaese is present, so we don't have to reinstall the node modules
-exports.releaseElectronNodeLocal = (cb) => createReleaseTask("../../apogeejs-electron-node/versionInfoLocal.json")(cb);
-exports.releaseElectronWebLocal = (cb) => createReleaseTask("../../apogeejs-electron-web/versionInfoLocal.json")(cb);
+exports.releaseServerIdeLocal = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfoLocal.json")(cb);
+exports.releaseNetIdeLocal = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfoLocal.json")(cb);
 exports.releaseServerLocal = (cb) => createReleaseTask("../../apogeejs-server/versionInfoLocal.json")(cb);
 
