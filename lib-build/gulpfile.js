@@ -28,6 +28,7 @@ const path = require('path');
 const buildUtils = require("./build-utils.js");
 
 const PATH_TO_ABSOLUTE_ROOT = "../..";
+const LIB_MAPPING_ABSOLUT_PATH = "/apogeejs-admin/ext/libMapping.json";
 let resolveAbsoluteUrl;
 let resolveId;
 let pathMapping;
@@ -49,35 +50,11 @@ function createReleaseTask(versionInfoFilePath) {
 
     //build data for module, independent of version
     const buildInfo = require(resolveAbsoluteUrl(versionInfo.buildInfoUrl));
+    const libMapping = require(resolveAbsoluteUrl(LIB_MAPPING_ABSOLUT_PATH));
 
-    //es module task
-    let esReleaseTask
-    if(buildInfo.esModule) {
-        esReleaseTask = createModuleTask(buildInfo,buildInfo.esModule,versionInfo,"es");
-    }
-
-    //npm module task
-    let npmReleaseTask;
-    if(buildInfo.npmModule) {
-        npmReleaseTask = createModuleTask(buildInfo,buildInfo.npmModule,versionInfo,"cjs");
-    }
-    
-    //combine tasks
-    if((buildInfo.esModule)&&(buildInfo.npmModule)) {
-        return parallel(
-            esReleaseTask,
-            npmReleaseTask
-        )
-    }
-    else if(buildInfo.esModule) {
-        return esReleaseTask;
-    }
-    else if(buildInfo.npmModule) {
-        return npmReleaseTask;
-    }
-    else {
-        throw new Error("Error in build info - no modules created");
-    }
+    //create the release task
+    let releaseTask = createModuleTask(buildInfo,libMapping,versionInfo);
+    return releaseTask;
 }
 
 /** This function constructs a path mapping to remap file urls to a desired release directory, where applicable. */
@@ -94,22 +71,19 @@ function createPathMapping(versionInfo) {
 }
 
 /** This constructs the module task according to the specified build info */
-function createModuleTask(buildInfo,moduleBuildInfo,versionInfo,format) {
+function createModuleTask(buildInfo,libMapping,versionInfo) {
 
     let outputFolder = resolveAbsoluteUrl(buildUtils.getReleaseFolderUrl(
             buildInfo.repoName,
-            format,
             versionInfo.version,
             versionInfo.isProductionRelease
         ));
-
-    let repoFolder = resolveAbsoluteUrl("/" + buildInfo.repoName);
 
     //======================================
     // Generate Release Specific Tasks
     //======================================
 
-    let buildTaskList = moduleBuildInfo.taskList.map(taskInput => {
+    let buildTaskList = buildInfo.taskList.map(taskInput => {
 
         switch(taskInput.type) {
             case "copyFileList": {
@@ -135,25 +109,20 @@ function createModuleTask(buildInfo,moduleBuildInfo,versionInfo,format) {
             }
 
             case "packageLib": {
-                let srcFile = path.join(repoFolder,"src",taskInput.esModuleFileName);
-                let outFileName = (format == "es") ? taskInput.esModuleFileName : taskInput.npmModuleFileName;
-                let destFile = path.join(outputFolder,"src",outFileName);
-                
-                let externalLibs = taskInput.externalLibs;
-                if(!externalLibs) externalLibs = [];
+                let sourceFile = resolveAbsoluteUrl(taskInput.sourceFileUrl);
+                let destFile = taskInput.childFolder ? path.join(outputFolder,taskInput.childFolder,taskInput.outputFileName) :
+                    path.join(outputFolder,taskInput.outputFileName);
 
-                let externalLibMapping;
-                if(format == "es") {
-                    externalLibMapping = esCreateExternalLibMapping(externalLibs);
+                let externalLibMapping = taskInput.externalLibMapping;
+                if(!externalLibMapping) externalLibMapping = {};
+                let externalLibs = [];
+                for(let libPath in externalLibMapping) {
+                    externalLibs.push(libPath);
                 }
-                else {
-                    externalLibMapping = taskInput.externalLibMapping;
-                    if(!externalLibMapping) externalLibMapping = {};
-                    npmExternalLibVerify(externalLibs,externalLibMapping);                }
 
-                let banner = buildUtils.getJsFileHeader(outFileName,versionInfo.version);
+                let banner = buildUtils.getJsFileHeader(taskInput.outputFileName,versionInfo.version);
 
-                return () => packageLibTask(srcFile,format,destFile,externalLibs,externalLibMapping,banner);
+                return () => packageLibTask(sourceFile,taskInput.format,destFile,externalLibs,externalLibMapping,banner);
             }
 
             default:
@@ -181,29 +150,6 @@ function createModuleTask(buildInfo,moduleBuildInfo,versionInfo,format) {
         return releaseTasks;
     }
 
-}
-
-/** This function creats the external lib mapping for creating an es module.
- * externalLibs - list of urls for external libs.
- * The key of the external lib mapping is the input url, as appears in the import statement.
- * The value is the value to use for the import statement in the resulting module.
- * Here we remap these to a new URL if there is a remapping.
- * NOTE - Even if we do not remap, we still need to add this because rollup tries to
- * create a relative URL, and it is not the correct one. */
-function esCreateExternalLibMapping(externalLibs) {
-    let externalLibMapping = {};
-    externalLibs.forEach(importUrl => {
-        let exportUrl = buildUtils.remapUrl(importUrl,pathMapping);
-        externalLibMapping[importUrl] = exportUrl;
-    });
-    return externalLibMapping;
-}
-
-/** This function just verifies there is a remapping for each external lib. */
-function npmExternalLibVerify(externalLibs,externalLibMapping) {
-    externalLibs.forEach(url => {
-        if(externalLibMapping[url] === undefined) throw new Error("Missing NPM module for external lib url " + url);
-    })
 }
 
 /** This function is a gulp task that copies files to a destination folder. */
@@ -281,17 +227,17 @@ function copyAndReplaceTask(srcFile,destFolder,replacementList,versionInfo) {
                 }
                 else {
                     //add a url to request version from the local server
-                    value = `http://localhost:8888/apogeejs-releases/node/releases-dev/${replacement.lib}/v${repoInfo.version}/${replacement.lib}-${repoInfo.version}.tgz`
+                    value = `http://localhost:8888/apogeejs-releases/node/releases-dev/${repoInfo.repoName}/v${repoInfo.version}/${repoInfo.repoName}-${repoInfo.version}.tgz`
                 }
             }
-            else if(replacement.type == "esReleasePath") {
-                value = buildUtils.getReleaseFolderUrl(replacement.lib,"es",repoInfo.version,repoInfo.isProductionRelease);
-            }
-            else if(replacement.type == "npmReleasePath") {
-                value = buildUtils.getReleaseFolderUrl(replacement.lib,"cjs",repoInfo.version,repoInfo.isProductionRelease);
-            }
+            // else if(replacement.type == "esReleasePath") {
+            //     value = buildUtils.getReleaseFolderUrl(repoInfo.repoName,"es",repoInfo.version,repoInfo.isProductionRelease);
+            // }
+            // else if(replacement.type == "npmReleasePath") {
+            //     value = buildUtils.getReleaseFolderUrl(repoInfo.repoName,"cjs",repoInfo.version,repoInfo.isProductionRelease);
+            // }
             else if(replacement.type == "deployPath") {
-                value = buildUtils.getDeployFolderUrl(replacement.lib,repoInfo.version,repoInfo.isProductionRelease);
+                value = buildUtils.getDeployFolderUrl(repoInfo.repoName,repoInfo.version,repoInfo.isProductionRelease);
             }
         }
 
@@ -333,34 +279,36 @@ function packageLibTask(srcFile,format,destFile,externalLibs,externalLibMapping,
 // Exports
 //============================
 
-//This task executes the complete release
-exports.releaseBaseLib = (cb) => createReleaseTask("../../apogeejs-base-lib/versionInfo.json")(cb);
-exports.releaseUtilLib = (cb) => createReleaseTask("../../apogeejs-util-lib/versionInfo.json")(cb);
-exports.releaseModelLib = (cb) => createReleaseTask("../../apogeejs-model-lib/versionInfo.json")(cb);
-exports.releaseAppLib = (cb) => createReleaseTask("../../apogeejs-app-lib/versionInfo.json")(cb);
-exports.releaseUiLib = (cb) => createReleaseTask("../../apogeejs-ui-lib/versionInfo.json")(cb);
-exports.releaseViewLib = (cb) => createReleaseTask("../../apogeejs-view-lib/versionInfo.json")(cb);
-exports.releaseCombinedFileAccess = (cb) => createReleaseTask("../../apogeejs-combined-file-access/versionInfo.json")(cb);
-
-exports.releaseAppBundle = (cb) => createReleaseTask("../../apogeejs-app-bundle/versionInfo.json")(cb);
-exports.releaseWebRuntime = (cb) => createReleaseTask("../../apogeejs-web-runtime/versionInfo.json")(cb);
-
 exports.releaseWebApp = (cb) => createReleaseTask("../../apogeejs-web-app/versionInfo.json")(cb);
-exports.releaseServerIde = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfo.json")(cb);
-exports.releaseNetIde = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfo.json")(cb);
-exports.releaseServer = (cb) => createReleaseTask("../../apogeejs-server/versionInfo.json")(cb);
 
-//"local" releases - These are for repos with npm modules that have dependencies on other repo npm modules
-//With these releases we will reference local copies of the releases, as served from the file server
-exports.releaseBaseLibLocal = (cb) => createReleaseTask("../../apogeejs-base-lib/versionInfoLocal.json")(cb);
-exports.releaseUtilLibLocal = (cb) => createReleaseTask("../../apogeejs-util-lib/versionInfoLocal.json")(cb);
-exports.releaseModelLibLocal = (cb) => createReleaseTask("../../apogeejs-model-lib/versionInfoLocal.json")(cb);
-exports.releaseAppLibLocal = (cb) => createReleaseTask("../../apogeejs-app-lib/versionInfoLocal.json")(cb);
-exports.releaseUiLibLocal = (cb) => createReleaseTask("../../apogeejs-ui-lib/versionInfoLocal.json")(cb);
-exports.releaseViewLibLocal = (cb) => createReleaseTask("../../apogeejs-view-lib/versionInfoLocal.json")(cb);
-exports.releaseAppBundleLocal = (cb) => createReleaseTask("../../apogeejs-app-bundle/versionInfoLocal.json")(cb);
-//these local releases also flag not checking if the releaese is present, so we don't have to reinstall the node modules
-exports.releaseServerIdeLocal = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfoLocal.json")(cb);
-exports.releaseNetIdeLocal = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfoLocal.json")(cb);
-exports.releaseServerLocal = (cb) => createReleaseTask("../../apogeejs-server/versionInfoLocal.json")(cb);
+// //This task executes the complete release
+// exports.releaseBaseLib = (cb) => createReleaseTask("../../apogeejs-base-lib/versionInfo.json")(cb);
+// exports.releaseUtilLib = (cb) => createReleaseTask("../../apogeejs-util-lib/versionInfo.json")(cb);
+// exports.releaseModelLib = (cb) => createReleaseTask("../../apogeejs-model-lib/versionInfo.json")(cb);
+// exports.releaseAppLib = (cb) => createReleaseTask("../../apogeejs-app-lib/versionInfo.json")(cb);
+// exports.releaseUiLib = (cb) => createReleaseTask("../../apogeejs-ui-lib/versionInfo.json")(cb);
+// exports.releaseViewLib = (cb) => createReleaseTask("../../apogeejs-view-lib/versionInfo.json")(cb);
+// exports.releaseCombinedFileAccess = (cb) => createReleaseTask("../../apogeejs-combined-file-access/versionInfo.json")(cb);
+
+// exports.releaseAppBundle = (cb) => createReleaseTask("../../apogeejs-app-bundle/versionInfo.json")(cb);
+// exports.releaseWebRuntime = (cb) => createReleaseTask("../../apogeejs-web-runtime/versionInfo.json")(cb);
+
+// exports.releaseWebApp = (cb) => createReleaseTask("../../apogeejs-web-app/versionInfo.json")(cb);
+// exports.releaseServerIde = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfo.json")(cb);
+// exports.releaseNetIde = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfo.json")(cb);
+// exports.releaseServer = (cb) => createReleaseTask("../../apogeejs-server/versionInfo.json")(cb);
+
+// //"local" releases - These are for repos with npm modules that have dependencies on other repo npm modules
+// //With these releases we will reference local copies of the releases, as served from the file server
+// exports.releaseBaseLibLocal = (cb) => createReleaseTask("../../apogeejs-base-lib/versionInfoLocal.json")(cb);
+// exports.releaseUtilLibLocal = (cb) => createReleaseTask("../../apogeejs-util-lib/versionInfoLocal.json")(cb);
+// exports.releaseModelLibLocal = (cb) => createReleaseTask("../../apogeejs-model-lib/versionInfoLocal.json")(cb);
+// exports.releaseAppLibLocal = (cb) => createReleaseTask("../../apogeejs-app-lib/versionInfoLocal.json")(cb);
+// exports.releaseUiLibLocal = (cb) => createReleaseTask("../../apogeejs-ui-lib/versionInfoLocal.json")(cb);
+// exports.releaseViewLibLocal = (cb) => createReleaseTask("../../apogeejs-view-lib/versionInfoLocal.json")(cb);
+// exports.releaseAppBundleLocal = (cb) => createReleaseTask("../../apogeejs-app-bundle/versionInfoLocal.json")(cb);
+// //these local releases also flag not checking if the releaese is present, so we don't have to reinstall the node modules
+// exports.releaseServerIdeLocal = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfoLocal.json")(cb);
+// exports.releaseNetIdeLocal = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfoLocal.json")(cb);
+// exports.releaseServerLocal = (cb) => createReleaseTask("../../apogeejs-server/versionInfoLocal.json")(cb);
 

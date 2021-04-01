@@ -1,0 +1,62 @@
+{
+    "/apogeejs-admin/ext/ace/ace_1.4.3/ace.es.js": {
+        "npmRemap": "ace-builds",
+        "version": "1.4.3",
+        "npmVersion": "^1.4.3",
+        "esRemap": "/apogeejs-admin/ext/ace/ace_1.4.3/ace.es.js"
+    },
+    "/apogeejs-admin/ext/esprima/esprima_2.7.3/esprima.es.js": {
+        "npmRemap": "esprima",
+        "version": "2.7.3",
+        "npmVersion": "^2.7.3",
+        "esRemap": "/apogeejs-admin/ext/ace/ace_1.4.3/ace.es.js"
+    },
+    "/apogeejs-admin/ext/handsontable/handsontable_6.2.0/handsontable.es.js": {
+        "npmRemap": "acebuilds",
+        "version": "6.2.0",
+        "npmVersion": "^6.2.0",
+        "esRemap": "/apogeejs-admin/ext/ace/ace_1.4.3/ace.es.js"
+    },
+    "/prosemirror-admin/dist.prosemirror-model.es.js": {
+        "npmRemap": "prosemirror-model",
+        "version": "1.10.0",
+        "npmVersion": "^1.10.0",
+        "esRemap": "/prosemirror-admin/dist.prosemirror-model.es.js"
+    },
+    "/prosemirror-admin/dist.prosemirror-state.es.js": {
+        "npmRemap": "prosemirror-state",
+        "version": "1.3.3",
+        "npmVersion": "^1.3.3",
+        "esRemap": "/prosemirror-admin/dist.prosemirror-state.es.js"
+    },
+    "/prosemirror-admin/dist.prosemirror-transform.es.js": {
+        "npmRemap": "prosemirror-transform",
+        "version": "1.2.6",
+        "npmVersion": "^1.2.6",
+        "esRemap": "/prosemirror-admin/dist.prosemirror-transform.es.js"
+    },
+    "/prosemirror-admin/dist.prosemirror-view.es.js": {
+        "npmRemap": "prosemirror-view",
+        "version": "1.14.13",
+        "npmVersion": "^1.14.13",
+        "esRemap": "/prosemirror-admin/dist.prosemirror-view.es.js"
+    },
+    "/prosemirror-admin/dist.prosemirror-keymap.es.js": {
+        "npmRemap": "prosemirror-keymap",
+        "version": "1.1.4",
+        "npmVersion": "^1.1.4",
+        "esRemap": "/prosemirror-admin/dist.prosemirror-keymap.es.js"
+    },
+    "/prosemirror-admin/dist.prosemirror-commands.es.js": {
+        "npmRemap": "prosemirror-commands",
+        "version": "1.1.4",
+        "npmVersion": "^1.1.4",
+        "esRemap": "/prosemirror-admin/dist.prosemirror-commands.es.js"
+    },
+    "/prosemirror-admin/dist.prosemirror-gapcursor.es.js": {
+        "npmRemap": "prosemirror-gapcursor",
+        "version": "1.1.5",
+        "npmVersion": "^1.1.5",
+        "esRemap": "/prosemirror-admin/dist.prosemirror-gapcursor.es.js"
+    }
+}

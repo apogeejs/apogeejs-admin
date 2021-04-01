@@ -100,26 +100,19 @@ exports.getJsFileHeader = function(fileName,version) {
 
 // release folder constants
 const RELEASE_PARENT_FOLDER_URL = "/apogeejs-releases";
-const ES_FOLDER = "web";
-const CJS_FOLDER = "node";
 const DEV_RELEASE_FOLDER = "releases-dev"
 const PROD_RELEASE_FOLDER = "releases";
 
-exports.getReleaseFolderUrl = function(repoName,format,version,isProductionRelease) {
-    let typeFolder;
-    if(format == "es") typeFolder = ES_FOLDER;
-    else if(format == "cjs") typeFolder = CJS_FOLDER;
-    else throw new Error("Unknown format: " + format);
-
+exports.getReleaseFolderUrl = function(repoName,version,isProductionRelease) {
     let releaseFolder = isProductionRelease ?  PROD_RELEASE_FOLDER : DEV_RELEASE_FOLDER;
     let releaseName = "v" + version;
-    return path.posix.join(RELEASE_PARENT_FOLDER_URL,typeFolder,releaseFolder,repoName,releaseName);
+    return path.posix.join(RELEASE_PARENT_FOLDER_URL,releaseFolder,repoName,releaseName);
 }
 
 exports.getDeployFolderUrl = function(repoName,version,isProductionRelease) {
     let releaseFolder = isProductionRelease ?  PROD_DEPLOY_FOLDER : DEV_RELEASE_FOLDER;
     let releaseName = "v" + version;
-    return path.posix.join("/",releaseFolder,repoName,releaseName);
+    return path.posix.join(RELEASE_PARENT_FOLDER_URL,releaseFolder,repoName,releaseName);
 }
 
 /** This function checks if the release folder is present. */
