@@ -280,6 +280,10 @@ function packageLibTask(srcFile,format,destFile,externalLibs,externalLibMapping,
 //============================
 
 exports.releaseWebApp = (cb) => createReleaseTask("../../apogeejs-web-app/versionInfo.json")(cb);
+exports.releaseServerIde = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfo.json")(cb);
+exports.releaseServer = (cb) => createReleaseTask("../../apogeejs-server/versionInfo.json")(cb);
+exports.releaseNetIde = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfo.json")(cb);
+exports.releaseWebRuntime = (cb) => createReleaseTask("../../apogeejs-web-runtime/versionInfo.json")(cb);
 
 // //This task executes the complete release
 // exports.releaseBaseLib = (cb) => createReleaseTask("../../apogeejs-base-lib/versionInfo.json")(cb);
