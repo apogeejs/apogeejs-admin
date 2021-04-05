@@ -26,12 +26,11 @@ const concat = require('gulp-concat');
 const rollup = require('rollup');
 const path = require('path');
 const buildUtils = require("./build-utils.js");
+const clean = require('gulp-clean');
 
 const PATH_TO_ABSOLUTE_ROOT = "../..";
-const LIB_MAPPING_ABSOLUT_PATH = "/apogeejs-admin/ext/libMapping.json";
 let resolveAbsoluteUrl;
 let resolveId;
-let pathMapping;
 let suppressReleasePresentCheck;
 
 /** This function creates the releaese task for the given repository. */
@@ -39,42 +38,44 @@ function createReleaseTask(versionInfoFilePath) {
 
     //release version information
     const versionInfo = require(versionInfoFilePath);
-    pathMapping = createPathMapping(versionInfo);
     suppressReleasePresentCheck = versionInfo.suppressReleasePresentCheck;
 
     //conversions for absolute references - "urls" relative to parent directories holding repos
     //used to convert urls to paths
-    resolveAbsoluteUrl = buildUtils.createResolveAbsoluteUrl(__dirname,PATH_TO_ABSOLUTE_ROOT,pathMapping); 
+    resolveAbsoluteUrl = buildUtils.createResolveAbsoluteUrl(__dirname,PATH_TO_ABSOLUTE_ROOT); 
     //used for rollup
     resolveId = buildUtils.createResolveId(resolveAbsoluteUrl); 
 
     //build data for module, independent of version
     const buildInfo = require(resolveAbsoluteUrl(versionInfo.buildInfoUrl));
-    const libMapping = require(resolveAbsoluteUrl(LIB_MAPPING_ABSOLUT_PATH));
 
     //create the release task
-    let releaseTask = createModuleTask(buildInfo,libMapping,versionInfo);
+    let releaseTask = createModuleTask(buildInfo,versionInfo);
     return releaseTask;
 }
 
-/** This function constructs a path mapping to remap file urls to a desired release directory, where applicable. */
-function createPathMapping(versionInfo) {
-    let pathMapping = {};
-    for(let repoName in versionInfo.dependentVersions) {
-        let info = versionInfo.dependentVersions[repoName];
-        let key = `/${repoName}/`;
-        let releaseDirectory = info.isProductionRelease ? "releases" : "releases-dev";
-        let value = `/apogeejs-releases/web/${releaseDirectory}/${repoName}/v${info.version}/`;
-        pathMapping[key] = value;
-    }
-    return pathMapping;
+/** This should be called to clean a release. */
+function cleanReleaseTask(versionInfoFilePath) {
+
+    const versionInfo = require(versionInfoFilePath);
+
+    resolveAbsoluteUrl = buildUtils.createResolveAbsoluteUrl(__dirname,PATH_TO_ABSOLUTE_ROOT); 
+
+    let releaseFolder = resolveAbsoluteUrl(buildUtils.getReleaseFolderUrl(
+        versionInfo.repoName,
+        versionInfo.version,
+        versionInfo.isProductionRelease
+    ));
+
+    return () => cleanFolderTask(releaseFolder);
+
 }
 
 /** This constructs the module task according to the specified build info */
-function createModuleTask(buildInfo,libMapping,versionInfo) {
+function createModuleTask(buildInfo,versionInfo) {
 
     let outputFolder = resolveAbsoluteUrl(buildUtils.getReleaseFolderUrl(
-            buildInfo.repoName,
+            versionInfo.repoName,
             versionInfo.version,
             versionInfo.isProductionRelease
         ));
@@ -230,12 +231,12 @@ function copyAndReplaceTask(srcFile,destFolder,replacementList,versionInfo) {
                     value = `http://localhost:8888/apogeejs-releases/node/releases-dev/${repoInfo.repoName}/v${repoInfo.version}/${repoInfo.repoName}-${repoInfo.version}.tgz`
                 }
             }
-            // else if(replacement.type == "esReleasePath") {
-            //     value = buildUtils.getReleaseFolderUrl(repoInfo.repoName,"es",repoInfo.version,repoInfo.isProductionRelease);
-            // }
-            // else if(replacement.type == "npmReleasePath") {
-            //     value = buildUtils.getReleaseFolderUrl(repoInfo.repoName,"cjs",repoInfo.version,repoInfo.isProductionRelease);
-            // }
+            else if(replacement.type == "esReleasePath") {
+                value = buildUtils.getReleaseFolderUrl(repoInfo.repoName,"es",repoInfo.version,repoInfo.isProductionRelease);
+            }
+            else if(replacement.type == "npmReleasePath") {
+                value = buildUtils.getReleaseFolderUrl(repoInfo.repoName,"cjs",repoInfo.version,repoInfo.isProductionRelease);
+            }
             else if(replacement.type == "deployPath") {
                 value = buildUtils.getDeployFolderUrl(repoInfo.repoName,repoInfo.version,repoInfo.isProductionRelease);
             }
@@ -275,44 +276,31 @@ function packageLibTask(srcFile,format,destFile,externalLibs,externalLibMapping,
     });
 }
 
+//clean (delete) a folder
+function cleanFolderTask(folder) {
+    return src(folder, {read: false, allowEmpty: true})
+        .pipe(clean({force: true}));
+}
+
 //============================
 // Exports
 //============================
 
-exports.releaseWebApp = (cb) => createReleaseTask("../../apogeejs-web-app/versionInfo.json")(cb);
-exports.releaseServerIde = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfo.json")(cb);
-exports.releaseServer = (cb) => createReleaseTask("../../apogeejs-server/versionInfo.json")(cb);
-exports.releaseNetIde = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfo.json")(cb);
-exports.releaseWebRuntime = (cb) => createReleaseTask("../../apogeejs-web-runtime/versionInfo.json")(cb);
+exports.productionWebApp = (cb) => createReleaseTask("../../apogeejs-web-app/versionInfo.json")(cb);
+exports.productionServerIde = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfo.json")(cb);
+exports.productionServer = (cb) => createReleaseTask("../../apogeejs-server/versionInfo.json")(cb);
+exports.productionNetIde = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfo.json")(cb);
+exports.productionWebRuntime = (cb) => createReleaseTask("../../apogeejs-web-runtime/versionInfo.json")(cb);
 
-// //This task executes the complete release
-// exports.releaseBaseLib = (cb) => createReleaseTask("../../apogeejs-base-lib/versionInfo.json")(cb);
-// exports.releaseUtilLib = (cb) => createReleaseTask("../../apogeejs-util-lib/versionInfo.json")(cb);
-// exports.releaseModelLib = (cb) => createReleaseTask("../../apogeejs-model-lib/versionInfo.json")(cb);
-// exports.releaseAppLib = (cb) => createReleaseTask("../../apogeejs-app-lib/versionInfo.json")(cb);
-// exports.releaseUiLib = (cb) => createReleaseTask("../../apogeejs-ui-lib/versionInfo.json")(cb);
-// exports.releaseViewLib = (cb) => createReleaseTask("../../apogeejs-view-lib/versionInfo.json")(cb);
-// exports.releaseCombinedFileAccess = (cb) => createReleaseTask("../../apogeejs-combined-file-access/versionInfo.json")(cb);
+exports.devWebApp = (cb) => createReleaseTask("../../apogeejs-web-app/versionInfoDev.json")(cb);
+exports.devServerIde = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfoDev.json")(cb);
+exports.devServer = (cb) => createReleaseTask("../../apogeejs-server/versionInfoDev.json")(cb);
+exports.devNetIde = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfoDev.json")(cb);
+exports.devWebRuntime = (cb) => createReleaseTask("../../apogeejs-web-runtime/versionInfoDev.json")(cb);
 
-// exports.releaseAppBundle = (cb) => createReleaseTask("../../apogeejs-app-bundle/versionInfo.json")(cb);
-// exports.releaseWebRuntime = (cb) => createReleaseTask("../../apogeejs-web-runtime/versionInfo.json")(cb);
-
-// exports.releaseWebApp = (cb) => createReleaseTask("../../apogeejs-web-app/versionInfo.json")(cb);
-// exports.releaseServerIde = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfo.json")(cb);
-// exports.releaseNetIde = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfo.json")(cb);
-// exports.releaseServer = (cb) => createReleaseTask("../../apogeejs-server/versionInfo.json")(cb);
-
-// //"local" releases - These are for repos with npm modules that have dependencies on other repo npm modules
-// //With these releases we will reference local copies of the releases, as served from the file server
-// exports.releaseBaseLibLocal = (cb) => createReleaseTask("../../apogeejs-base-lib/versionInfoLocal.json")(cb);
-// exports.releaseUtilLibLocal = (cb) => createReleaseTask("../../apogeejs-util-lib/versionInfoLocal.json")(cb);
-// exports.releaseModelLibLocal = (cb) => createReleaseTask("../../apogeejs-model-lib/versionInfoLocal.json")(cb);
-// exports.releaseAppLibLocal = (cb) => createReleaseTask("../../apogeejs-app-lib/versionInfoLocal.json")(cb);
-// exports.releaseUiLibLocal = (cb) => createReleaseTask("../../apogeejs-ui-lib/versionInfoLocal.json")(cb);
-// exports.releaseViewLibLocal = (cb) => createReleaseTask("../../apogeejs-view-lib/versionInfoLocal.json")(cb);
-// exports.releaseAppBundleLocal = (cb) => createReleaseTask("../../apogeejs-app-bundle/versionInfoLocal.json")(cb);
-// //these local releases also flag not checking if the releaese is present, so we don't have to reinstall the node modules
-// exports.releaseServerIdeLocal = (cb) => createReleaseTask("../../apogeejs-server-ide/versionInfoLocal.json")(cb);
-// exports.releaseNetIdeLocal = (cb) => createReleaseTask("../../apogeejs-net-ide/versionInfoLocal.json")(cb);
-// exports.releaseServerLocal = (cb) => createReleaseTask("../../apogeejs-server/versionInfoLocal.json")(cb);
+exports.cleanDevWebApp = (cb) => cleanReleaseTask("../../apogeejs-web-app/versionInfoDev.json")(cb);
+exports.cleanDevServerIde = (cb) => cleanReleaseTask("../../apogeejs-server-ide/versionInfoDev.json")(cb);
+exports.cleanDevServer = (cb) => cleanReleaseTask("../../apogeejs-server/versionInfoDev.json")(cb);
+exports.cleanDevNetIde = (cb) => cleanReleaseTask("../../apogeejs-net-ide/versionInfoDev.json")(cb);
+exports.cleanDevWebRuntime = (cb) => cleanReleaseTask("../../apogeejs-web-runtime/versionInfoDev.json")(cb);
 
