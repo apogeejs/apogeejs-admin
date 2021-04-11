@@ -1,4 +1,4 @@
-import resolve from '@rollup/plugin-node-resolve';
+import {nodeResolve} from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 
 
@@ -12,7 +12,7 @@ export default [
 			{ file: '../../apogeejs-releases/releases/ext/ace/v1.4.12/ace.es.js', format: 'es' }
 		],
 		plugins: [
-			resolve(),
+			nodeResolve(),
 			commonjs()
 		]
 	}
