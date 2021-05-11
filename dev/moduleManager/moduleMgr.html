@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <script> 
+            function addUrl() {
+                let input = document.getElementById("urlInput");
+                if((input)&&(input.value.length > 0)) {
+                    let parentWindow = window.opener ? window.opener : window.parent ? window.parent : null;
+                    if((parentWindow)&&(parentWindow.apogeeapp)) {
+                        let url = input.value;
+                        let app = parentWindow.apogeeapp.Apogee.getInstance();
+                        let commandData = {};
+                        commandData.type = "addLink";
+                        commandData.data = {
+                            entryType: "es module",
+                            url: url
+                        };
+                        app.executeCommand(commandData);
+                    }
+                    else {
+                        alert("parent interface not found!");
+                    }
+                }
+                else {
+                    alert("Input not valid!");
+                }
+            }
+        </script>
+    </head>
+    <body>
+        URL: <input type="text" id="urlInput"></input>
+        <button onclick="addUrl()">Add Module</button>
+    </body>
+</html>
