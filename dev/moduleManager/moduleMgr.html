@@ -1,33 +1,95 @@
 <html>
     <head>
-        <script> 
-            function addUrl() {
-                let input = document.getElementById("urlInput");
-                if((input)&&(input.value.length > 0)) {
-                    let parentWindow = window.opener ? window.opener : window.parent ? window.parent : null;
-                    if((parentWindow)&&(parentWindow.apogeeapp)) {
-                        let url = input.value;
-                        let app = parentWindow.apogeeapp.Apogee.getInstance();
-                        let commandData = {};
-                        commandData.type = "addLink";
-                        commandData.data = {
-                            entryType: "es module",
-                            url: url
-                        };
-                        app.executeCommand(commandData);
-                    }
-                    else {
-                        alert("parent interface not found!");
-                    }
-                }
-                else {
-                    alert("Input not valid!");
-                }
+        <style>
+            .moduleCell {
+                border: 1px solid darkgray;
+                padding: 5px;
+                margin: 1px;
             }
+            .headerCell {
+
+            }
+            .bodyCell {
+
+            }
+            .leftCell {
+                display: inline-block;
+                vertical-align: top;
+            }
+            .rightCell {
+                display: inline-block;
+                margin-left: 10px;
+                vertical-align: top;
+            }
+            .titleField {
+                font-weight: bold;
+                font-size: x-large;
+                display: inline-block;
+            }
+            .statusField {
+                color: gray;
+                font-weight: bold;
+                display: inline-block;
+                margin-left: 15px;
+            }
+            .shortDescField {
+                padding: 10px 0px;
+            }
+            .versionContainer {
+                padding: 10px 0px;
+            }
+            .versionLabel {
+
+            }
+            .workspaceCommandLink {
+                font-weight: bold;
+                text-decoration: none;
+                color: darkblue;
+            }
+            .workspaceCommandLink:hover {
+                background-color: lightgray;
+            }
+            .workspaceCommandContainer {
+
+            }
+            .workspaceCommandSetContainer {
+                padding: 10px 0px;
+                display: inline-block;
+
+            }
+            .referenceCommandLink {
+                text-decoration: none;
+                color: darkblue;
+            }
+            .referenceCommandLink:hover {
+                background-color: lightgray;
+            }
+            .referenceCommandContainer {
+                
+            }
+            .referenceCommandSetContainer {
+                padding: 5px 0px;
+            }
+            .moreOrLessLink {
+                font-size: smaller;
+                text-decoration: none;
+            }
+            .moreOrLessLink:hover {
+                background-color: lightgray;
+            }
+            .moreOrLessContainer {
+            }
+        </style>
+
+        <script src="moduleManager.js"/>
+        <script>
+            window.init = function() {
+                load();
+            }    
         </script>
     </head>
-    <body>
-        URL: <input type="text" id="urlInput"></input>
-        <button onclick="addUrl()">Add Module</button>
+    <body onload="load()">
+        <h1>Module Manager</h1>
+        <div id="moduleListContainer"></div>
     </body>
 </html>

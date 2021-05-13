@@ -1,32 +1,41 @@
 <html>
     <head>
         <style>
-            .moduleTable {
-                border-collapse:collapse;
-            }
-            .moduleRow {
+            .moduleCell {
                 border: 1px solid darkgray;
+                padding: 5px;
+                margin: 1px;
             }
-            .leftCell {
-                vertical-align:top;
-                padding: 10px 5px;
+            .headerCell {
 
             }
+            .bodyCell {
+
+            }
+            .leftCell {
+                display: inline-block;
+                vertical-align: top;
+            }
             .rightCell {
-                vertical-align:top;
-                padding: 10px 5px;
+                display: inline-block;
+                margin-left: 10px;
+                vertical-align: top;
             }
-            .displayName {
+            .titleField {
                 font-weight: bold;
-            }
-            .moduleName {
-                font-weight: bold;
+                font-size: x-large;
+                display: inline-block;
             }
             .statusField {
                 color: gray;
                 font-weight: bold;
+                display: inline-block;
+                margin-left: 15px;
             }
-            .versionDiv {
+            .shortDescField {
+                padding: 10px 0px;
+            }
+            .versionContainer {
                 padding: 10px 0px;
             }
             .versionLabel {
@@ -40,8 +49,13 @@
             .workspaceCommandLink:hover {
                 background-color: lightgray;
             }
-            .description {
-                margin-bottom: 5px;
+            .workspaceCommandContainer {
+
+            }
+            .workspaceCommandSetContainer {
+                padding: 10px 0px;
+                display: inline-block;
+
             }
             .referenceCommandLink {
                 text-decoration: none;
@@ -50,6 +64,12 @@
             .referenceCommandLink:hover {
                 background-color: lightgray;
             }
+            .referenceCommandContainer {
+                
+            }
+            .referenceCommandSetContainer {
+                padding: 5px 0px;
+            }
             .moreOrLessLink {
                 font-size: smaller;
                 text-decoration: none;
@@ -57,12 +77,53 @@
             .moreOrLessLink:hover {
                 background-color: lightgray;
             }
+            .moreOrLessContainer {
+            }
         </style>
 
     </head>
     <body>
-        <table class="moduleTable">
-            <tr class="moduleRow">
+        <div class="moduleCell">
+            <div class="headerCell">
+                <div class="titleField">CSV Parse Module: apogeejs-module-cvs</div>
+                <div class="statusField">Loaded in Workspace: 1.3.4-p1</div>
+                <div class="shortDescField">This module parses CSV text into JSON. It uses the Papaparse CSV library.</div>
+            </div>
+            <div class="bodyCell">
+                <div class="leftCell">
+                    <div class="versionContainer">
+                        <span class="versionLabel">Version:</span>
+                        <select>
+                            <option>1.3.4-p1</option>
+                        </select>
+                    </div>
+                    <div class="workspaceCommandSetContainer">
+                        <div class="workspaceCommandContainer"><a href="*" onclick="XXX" class="workspaceCommandLink">Add to Workspace</a></div>
+                        <div class="workspaceCommandContainer"><a href="*" onclick="XXX" class="workspaceCommandLink">Remove from Workspace</a></div>
+                        <div class="workspaceCommandContainer"><a href="*" onclick="XXX" class="workspaceCommandLink">Upgrade to this Version</a></div>
+                    </div>
+                    <div class="moreOrLessContainer"><a href="*" onclick="XXX" class="moreOrLessLink">Show Less</a></div>
+                </div>
+                <div class="rightCell">
+                    <div class="referenceCommandSetContainer">
+                        <div class="referenceCommandContainer"><a href="*" onclick="XXX" class="referenceCommandLink">Open Demo Workspace</a></div>
+                    </div>
+                    <div class="referenceCommandSetContainer">
+                        <div class="referenceCommandContainer"><a href="*" onclick="XXX" class="referenceCommandLink">Open Web Page</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="moduleCell">
+            <div class="headerCell">
+                <div class="titleField">CSV Parse Module: apogeejs-module-cvs</div>
+                <div class="statusField">Installed in App: 1.3.4-p1 (Not Loaded in Workspace)</div>
+                <div class="shortDescField">This module parses CSV text into JSON. It uses the Papaparse CSV library.</div>
+                <div class="moreOrLessContainer"><a href="*" onclick="XXX" class="moreOrLessLink">Show More</a></div>
+            </div>
+        </div>
+
+ <!--           <tr class="moduleRow">
                 <td class="leftCell">
                     <div class="displayName">CSV Parse Module</div>
                     <div class="moduleName">apogeejs-module-cvs</div>
@@ -117,6 +178,6 @@
                         Line, Bar and XY Scatter plots.</div><br>
                 </td>
             </tr>
-        </table>
+        </table>-->
     </body>
 </html>
