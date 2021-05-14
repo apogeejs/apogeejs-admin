@@ -1,9 +1,25 @@
+//======================
+// Fields
+//======================
+let appModules = null;
+let moduleDataList = [];
 
+const STATUS_UNKNOWN = -1;
 
+const NPM_NOT_INSTALL = 0;
+const NPM_INTALLED_NOT_LOADED = 1;
+const NPM_INSTALLED_AND_LOADED = 3;
 
+const ES_NOT_LOADED = 0;
+const ES_LOADED = 3;
+
+const MODULE_REQUEST_URL = "moduleData.json";
+
+//======================
+// Functions
+//======================
 /** This method loads the module list. */
 async function load() {
-    let initialData = readInputData(); //we use this later
 
     let modulesConfig = await fetch(MODULE_REQUEST_URL).then(response => {
         if(response.ok) {
@@ -16,11 +32,23 @@ async function load() {
     })
 
     if(modulesConfig) {
-        populateList(modulesConfig.modules);
+        populateDomList(modulesConfig.modules);
+
+        let initialAppModules = readInputData();
+        updateAppModuleData(initialAppModules);
     }
 }
 
-const MODULE_REQUEST_URL = "moduleData.json";
+function receiveMessage() {
+    //implement to code to recieve messages
+    //use this to call updateAppModuleData(updateAppModules);
+}
+
+/** This updates the status for each module entry. */
+function updateAppModuleData(updatedAppModules) {
+    appModules = updatedAppModules; //store this
+    moduleDataList.forEach(moduleData => updateModuleStatus(moduleData));
+}
 
 //==================
 // External Functions
@@ -41,10 +69,32 @@ function openWebLink(url) {
     alert("Open web link not implemented")
 }
 
+
+//========================
+// Handlers
+//========================
+function moreClicked(moduleData) {
+    //make sure the proper version data is populated
+    loadBodyForVersion(moduleData)
+
+    moduleData.moreContainer.style.display = "none";
+    moduleData.bodyCell.style.display = "";
+}
+
+function lessClicked(moduleData) {
+    moduleData.moreContainer.style.display = "";
+    moduleData.bodyCell.style.display = "none";
+}
+
+function versionSelectorChanged(moduleData) {
+    loadBodyForVersion(moduleData);
+}
+
 //=================
 // Internal Functions
 //=================
 
+/** This function initially populates the module list. */
 function populateList(moduleListConfig) {
 
     let listContainerElement = document.getElementById("moduleListContainer");
@@ -65,7 +115,6 @@ function populateList(moduleListConfig) {
         moduleCell.appendChild(headerCell);
         let bodyCell = document.createElement("div");
         bodyCell.className = "bodyCell";
-        bodyCell.style.display = "none"; //initially invisible
         moduleCell.appendChild(bodyCell);
         moduleData.bodyCell = bodyCell; //save this
 
@@ -76,8 +125,8 @@ function populateList(moduleListConfig) {
         headerCell.appendChild(titleField);
         let statusField = document.createElement("div");
         statusField.className = "statusField";
-        statusField.innerHTML = getStatus(moduleConfig);
         headerCell.appendChild(statusField);
+        moduleData.bodyCell = bodyCell; //save this
         let shortDescField = document.createElement("div");
         shortDescField.className = "shortDescField";
         shortDescField.innerHTML = getShortDesc(moduleConfig);
@@ -93,6 +142,11 @@ function populateList(moduleListConfig) {
         moreLink.innerHTML = "show more";
         moreContainer.appendChild(moreLink);
         moduleData.moreContainer = moreContainer; //save this
+
+        //start in a closed state
+        bodyCell.style.display = "none"; //initially invisible
+        moreLink.style.display = ""; //initially visible
+        moduleData.isOpen = false;
 
         //fill in the parts of the body that do not depend on the selected version
         let leftCell = document.createElement("div");
@@ -116,7 +170,6 @@ function populateList(moduleListConfig) {
         populateVersionSelector(moduleConfig,versionSelector);
         moduleData.versionSelector = versionSelector; //save this
         
-
         let workspaceCommandSetContainer = document.createElement("div");
         workspaceCommandSetContainer.className = "workspaceCommandSetContainer";
         leftCell.appendChild(workspaceCommandSetContainer);
@@ -144,10 +197,28 @@ function populateList(moduleListConfig) {
         moduleData.webLinkSetContainer = webLinkSetContainer; //save this
 
         //add to the module list
-        listContainerElement.appendChild(moduleCell);        
+        listContainerElement.appendChild(moduleCell);  
+        moduleDataList.push(moduleData);      
     })
 }
 
+/** This sets or updates the part of the module display that depends on the current app/workspace modules. */
+function updateModuleStatus(moduleData) {
+    let newStatusInfo = getStatus(moduleData);
+    if(isStatusEqual(newStatusInfo,moduleData.StatusInfo)) return;
+
+    //set status message
+    moduleData.statusField = getStatusMsg(moduleData.statusInfo);
+
+    //set the workspace commands
+    if(moduleData.isOpened) {
+        let version = moduleData.versionSelector.value;
+        let selectedVersionInfo = lookupVersionInfo(version,moduleData);
+        setWorkspaceCommands(selectedVersionInfo,moduleData) 
+    }
+}
+
+/** This method returns the title text for a given module. */
 function getTitle(moduleConfig) {
     let title;
     if(moduleConfig.displayName) title = moduleConfig.displayName + ": ";
@@ -157,15 +228,18 @@ function getTitle(moduleConfig) {
     return title;
 }
 
-function getStatus(moduleConfig) {
+/** This method returns the status text for a given status value. */
+function getStatusMsg(statusValue) {
     return "-- status not available --";
 }
 
+/** This function returns the short description for a module. */
 function getShortDesc(moduleConfig) {
     if(moduleConfig.shortDesc) return moduleConfig.shortDesc;
     else return "No description available";
 }
 
+/** This function populates the version selector for a module. */
 function populateVersionSelector(moduleConfig,versionSelector) {
     moduleConfig.versions.forEach(versionInfo => {
         let optionElement = document.createElement("option");
@@ -174,27 +248,26 @@ function populateVersionSelector(moduleConfig,versionSelector) {
     })
 }
 
+/** This method loads the body for a given bersion of a given module */
 function loadBodyForVersion(moduleData) {
     let version = moduleData.versionSelector.value;
     if((moduleData.loadedBodyVersion != version)&&(moduleData.moduleConfig.versions)) {
-        //get rid of any old data
-        clearBody(moduleData);
         //load the new data
-        let activeVersionInfo = moduleData.moduleConfig.versions.find(versionInfo => versionInfo.version == version);
-        if(activeVersionInfo) {
-            if(activeVersionInfo.esUrl) {
-                //for now I will ad fixed commands, without the status
-                addWorkspaceCommands(activeVersionInfo.esUrl,moduleData);
-            }
-            if(activeVersionInfo.demoWorkspaces) {
+        let selectedVersionInfo = lookupVersionInfo(version,moduleData);
+        if(selectedVersionInfo) {
+
+            setWorkspaceCommands(activeVersionInfo,moduleData);
+        
+            if(selectedVersionInfo.demoWorkspaces) {
                 //add each demo workspace link
                 activeVersionInfo.demoWorkspaces.forEach(workspaceInfo => {
-                    addReferenceWorkspace(workspaceInfo,moduleData);
+                    setReferenceWorkspace(workspaceInfo,moduleData);
                 });
             }
-            if(activeVersionInfo.webLink) {
+
+            if(selectedVersionInfo.webLink) {
                 //add the web link
-                addReferenceWebLink(activeVersionInfo.webLink,moduleData);
+                seReferenceWebLink(activeVersionInfo.webLink,moduleData);
             }
 
             moduleData.loadedBodyVersion = version;
@@ -202,13 +275,12 @@ function loadBodyForVersion(moduleData) {
     }
 }
 
-function clearBody(moduleData) {
+/** This function adds the workspace commands for a module, which is the commands to add and remove
+ * the module from the application/workspace. */
+function setWorkspaceCommands(versionInfo,moduleData) {
+    //clear data
     moduleData.workspaceCommandSetContainer.innerHTML = "";
-    moduleData.demoLinkSetContainer.innerHTML = "";
-    moduleData.webLinkSetContainer.innerHTML = "";
-}
-
-function addWorkspaceCommands(moduleUrl,moduleData) {
+//FIX THIS!!!! I CHANGED THE INPUT ARGS
     let addContainer = document.createElement("div");
     addContainer.className = "referenceCommandSetContainer";
     let addLink = document.createElement("a");
@@ -228,7 +300,11 @@ function addWorkspaceCommands(moduleUrl,moduleData) {
     moduleData.workspaceCommandSetContainer.appendChild(removeContainer);
 }
 
-function addReferenceWorkspace(workspaceInfo,moduleData) {
+/** This method adds the demo workspaces to a module for a given version. */
+function setReferenceWorkspace(workspaceInfo,moduleData) {
+    //clear data
+    moduleData.demoLinkSetContainer.innerHTML = "";
+
     if(workspaceInfo.webUrl) {
         let referenceLinkContainer = document.createElement("div");
         referenceLinkContainer.className = "referenceCommandSetContainer";
@@ -245,7 +321,11 @@ function addReferenceWorkspace(workspaceInfo,moduleData) {
     }
 }
 
-function addReferenceWebLink(url,moduleData) {
+/** This method adds the web links to a module for a given version. */
+function setReferenceWebLink(url,moduleData) {
+    //clear data
+    moduleData.webLinkSetContainer.innerHTML = "";
+
     let referenceLinkContainer = document.createElement("div");
     referenceLinkContainer.className = "referenceCommandSetContainer";
 
@@ -258,25 +338,77 @@ function addReferenceWebLink(url,moduleData) {
     moduleData.webLinkSetContainer.appendChild(referenceLinkContainer);
 }
 
-function moreClicked(moduleData) {
-    //make sure the proper version data is populated
-    loadBodyForVersion(moduleData)
+//==================
+// other utilities
+//==================
 
-    moduleData.moreContainer.style.display = "none";
-    moduleData.bodyCell.style.display = "";
+function lookupVersionInfo(version,moduleData) {
+    return moduleData.moduleConfig.versions.find(versionInfo => versionInfo.version == version);
 }
 
-function lessClicked(moduleData) {
-    moduleData.moreContainer.style.display = "";
-    moduleData.bodyCell.style.display = "none";
+function isStatusEqual(statusInfo1,statusInfo2) {
+    //POPULATE THIS!!!
 }
 
-function versionSelectorChanged(moduleData) {
-    loadBodyForVersion(moduleData);
+/** This function gets the status value for a given module. */
+function getStatus(moduleData) {
+    let statusInfo = {};
+
+    if(!appModules) {
+        statusInfo.status = STATUS_UNKNOWN;
+        return statusInfo;
+    }
+    
+    if(appModules.moduleType == "es") {
+        statusInfo.type = "es";
+//===========================================================================
+//this is wrong
+        let loadedUrl = appModules.esModules[moduleData.moduleName];
+//===========================================================================
+        if(loadedUrl !== undefined) {
+            //find this url in the list, load version from the item
+//============================================================================
+//rethink this
+            let versionInfo = moduleData.versions.find(versionInfo => versionInfo.esUrl == loadedUrl);
+//=============================================================================
+            statusInfo.status = ES_LOADED;
+            statusInfo.url = loadedUrl;
+            if(versionInfo) {
+                statusInfo.version = versionInfo.version;
+            }
+            else {
+                statusInfo.unknownVersion = true;
+            } 
+        }
+        else {
+            statusInfo.status = ES_NOT_LOADED;
+        }
+    }
+    else if(appModules.moduleType == "npm") {
+        statusInfo.type = "npm";
+        let installedVersion = appModules.npmModules.installed[moduleData.moduleName];
+        let isLoaded = appModules.npmModules.loaded[moduleData.moduleName];
+//============================================================================
+//think about the case where the installed version is not in the app modules list.
+//============================================================================
+        if(installedVersion !== undefined) {
+            statusInfo.status = isLoaded ? NPM_INSTALLED_AND_LOADED : NPM_INSTALLED_NOT_LOADED;
+            statusInfo.installedVersion = installedVersion;
+        }
+        else {
+            statusInfo.status = NPM_NOT_INSTALLED;
+        }
+    }
+    else {
+        alert("Error: Unknown module type!");
+        statusInfo.status = STATUS_UNKNOWN;
+    }
+
+    return statusInfo;
 }
 
 function readInputData() {
-    queryField = readQueryField("initialData");
+    queryField = readQueryField("appModules");
     if(queryField) {
         try {
             return JSON.parse(queryField);
@@ -293,8 +425,6 @@ function readInputData() {
 }
 
 function readQueryField(field) {
-    var href = window.location.href;
-    var reg = new RegExp( '[?&]' + field + '=([^&#]*)', 'i' );
-    var string = reg.exec(href);
-    return string ? string[1] : null;
+    var params = new URLSearchParams(window.location.search);
+    return params.get(field);
 }
