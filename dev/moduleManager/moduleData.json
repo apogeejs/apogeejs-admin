@@ -35,7 +35,8 @@
 							"webUrl": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
 						}
 					],
-					"webLink": "https://apogeejs.com"
+					"webLink": "https://apogeejs.com",
+					"isLatest": true
 				}
 			]
 		},
@@ -62,7 +63,8 @@
 							"webUrl": "http://localhost:8888/apogeejs-module-csv/csvParseWorkspaceLocal.json"
 						}
 					],
-					"webLink": "https://apogeejs.com"
+					"webLink": "https://apogeejs.com",
+					"isLatest": true
 				}
 			]
 		}

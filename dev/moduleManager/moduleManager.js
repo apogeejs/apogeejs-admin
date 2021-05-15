@@ -8,10 +8,10 @@ const STATUS_UNKNOWN = -1;
 
 const NPM_NOT_INSTALL = 0;
 const NPM_INTALLED_NOT_LOADED = 1;
-const NPM_INSTALLED_AND_LOADED = 3;
+const NPM_INSTALLED_AND_LOADED = 2;
 
-const ES_NOT_LOADED = 0;
-const ES_LOADED = 3;
+const ES_NOT_LOADED = 3;
+const ES_LOADED = 4;
 
 const MODULE_REQUEST_URL = "moduleData.json";
 
@@ -21,6 +21,7 @@ const MODULE_REQUEST_URL = "moduleData.json";
 /** This method loads the module list. */
 async function load() {
 
+    //get module data from server
     let modulesConfig = await fetch(MODULE_REQUEST_URL).then(response => {
         if(response.ok) {
             return response.json();
@@ -32,8 +33,10 @@ async function load() {
     })
 
     if(modulesConfig) {
+        //populate base info in dom elements
         populateDomList(modulesConfig.modules);
 
+        //populate status based on app/workspace data
         let initialAppModules = readInputData();
         updateAppModuleData(initialAppModules);
     }
@@ -79,11 +82,13 @@ function moreClicked(moduleData) {
 
     moduleData.moreContainer.style.display = "none";
     moduleData.bodyCell.style.display = "";
+    moduleData.isOpened = true;
 }
 
 function lessClicked(moduleData) {
     moduleData.moreContainer.style.display = "";
     moduleData.bodyCell.style.display = "none";
+    moduleData.isOpened = false;
 }
 
 function versionSelectorChanged(moduleData) {
@@ -106,6 +111,7 @@ function populateList(moduleListConfig) {
     moduleListConfig.forEach(moduleConfig => {
         let moduleData = {};
         moduleData.moduleConfig = moduleConfig;
+        moduleData.moduleName = moduleConfig.moduleName;
 
         //create the main cells
         let moduleCell = document.createElement("div");
@@ -146,7 +152,7 @@ function populateList(moduleListConfig) {
         //start in a closed state
         bodyCell.style.display = "none"; //initially invisible
         moreLink.style.display = ""; //initially visible
-        moduleData.isOpen = false;
+        moduleData.isOpened = false;
 
         //fill in the parts of the body that do not depend on the selected version
         let leftCell = document.createElement("div");
@@ -205,10 +211,12 @@ function populateList(moduleListConfig) {
 /** This sets or updates the part of the module display that depends on the current app/workspace modules. */
 function updateModuleStatus(moduleData) {
     let newStatusInfo = getStatus(moduleData);
-    if(isStatusEqual(newStatusInfo,moduleData.StatusInfo)) return;
+    if(isStatusEqual(newStatusInfo,moduleData.statusInfo)) return;
+
+    moduleData.statusInfo = newStatusInfo;
 
     //set status message
-    moduleData.statusField = getStatusMsg(moduleData.statusInfo);
+    moduleData.statusField = getStatusMsg(newStatusInfo);
 
     //set the workspace commands
     if(moduleData.isOpened) {
@@ -255,21 +263,18 @@ function loadBodyForVersion(moduleData) {
         //load the new data
         let selectedVersionInfo = lookupVersionInfo(version,moduleData);
         if(selectedVersionInfo) {
-
-            setWorkspaceCommands(activeVersionInfo,moduleData);
-        
+            //update commands for the app/workspace
+            setWorkspaceCommands(selectedVersionInfo,moduleData);
             if(selectedVersionInfo.demoWorkspaces) {
                 //add each demo workspace link
                 activeVersionInfo.demoWorkspaces.forEach(workspaceInfo => {
                     setReferenceWorkspace(workspaceInfo,moduleData);
                 });
             }
-
             if(selectedVersionInfo.webLink) {
                 //add the web link
                 seReferenceWebLink(activeVersionInfo.webLink,moduleData);
             }
-
             moduleData.loadedBodyVersion = version;
         }
     }
@@ -277,27 +282,133 @@ function loadBodyForVersion(moduleData) {
 
 /** This function adds the workspace commands for a module, which is the commands to add and remove
  * the module from the application/workspace. */
-function setWorkspaceCommands(versionInfo,moduleData) {
-    //clear data
-    moduleData.workspaceCommandSetContainer.innerHTML = "";
-//FIX THIS!!!! I CHANGED THE INPUT ARGS
-    let addContainer = document.createElement("div");
-    addContainer.className = "referenceCommandSetContainer";
-    let addLink = document.createElement("a");
-    addLink.className = "workspaceCommandLink";
-    addLink.onclick = () => addEsModuleToWorkspace(moduleUrl);
-    addLink.innerHTML = "Add module to Workspace";
-    addContainer.appendChild(addLink);
-    moduleData.workspaceCommandSetContainer.appendChild(addContainer);
+function setWorkspaceCommands(selectedVersionInfo,moduleData) {
+    let domContainer = moduleData.workspaceCommandSetContainer;
+    let statusInfo = moduleData.status;
 
-    let removeContainer = document.createElement("div");
-    removeContainer.className = "referenceCommandSetContainer";
-    let removeLink = document.createElement("a");
-    removeLink.className = "workspaceCommandLink";
-    removeLink.onclick = () => removeEsModuleFromWorkspace(moduleUrl);
-    removeLink.innerHTML = "Remove module from Workspace";
-    removeContainer.appendChild(removeLink);
-    moduleData.workspaceCommandSetContainer.appendChild(removeContainer);
+    //clear data
+    domContainer.innerHTML = "";
+
+    switch(statusInfo.status) {
+        case STATUS_UNKNOWN:
+            //figure out what to do here
+            break;
+
+        case ES_NOT_LOADED:
+            //load the selected version
+            {
+                let handler = () => loadEsModule(selectedVersionInfo.esUrl); 
+                let msg;
+                if(selectedVersionInfo.isLatest) {
+                    msg = "Load Module to Workspace";
+                }
+                else {
+                    msg = "Load this Version to Workspace (not latest) "
+                }
+                moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msg,handler));
+            }
+            break;
+
+        case ES_LOADED:
+            //unload the current version, whichever that is
+            {
+                let handler = () => unloadEsModule(statusInfo.url); 
+                let msg = "Unload Module from Workspace";
+                moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msg,handler));
+            }
+
+            //if the selected version is not loaded, allow for a switch
+            //specify if the selected is latest/newer, not latest/older
+            if(statusInfo.version != selectedVersionInfo.version) {
+                let handler = () => switchEsModule(statusInfo.url,selectedVersionInfo.esUrl);
+                let msg;
+                if(selectedVersionInfo.isLatest) msg = "Upgrade to this Version (latest)"
+                else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade to this Version (not latest version)"
+                else msg = "Downgrade to this Version (older!)"
+                moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msg,handler));
+            }
+            break;
+
+        case NPM_NOT_INSTALL:
+            //two commands - install and load, or just install
+            {
+                let handlerInstall = () => installNpmModule(moduleData.moduleName);
+                let handlerInstallAndLoad = () => installAndLoadNpmModule(moduleData.moduleName);
+                let msgInstall, msgInstallAndLoad;
+                //message is different for latest versus not latest
+                if(selectedVersionInfo.isLatest) {
+                    msgInstall = "Install Module, without Loading to Workspace";
+                    msgInstallAndLoad = "Install Module and Load to Workspace";
+                }
+                else {
+                    msgInstall = "Install this Version, without Loading to Workspace (not latest)"
+                    msgInstallAndLoad = "Install this Version and Load to Workspace (not latest)"
+                }
+                moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msgInstallAndLoad,handlerInstallAndLoad));
+                moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msgInstall,handlerInstall));
+            }
+            break;
+
+        case NPM_INSTALLED_NOT_LOADED:
+            //load module to workspace
+            {
+                let handler = () => loadNpmModule(moduleData.moduleName); 
+                let msg = "Load Module to Workspace";
+                moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msg,handler));
+            }
+
+            //if the selected version is not installed, allow for a switch
+            if(statusInfo.version != selectedVersionInfo.version) {
+                let handler = () => switchNpmModule(moduleData.moduleName,statusInfo.version,selectedVersionInfo.version);
+                let msg;
+                if(selectedVersionInfo.isLatest) msg = "Upgrade Installed to this Version (latest)"
+                else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade Installed to this Version (not latest version)"
+                else msg = "Downgrade Installed to this Version (older!)"
+                moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msg,handler));
+            }
+
+            //uninstall, whicher version is installed
+            {
+                let handler = () => uninstallNpmModule(moduleData.moduleName);
+                let msg = "Uninstall Module from App";
+                moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msg,handler));
+            }
+            break;
+
+        case NPM_INSTALLED_AND_LOADED:
+            //unload module to workspace
+            {
+                let handler = () => unloadNpmModule(moduleData.moduleName); 
+                let msg = "Unload Module from Workspace";
+                moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msg,handler));
+            }
+
+            //if the selected version is not installed, allow for a switch
+            //specify if the selected is latest/newer, not latest/older (same logic as above)
+            //if the selected version is not installed, allow for a switch
+            if(statusInfo.version != selectedVersionInfo.version) {
+                let handler = () => switchNpmModule(moduleData.moduleName,statusInfo.version,selectedVersionInfo.version);
+                let msg;
+                if(selectedVersionInfo.isLatest) msg = "Upgrade Installed to this Version (latest)"
+                else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade Installed to this Version (not latest version)"
+                else msg = "Downgrade Installed to this Version (older!)"
+                moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msg,handler));
+            }
+
+            //note - no uninstall command
+            break;
+    }
+}
+
+function createWorkspaceCommand(text,handler) {
+    let container = document.createElement("div");
+    container.className = "referenceCommandSetContainer";
+    let link = document.createElement("a");
+    link.className = "workspaceCommandLink";
+    link.onclick = handler;
+    link.innerHTML = text;
+    container.appendChild(link);
+    return container;
 }
 
 /** This method adds the demo workspaces to a module for a given version. */
@@ -347,7 +458,13 @@ function lookupVersionInfo(version,moduleData) {
 }
 
 function isStatusEqual(statusInfo1,statusInfo2) {
-    //POPULATE THIS!!!
+    //just use type, status and version for equality (may be other fields too)
+    return ( (statusInfo1.type = statusInfo2.type) &&
+            (statusInfo1.status = statusInfo2.status) &&
+            (statusInfo1.version = statusInfo2.version) &&
+            (statusInfo1.url = statusInfo2.url) && //es only 
+            (statusInfo1.unrecognizedVersion = statusInfo2.unrecognizedVersion) //npm only, for now
+        );
 }
 
 /** This function gets the status value for a given module. */
@@ -361,39 +478,30 @@ function getStatus(moduleData) {
     
     if(appModules.moduleType == "es") {
         statusInfo.type = "es";
-//===========================================================================
-//this is wrong
-        let loadedUrl = appModules.esModules[moduleData.moduleName];
-//===========================================================================
-        if(loadedUrl !== undefined) {
-            //find this url in the list, load version from the item
-//============================================================================
-//rethink this
-            let versionInfo = moduleData.versions.find(versionInfo => versionInfo.esUrl == loadedUrl);
-//=============================================================================
+        //based on url (for now), see if a version of this module is loaded
+        let loadedVersionInfo = moduleData.versions.find(versionInfo => (appModules.esModules.indexOf(versionInfo.esUrl) >= 0));
+        if(loadedVersionInfo) {
             statusInfo.status = ES_LOADED;
-            statusInfo.url = loadedUrl;
-            if(versionInfo) {
-                statusInfo.version = versionInfo.version;
-            }
-            else {
-                statusInfo.unknownVersion = true;
-            } 
+            statusInfo.url = loadedVersionInfo.esUrl;
+            statusInfo.version = loadedVersionInfo.version;
         }
         else {
+            //not loaded, or an unrecognized version is loaded (we don't know)
             statusInfo.status = ES_NOT_LOADED;
         }
     }
     else if(appModules.moduleType == "npm") {
         statusInfo.type = "npm";
         let installedVersion = appModules.npmModules.installed[moduleData.moduleName];
-        let isLoaded = appModules.npmModules.loaded[moduleData.moduleName];
-//============================================================================
-//think about the case where the installed version is not in the app modules list.
-//============================================================================
+        let isLoaded = (appModules.npmModules.loaded.indexOf[moduleData.moduleName] >= 0);
         if(installedVersion !== undefined) {
             statusInfo.status = isLoaded ? NPM_INSTALLED_AND_LOADED : NPM_INSTALLED_NOT_LOADED;
-            statusInfo.installedVersion = installedVersion;
+            statusInfo.version = installedVersion;
+            //check if this is an unknown version
+            let installedVersionInfo = moduleData.versions.find(versionInfo => (versionInfo.version == installedVersion));
+            if(!installedVersionInfo) {
+                statusInfo.unrecognizedVersion = true;
+            }
         }
         else {
             statusInfo.status = NPM_NOT_INSTALLED;
