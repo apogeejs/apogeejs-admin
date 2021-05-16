@@ -1,6 +1,8 @@
 //======================
 // Fields
 //======================
+let callingWindow = null;
+let callingUrl = null;
 let appModules = null;
 let moduleDataList = [];
 
@@ -21,6 +23,16 @@ const MODULE_REQUEST_URL = "moduleData.json";
 /** This method loads the module list. */
 async function load() {
 
+    //get the url for the calling app, for message passing
+    callingWindow = window.opener;
+    callingUrl = readQueryField("callingUrl");
+
+    //listener for messages from the app
+    window.addEventListener("message",event => receiveMessage(event));
+
+    //this message lets the main window know the module manager closed
+    window.addEventListener("unload",() => closeModuleManager());
+
     //get module data from server
     let modulesConfig = await fetch(MODULE_REQUEST_URL).then(response => {
         if(response.ok) {
@@ -37,39 +49,100 @@ async function load() {
         populateDomList(modulesConfig.modules);
 
         //populate status based on app/workspace data
-        let initialAppModules = readInputData();
+        let initialAppModules = readAppModules();
         updateAppModuleData(initialAppModules);
     }
-}
-
-function receiveMessage() {
-    //implement to code to recieve messages
-    //use this to call updateAppModuleData(updateAppModules);
-}
-
-/** This updates the status for each module entry. */
-function updateAppModuleData(updatedAppModules) {
-    appModules = updatedAppModules; //store this
-    moduleDataList.forEach(moduleData => updateModuleStatus(moduleData));
 }
 
 //==================
 // External Functions
 //==================
-function addEsModuleToWorkspace(esModuleUrl) {
-    alert("Add module not implemented")
+function loadEsModule(moduleUrl,moduleName) {
+    let messageData = {
+        moduleIdentifier: moduleUrl,
+        moduleName: moduleName
+    }
+    sendMessage("loadModule",messageData);
 }
 
-function removeEsModuleFromWorkspace(esModuleUrl) {
-    alert("Remove module not implemented")
+function unloadESModule(moduleUrl) {
+    let messageData = {
+        moduleIdentifier: moduleUrl
+    }
+    sendMessage("unloadModule",messageData);
+}
+
+function switchEsModule(newUrl,oldUrl) {
+    let messageData = {
+        newIdentifier: newUrl,
+        oldIdentifier: oldUrl
+    }
+    sendMessage("switchModule",messageData);
+}
+
+function installNpmModule(moduleName,moduleVersion) {
+    let messageData = {
+        moduleName: moduleName,
+        moduleVersion: moduleVersion
+    }
+    sendMessage("installNpmModule",messageData);
+}
+
+function installAndLoadNpmModule(npmModuleName,version) {
+    let messageData = {
+        moduleName: moduleName,
+        moduleVersion: moduleVersion
+    }
+    sendMessage("installAndLoadNpmModule",messageData);
+}
+
+function loadNpmModule(moduleName) {
+    let messageData = {
+        moduleIdentifier: moduleName,
+        moduleName: moduleName
+    }
+    sendMessage("loadModule",messageData);
+}
+
+function uninstallNpmModule(moduleName) {
+    let messageData = {
+        moduleName: moduleName
+    }
+    sendMessage("uninstallNpmModule",messageData);
+}
+
+function unloadModule(moduleName) {
+    let messageData = {
+        moduleIdentifier: moduleName
+    }
+    sendMessage("unloadModule",messageData);
+}
+
+function switchNpmModule(moduleName,newVersion,oldVersion) {
+    let messageData = {
+        moduleName: moduleName,
+        newVersion: newVersion,
+        oldVersion: oldVersion
+    }
+    sendMessage("switchEsModule",messageData);
 }
 
 function openWebWorkspace(workspaceUrl) {
-    alert("Open demo workspace not implemented")
+    let messageData = {
+        workspaceUrl: workspaceUrl
+    }
+    sendMessage("openWorkspace",messageData);
 }
 
-function openWebLink(url) {
-    alert("Open web link not implemented")
+function openWebLink(linkUrl) {
+    let messageData = {
+        linkUrl: linkUrl
+    }
+    sendMessage("openLink",messageData);
+}
+
+function closeModuleManager() {
+    sendMessage("closeModuleManager",null);
 }
 
 
@@ -96,11 +169,30 @@ function versionSelectorChanged(moduleData) {
 }
 
 //=================
-// Internal Functions
+// Messaging Functions
+//=================
+
+function receiveMessage(event) {
+    switch(event.data.message) {
+        case "appModules": 
+            updateAppModuleData(event.data.value);
+            break;
+    }
+}
+
+function sendMessage(messageType,messageValue) {
+    if((callingWindow)&&(callingWindow.postMessage)) {
+        callingWindow.postMessage({message: messageType, value: messageValue},callingUrl);
+    }
+}
+        
+
+//=================
+// Internal Functions - DOM
 //=================
 
 /** This function initially populates the module list. */
-function populateList(moduleListConfig) {
+function populateDomList(moduleListConfig) {
 
     let listContainerElement = document.getElementById("moduleListContainer");
     if(!listContainerElement) {
@@ -132,7 +224,7 @@ function populateList(moduleListConfig) {
         let statusField = document.createElement("div");
         statusField.className = "statusField";
         headerCell.appendChild(statusField);
-        moduleData.bodyCell = bodyCell; //save this
+        moduleData.statusField = statusField; //save this
         let shortDescField = document.createElement("div");
         shortDescField.className = "shortDescField";
         shortDescField.innerHTML = getShortDesc(moduleConfig);
@@ -173,8 +265,13 @@ function populateList(moduleListConfig) {
         versionSelector = document.createElement("select");
         versionSelector.onchange = () => versionSelectorChanged(moduleData);
         versionContainer.appendChild(versionSelector);
-        populateVersionSelector(moduleConfig,versionSelector);
+        let notLatestContainer = document.createElement("div");
+        notLatestContainer.className = "notLatestContainer";
+        notLatestContainer.innerHTML = "Not Latest Version!"
+        versionContainer.appendChild(notLatestContainer);
+        populateVersionSelector(moduleConfig,versionSelector,notLatestContainer);
         moduleData.versionSelector = versionSelector; //save this
+        moduleData.notLatestContainer = notLatestContainer; //save this
         
         let workspaceCommandSetContainer = document.createElement("div");
         workspaceCommandSetContainer.className = "workspaceCommandSetContainer";
@@ -216,7 +313,7 @@ function updateModuleStatus(moduleData) {
     moduleData.statusInfo = newStatusInfo;
 
     //set status message
-    moduleData.statusField = getStatusMsg(newStatusInfo);
+    moduleData.statusField.innerHTML = getStatusMsg(newStatusInfo);
 
     //set the workspace commands
     if(moduleData.isOpened) {
@@ -237,8 +334,26 @@ function getTitle(moduleConfig) {
 }
 
 /** This method returns the status text for a given status value. */
-function getStatusMsg(statusValue) {
-    return "-- status not available --";
+function getStatusMsg(statusInfo) {
+    switch(statusInfo.status) {
+        case STATUS_UNKNOWN:
+            return "Status Unknown";
+
+        case ES_NOT_LOADED:
+            return "Not Loaded in Workspace"
+
+        case ES_LOADED:
+            return "Loaded in Workspace: " + statusInfo.version;
+
+        case NPM_NOT_INSTALL:
+            return "Not Installed in App"
+
+        case NPM_INSTALLED_NOT_LOADED:
+            return "Not loaded in Workspace; Installed in App: " + statusInfo.version;
+
+        case NPM_INSTALLED_AND_LOADED:
+            return "Installed and Loaded in Workspace: " + statusInfo.version;
+    }
 }
 
 /** This function returns the short description for a module. */
@@ -248,12 +363,17 @@ function getShortDesc(moduleConfig) {
 }
 
 /** This function populates the version selector for a module. */
-function populateVersionSelector(moduleConfig,versionSelector) {
+function populateVersionSelector(moduleConfig,versionSelector,notLatestContainer) {
     moduleConfig.versions.forEach(versionInfo => {
         let optionElement = document.createElement("option");
         optionElement.text = versionInfo.version;
         versionSelector.add(optionElement);
+        //make the initial selection the latest
+        if(versionInfo.isLatest) {
+            versionSelector.selectedIndex = versionSelector.length-1;
+        }
     })
+    notLatestContainer.style.display = "none"; 
 }
 
 /** This method loads the body for a given bersion of a given module */
@@ -267,14 +387,17 @@ function loadBodyForVersion(moduleData) {
             setWorkspaceCommands(selectedVersionInfo,moduleData);
             if(selectedVersionInfo.demoWorkspaces) {
                 //add each demo workspace link
-                activeVersionInfo.demoWorkspaces.forEach(workspaceInfo => {
+                selectedVersionInfo.demoWorkspaces.forEach(workspaceInfo => {
                     setReferenceWorkspace(workspaceInfo,moduleData);
                 });
             }
             if(selectedVersionInfo.webLink) {
                 //add the web link
-                seReferenceWebLink(activeVersionInfo.webLink,moduleData);
+                setReferenceWebLink(selectedVersionInfo.webLink,moduleData);
             }
+            //set the visibility of the "not latest" label
+            moduleData.notLatestContainer.style.display = selectedVersionInfo.isLatest ? "none" : "";
+            
             moduleData.loadedBodyVersion = version;
         }
     }
@@ -284,7 +407,7 @@ function loadBodyForVersion(moduleData) {
  * the module from the application/workspace. */
 function setWorkspaceCommands(selectedVersionInfo,moduleData) {
     let domContainer = moduleData.workspaceCommandSetContainer;
-    let statusInfo = moduleData.status;
+    let statusInfo = moduleData.statusInfo;
 
     //clear data
     domContainer.innerHTML = "";
@@ -297,7 +420,7 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
         case ES_NOT_LOADED:
             //load the selected version
             {
-                let handler = () => loadEsModule(selectedVersionInfo.esUrl); 
+                let handler = () => loadEsModule(selectedVersionInfo.esUrl,moduleData.moduleName); 
                 let msg;
                 if(selectedVersionInfo.isLatest) {
                     msg = "Load Module to Workspace";
@@ -324,7 +447,7 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
                 let msg;
                 if(selectedVersionInfo.isLatest) msg = "Upgrade to this Version (latest)"
                 else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade to this Version (not latest version)"
-                else msg = "Downgrade to this Version (older!)"
+                else msg = "Downgrade to this Older Version"
                 moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msg,handler));
             }
             break;
@@ -332,8 +455,8 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
         case NPM_NOT_INSTALL:
             //two commands - install and load, or just install
             {
-                let handlerInstall = () => installNpmModule(moduleData.moduleName);
-                let handlerInstallAndLoad = () => installAndLoadNpmModule(moduleData.moduleName);
+                let handlerInstall = () => installNpmModule(moduleData.moduleName,selectedVersionInfo.version);
+                let handlerInstallAndLoad = () => installAndLoadNpmModule(moduleData.moduleName,selectedVersionInfo.version);
                 let msgInstall, msgInstallAndLoad;
                 //message is different for latest versus not latest
                 if(selectedVersionInfo.isLatest) {
@@ -359,7 +482,9 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
 
             //if the selected version is not installed, allow for a switch
             if(statusInfo.version != selectedVersionInfo.version) {
-                let handler = () => switchNpmModule(moduleData.moduleName,statusInfo.version,selectedVersionInfo.version);
+                let newVersion = selectedVersionInfo.version;
+                let oldVersion = statusInfo.version;
+                let handler = () => switchNpmModule(moduleData.moduleName,newVersion,oldVersion);
                 let msg;
                 if(selectedVersionInfo.isLatest) msg = "Upgrade Installed to this Version (latest)"
                 else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade Installed to this Version (not latest version)"
@@ -387,7 +512,9 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
             //specify if the selected is latest/newer, not latest/older (same logic as above)
             //if the selected version is not installed, allow for a switch
             if(statusInfo.version != selectedVersionInfo.version) {
-                let handler = () => switchNpmModule(moduleData.moduleName,statusInfo.version,selectedVersionInfo.version);
+                let newVersion = selectedVersionInfo.version;
+                let oldVersion = statusInfo.version;
+                let handler = () => switchNpmModule(moduleData.moduleName,newVersion,oldVersion);
                 let msg;
                 if(selectedVersionInfo.isLatest) msg = "Upgrade Installed to this Version (latest)"
                 else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade Installed to this Version (not latest version)"
@@ -449,21 +576,30 @@ function setReferenceWebLink(url,moduleData) {
     moduleData.webLinkSetContainer.appendChild(referenceLinkContainer);
 }
 
-//==================
-// other utilities
-//==================
+//=================
+// Internal Functions - Other
+//=================
+
+/** This updates the status for each module entry. */
+function updateAppModuleData(updatedAppModules) {
+    appModules = updatedAppModules; //store this
+    moduleDataList.forEach(moduleData => updateModuleStatus(moduleData));
+}
 
 function lookupVersionInfo(version,moduleData) {
     return moduleData.moduleConfig.versions.find(versionInfo => versionInfo.version == version);
 }
 
 function isStatusEqual(statusInfo1,statusInfo2) {
+    //treat both "false" as not equal
+    if((!statusInfo1)||(!statusInfo2)) return false;
+
     //just use type, status and version for equality (may be other fields too)
-    return ( (statusInfo1.type = statusInfo2.type) &&
-            (statusInfo1.status = statusInfo2.status) &&
-            (statusInfo1.version = statusInfo2.version) &&
-            (statusInfo1.url = statusInfo2.url) && //es only 
-            (statusInfo1.unrecognizedVersion = statusInfo2.unrecognizedVersion) //npm only, for now
+    return ( (statusInfo1.type == statusInfo2.type) &&
+            (statusInfo1.status == statusInfo2.status) &&
+            (statusInfo1.version == statusInfo2.version) &&
+            (statusInfo1.url == statusInfo2.url) && //es only 
+            (statusInfo1.unrecognizedVersion == statusInfo2.unrecognizedVersion) //npm only, for now
         );
 }
 
@@ -479,7 +615,7 @@ function getStatus(moduleData) {
     if(appModules.moduleType == "es") {
         statusInfo.type = "es";
         //based on url (for now), see if a version of this module is loaded
-        let loadedVersionInfo = moduleData.versions.find(versionInfo => (appModules.esModules.indexOf(versionInfo.esUrl) >= 0));
+        let loadedVersionInfo = moduleData.moduleConfig.versions.find(versionInfo => (appModules.esModules.indexOf(versionInfo.esUrl) >= 0));
         if(loadedVersionInfo) {
             statusInfo.status = ES_LOADED;
             statusInfo.url = loadedVersionInfo.esUrl;
@@ -498,7 +634,7 @@ function getStatus(moduleData) {
             statusInfo.status = isLoaded ? NPM_INSTALLED_AND_LOADED : NPM_INSTALLED_NOT_LOADED;
             statusInfo.version = installedVersion;
             //check if this is an unknown version
-            let installedVersionInfo = moduleData.versions.find(versionInfo => (versionInfo.version == installedVersion));
+            let installedVersionInfo = moduleData.moduleConfig.versions.find(versionInfo => (versionInfo.version == installedVersion));
             if(!installedVersionInfo) {
                 statusInfo.unrecognizedVersion = true;
             }
@@ -516,10 +652,10 @@ function getStatus(moduleData) {
 }
 
 function readInputData() {
-    queryField = readQueryField("appModules");
-    if(queryField) {
+    let appModuleString = readQueryField("appModules");
+    if(appModuleString) {
         try {
-            return JSON.parse(queryField);
+            return JSON.parse(appModuleString);
         }
         catch(error) {
             if(error.stack) console.error(error.stack);
