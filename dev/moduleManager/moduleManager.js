@@ -72,12 +72,12 @@ function unloadESModule(moduleUrl) {
     sendMessage("unloadModule",messageData);
 }
 
-function switchEsModule(newUrl,oldUrl) {
+function updateEsModule(newUrl,oldUrl) {
     let messageData = {
         newIdentifier: newUrl,
         oldIdentifier: oldUrl
     }
-    sendMessage("switchModule",messageData);
+    sendMessage("updateModule",messageData);
 }
 
 function installNpmModule(moduleName,moduleVersion) {
@@ -118,13 +118,9 @@ function unloadModule(moduleName) {
     sendMessage("unloadModule",messageData);
 }
 
-function switchNpmModule(moduleName,newVersion,oldVersion) {
-    let messageData = {
-        moduleName: moduleName,
-        newVersion: newVersion,
-        oldVersion: oldVersion
-    }
-    sendMessage("switchEsModule",messageData);
+function updateNpmModule(moduleName,newVersion) {
+    //same as install
+    installNpmModule(moduleName,newVersion)
 }
 
 function openWebWorkspace(workspaceUrl) {
@@ -443,7 +439,7 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
             //if the selected version is not loaded, allow for a switch
             //specify if the selected is latest/newer, not latest/older
             if(statusInfo.version != selectedVersionInfo.version) {
-                let handler = () => switchEsModule(statusInfo.url,selectedVersionInfo.esUrl);
+                let handler = () => updateEsModule(statusInfo.url,selectedVersionInfo.esUrl);
                 let msg;
                 if(selectedVersionInfo.isLatest) msg = "Upgrade to this Version (latest)"
                 else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade to this Version (not latest version)"
@@ -483,8 +479,7 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
             //if the selected version is not installed, allow for a switch
             if(statusInfo.version != selectedVersionInfo.version) {
                 let newVersion = selectedVersionInfo.version;
-                let oldVersion = statusInfo.version;
-                let handler = () => switchNpmModule(moduleData.moduleName,newVersion,oldVersion);
+                let handler = () => updateNpmModule(moduleData.moduleName,newVersion);
                 let msg;
                 if(selectedVersionInfo.isLatest) msg = "Upgrade Installed to this Version (latest)"
                 else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade Installed to this Version (not latest version)"
@@ -513,8 +508,7 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
             //if the selected version is not installed, allow for a switch
             if(statusInfo.version != selectedVersionInfo.version) {
                 let newVersion = selectedVersionInfo.version;
-                let oldVersion = statusInfo.version;
-                let handler = () => switchNpmModule(moduleData.moduleName,newVersion,oldVersion);
+                let handler = () => updateNpmModule(moduleData.moduleName,newVersion);
                 let msg;
                 if(selectedVersionInfo.isLatest) msg = "Upgrade Installed to this Version (latest)"
                 else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade Installed to this Version (not latest version)"
