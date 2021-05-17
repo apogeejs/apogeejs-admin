@@ -17,6 +17,9 @@ const ES_LOADED = 4;
 
 const MODULE_REQUEST_URL = "moduleData.json";
 
+const ES_MODULE_TYPE = "es module";
+const NPM_MODULE_TYPE = "npm module";
+
 //======================
 // Functions
 //======================
@@ -49,7 +52,7 @@ async function load() {
         populateDomList(modulesConfig.modules);
 
         //populate status based on app/workspace data
-        let initialAppModules = readAppModules();
+        let initialAppModules = readInputData();
         updateAppModuleData(initialAppModules);
     }
 }
@@ -65,7 +68,7 @@ function loadEsModule(moduleUrl,moduleName) {
     sendMessage("loadModule",messageData);
 }
 
-function unloadESModule(moduleUrl) {
+function unloadEsModule(moduleUrl) {
     let messageData = {
         moduleIdentifier: moduleUrl
     }
@@ -439,7 +442,9 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
             //if the selected version is not loaded, allow for a switch
             //specify if the selected is latest/newer, not latest/older
             if(statusInfo.version != selectedVersionInfo.version) {
-                let handler = () => updateEsModule(statusInfo.url,selectedVersionInfo.esUrl);
+                let oldUrl = statusInfo.url;
+                let newUrl = selectedVersionInfo.esUrl;
+                let handler = () => updateEsModule(newUrl,oldUrl);
                 let msg;
                 if(selectedVersionInfo.isLatest) msg = "Upgrade to this Version (latest)"
                 else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade to this Version (not latest version)"
@@ -606,10 +611,10 @@ function getStatus(moduleData) {
         return statusInfo;
     }
     
-    if(appModules.moduleType == "es") {
-        statusInfo.type = "es";
+    if(appModules.moduleType == ES_MODULE_TYPE) {
+        statusInfo.type = ES_MODULE_TYPE;
         //based on url (for now), see if a version of this module is loaded
-        let loadedVersionInfo = moduleData.moduleConfig.versions.find(versionInfo => (appModules.esModules.indexOf(versionInfo.esUrl) >= 0));
+        let loadedVersionInfo = moduleData.moduleConfig.versions.find(versionInfo => (appModules.modules.indexOf(versionInfo.esUrl) >= 0));
         if(loadedVersionInfo) {
             statusInfo.status = ES_LOADED;
             statusInfo.url = loadedVersionInfo.esUrl;
@@ -620,8 +625,8 @@ function getStatus(moduleData) {
             statusInfo.status = ES_NOT_LOADED;
         }
     }
-    else if(appModules.moduleType == "npm") {
-        statusInfo.type = "npm";
+    else if(appModules.moduleType == NPM_MODULE_TYPE) {
+        statusInfo.type = NPM_MODULE_TYPE;
         let installedVersion = appModules.npmModules.installed[moduleData.moduleName];
         let isLoaded = (appModules.npmModules.loaded.indexOf[moduleData.moduleName] >= 0);
         if(installedVersion !== undefined) {
