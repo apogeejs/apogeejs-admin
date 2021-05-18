@@ -2,6 +2,7 @@
 // Fields
 //======================
 let callingWindow = null;
+let windowId = null;
 let callingUrl = null;
 let appModules = null;
 let moduleDataList = [];
@@ -29,12 +30,13 @@ async function load() {
     //get the url for the calling app, for message passing
     callingWindow = window.opener;
     callingUrl = readQueryField("callingUrl");
+    windowId = readQueryField("windowId");
 
     //listener for messages from the app
     window.addEventListener("message",event => receiveMessage(event));
 
     //this message lets the main window know the module manager closed
-    window.addEventListener("unload",() => closeModuleManager());
+    window.addEventListener("beforeunload",() => closeModuleManager());
 
     //get module data from server
     let modulesConfig = await fetch(MODULE_REQUEST_URL).then(response => {
@@ -179,9 +181,15 @@ function receiveMessage(event) {
     }
 }
 
-function sendMessage(messageType,messageValue) {
+function sendMessage(messageType,messageData) {
+    let payload = {};
+    payload.messageData = messageData;
+
+    //this identifies the window sending the message
+    payload.windowId = windowId;
+
     if((callingWindow)&&(callingWindow.postMessage)) {
-        callingWindow.postMessage({message: messageType, value: messageValue},callingUrl);
+        callingWindow.postMessage({message: messageType, value: payload},callingUrl);
     }
 }
         
