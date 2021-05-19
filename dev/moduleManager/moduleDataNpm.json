@@ -8,7 +8,8 @@
 			"shortDesc": "This modules creates plot using the Chart.js library. It includes Line, Bar and XY Scatter plots.",
 			"versions": [
 				{
-					"version": "3.2.0-p1",
+					"realversion": "3.2.0-p1",
+					"version": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v3.2.0-p1/npm/apogeejs-module-chartjs-3.2.0-p1.tgz",
 					"npmUrl": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v3.2.0-p1/npm/apogeejs-module-chartjs-3.2.0-p1.tgz",
 					"esUrl": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v3.2.0-p1/es/src/ChartJSComponentModule.js",
 					"demoWorkspaces": [
@@ -27,7 +28,8 @@
 			"shortDesc": "This module parses CSV text into JSON. It uses the Papaparse CSV library.",
 			"versions": [
 				{
-					"version": "1.3.4-p1",
+					"realversion": "1.3.4-p1",
+					"version": "http://localhost:8888/apogeejs-module-csv/releases-dev/v1.3.4-p1/npm/apogeejs-module-csv-1.3.4-p1.tgz",
 					"npmUrl": "http://localhost:8888/apogeejs-module-csv/releases-dev/v1.3.4-p1/npm/apogeejs-module-csv-1.3.4-p1.tgz",
 					"esUrl": "http://localhost:8888/apogeejs-module-csv/releases-dev/v1.3.4-p1/es/src/CSVComponentModule.js",
 					"demoWorkspaces": [

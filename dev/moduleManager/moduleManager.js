@@ -517,7 +517,7 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
         case NPM_INSTALLED_AND_LOADED:
             //unload module to workspace
             {
-                let handler = () => unloadNpmModule(moduleData.moduleName); 
+                let handler = () => unloadModule(moduleData.moduleName); 
                 let msg = "Unload Module from Workspace";
                 moduleData.workspaceCommandSetContainer.appendChild(createWorkspaceCommand(msg,handler));
             }
@@ -642,7 +642,7 @@ function getStatus(moduleData) {
     else if(moduleType == NPM_MODULE_TYPE) {
         statusInfo.type = NPM_MODULE_TYPE;
         let installedVersion = appModules.npmModules.installed[moduleData.moduleName];
-        let isLoaded = (appModules.npmModules.loaded.indexOf[moduleData.moduleName] >= 0);
+        let isLoaded = (appModules.npmModules.loaded.indexOf(moduleData.moduleName) >= 0);
         if(installedVersion !== undefined) {
             statusInfo.status = isLoaded ? NPM_INSTALLED_AND_LOADED : NPM_INSTALLED_NOT_LOADED;
             statusInfo.version = installedVersion;
