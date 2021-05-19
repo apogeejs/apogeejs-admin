@@ -5,18 +5,20 @@ let callingWindow = null;
 let windowId = null;
 let callingUrl = null;
 let appModules = null;
+let moduleType = null;
 let moduleDataList = [];
 
 const STATUS_UNKNOWN = -1;
 
-const NPM_NOT_INSTALL = 0;
-const NPM_INTALLED_NOT_LOADED = 1;
+const NPM_NOT_INSTALLED = 0;
+const NPM_INSTALLED_NOT_LOADED = 1;
 const NPM_INSTALLED_AND_LOADED = 2;
 
 const ES_NOT_LOADED = 3;
 const ES_LOADED = 4;
 
 const MODULE_REQUEST_URL = "moduleData.json";
+const MODULE_REQUEST_URL_NPM_TEMP = "moduleDataNpm.json";
 
 const ES_MODULE_TYPE = "es module";
 const NPM_MODULE_TYPE = "npm module";
@@ -31,15 +33,14 @@ async function load() {
     callingWindow = window.opener;
     callingUrl = readQueryField("callingUrl");
     windowId = readQueryField("windowId");
+    moduleType = readQueryField("moduleType");
 
     //listener for messages from the app
     window.addEventListener("message",event => receiveMessage(event));
 
-    //this message lets the main window know the module manager closed
-    window.addEventListener("beforeunload",() => closeModuleManager());
-
     //get module data from server
-    let modulesConfig = await fetch(MODULE_REQUEST_URL).then(response => {
+    let url = getModuleDataUrl();
+    let modulesConfig = await fetch(url).then(response => {
         if(response.ok) {
             return response.json();
         }
@@ -63,89 +64,95 @@ async function load() {
 // External Functions
 //==================
 function loadEsModule(moduleUrl,moduleName) {
-    let messageData = {
+    let commandData = {
         moduleIdentifier: moduleUrl,
         moduleName: moduleName
     }
-    sendMessage("loadModule",messageData);
+    sendMessage("loadModule",commandData);
 }
 
 function unloadEsModule(moduleUrl) {
-    let messageData = {
+    let commandData = {
         moduleIdentifier: moduleUrl
     }
-    sendMessage("unloadModule",messageData);
+    sendMessage("unloadModule",commandData);
 }
 
 function updateEsModule(newUrl,oldUrl) {
-    let messageData = {
+    let commandData = {
         newIdentifier: newUrl,
         oldIdentifier: oldUrl
     }
-    sendMessage("updateModule",messageData);
+    sendMessage("updateModule",commandData);
 }
 
-function installNpmModule(moduleName,moduleVersion) {
-    let messageData = {
-        moduleName: moduleName,
-        moduleVersion: moduleVersion
+function installNpmModule(moduleName,selectedVersionInfo) {
+    let commandData = {
+        installArg: getNpmInstallArg(moduleName,selectedVersionInfo)
     }
-    sendMessage("installNpmModule",messageData);
+    sendMessage("installNpmModule",commandData);
 }
 
-function installAndLoadNpmModule(npmModuleName,version) {
-    let messageData = {
-        moduleName: moduleName,
-        moduleVersion: moduleVersion
+function getNpmInstallArg(moduleName,selectedVersionInfo) {
+    if(selectedVersionInfo.npmUrl) {
+        return selectedVersionInfo.npmUrl;
     }
-    sendMessage("installAndLoadNpmModule",messageData);
+    else if(selectedVersionInfo.version) {
+        return moduleName + "@" + selectedVersionInfo.version;
+    }
+    else {
+        return moduleName;
+    }
+}
+
+function installAndLoadNpmModule(moduleName,selectedVersionInfo) {
+    let commandData = {
+        moduleName: moduleName,
+        installArg: getNpmInstallArg(moduleName,selectedVersionInfo)
+    }
+    sendMessage("installAndLoadNpmModule",commandData);
 }
 
 function loadNpmModule(moduleName) {
-    let messageData = {
+    let commandData = {
         moduleIdentifier: moduleName,
         moduleName: moduleName
     }
-    sendMessage("loadModule",messageData);
+    sendMessage("loadModule",commandData);
 }
 
 function uninstallNpmModule(moduleName) {
-    let messageData = {
+    let commandData = {
         moduleName: moduleName
     }
-    sendMessage("uninstallNpmModule",messageData);
+    sendMessage("uninstallNpmModule",commandData);
 }
 
 function unloadModule(moduleName) {
-    let messageData = {
+    let commandData = {
         moduleIdentifier: moduleName
     }
-    sendMessage("unloadModule",messageData);
+    sendMessage("unloadModule",commandData);
 }
 
-function updateNpmModule(moduleName,newVersion) {
+function updateNpmModule(moduleName,selectedVersionInfo) {
     //same as install
-    installNpmModule(moduleName,newVersion)
+    installNpmModule(moduleName,selectedVersionInfo)
 }
 
 function openWebWorkspace(workspaceUrl) {
-    let messageData = {
+    let commandData = {
         workspaceUrl: workspaceUrl
     }
-    sendMessage("openWorkspace",messageData);
+    sendMessage("openWorkspace",commandData);
 }
 
 function openWebLink(linkUrl) {
-    let messageData = {
+    let commandData = {
         linkUrl: linkUrl
     }
-    sendMessage("openLink",messageData);
+    sendMessage("openLink",commandData);
 }
-
-function closeModuleManager() {
-    sendMessage("closeModuleManager",null);
-}
-
 
 //========================
 // Handlers
@@ -181,15 +188,15 @@ function receiveMessage(event) {
     }
 }
 
-function sendMessage(messageType,messageData) {
-    let payload = {};
-    payload.messageData = messageData;
+function sendMessage(messageType,commandData) {
+    let messageData = {};
+    messageData.commandData = commandData;
 
     //this identifies the window sending the message
-    payload.windowId = windowId;
+    messageData.windowId = windowId;
 
     if((callingWindow)&&(callingWindow.postMessage)) {
-        callingWindow.postMessage({message: messageType, value: payload},callingUrl);
+        callingWindow.postMessage({message: messageType, value: messageData},callingUrl);
     }
 }
         
@@ -352,7 +359,7 @@ function getStatusMsg(statusInfo) {
         case ES_LOADED:
             return "Loaded in Workspace: " + statusInfo.version;
 
-        case NPM_NOT_INSTALL:
+        case NPM_NOT_INSTALLED:
             return "Not Installed in App"
 
         case NPM_INSTALLED_NOT_LOADED:
@@ -461,11 +468,11 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
             }
             break;
 
-        case NPM_NOT_INSTALL:
+        case NPM_NOT_INSTALLED:
             //two commands - install and load, or just install
             {
-                let handlerInstall = () => installNpmModule(moduleData.moduleName,selectedVersionInfo.version);
-                let handlerInstallAndLoad = () => installAndLoadNpmModule(moduleData.moduleName,selectedVersionInfo.version);
+                let handlerInstall = () => installNpmModule(moduleData.moduleName,selectedVersionInfo);
+                let handlerInstallAndLoad = () => installAndLoadNpmModule(moduleData.moduleName,selectedVersionInfo);
                 let msgInstall, msgInstallAndLoad;
                 //message is different for latest versus not latest
                 if(selectedVersionInfo.isLatest) {
@@ -491,8 +498,7 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
 
             //if the selected version is not installed, allow for a switch
             if(statusInfo.version != selectedVersionInfo.version) {
-                let newVersion = selectedVersionInfo.version;
-                let handler = () => updateNpmModule(moduleData.moduleName,newVersion);
+                let handler = () => updateNpmModule(moduleData.moduleName,selectedVersionInfo);
                 let msg;
                 if(selectedVersionInfo.isLatest) msg = "Upgrade Installed to this Version (latest)"
                 else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade Installed to this Version (not latest version)"
@@ -619,7 +625,7 @@ function getStatus(moduleData) {
         return statusInfo;
     }
     
-    if(appModules.moduleType == ES_MODULE_TYPE) {
+    if(moduleType == ES_MODULE_TYPE) {
         statusInfo.type = ES_MODULE_TYPE;
         //based on url (for now), see if a version of this module is loaded
         let loadedVersionInfo = moduleData.moduleConfig.versions.find(versionInfo => (appModules.modules.indexOf(versionInfo.esUrl) >= 0));
@@ -633,7 +639,7 @@ function getStatus(moduleData) {
             statusInfo.status = ES_NOT_LOADED;
         }
     }
-    else if(appModules.moduleType == NPM_MODULE_TYPE) {
+    else if(moduleType == NPM_MODULE_TYPE) {
         statusInfo.type = NPM_MODULE_TYPE;
         let installedVersion = appModules.npmModules.installed[moduleData.moduleName];
         let isLoaded = (appModules.npmModules.loaded.indexOf[moduleData.moduleName] >= 0);
@@ -678,4 +684,9 @@ function readInputData() {
 function readQueryField(field) {
     var params = new URLSearchParams(window.location.search);
     return params.get(field);
+}
+
+function getModuleDataUrl() {
+    if(moduleType == NPM_MODULE_TYPE) return MODULE_REQUEST_URL_NPM_TEMP;
+    else return MODULE_REQUEST_URL;
 }
