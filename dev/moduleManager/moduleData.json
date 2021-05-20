@@ -30,7 +30,8 @@
 				{
 					"version": "3.2.0-p1",
 					"esUrl": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v3.2.0-p1/es/src/ChartJSComponentModule.js",
-					"demoWorkspaces": [
+					"npmUrl": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v3.2.0-p1/npm/apogeejs-module-chartjs-3.2.0-p1.tgz",
+					"esDemoWorkspaces": [
 						{
 							"webUrl": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
 						}
@@ -58,7 +59,8 @@
 				{
 					"version": "1.3.4-p1",
 					"esUrl": "http://localhost:8888/apogeejs-module-csv/releases-dev/v1.3.4-p1/es/src/CSVComponentModule.js",
-					"demoWorkspaces": [
+					"npmUrl": "http://localhost:8888/apogeejs-module-csv/releases-dev/v1.3.4-p1/npm/apogeejs-module-csv-1.3.4-p1.tgz",
+					"esDemoWorkspaces": [
 						{
 							"webUrl": "http://localhost:8888/apogeejs-module-csv/csvParseWorkspaceLocal.json"
 						}

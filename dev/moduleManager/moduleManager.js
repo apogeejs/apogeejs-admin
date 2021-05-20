@@ -8,6 +8,7 @@ let appModules = null;
 let moduleType = null;
 let moduleDataList = [];
 
+//constants
 const STATUS_UNKNOWN = -1;
 
 const NPM_NOT_INSTALLED = 0;
@@ -28,12 +29,13 @@ const NPM_MODULE_TYPE = "npm module";
 //======================
 /** This method loads the module list. */
 async function load() {
-
-    //get the url for the calling app, for message passing
     callingWindow = window.opener;
-    callingUrl = readQueryField("callingUrl");
-    windowId = readQueryField("windowId");
-    moduleType = readQueryField("moduleType");
+
+    //read the inputs, passed as query parameters
+    let paramSuccess = loadInputParams();
+    if(!paramSuccess) {
+        return;
+    }
 
     //listener for messages from the app
     window.addEventListener("message",event => receiveMessage(event));
@@ -42,10 +44,16 @@ async function load() {
     let url = getModuleDataUrl();
     let modulesConfig = await fetch(url).then(response => {
         if(response.ok) {
-            return response.json();
+            try {
+                return response.json();
+            }
+            catch(error) {
+                fatalError("Error parsing module data from server");
+                return null;
+            }
         }
         else {
-            alert("Error loading module data from server");
+            fatalError("Error loading module data from server");
             return null;
         }
     })
@@ -55,13 +63,12 @@ async function load() {
         populateDomList(modulesConfig.modules);
 
         //populate status based on app/workspace data
-        let initialAppModules = readInputData();
-        updateAppModuleData(initialAppModules);
+        updateAppModuleData(appModules);
     }
 }
 
 //==================
-// External Functions
+// External Command Functions
 //==================
 function loadEsModule(moduleUrl,moduleName) {
     let commandData = {
@@ -78,10 +85,11 @@ function unloadEsModule(moduleUrl) {
     sendMessage("unloadModule",commandData);
 }
 
-function updateEsModule(newUrl,oldUrl) {
+function updateEsModule(newUrl,oldUrl,moduleName) {
     let commandData = {
         newIdentifier: newUrl,
-        oldIdentifier: oldUrl
+        oldIdentifier: oldUrl,
+        moduleName: moduleName
     }
     sendMessage("updateModule",commandData);
 }
@@ -95,12 +103,16 @@ function installNpmModule(moduleName,selectedVersionInfo) {
 
 function getNpmInstallArg(moduleName,selectedVersionInfo) {
     if(selectedVersionInfo.npmUrl) {
+        //url of tgz file
         return selectedVersionInfo.npmUrl;
     }
     else if(selectedVersionInfo.version) {
+        //install the given version
         return moduleName + "@" + selectedVersionInfo.version;
     }
     else {
+        //this shouldn't happen, but it will instsall latest
+        //we might want some different handling
         return moduleName;
     }
 }
@@ -200,17 +212,17 @@ function sendMessage(messageType,commandData) {
     }
 }
         
-
 //=================
-// Internal Functions - DOM
+// Internal Functions - DOM manipulation
 //=================
 
-/** This function initially populates the module list. */
+/** This function initially populates the module list, minus elements that 
+ * depend on the modules current status. */
 function populateDomList(moduleListConfig) {
 
     let listContainerElement = document.getElementById("moduleListContainer");
     if(!listContainerElement) {
-        alert("Error loading page: list container not found!");
+        fatalError("Error loading page: list container not found!");
         return;
     }
 
@@ -337,45 +349,6 @@ function updateModuleStatus(moduleData) {
     }
 }
 
-/** This method returns the title text for a given module. */
-function getTitle(moduleConfig) {
-    let title;
-    if(moduleConfig.displayName) title = moduleConfig.displayName + ": ";
-    else title = "";
-
-    title += moduleConfig.moduleName;
-    return title;
-}
-
-/** This method returns the status text for a given status value. */
-function getStatusMsg(statusInfo) {
-    switch(statusInfo.status) {
-        case STATUS_UNKNOWN:
-            return "Status Unknown";
-
-        case ES_NOT_LOADED:
-            return "Not Loaded in Workspace"
-
-        case ES_LOADED:
-            return "Loaded in Workspace: " + statusInfo.version;
-
-        case NPM_NOT_INSTALLED:
-            return "Not Installed in App"
-
-        case NPM_INSTALLED_NOT_LOADED:
-            return "Not loaded in Workspace; Installed in App: " + statusInfo.version;
-
-        case NPM_INSTALLED_AND_LOADED:
-            return "Installed and Loaded in Workspace: " + statusInfo.version;
-    }
-}
-
-/** This function returns the short description for a module. */
-function getShortDesc(moduleConfig) {
-    if(moduleConfig.shortDesc) return moduleConfig.shortDesc;
-    else return "No description available";
-}
-
 /** This function populates the version selector for a module. */
 function populateVersionSelector(moduleConfig,versionSelector,notLatestContainer) {
     moduleConfig.versions.forEach(versionInfo => {
@@ -399,12 +372,7 @@ function loadBodyForVersion(moduleData) {
         if(selectedVersionInfo) {
             //update commands for the app/workspace
             setWorkspaceCommands(selectedVersionInfo,moduleData);
-            if(selectedVersionInfo.demoWorkspaces) {
-                //add each demo workspace link
-                selectedVersionInfo.demoWorkspaces.forEach(workspaceInfo => {
-                    setReferenceWorkspace(workspaceInfo,moduleData);
-                });
-            }
+            setReferenceWorkspaces(selectedVersionInfo,moduleData);
             if(selectedVersionInfo.webLink) {
                 //add the web link
                 setReferenceWebLink(selectedVersionInfo.webLink,moduleData);
@@ -459,7 +427,7 @@ function setWorkspaceCommands(selectedVersionInfo,moduleData) {
             if(statusInfo.version != selectedVersionInfo.version) {
                 let oldUrl = statusInfo.url;
                 let newUrl = selectedVersionInfo.esUrl;
-                let handler = () => updateEsModule(newUrl,oldUrl);
+                let handler = () => updateEsModule(newUrl,oldUrl,moduleData.moduleName);
                 let msg;
                 if(selectedVersionInfo.isLatest) msg = "Upgrade to this Version (latest)"
                 else if(selectedVersionInfo.version > statusInfo.version) msg = "Upgrade to this Version (not latest version)"
@@ -551,6 +519,27 @@ function createWorkspaceCommand(text,handler) {
     return container;
 }
 
+function setReferenceWorkspaces(selectedVersionInfo,moduleData) {
+    let demoWorkspaces;
+    if(moduleType == ES_MODULE_TYPE) {
+        demoWorkspaces = selectedVersionInfo.esDemoWorkspaces
+    }
+    else if(moduleType == NPM_MODULE_TYPE) {
+        demoWorkspaces = selectedVersionInfo.npmDemoWorkspaces
+    }
+    else {
+        //unknown type
+        return;
+    }
+
+    if(demoWorkspaces) {
+        //add each demo workspace link
+        demoWorkspaces.forEach(workspaceInfo => {
+            setReferenceWorkspace(workspaceInfo,moduleData);
+        });
+    }
+}
+
 /** This method adds the demo workspaces to a module for a given version. */
 function setReferenceWorkspace(workspaceInfo,moduleData) {
     //clear data
@@ -628,11 +617,16 @@ function getStatus(moduleData) {
     if(moduleType == ES_MODULE_TYPE) {
         statusInfo.type = ES_MODULE_TYPE;
         //based on url (for now), see if a version of this module is loaded
-        let loadedVersionInfo = moduleData.moduleConfig.versions.find(versionInfo => (appModules.modules.indexOf(versionInfo.esUrl) >= 0));
-        if(loadedVersionInfo) {
+        let {isLoaded, loadedVersionInfo} = findEsVersionInfo(moduleData);
+        if(isLoaded) {
             statusInfo.status = ES_LOADED;
             statusInfo.url = loadedVersionInfo.esUrl;
             statusInfo.version = loadedVersionInfo.version;
+            //this means we don't have this vesion in our versions download
+            //except for now we won't get here since then we won't recognize the module is loaded.
+            if(!loadedVersionInfo) {
+                statusInfo.unrecognizedVersion = true;
+            }
         }
         else {
             //not loaded, or an unrecognized version is loaded (we don't know)
@@ -641,13 +635,12 @@ function getStatus(moduleData) {
     }
     else if(moduleType == NPM_MODULE_TYPE) {
         statusInfo.type = NPM_MODULE_TYPE;
-        let installedVersion = appModules.npmModules.installed[moduleData.moduleName];
-        let isLoaded = (appModules.npmModules.loaded.indexOf(moduleData.moduleName) >= 0);
+        let installedVersion = findInstalledNpmVersion(moduleData);
+        let {isLoaded, installedVersionInfo} = findNpmVersionInfo(moduleData,installedVersion);
         if(installedVersion !== undefined) {
             statusInfo.status = isLoaded ? NPM_INSTALLED_AND_LOADED : NPM_INSTALLED_NOT_LOADED;
             statusInfo.version = installedVersion;
-            //check if this is an unknown version
-            let installedVersionInfo = moduleData.moduleConfig.versions.find(versionInfo => (versionInfo.version == installedVersion));
+            //this means we don't have this vesion in our versions download
             if(!installedVersionInfo) {
                 statusInfo.unrecognizedVersion = true;
             }
@@ -664,22 +657,137 @@ function getStatus(moduleData) {
     return statusInfo;
 }
 
-function readInputData() {
-    let appModuleString = readQueryField("appModules");
-    if(appModuleString) {
-        try {
-            return JSON.parse(appModuleString);
-        }
-        catch(error) {
-            if(error.stack) console.error(error.stack);
-            console.log(error.toString);
-            alert("Error loading page: unable to read input data.");
+/** This function returns if the given module is loaded in the workspace and the assocaited version info 
+ * for the laoded version. */
+function findEsVersionInfo(moduleData) {
+    //we only know it is loaded by the url string, so if a different url is loaded for it, we won't recognize it
+    let loadedVersionInfo = moduleData.moduleConfig.versions.find(versionInfo => (appModules.modules.indexOf(versionInfo.esUrl) >= 0));
+    let isLoaded = loadedVersionInfo ? true : false;
+    return {isLoaded,loadedVersionInfo};
+}
+
+/** This returns true if the module is installed in the application. */
+function findInstalledNpmVersion(moduleData) {
+    return appModules.modules.installed[moduleData.moduleName];
+}
+
+/** This functino return isLoaded, true if the module is loaded, and installedVersionInfo, the version info for the 
+ * loaded version. It is possible the installed version info is not available. */
+function findNpmVersionInfo(moduleData,installedVersion) {
+    let isLoaded = (appModules.modules.loaded.indexOf(moduleData.moduleName) >= 0);
+    let installedVersionInfo = moduleData.moduleConfig.versions.find(versionInfo => {
+        if(versionInfo.npmUrl) return (versionInfo.npmUrl == installedVersion);
+        else return (versionInfo.version == installedVersion);
+    })
+    return {isLoaded,installedVersionInfo};
+}
+
+/** This method returns the title text for a given module. */
+function getTitle(moduleConfig) {
+    let title;
+    if(moduleConfig.displayName) title = moduleConfig.displayName + ": ";
+    else title = "";
+
+    title += moduleConfig.moduleName;
+    return title;
+}
+
+/** This method returns the status text for a given status value. */
+function getStatusMsg(statusInfo) {
+    let msg;
+    let addVersion = false;
+    switch(statusInfo.status) {
+        case ES_NOT_LOADED:
+            msg = "Not Loaded in Workspace";
+            break;
+
+        case ES_LOADED:
+            msg = "Loaded in Workspace: ";
+            addVersion = true;
+            break;
+
+        case NPM_NOT_INSTALLED:
+            msg = "Not Installed in App";
+            break;
+
+        case NPM_INSTALLED_NOT_LOADED:
+            msg = "Not loaded in Workspace; Installed in App: ";
+            addVersion = true;
+            break;
+
+        case NPM_INSTALLED_AND_LOADED:
+            msg = "Installed and Loaded in Workspace: ";
+            addVersion = true;
+            break;
+
+        case STATUS_UNKNOWN:
+        default:
+            msg = "Status Unknown";
+            break;
+    }
+
+    if(addVersion) {
+        msg += statusInfo.version;
+        if(statusInfo.unrecognizedVersion) {
+            msg += " (Unrecognized Version!)";
         }
     }
-    
-    //if we get here we don't have the data
-    return {};
+
+    return msg;
 }
+
+/** This function returns the short description for a module. */
+function getShortDesc(moduleConfig) {
+    if(moduleConfig.shortDesc) return moduleConfig.shortDesc;
+    else return "No description available";
+}
+
+/** This loads and verifies the input parameters. */
+function loadInputParams() {
+    var params = new URLSearchParams(window.location.search);
+
+    callingUrl = params.get("callingUrl");
+    if(!callingUrl) {
+        fatalError("CallingUrl not found in input.");
+        return false;
+    }
+
+    windowId = params.get("windowId");
+    if(!windowId) {
+        fatalError("Window ID not found in input.");
+        return false;
+    }
+
+    moduleType = params.get("moduleType");
+    if(!moduleType) {
+        fatalError("Module type not found in input.");
+        return false;
+    }
+
+    let appModulesString = readQueryField("appModules");
+    if(!appModulesString) { 
+        fatalError("App modules not found in input.");
+        return false;
+    }
+
+    try {
+        appModules = JSON.parse(appModulesString);
+    }
+    catch(error) {
+        if(error.stack) console.error(error.stack);
+        console.log(error.toString);
+        fatalError("Error loading page: unable to read input data.");
+        return false;
+    }
+
+    return true;
+}
+
+function fatalError(reason) {
+    alert("Fatal error opening module manager: " + reason);
+    window.close();
+}
+
 
 function readQueryField(field) {
     var params = new URLSearchParams(window.location.search);
@@ -687,6 +795,5 @@ function readQueryField(field) {
 }
 
 function getModuleDataUrl() {
-    if(moduleType == NPM_MODULE_TYPE) return MODULE_REQUEST_URL_NPM_TEMP;
-    else return MODULE_REQUEST_URL;
+    return MODULE_REQUEST_URL;
 }
