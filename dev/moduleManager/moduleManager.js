@@ -4,6 +4,7 @@
 let callingWindow = null;
 let windowId = null;
 let callingUrl = null;
+let openLinkFromApp = false;
 let appModules = null;
 let moduleType = null;
 let moduleDataList = [];
@@ -19,7 +20,6 @@ const ES_NOT_LOADED = 3;
 const ES_LOADED = 4;
 
 const MODULE_REQUEST_URL = "moduleData.json";
-const MODULE_REQUEST_URL_NPM_TEMP = "moduleDataNpm.json";
 
 const ES_MODULE_TYPE = "es module";
 const NPM_MODULE_TYPE = "npm module";
@@ -153,17 +153,35 @@ function updateNpmModule(moduleName,selectedVersionInfo) {
 }
 
 function openWebWorkspace(workspaceUrl) {
-    let commandData = {
-        workspaceUrl: workspaceUrl
+    if(openLinkFromApp) {
+        //let the app open the workspace
+        let commandData = {
+            workspaceUrl: workspaceUrl
+        }
+        sendMessage("openWorkspace",commandData);
     }
-    sendMessage("openWorkspace",commandData);
+    else {
+        //open the workspace in a browser
+        if(callingUrl) {
+            let url = callingUrl + "?url=" + workspaceUrl; 
+            this.openWebLink(url);
+        }
+    }
 }
 
 function openWebLink(linkUrl) {
-    let commandData = {
-        linkUrl: linkUrl
+    if(openLinkFromApp) {
+        //let the app open the link
+        let commandData = {
+            linkUrl: linkUrl
+        }
+        sendMessage("openLink",commandData);
     }
-    sendMessage("openLink",commandData);
+    else {
+        //open the link in a browser
+        window.open(linkUrl)
+        window.opener = null;
+    }
 }
 
 //========================
@@ -746,6 +764,8 @@ function getShortDesc(moduleConfig) {
 function loadInputParams() {
     var params = new URLSearchParams(window.location.search);
 
+    console.log(window.location.search);
+
     callingUrl = params.get("callingUrl");
     if(!callingUrl) {
         fatalError("CallingUrl not found in input.");
@@ -762,6 +782,14 @@ function loadInputParams() {
     if(!moduleType) {
         fatalError("Module type not found in input.");
         return false;
+    }
+
+    let openWindowParam = params.get("openWindow");
+    if(openWindowParam == "app") {
+        openLinkFromApp = true;
+    }
+    else {
+        openLinkFromApp = false;
     }
 
     let appModulesString = readQueryField("appModules");

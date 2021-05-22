@@ -36,6 +36,12 @@
 							"webUrl": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
 						}
 					],
+					"npmDemoWorkspaces": [
+						{
+							"webUrl": "http://localhost:8888/apogeejs-admin/dev/moduleManager/moduleTestWorkspace.json",
+							"name": "Just a test workspace!"
+						}
+					],
 					"webLink": "https://apogeejs.com",
 					"isLatest": true
 				}
