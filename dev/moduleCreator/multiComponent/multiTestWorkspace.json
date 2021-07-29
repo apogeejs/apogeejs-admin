@@ -5,8 +5,8 @@
         "refEntries": [
             {
                 "entryType": "es module",
-                "url": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/ManualLoginComponentModule.js?try=4",
-                "nickname": "ManualLoginComponentModu"
+                "url": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js",
+                "nickname": "MultiLoginComponentModule"
             }
         ],
         "viewState": {
@@ -239,8 +239,7 @@
                 },
                 "children": {
                     "test": {
-                        "type": "apogeeapp.ManualLoginCell",
-                        "validatorCode": "return true;",
+                        "type": "apogeeapp.MultiLoginCell",
                         "viewState": {
                             "childDisplayState": {
                                 "views": {
