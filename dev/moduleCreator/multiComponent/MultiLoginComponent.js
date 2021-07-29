@@ -44,6 +44,27 @@ export default class MultiLoginComponent extends Component {
         }
     }
 
+    //COPIED FROM PARENT COMPONENT SO WE CAN LOAD CHILDREN!!! (clean this up)
+    /** This is used to update properties, such as from the set properties form. */
+    loadPropertyValues(modelManager,json) {
+        super.loadPropertyValues(modelManager,json);
+
+        //load properties in child components if needed
+        if(json.children) {
+            let model = modelManager.getModel();
+            let parentMember = this.getParentFolderForChildren();
+            for(let childName in json.children) {
+                let childMember = parentMember.lookupChild(model,childName);
+                if(childMember) {
+                    let childJson = componentJson.children[childName];
+                    let childComponentId = modelManager.getComponentIdByMemberId(memberId);
+                    let childComponent = modelManager.getComponentByComponentId(childComponentId);
+                    childComponent.loadPropertyValues(modelManager,childJson);
+                }
+            }
+        }
+    }
+
     getParentFolderForChildren() {
         return this.getMember();
     }
