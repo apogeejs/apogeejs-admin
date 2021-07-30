@@ -42,20 +42,61 @@ let MAIN_FORM_VIEW = {
     getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
 }
 
-let SESSION_TOKEN_VIEW = getMemberDataTextViewModeEntry("member",{name:"sessionToken",label:"Session Token"});
-let BASE_URL_VIEW = getMemberDataTextViewModeEntry("member",{name:"LOGIN_URL",label:"Base Login URL"});;
+let SESSION_TOKEN_VIEW = getMemberDataTextViewModeEntry("member",{name:"sessionToken",label:"Session Token: "});
+let BASE_URL_VIEW = getMemberDataTextViewModeEntry("member",{name:"LOGIN_URL",label:"Base Login URL: "});
+let FOO_TRYER_VIEW = getMemberDataTextViewModeEntry("member",{name:"fooTryer",label:"Test Function Arg List: "});
 
 
 MultiLoginComponentView.VIEW_MODES = [
     getErrorViewModeEntry(),
     childViewModeWrapper(["loginForm"],MAIN_FORM_VIEW),
     childViewModeWrapper(["sessionToken"],SESSION_TOKEN_VIEW),
-    childViewModeWrapper(["LOGIN_URL"],BASE_URL_VIEW)
+    childViewModeWrapper(["LOGIN_URL"],BASE_URL_VIEW),
+    childViewModeWrapper(["fooTryer"],FOO_TRYER_VIEW)
 ];
 
 MultiLoginComponentView.componentName = "apogeeapp.MultiLoginCell";
 MultiLoginComponentView.hasTabEntry = false;
 MultiLoginComponentView.hasChildEntry = true;
 MultiLoginComponentView.ICON_RES_PATH = "/icons3/mapCellIcon.png";
+
+
+
+MultiLoginComponentView.propertyDialogEntries = [
+    {
+        component: "foo",
+        member: ".",
+        propertyKey: "argList",
+        dialogElement: {
+            "type":"radioButtonGroup",
+            "label":"Arg List: ",
+            "entries":["x,y","y,x"],
+            "hint": "Function = 10*x + y",
+            "key":"foo.argListString"
+        },
+        propertyToForm: argListValue => argListValue.toString(),
+        formToProperty: argListString => apogeutil.parseStringArray(argListString)
+    },
+    {
+        component: "sessionToken",
+        propertyKey: "dataView",
+        dialogElement: {
+            "type":"dropdown",
+            "label":"Session Token Display Format: ",
+            "entries":["Colorized","Plain Text"],
+            "key":"sessionToken.dataView"
+        }
+    },
+    {
+        component: "LOGIN_URL",
+        propertyKey: "dataView",
+        dialogElement: {
+            "type":"dropdown",
+            "label":"LOGIN_URL Display Format: ",
+            "entries":["Colorized","Plain Text"],
+            "key":"LOGIN_URL.dataView"
+        }
+    }
+];
 
 
