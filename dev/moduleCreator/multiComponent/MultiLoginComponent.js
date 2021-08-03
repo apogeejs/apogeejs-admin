@@ -46,20 +46,19 @@ export default class MultiLoginComponent extends Component {
 
     //COPIED FROM PARENT COMPONENT SO WE CAN LOAD CHILDREN!!! (clean this up)
     /** This is used to update properties, such as from the set properties form. */
-    loadPropertyValues(modelManager,json) {
-        super.loadPropertyValues(modelManager,json);
+    loadPropertyValues(modelManager,propertyJson) {
+        super.loadPropertyValues(modelManager,propertyJson);
 
         //load properties in child components if needed
-        if(json.children) {
-            let model = modelManager.getModel();
+        if(propertyJson.children) {
             let parentMember = this.getParentFolderForChildren();
-            for(let childName in json.children) {
-                let childMember = parentMember.lookupChild(model,childName);
-                if(childMember) {
-                    let childJson = componentJson.children[childName];
-                    let childComponentId = modelManager.getComponentIdByMemberId(memberId);
-                    let childComponent = modelManager.getComponentByComponentId(childComponentId);
-                    childComponent.loadPropertyValues(modelManager,childJson);
+            for(let childName in propertyJson.children) {
+                let childMemberId = parentMember.lookupChildId(childName);
+                if(childMemberId) {
+                    let childPropertyJson = propertyJson.children[childName];
+                    let childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
+                    let childComponent = modelManager.getMutableComponentByComponentId(childComponentId);
+                    childComponent.loadPropertyValues(modelManager,childPropertyJson);
                 }
             }
         }
@@ -285,36 +284,34 @@ const DEFAULT_MEMBER_JSON = {
 }
 
 const DEFAULT_COMPONENT_JSON = {
-	"main": {
-		"type": "apogeeapp.MultiLoginComponent",
-		"children": {
-			"loginForm": {
-				"type": "apogeeapp.DesignerDataFormCell",
-				"validatorCode": "return true;",
-				"allowInputExpressions": true
-			},
-			"loginRequest": {
-				"type": "apogeeapp.WebRequestCell"
-			},
-			"loginUrl": {
-				"type": "apogeeapp.JsonCell",
-				"dataView": "Colorized"
-			},
-			"sessionToken": {
-				"type": "apogeeapp.JsonCell",
-				"dataView": "Colorized"
-			},
-			"LOGIN_URL": {
-				"type": "apogeeapp.JsonCell",
-				"dataView": "Colorized"
-			},
-			"foo": {
-				"type": "apogeeapp.FunctionCell"
-			},
-			"fooTryer": {
-				"type": "apogeeapp.JsonCell",
-				"dataView": "Colorized"
-			}
+	"type": "apogeeapp.MultiLoginCell",
+	"children": {
+		"loginForm": {
+			"type": "apogeeapp.DesignerDataFormCell",
+			"validatorCode": "return true;",
+			"allowInputExpressions": true
+		},
+		"loginRequest": {
+			"type": "apogeeapp.WebRequestCell"
+		},
+		"loginUrl": {
+			"type": "apogeeapp.JsonCell",
+			"dataView": "Colorized"
+		},
+		"sessionToken": {
+			"type": "apogeeapp.JsonCell",
+			"dataView": "Colorized"
+		},
+		"LOGIN_URL": {
+			"type": "apogeeapp.JsonCell",
+			"dataView": "Colorized"
+		},
+		"foo": {
+			"type": "apogeeapp.FunctionCell"
+		},
+		"fooTryer": {
+			"type": "apogeeapp.JsonCell",
+			"dataView": "Colorized"
 		}
 	}
 }

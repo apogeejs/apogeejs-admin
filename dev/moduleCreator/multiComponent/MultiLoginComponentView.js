@@ -1,9 +1,9 @@
 import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
 import {getErrorViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
+import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js"
 
 /** This component represents a table object. */
 export default class MultiLoginComponentView extends ComponentView {
-
 
     //needed as a part component view, for now - does nothing
     addChild(childComponentView) {}
@@ -42,9 +42,27 @@ let MAIN_FORM_VIEW = {
     getDataDisplay: (componentView,displayContainer) => componentView.getFormViewDataDisplay(displayContainer)
 }
 
-let SESSION_TOKEN_VIEW = getMemberDataTextViewModeEntry("member",{name:"sessionToken",label:"Session Token: "});
-let BASE_URL_VIEW = getMemberDataTextViewModeEntry("member",{name:"LOGIN_URL",label:"Base Login URL: "});
-let FOO_TRYER_VIEW = getMemberDataTextViewModeEntry("member",{name:"fooTryer",label:"Test Function Arg List: "});
+let SESSION_TOKEN_VIEW = {
+    name: "sessionToken",
+    label: "Session Token",
+    sourceLayer: "model",
+    sourceType: "data",
+    suffix: "",
+    isActive: false,
+    getDataDisplay: (componentView,displayContainer) => componentView.getDataViewDisplay(displayContainer)
+}
+
+let BASE_URL_VIEW = {
+    name: "LOGIN_URL",
+    label: "Base Login URL",
+    sourceLayer: "model",
+    sourceType: "data",
+    suffix: "",
+    isActive: false,
+    getDataDisplay: (componentView,displayContainer) => componentView.getDataViewDisplay(displayContainer)
+}
+
+let FOO_TRYER_VIEW = getMemberDataTextViewModeEntry("member",{name:"fooTryer",label:"Test Function Arg List"});
 
 
 MultiLoginComponentView.VIEW_MODES = [
@@ -75,7 +93,7 @@ MultiLoginComponentView.propertyDialogEntries = [
             "key":"foo.argListString"
         },
         propertyToForm: argListValue => argListValue.toString(),
-        formToProperty: argListString => apogeutil.parseStringArray(argListString)
+        formToProperty: argListString => apogeeutil.parseStringArray(argListString)
     },
     {
         component: "sessionToken",
@@ -83,7 +101,7 @@ MultiLoginComponentView.propertyDialogEntries = [
         dialogElement: {
             "type":"dropdown",
             "label":"Session Token Display Format: ",
-            "entries":["Colorized","Plain Text"],
+            "entries":["Colorized","Text Data"],
             "key":"sessionToken.dataView"
         }
     },
@@ -93,7 +111,7 @@ MultiLoginComponentView.propertyDialogEntries = [
         dialogElement: {
             "type":"dropdown",
             "label":"LOGIN_URL Display Format: ",
-            "entries":["Colorized","Plain Text"],
+            "entries":["Colorized","Text Data"],
             "key":"LOGIN_URL.dataView"
         }
     }
