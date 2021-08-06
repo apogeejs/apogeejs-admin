@@ -68,7 +68,60 @@ export default class MultiLoginComponent extends Component {
         return this.getMember();
     }
 
+	//////////////////////////////////////////////
+	// Child accessor methods - move this later
+	////////////////////////////////////////////////
 
+	//for parent components!
+	getChildComponent(modelManager,componentPath) {
+		if((!componentPath)||(componentPath == ".")) {
+			return this;
+		}
+		else {
+			let componentPathArray = this._getPathArrayFromPath(componentPath);
+			return this._getChildComponent(modelManager,this,componentPathArray);
+		}
+	}
+
+	//make this static too?
+	/** This converts a component or member path to a path array. */
+	_getPathArrayFromPath(path) {
+		if((!path)||(path == ".")) {
+			return [];
+		}
+		else {
+			return path.split(",").map(entry => entry.trim());
+		}
+	}
+
+	//maybe make this static?
+	_getChildComponent(modelManager,parentComponent,componentPathArray,startIndex) {
+		if(componentPathArray.length == 0) return parentComponent;
+		if(startIndex === undefined) startIndex = 0;
+	
+		let folderMember = parentComponent.getParentFolderForChildren();
+		let childMemberId = folderMember.lookupChildId(componentPathArray[startIndex]);
+		let childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
+		let childComponent = modelManager.getComponentByComponentId(childComponentId);
+		if(startIndex >= componentPathArray.length-1) {
+			return childComponent;
+		}
+		else {
+			return this._getChildComponent(modelManager,childComponent,componentPathArray,startIndex+1);
+		}
+	}
+
+	//for parent components!!!
+	//BELOW ONLY APPLIES IF THE PARENT IS A FOLDER (FIX FOR FUNCTION FOLDER!!!)
+	//I think we need to look up the type for the component children. We might need to add model manager.
+	getFullMemberPath(componentPath,memberPath) {
+		if((!componentPath)||(componentPath == ".")) {
+			return memberPath;
+		}
+		else {
+			return componentPath + "." + memberPath;
+		}
+	}
 }
 
 //======================================

@@ -6,8 +6,18 @@ import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js"
 export default class MultiLoginComponentView extends ComponentView {
 
     //needed as a part component view, for now - does nothing
-    addChild(childComponentView) {}
-}
+    addChild(childComponentView) {
+        //TESTING!!!////////
+        childComponentView.setComponentDisplay(this.getComponentDisplay());
+        ///////////////////
+    }
+
+    removeChild(childComponentView) {
+        //TESTING!!!////////
+        //do something here?
+        //////////////////////
+    }
+ }
 
 function childViewModeWrapper(childPathArray,originalViewModeEntry) {
     let viewModeEntry = {};
@@ -16,6 +26,11 @@ function childViewModeWrapper(childPathArray,originalViewModeEntry) {
         let childComponentView = getChildComponentView(childPathArray,parentComponentView);
         return originalViewModeEntry.getDataDisplay(childComponentView,displayContainer);
     }
+
+    //TESTING!!!////////
+    viewModeEntry.childPath = childPathArray[0];
+    /////////////////////
+
     return viewModeEntry;
 }
 
