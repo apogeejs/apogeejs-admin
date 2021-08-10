@@ -118,6 +118,9 @@ export default class MultiLoginComponent extends Component {
 		if((!componentPath)||(componentPath == ".")) {
 			return memberPath;
 		}
+		else if((!memberPath)||(memberPath == ".")) {
+			return componentPath;
+		}
 		else {
 			return componentPath + "." + memberPath;
 		}

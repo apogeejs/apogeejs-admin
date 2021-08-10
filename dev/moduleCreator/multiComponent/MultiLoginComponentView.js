@@ -8,7 +8,9 @@ export default class MultiLoginComponentView extends ComponentView {
     //needed as a part component view, for now - does nothing
     addChild(childComponentView) {
         //TESTING!!!////////
-        childComponentView.setComponentDisplay(this.getComponentDisplay());
+        let componentDisplay = this.getComponentDisplay();
+        componentDisplay.addChildComponentView(childComponentView);
+        childComponentView.setComponentDisplay(componentDisplay);
         ///////////////////
     }
 
