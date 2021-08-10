@@ -33,8 +33,10 @@ function childViewModeWrapper(childPath,originalViewModeEntry) {
 }
 
 function getChildComponentView(childPath,parentComponentView) {
-    let childComponent = getChildComponent(modelManager,childPath);
-    return parentComponentView.appViewInterface.getComponentViewByComponentId(childComponent.getId());
+    let appViewInterface = parentComponentView.getAppViewInterface();
+    let parentComponent = parentComponentView.getComponent();
+    let childComponent = parentComponent.getChildComponent(appViewInterface.getModelManager(),childPath);
+    return appViewInterface.getComponentViewByComponentId(childComponent.getId());
 }
 //======================================
 // This is the component generator, to register the component
@@ -72,10 +74,10 @@ let FOO_TRYER_VIEW = getMemberDataTextViewModeEntry("member",{name:"fooTryer",la
 
 MultiLoginComponentView.VIEW_MODES = [
     getErrorViewModeEntry(),
-    childViewModeWrapper(["loginForm"],MAIN_FORM_VIEW),
-    childViewModeWrapper(["sessionToken"],SESSION_TOKEN_VIEW),
-    childViewModeWrapper(["LOGIN_URL"],BASE_URL_VIEW),
-    childViewModeWrapper(["fooTryer"],FOO_TRYER_VIEW)
+    childViewModeWrapper("loginForm",MAIN_FORM_VIEW),
+    childViewModeWrapper("sessionToken",SESSION_TOKEN_VIEW),
+    childViewModeWrapper("LOGIN_URL",BASE_URL_VIEW),
+    childViewModeWrapper("fooTryer",FOO_TRYER_VIEW)
 ];
 
 MultiLoginComponentView.componentName = "apogeeapp.MultiLoginCell";

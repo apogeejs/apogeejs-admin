@@ -1,68 +1,7 @@
-import Component from "/apogeejs-app-lib/src/component/Component.js";
+import ParentComponent from "/apogeejs-app-lib/src/component/ParentComponent.js";
 
 /** This component represents a table object. */
-export default class MultiLoginComponent extends Component {
-
-    
-    /** This serializes the table component. */
-    writeExtendedData(json,modelManager) {
-        
-        //save the children
-        var folder = this.getParentFolderForChildren();
-        var childrenPresent = false;
-        var children = {};
-        var childIdMap = folder.getChildIdMap();
-        for(var key in childIdMap) {
-            var childId = childIdMap[key];
-            var childComponentId = modelManager.getComponentIdByMemberId(childId);
-            var childComponent = modelManager.getComponentByComponentId(childComponentId);
-            var name = childComponent.getName();
-            children[name] = childComponent.toJson(modelManager);
-            childrenPresent = true;
-        }
-        if(childrenPresent) {
-            json.children = children;
-        }
-
-        return json;
-    }
-
-    //COPIED FROM PARENT COMPONENT SO WE CAN LOAD CHILDREN!!! (clean this up)
-    /** This method loads the children for this component */
-    loadChildrenFromJson(modelManager,componentJson) {
-        if(componentJson.children) {
-            let parentMember = this.getParentFolderForChildren();
-            
-            for(let childName in componentJson.children) {
-                let childMember = parentMember.lookupChild(modelManager.getModel(),childName);
-                if(childMember) {
-                    let childComponentJson = componentJson.children[childName];
-                    modelManager.createComponentFromMember(childMember,childComponentJson);
-                }
-            };
-
-        }
-    }
-
-    //COPIED FROM PARENT COMPONENT SO WE CAN LOAD CHILDREN!!! (clean this up)
-    /** This is used to update properties, such as from the set properties form. */
-    loadPropertyValues(modelManager,propertyJson) {
-        super.loadPropertyValues(modelManager,propertyJson);
-
-        //load properties in child components if needed
-        if(propertyJson.children) {
-            let parentMember = this.getParentFolderForChildren();
-            for(let childName in propertyJson.children) {
-                let childMemberId = parentMember.lookupChildId(childName);
-                if(childMemberId) {
-                    let childPropertyJson = propertyJson.children[childName];
-                    let childComponentId = modelManager.getComponentIdByMemberId(childMemberId);
-                    let childComponent = modelManager.getMutableComponentByComponentId(childComponentId);
-                    childComponent.loadPropertyValues(modelManager,childPropertyJson);
-                }
-            }
-        }
-    }
+export default class MultiLoginComponent extends ParentComponent {
 
     getParentFolderForChildren() {
         return this.getMember();
