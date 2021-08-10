@@ -21,32 +21,20 @@ export default class MultiLoginComponentView extends ComponentView {
     }
  }
 
-function childViewModeWrapper(childPathArray,originalViewModeEntry) {
+function childViewModeWrapper(childPath,originalViewModeEntry) {
     let viewModeEntry = {};
     Object.assign(viewModeEntry,originalViewModeEntry);
     viewModeEntry.getDataDisplay = (parentComponentView,displayContainer) => {
-        let childComponentView = getChildComponentView(childPathArray,parentComponentView);
+        let childComponentView = getChildComponentView(childPath,parentComponentView);
         return originalViewModeEntry.getDataDisplay(childComponentView,displayContainer);
     }
-
-    //TESTING!!!////////
-    viewModeEntry.childPath = childPathArray[0];
-    /////////////////////
-
+    viewModeEntry.childPath = childPath;
     return viewModeEntry;
 }
 
-function getChildComponentView(childPathArray,parentComponentView) {
-    //get the child member
-    let parentComponent = parentComponentView.getComponent();
-    let folderMember = parentComponent.getMember();
-    let modelManager = parentComponentView.getApp().getModelManager();
-    let model = modelManager.getModel();
-    let childMember = folderMember.lookupChildFromPathArray(model,childPathArray);
-    //get the component view
-    let childComponentId = modelManager.getComponentIdByMemberId(childMember.getId());
-    let childComponentView = parentComponentView.appViewInterface.getComponentViewByComponentId(childComponentId);
-    return childComponentView;
+function getChildComponentView(childPath,parentComponentView) {
+    let childComponent = getChildComponent(modelManager,childPath);
+    return parentComponentView.appViewInterface.getComponentViewByComponentId(childComponent.getId());
 }
 //======================================
 // This is the component generator, to register the component
