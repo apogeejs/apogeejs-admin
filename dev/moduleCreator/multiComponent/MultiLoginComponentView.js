@@ -21,28 +21,12 @@ export default class MultiLoginComponentView extends ComponentView {
     }
  }
 
-function childViewModeWrapper(childPath,originalViewModeEntry) {
-    let viewModeEntry = {};
-    Object.assign(viewModeEntry,originalViewModeEntry);
-    viewModeEntry.getDataDisplay = (parentComponentView,displayContainer) => {
-        let childComponentView = getChildComponentView(childPath,parentComponentView);
-        return originalViewModeEntry.getDataDisplay(childComponentView,displayContainer);
-    }
-    viewModeEntry.childPath = childPath;
-    return viewModeEntry;
-}
-
-function getChildComponentView(childPath,parentComponentView) {
-    let appViewInterface = parentComponentView.getAppViewInterface();
-    let parentComponent = parentComponentView.getComponent();
-    let childComponent = parentComponent.getChildComponent(appViewInterface.getModelManager(),childPath);
-    return appViewInterface.getComponentViewByComponentId(childComponent.getId());
-}
 //======================================
 // This is the component generator, to register the component
 //======================================
 
 let MAIN_FORM_VIEW = {
+    childPath: "loginForm",
     name: "Form",
     label: "Form", 
     isActive: false, //DOH! if this is true, the child component view is not ready in time.
@@ -50,7 +34,8 @@ let MAIN_FORM_VIEW = {
 }
 
 let SESSION_TOKEN_VIEW = {
-    name: "sessionToken",
+    childPath: "sessionToken",
+    name: "Data",
     label: "Session Token",
     sourceLayer: "model",
     sourceType: "data",
@@ -60,7 +45,8 @@ let SESSION_TOKEN_VIEW = {
 }
 
 let BASE_URL_VIEW = {
-    name: "LOGIN_URL",
+    childPath: "LOGIN_URL",
+    name: "Data",
     label: "Base Login URL",
     sourceLayer: "model",
     sourceType: "data",
@@ -69,15 +55,15 @@ let BASE_URL_VIEW = {
     getDataDisplay: (componentView,displayContainer) => componentView.getDataViewDisplay(displayContainer)
 }
 
-let FOO_TRYER_VIEW = getMemberDataTextViewModeEntry("member",{name:"fooTryer",label:"Test Function Arg List"});
+let FOO_TRYER_VIEW = getMemberDataTextViewModeEntry("member",{name: "Data",label:"Test Function Arg List",childPath:"fooTryer"});
 
 
 MultiLoginComponentView.VIEW_MODES = [
     getErrorViewModeEntry(),
-    childViewModeWrapper("loginForm",MAIN_FORM_VIEW),
-    childViewModeWrapper("sessionToken",SESSION_TOKEN_VIEW),
-    childViewModeWrapper("LOGIN_URL",BASE_URL_VIEW),
-    childViewModeWrapper("fooTryer",FOO_TRYER_VIEW)
+    MAIN_FORM_VIEW,
+    SESSION_TOKEN_VIEW,
+    BASE_URL_VIEW,
+    FOO_TRYER_VIEW
 ];
 
 MultiLoginComponentView.componentName = "apogeeapp.MultiLoginCell";
