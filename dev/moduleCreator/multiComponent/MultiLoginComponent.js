@@ -18,7 +18,7 @@ const DEFAULT_MEMBER_JSON = {
 				"formData": {
 					"name": "formData",
 					"type": "apogee.JsonMember",
-					"updateData": {
+					"fields": {
 						"data": {
 							"uniqueKey": "topLevelDataPanel",
 							"type": "panel",
@@ -64,7 +64,7 @@ const DEFAULT_MEMBER_JSON = {
 				"formResult": {
 					"name": "formResult",
 					"type": "apogee.JsonMember",
-					"updateData": {
+					"fields": {
 						"data": {
 							"uniqueKey": "topLevelDataPanel",
 							"type": "panel",
@@ -115,7 +115,7 @@ const DEFAULT_MEMBER_JSON = {
 				"value": {
 					"name": "value",
 					"type": "apogee.JsonMember",
-					"updateData": {
+					"fields": {
 						"data": {
 							"email": "sutter@intransix.com",
 							"password": "xxx"
@@ -131,7 +131,7 @@ const DEFAULT_MEMBER_JSON = {
 				"formData": {
 					"name": "formData",
 					"type": "apogee.JsonMember",
-					"updateData": {
+					"fields": {
 						"data": {
 							"url": "loginUrl",
 							"urlType": "simple",
@@ -148,7 +148,7 @@ const DEFAULT_MEMBER_JSON = {
 				"formResult": {
 					"name": "formResult",
 					"type": "apogee.JsonMember",
-					"updateData": {
+					"fields": {
 						"argList": [],
 						"functionBody": "let output = {};\noutput[\"url\"] = loginUrl\noutput[\"urlType\"] = \"simple\"\noutput[\"method\"] = \"GET\"\noutput[\"body\"] = \"\"\noutput[\"bodyType\"] = \"value\"\noutput[\"contentType\"] = \"none\"\noutput[\"headers\"] = []\noutput[\"outputFormat\"] = \"mime\"\noutput[\"onError\"] = \"error\"\nreturn output;",
 						"supplementalCode": "",
@@ -164,7 +164,7 @@ const DEFAULT_MEMBER_JSON = {
 		"loginUrl": {
 			"name": "loginUrl",
 			"type": "apogee.JsonMember",
-			"updateData": {
+			"fields": {
 				"argList": [],
 				"functionBody": "if(!loginForm.value) return apogeeutil.INVALID_VALUE;\n\nreturn LOGIN_URL + `?email=${loginForm.value.email}&password=${loginForm.value.password}`",
 				"supplementalCode": ""
@@ -173,7 +173,7 @@ const DEFAULT_MEMBER_JSON = {
 		"sessionToken": {
 			"name": "sessionToken",
 			"type": "apogee.JsonMember",
-			"updateData": {
+			"fields": {
 				"argList": [],
 				"functionBody": "return loginRequest.data.body.sessionToken",
 				"supplementalCode": ""
@@ -182,14 +182,14 @@ const DEFAULT_MEMBER_JSON = {
 		"LOGIN_URL": {
 			"name": "LOGIN_URL",
 			"type": "apogee.JsonMember",
-			"updateData": {
+			"fields": {
 				"data": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/login.json"
 			}
 		},
 		"foo": {
 			"name": "foo",
 			"type": "apogee.FunctionMember",
-			"updateData": {
+			"fields": {
 				"argList": [
 					"x",
 					"y"
@@ -201,7 +201,7 @@ const DEFAULT_MEMBER_JSON = {
 		"fooTryer": {
 			"name": "fooTryer",
 			"type": "apogee.JsonMember",
-			"updateData": {
+			"fields": {
 				"argList": [],
 				"functionBody": "return foo(10,1);",
 				"supplementalCode": ""
@@ -215,30 +215,40 @@ const DEFAULT_COMPONENT_JSON = {
 	"children": {
 		"loginForm": {
 			"type": "apogeeapp.DesignerDataFormCell",
-			"validatorCode": "return true;",
-			"allowInputExpressions": true
+			"fields": {
+				"validatorCode": "return true;",
+				"allowInputExpressions": true
+			}
 		},
 		"loginRequest": {
 			"type": "apogeeapp.WebRequestCell"
 		},
 		"loginUrl": {
 			"type": "apogeeapp.JsonCell",
-			"dataView": "Colorized"
+			"fields": {
+				"dataView": "Colorized"
+			}
 		},
 		"sessionToken": {
 			"type": "apogeeapp.JsonCell",
-			"dataView": "Colorized"
+			"fields": {
+				"dataView": "Colorized"
+			}
 		},
 		"LOGIN_URL": {
 			"type": "apogeeapp.JsonCell",
-			"dataView": "Colorized"
+			"fields": {
+				"dataView": "Colorized"
+			}
 		},
 		"foo": {
 			"type": "apogeeapp.FunctionCell"
 		},
 		"fooTryer": {
 			"type": "apogeeapp.JsonCell",
-			"dataView": "Colorized"
+			"fields": {
+				"dataView": "Colorized"
+			}
 		}
 	}
 }
