@@ -1,12 +1,5 @@
 import Component from "/apogeejs-app-lib/src/component/Component.js";
 
-/** This component represents a table object. */
-export default class MultiLoginComponent extends Component {}
-
-//======================================
-// This is the component generator, to register the component
-//======================================
-
 const DEFAULT_MEMBER_JSON = {
 	"name": "main",
 	"type": "apogee.Folder",
@@ -253,9 +246,11 @@ const DEFAULT_COMPONENT_JSON = {
 	}
 }
 
-MultiLoginComponent.CLASS_CONFIG = {
+const MultiLoginComponentConfig = {
+	componentClass: Component,
 	displayName: "Multi Login Cell",
 	defaultMemberJson: DEFAULT_MEMBER_JSON,
     defaultComponentJson: DEFAULT_COMPONENT_JSON,
 	childParentFolderPath: "."
 }
+export default MultiLoginComponentConfig;
