@@ -3,7 +3,7 @@ import {getErrorViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-vi
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js"
 
 /** This component represents a table object. */
-export default class MultiLoginComponentView extends ComponentView {
+class MultiLoginComponentView extends ComponentView {
 
     //needed as a part component view, for now - does nothing
     addChild(childComponentView) {
@@ -58,56 +58,56 @@ let BASE_URL_VIEW = {
 let FOO_TRYER_VIEW = getMemberDataTextViewModeEntry("member",{name: "Data",label:"Test Function Arg List",childPath:"fooTryer"});
 
 
-MultiLoginComponentView.VIEW_MODES = [
-    getErrorViewModeEntry(),
-    MAIN_FORM_VIEW,
-    SESSION_TOKEN_VIEW,
-    BASE_URL_VIEW,
-    FOO_TRYER_VIEW
-];
-
-MultiLoginComponentView.componentName = "apogeeapp.MultiLoginCell";
-MultiLoginComponentView.hasTabEntry = false;
-MultiLoginComponentView.hasChildEntry = true;
-MultiLoginComponentView.ICON_RES_PATH = "/icons3/mapCellIcon.png";
-
-
-
-MultiLoginComponentView.propertyDialogEntries = [
-    {
-        component: "foo",
-        member: ".",
-        propertyKey: "argList",
-        dialogElement: {
-            "type":"radioButtonGroup",
-            "label":"Arg List: ",
-            "entries":["x,y","y,x"],
-            "hint": "Function = 10*x + y",
-            "key":"foo.argListString"
+const MultiLoginComponentViewConfig = {
+    componentType: "apogeeapp.MultiLoginCell",
+    viewClass: MultiLoginComponentView,
+    viewModes: [
+        getErrorViewModeEntry(),
+        MAIN_FORM_VIEW,
+        SESSION_TOKEN_VIEW,
+        BASE_URL_VIEW,
+        FOO_TRYER_VIEW
+    ],
+    hasTabEntry: false,
+    hasChildEntry: true,
+    iconResPath: "/icons3/mapCellIcon.png",
+    propertyDialogEntries: [
+        {
+            component: "foo",
+            member: ".",
+            propertyKey: "argList",
+            dialogElement: {
+                "type":"radioButtonGroup",
+                "label":"Arg List: ",
+                "entries":["x,y","y,x"],
+                "hint": "Function = 10*x + y",
+                "key":"foo.argListString"
+            },
+            propertyToForm: argListValue => argListValue.toString(),
+            formToProperty: argListString => apogeeutil.parseStringArray(argListString)
         },
-        propertyToForm: argListValue => argListValue.toString(),
-        formToProperty: argListString => apogeeutil.parseStringArray(argListString)
-    },
-    {
-        component: "sessionToken",
-        propertyKey: "dataView",
-        dialogElement: {
-            "type":"dropdown",
-            "label":"Session Token Display Format: ",
-            "entries":["Colorized","Text Data"],
-            "key":"sessionToken.dataView"
+        {
+            component: "sessionToken",
+            propertyKey: "dataView",
+            dialogElement: {
+                "type":"dropdown",
+                "label":"Session Token Display Format: ",
+                "entries":["Colorized","Text Data"],
+                "key":"sessionToken.dataView"
+            }
+        },
+        {
+            component: "LOGIN_URL",
+            propertyKey: "dataView",
+            dialogElement: {
+                "type":"dropdown",
+                "label":"LOGIN_URL Display Format: ",
+                "entries":["Colorized","Text Data"],
+                "key":"LOGIN_URL.dataView"
+            }
         }
-    },
-    {
-        component: "LOGIN_URL",
-        propertyKey: "dataView",
-        dialogElement: {
-            "type":"dropdown",
-            "label":"LOGIN_URL Display Format: ",
-            "entries":["Colorized","Text Data"],
-            "key":"LOGIN_URL.dataView"
-        }
-    }
-];
+    ]
+}
+export default MultiLoginComponentViewConfig;
 
 

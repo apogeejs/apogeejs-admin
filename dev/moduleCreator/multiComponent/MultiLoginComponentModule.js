@@ -1,6 +1,6 @@
 //import ManaualLoginComponentMember from "./ManaualLoginComponentMember.js";
 import MultiLoginComponentConfig from "./MultiLoginComponent.js";
-import MultiLoginComponentView from "./MultiLoginComponentView.js";
+import MultiLoginComponentViewConfig from "./MultiLoginComponentView.js";
 
 const MultiLoginComponentModule = {
     initApogeeModule: function() {
@@ -17,7 +17,7 @@ const MultiLoginComponentModule = {
         //-------------------------------
         //register the parse csv component view
         //-------------------------------
-        apogeeview.registerComponentView(MultiLoginComponentView);
+        apogeeview.registerComponentView(MultiLoginComponentViewConfig);
     },
 
     removeApogeeModule: function() {
@@ -34,7 +34,7 @@ const MultiLoginComponentModule = {
         //-------------------------------
         //register the parse csv component view
         //-------------------------------
-        apogeeview.unregisterComponentView(MultiLoginComponentView);
+        apogeeview.unregisterComponentView(MultiLoginComponentViewConfig);
     }
 }
 
