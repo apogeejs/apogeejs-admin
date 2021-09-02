@@ -1,1 +1,372 @@
-{"fileType":"apogee app js workspace","version":"0.60","references":{"refEntries":[{"entryType":"es module","url":"http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js","nickname":"MultiLoginComponentModule"}],"viewState":{"treeState":1,"lists":{"es module":{"treeState":1},"js link":{"treeState":0},"css link":{"treeState":0}}}},"code":{"model":{"fileType":"apogee model","version":0.3,"name":"Workspace","children":{"main":{"name":"main","type":"apogee.Folder","children":{"test":{"name":"test","type":"apogee.Folder","children":{"loginForm":{"name":"loginForm","type":"apogee.Folder","children":{"formData":{"name":"formData","type":"apogee.JsonMember","updateData":{"data":{"uniqueKey":"topLevelDataPanel","type":"panel","formData":[{"key":"basicTextField","value":{"uniqueKey":"basicTextField","type":"textField","label":"Email: ","customLayout":{"size":"50"},"value":"","expressionType":"value","hint":"","help":"","useSelector":"none","key":"email"}},{"key":"basicTextField","value":{"uniqueKey":"basicTextField","type":"textField","label":"Password: ","customLayout":{"size":"50"},"value":"","expressionType":"value","hint":"","help":"","useSelector":"none","key":"password"}}]}}},"formResult":{"name":"formResult","type":"apogee.JsonMember","updateData":{"data":{"uniqueKey":"topLevelDataPanel","type":"panel","formData":[{"key":"basicTextField","value":{"uniqueKey":"basicTextField","type":"textField","label":"Email: ","customLayout":{"size":"50"},"value":"","expressionType":"value","hint":"","help":"","useSelector":"none","key":"email"}},{"key":"basicTextField","value":{"uniqueKey":"basicTextField","type":"textField","label":"Password: ","customLayout":{"size":"50"},"value":"","expressionType":"value","hint":"","help":"","useSelector":"none","key":"password"}}]},"contextParentGeneration":2}},"data":{"name":"data","type":"apogee.DesignerDataFormMember"},"value":{"name":"value","type":"apogee.JsonMember","updateData":{"data":{"email":"sutter@intransix.com","password":"xxx"}}}}},"loginRequest":{"name":"loginRequest","type":"apogee.Folder","children":{"formData":{"name":"formData","type":"apogee.JsonMember","updateData":{"data":{"url":"loginUrl","urlType":"simple","method":"GET","body":"","bodyType":"value","contentType":"none","headers":[],"outputFormat":"mime","onError":"error"}}},"formResult":{"name":"formResult","type":"apogee.JsonMember","updateData":{"argList":[],"functionBody":"let output = {};\noutput[\"url\"] = loginUrl\noutput[\"urlType\"] = \"simple\"\noutput[\"method\"] = \"GET\"\noutput[\"body\"] = \"\"\noutput[\"bodyType\"] = \"value\"\noutput[\"contentType\"] = \"none\"\noutput[\"headers\"] = []\noutput[\"outputFormat\"] = \"mime\"\noutput[\"onError\"] = \"error\"\nreturn output;","supplementalCode":"","contextParentGeneration":2}},"data":{"name":"data","type":"apogee.WebRequestMember"}}},"loginUrl":{"name":"loginUrl","type":"apogee.JsonMember","updateData":{"argList":[],"functionBody":"if(!loginForm.value) return apogeeutil.INVALID_VALUE;\n\nreturn LOGIN_URL + `?email=${loginForm.value.email}&password=${loginForm.value.password}`","supplementalCode":""}},"sessionToken":{"name":"sessionToken","type":"apogee.JsonMember","updateData":{"argList":[],"functionBody":"return loginRequest.data.body.sessionToken","supplementalCode":""}},"LOGIN_URL":{"name":"LOGIN_URL","type":"apogee.JsonMember","updateData":{"data":"http://localhost:8888/apogeejs-admin/dev/moduleCreator/login.json"}},"foo":{"name":"foo","type":"apogee.FunctionMember","updateData":{"argList":["x","y"],"functionBody":"return 2*x+y;","supplementalCode":""}},"fooTryer":{"name":"fooTryer","type":"apogee.JsonMember","updateData":{"argList":[],"functionBody":"return foo(10,1);","supplementalCode":""}}}}}}}},"components":{"main":{"type":"apogeeapp.PageComponent","data":{"doc":{"type":"doc","content":[{"type":"apogeeComponent","attrs":{"name":"test","id":0,"state":""}}]}},"children":{"test":{"type":"apogeeapp.MultiLoginCell","children":{"loginForm":{"type":"apogeeapp.DesignerDataFormCell","validatorCode":"return true;","allowInputExpressions":true,"viewState":{"childDisplayState":null,"treeState":null}},"loginRequest":{"type":"apogeeapp.WebRequestCell","viewState":{"childDisplayState":null,"treeState":null}},"loginUrl":{"type":"apogeeapp.JsonCell","dataView":"Colorized","viewState":{"childDisplayState":null,"treeState":null}},"sessionToken":{"type":"apogeeapp.JsonCell","dataView":"Colorized","viewState":{"childDisplayState":null,"treeState":null}},"LOGIN_URL":{"type":"apogeeapp.JsonCell","dataView":"Colorized","viewState":{"childDisplayState":null,"treeState":null}},"foo":{"type":"apogeeapp.FunctionCell","viewState":{"childDisplayState":null,"treeState":null}},"fooTryer":{"type":"apogeeapp.JsonCell","dataView":"Colorized","viewState":{"childDisplayState":null,"treeState":null}}},"viewState":{"childDisplayState":{"views":{"Info":{"isViewActive":false},"Form":{"isViewActive":false},"sessionToken":{"isViewActive":false},"LOGIN_URL":{"isViewActive":false},"fooTryer":{"isViewActive":false}}}}}},"viewState":{"treeState":1,"tabOpened":true,"tabShowing":true}},"viewState":{"treeState":1}}},"viewState":{"treeState":1}}
+{
+	"fileType": "apogee app js workspace",
+	"version": "1.0",
+	"references": {
+		"refEntries": [
+			{
+				"entryType": "es module",
+				"url": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js",
+				"nickname": "MultiLoginComponentModule"
+			}
+		],
+		"viewState": {
+			"treeState": 1,
+			"lists": {
+				"es module": {
+					"treeState": 1
+				},
+				"js link": {
+					"treeState": 0
+				},
+				"css link": {
+					"treeState": 0
+				}
+			}
+		}
+	},
+	"code": {
+		"model": {
+			"fileType": "apogee model",
+			"version": "1.0",
+			"name": "Workspace",
+			"children": {
+				"main": {
+					"name": "main",
+					"type": "apogee.Folder",
+					"children": {
+						"test": {
+							"name": "test",
+							"type": "apogee.Folder",
+							"children": {
+								"loginForm": {
+									"name": "loginForm",
+									"type": "apogee.Folder",
+									"children": {
+										"formData": {
+											"name": "formData",
+											"type": "apogee.JsonMember",
+											"fields": {
+												"data": {
+													"uniqueKey": "topLevelDataPanel",
+													"type": "panel",
+													"formData": [
+														{
+															"key": "basicTextField",
+															"value": {
+																"uniqueKey": "basicTextField",
+																"type": "textField",
+																"label": "Email: ",
+																"customLayout": {
+																	"size": "50"
+																},
+																"value": "",
+																"expressionType": "value",
+																"hint": "",
+																"help": "",
+																"useSelector": "none",
+																"key": "email"
+															}
+														},
+														{
+															"key": "basicTextField",
+															"value": {
+																"uniqueKey": "basicTextField",
+																"type": "textField",
+																"label": "Password: ",
+																"customLayout": {
+																	"size": "50"
+																},
+																"value": "",
+																"expressionType": "value",
+																"hint": "",
+																"help": "",
+																"useSelector": "none",
+																"key": "password"
+															}
+														}
+													]
+												}
+											}
+										},
+										"formResult": {
+											"name": "formResult",
+											"type": "apogee.JsonMember",
+											"fields": {
+												"data": {
+													"uniqueKey": "topLevelDataPanel",
+													"type": "panel",
+													"formData": [
+														{
+															"key": "basicTextField",
+															"value": {
+																"uniqueKey": "basicTextField",
+																"type": "textField",
+																"label": "Email: ",
+																"customLayout": {
+																	"size": "50"
+																},
+																"value": "",
+																"expressionType": "value",
+																"hint": "",
+																"help": "",
+																"useSelector": "none",
+																"key": "email"
+															}
+														},
+														{
+															"key": "basicTextField",
+															"value": {
+																"uniqueKey": "basicTextField",
+																"type": "textField",
+																"label": "Password: ",
+																"customLayout": {
+																	"size": "50"
+																},
+																"value": "",
+																"expressionType": "value",
+																"hint": "",
+																"help": "",
+																"useSelector": "none",
+																"key": "password"
+															}
+														}
+													]
+												},
+												"contextParentGeneration": 2
+											}
+										},
+										"data": {
+											"name": "data",
+											"type": "apogee.DesignerDataFormMember"
+										},
+										"value": {
+											"name": "value",
+											"type": "apogee.JsonMember",
+											"fields": {
+												"data": {
+													"email": "sutter@intransix.com",
+													"password": "xxx"
+												}
+											}
+										}
+									}
+								},
+								"loginRequest": {
+									"name": "loginRequest",
+									"type": "apogee.Folder",
+									"children": {
+										"formData": {
+											"name": "formData",
+											"type": "apogee.JsonMember",
+											"fields": {
+												"data": {
+													"url": "loginUrl",
+													"urlType": "simple",
+													"method": "GET",
+													"body": "",
+													"bodyType": "value",
+													"contentType": "none",
+													"headers": [],
+													"outputFormat": "mime",
+													"onError": "error"
+												}
+											}
+										},
+										"formResult": {
+											"name": "formResult",
+											"type": "apogee.JsonMember",
+											"fields": {
+												"argList": [],
+												"functionBody": "let output = {};\noutput[\"url\"] = loginUrl\noutput[\"urlType\"] = \"simple\"\noutput[\"method\"] = \"GET\"\noutput[\"body\"] = \"\"\noutput[\"bodyType\"] = \"value\"\noutput[\"contentType\"] = \"none\"\noutput[\"headers\"] = []\noutput[\"outputFormat\"] = \"mime\"\noutput[\"onError\"] = \"error\"\nreturn output;",
+												"supplementalCode": "",
+												"contextParentGeneration": 2
+											}
+										},
+										"data": {
+											"name": "data",
+											"type": "apogee.WebRequestMember"
+										}
+									}
+								},
+								"loginUrl": {
+									"name": "loginUrl",
+									"type": "apogee.JsonMember",
+									"fields": {
+										"argList": [],
+										"functionBody": "if(!loginForm.value) return apogeeutil.INVALID_VALUE;\n\nreturn LOGIN_URL + `?email=${loginForm.value.email}&password=${loginForm.value.password}`",
+										"supplementalCode": ""
+									}
+								},
+								"sessionToken": {
+									"name": "sessionToken",
+									"type": "apogee.JsonMember",
+									"fields": {
+										"argList": [],
+										"functionBody": "return loginRequest.data.body.sessionToken",
+										"supplementalCode": ""
+									}
+								},
+								"LOGIN_URL": {
+									"name": "LOGIN_URL",
+									"type": "apogee.JsonMember",
+									"fields": {
+										"data": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/login.json"
+									}
+								},
+								"foo": {
+									"name": "foo",
+									"type": "apogee.FunctionMember",
+									"fields": {
+										"argList": [
+											"x",
+											"y"
+										],
+										"functionBody": "return 2*x+y;",
+										"supplementalCode": ""
+									}
+								},
+								"fooTryer": {
+									"name": "fooTryer",
+									"type": "apogee.JsonMember",
+									"fields": {
+										"argList": [],
+										"functionBody": "return foo(10,1);",
+										"supplementalCode": ""
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"components": {
+			"main": {
+				"type": "apogeeapp.PageComponent",
+				"children": {
+					"test": {
+						"type": "apogeeapp.MultiLoginCell",
+						"children": {
+							"loginForm": {
+								"type": "apogeeapp.DesignerDataFormCell",
+								"viewState": {
+									"childDisplayState": null,
+									"treeState": null
+								},
+								"fields": {
+									"validatorCode": "return true;",
+									"allowInputExpressions": true
+								}
+							},
+							"loginRequest": {
+								"type": "apogeeapp.WebRequestCell",
+								"viewState": {
+									"childDisplayState": null,
+									"treeState": null
+								}
+							},
+							"loginUrl": {
+								"type": "apogeeapp.JsonCell",
+								"viewState": {
+									"childDisplayState": null,
+									"treeState": null
+								},
+								"fields": {
+									"dataView": "Colorized"
+								}
+							},
+							"sessionToken": {
+								"type": "apogeeapp.JsonCell",
+								"viewState": {
+									"childDisplayState": null,
+									"treeState": null
+								},
+								"fields": {
+									"dataView": "Colorized"
+								}
+							},
+							"LOGIN_URL": {
+								"type": "apogeeapp.JsonCell",
+								"viewState": {
+									"childDisplayState": null,
+									"treeState": null
+								},
+								"fields": {
+									"dataView": "Colorized"
+								}
+							},
+							"foo": {
+								"type": "apogeeapp.FunctionCell",
+								"viewState": {
+									"childDisplayState": null,
+									"treeState": null
+								}
+							},
+							"fooTryer": {
+								"type": "apogeeapp.JsonCell",
+								"viewState": {
+									"childDisplayState": null,
+									"treeState": null
+								},
+								"fields": {
+									"dataView": "Colorized"
+								}
+							}
+						},
+						"viewState": {
+							"childDisplayState": {
+								"views": {
+									"Info": {
+										"isViewActive": false
+									},
+									"Form": {
+										"isViewActive": false
+									},
+									"sessionToken": {
+										"isViewActive": false
+									},
+									"LOGIN_URL": {
+										"isViewActive": false
+									},
+									"fooTryer": {
+										"isViewActive": false
+									}
+								}
+							}
+						}
+					}
+				},
+				"viewState": {
+					"treeState": 1,
+					"tabOpened": true,
+					"tabShowing": true
+				},
+				"fields": {
+					"editorState": {
+						"doc": {
+							"type": "doc",
+							"content": [
+								{
+									"type": "apogeeComponent",
+									"attrs": {
+										"name": "test",
+										"id": 0,
+										"state": ""
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"viewState": {
+				"fields": {
+					"treeState": 1
+				}
+			}
+		}
+	},
+	"viewState": {
+		"treeState": 1
+	}
+}
