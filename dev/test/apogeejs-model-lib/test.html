@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Apogee</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+        <script type="text/javascript" src="/apogeejs-model-lib/src/webGlobals.js"></script>
+        <script type="text/javascript" src="/apogeejs-model-lib/src/debugHook.js"></script>
+        <script type="module" src="./testInit.js"></script>
+        <script type="module">
+            import runTests from "./runTests.js";
+            __globals__.runTests = runTests;
+        </script>
+
+
+        
+	</head>
+    <body onload="__globals__.runTests()" >
+	</body>
+</html>
