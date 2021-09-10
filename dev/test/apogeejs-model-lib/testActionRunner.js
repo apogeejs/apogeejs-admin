@@ -1,5 +1,6 @@
 import {Model,doAction} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 
+/** This module contains functions to create a model object and run commands on it. */
 
 /////////////////////////////////////////////
 // The functions here us the following structure, as a wrapper for the current data in the sequence.
@@ -9,27 +10,29 @@ import {Model,doAction} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 //     initialModel: This is the initial model
 //     currentModel: This is the current model, and typically the model after the sequence
 //     actionList: This is an array of actions to execute
-//     listeners: These is a js object with listeners to be used if desired. They possible listeners are
+//     listeners: These is a js object with listeners for model events. These are optional. They possible listeners are
 //         member_created(model,action,actionIndex,member)
 //         member_updated(model,action,actionIndex,member)
 //         member_deleted(model,action,actionIndex,member)
 //         model_updated(model,action,actionIndex,modelFromEvent)
-//     results: This is an array of results, with the following format:
+//     results: This is an array of results, compiled after each action is run. This will be used if it is defined.
 //          model: This is the model after the action completed
 //          action: This is the action that was run
 //          index: This is the index for the action in the action list. If the action was a later async action, the index will be -1
 //          actionResult: this is the action result
 // }
+///////////////////////////////////////////////////
 
 /** This method creates and loads a new model.
  * inputs
  * - sequenceData
- *     listeners - any desired listeners, if applicable
- * - initialModeJson - the json to load. This can be left as null if an empty model is desired.
+ *     listeners - any desired event listeners, if applicable (OPTIONAL)
+ *     results - this holds results from each action, if an (ampty) array is passed in. (OPTIONAL)
+ * - initialModeJson - the json to load. This can be left as null if an empty model is desired. (OPTIONAL)
  * 
  * outputs:
  * - sequenceData - this will be written into
- *     initialModel - the unloaded initial model
+ *     initialModel - the unloaded initial model 
  *     currentModel - the final model
  *     results - the results from loading the model, and any other async actions.
 */
@@ -50,9 +53,10 @@ export function createModel(sequenceData,initialModelJson) {
 /** This method creates and loads a new model.
  * inputs:
  * - sequenceData
- *     initialModel - the input model
- *     actionList: This is an array of actions to execute
- *     listeners - any desired listeners, if applicable
+ *     initialModel - the input model (REQUIRED)
+ *     actionList: This is an array of actions to execute (REQUIRED)
+ *     listeners - any desired event listeners, if applicable (OPTIONAL)
+ *     results - this holds results from each action, if an (ampty) array is passed in. (OPTIONAL)
  *     
  * outputs:
  * - sequenceData - this will be written into
@@ -76,9 +80,8 @@ export function runActionSequence(sequenceData) {
 /** This function should be called on the latest model, to destroy it. 
  * inputs:
  * - sequenceData
- *     initialModel - the input model
- *     listeners - any desired listeners, if applicable 
- * 
+ *     initialModel - the input model (REQUIRED)
+ *     listeners - any desired event listeners, if applicable (OPTIONAL)
 */
 export function destroyModel(sequenceData) {
     let oldModel = sequenceData.initialModel;
@@ -122,9 +125,10 @@ function runActionOnModel(action,index,sequenceData) {
     if(actionResult.actionDone) sequenceData.currentModel = model;
 
     //save the results in the sequence
-    if(!sequenceData.results) sequenceData.results = [];
-    sequenceData.results.push({model, index, action, actionResult});
-    
+    if(sequenceData.results) {
+        sequenceData.results.push({model, index, action, actionResult});
+    }
+
     return actionResult.actionDone;
 }
 
