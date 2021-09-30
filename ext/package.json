@@ -4,7 +4,7 @@
   "dependencies": {
     "ace-builds": "1.4.12",
     "esprima": "4.0.1",
-    "handsontable": "6.2.2",
+    "handsontable": "10.0.0",
     "lodash": "4.17.21",
     "@babel/polyfill": "^7.12.1"
   },
