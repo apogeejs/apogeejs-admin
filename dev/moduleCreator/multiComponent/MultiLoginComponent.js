@@ -101,6 +101,14 @@ const DEFAULT_MEMBER_JSON = {
 						"contextParentGeneration": 2
 					}
 				},
+				"isValid": {
+					"name": "isValid",
+					"type": "apogee.FunctionMember",
+					"fields": {
+						"argList": ["formValue"],
+						"functionBody": "return true;"
+					}
+				},
 				"data": {
 					"name": "data",
 					"type": "apogee.DesignerDataFormMember"

@@ -1,25 +1,6 @@
-import ComponentView from "/apogeejs-view-lib/src/componentdisplay/ComponentView.js";
+import MultiComponentView from "/apogeejs-view-lib/src/componentdisplay/MultiComponentView.js";
 import {getErrorViewModeEntry,getMemberDataTextViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 import apogeeutil from "/apogeejs-util-lib/src/apogeeUtilLib.js"
-
-/** This component represents a table object. */
-class MultiLoginComponentView extends ComponentView {
-
-    //needed as a part component view, for now - does nothing
-    addChild(childComponentView) {
-        //TESTING!!!////////
-        let componentDisplay = this.getComponentDisplay();
-        componentDisplay.addChildComponentView(childComponentView);
-        childComponentView.setComponentDisplay(componentDisplay);
-        ///////////////////
-    }
-
-    removeChild(childComponentView) {
-        //TESTING!!!////////
-        //do something here?
-        //////////////////////
-    }
- }
 
 //======================================
 // This is the component generator, to register the component
@@ -60,7 +41,7 @@ let FOO_TRYER_VIEW = getMemberDataTextViewModeEntry("member",{name: "Data",label
 
 const MultiLoginComponentViewConfig = {
     componentType: "apogeeapp.MultiLoginCell",
-    viewClass: MultiLoginComponentView,
+    viewClass: MultiComponentView,
     viewModes: [
         getErrorViewModeEntry(),
         MAIN_FORM_VIEW,
