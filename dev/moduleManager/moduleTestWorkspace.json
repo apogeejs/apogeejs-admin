@@ -1,1 +1,107 @@
-{"fileType":"apogee app js workspace","version":"0.60","references":{"viewState":{"treeState":1,"lists":{"es module":{"treeState":0},"js link":{"treeState":0},"css link":{"treeState":0}}}},"code":{"model":{"fileType":"apogee model","version":0.3,"name":"Workspace","children":{"main":{"name":"main","type":"apogee.Folder","children":{"openModuleManager":{"name":"openModuleManager","type":"apogee.JsonMember","updateData":{"data":""}}}}}},"components":{"main":{"type":"apogeeapp.PageComponent","data":{"doc":{"type":"doc","content":[{"type":"apogeeComponent","attrs":{"name":"openModuleManager","id":0,"state":""}}]}},"children":{"openModuleManager":{"type":"apogeeapp.NewActionFormCell","layoutCode":"let onSubmit = () => {\n    apogeeapp.Apogee.getInstance().openModuleManager();\n}\n\nreturn [\n    {\n        type: \"submit\",\n        onSubmit: onSubmit\n    }    \n]","viewState":{"childDisplayState":{"views":{"Info":{"isViewActive":true},"form":{"isViewActive":true},"layout":{"isViewActive":true,"height":7000},"input":{"isViewActive":false},"inputPrivate":{"isViewActive":false}}}}}},"viewState":{"treeState":1,"tabOpened":true,"tabShowing":true}},"viewState":{"treeState":1}}},"viewState":{"treeState":1}}
+{
+	"fileType": "apogee app js workspace",
+	"version": "1.0",
+	"references": {
+		"viewState": {
+			"treeState": 1,
+			"lists": {
+				"es module": {
+					"treeState": 0
+				},
+				"js link": {
+					"treeState": 0
+				},
+				"css link": {
+					"treeState": 0
+				}
+			}
+		}
+	},
+	"code": {
+		"model": {
+			"fileType": "apogee model",
+			"version": "1.0",
+			"name": "Workspace",
+			"children": {
+				"main": {
+					"name": "main",
+					"type": "apogee.Folder",
+					"children": {
+						"openModuleManager": {
+							"name": "openModuleManager",
+							"type": "apogee.DataMember",
+							"fields": {
+								"data": ""
+							}
+						}
+					}
+				}
+			}
+		},
+		"components": {
+			"main": {
+				"type": "apogeeapp.PageComponent",
+				"children": {
+					"openModuleManager": {
+						"type": "apogeeapp.FullActionFormCell",
+						"viewState": {
+							"childDisplayState": {
+								"views": {
+									"Info": {
+										"isViewActive": true
+									},
+									"form": {
+										"isViewActive": true
+									},
+									"layout": {
+										"isViewActive": true,
+										"height": 7000
+									},
+									"input": {
+										"isViewActive": false
+									},
+									"inputPrivate": {
+										"isViewActive": false
+									}
+								}
+							}
+						},
+						"fields": {
+							"layoutCode": "let onSubmit = () => {\n    apogeeapp.Apogee.getInstance().openModuleManager();\n}\n\nreturn [\n    {\n        type: \"submit\",\n        onSubmit: onSubmit\n    }    \n]"
+						}
+					}
+				},
+				"viewState": {
+					"treeState": 1,
+					"tabOpened": true,
+					"tabShowing": true
+				},
+				"fields": {
+					"editorState": {
+						"doc": {
+							"type": "doc",
+							"content": [
+								{
+									"type": "apogeeComponent",
+									"attrs": {
+										"name": "openModuleManager",
+										"id": 0,
+										"state": ""
+									}
+								}
+							]
+						}
+					}
+				}
+			},
+			"viewState": {
+				"fields": {
+					"treeState": 1
+				}
+			}
+		}
+	},
+	"viewState": {
+		"treeState": 1
+	}
+}
