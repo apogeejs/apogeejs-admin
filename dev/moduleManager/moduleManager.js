@@ -21,8 +21,8 @@ const ES_LOADED = 4;
 
 const MODULE_REQUEST_URL = "moduleData.json";
 
-const ES_MODULE_TYPE = "es module";
-const NPM_MODULE_TYPE = "npm module";
+const ES_MODULE_TYPE = "web apogee module";
+const NPM_MODULE_TYPE = "node apogess module";
 
 //======================
 // Functions
