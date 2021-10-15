@@ -15,6 +15,7 @@
 							"webUrl": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
 						}
 					],
+					"npmUrl": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v4.0.0-p1/npm/apogeejs-module-chartjs-4.0.0-p1.tgz",
 					"webLink": "https://apogeejs.com",
 					"isLatest": true
 				}
