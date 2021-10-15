@@ -37,6 +37,18 @@
 					"isLatest": true
 				}
 			]
+		},
+		{
+			"moduleName": "multi-login-component",
+			"displayName": "Test Multi Component",
+			"shortDesc": "This module is a multicomponent.",
+			"versions": [
+				{
+					"version": "2.0.0-p1",
+					"esUrl": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js",
+					"isLatest": true
+				}
+			]
 		}
 	]
 }
