@@ -9,17 +9,13 @@
 			"versions": [
 				{
 					"version": "4.0.0-p1",
-					"es": {
-						"url": "http://localhost:8888/apogeejs-module-chartjs/src/ChartJSComponentModule.js",
-						"demoWorkspaces": [
-							{
-								"url": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
-							}
-						]
-					},
-					"node": {
-						"url": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v4.0.0-p1/npm/apogeejs-module-chartjs-4.0.0-p1.tgz"
-					},
+					"esUrl": "http://localhost:8888/apogeejs-module-chartjs/src/ChartJSComponentModule.js",
+					"esDemoWorkspaces": [
+						{
+							"webUrl": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
+						}
+					],
+					"npmUrl": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v4.0.0-p1/npm/apogeejs-module-chartjs-4.0.0-p1.tgz",
 					"webLink": "https://apogeejs.com",
 					"isLatest": true
 				}
@@ -32,14 +28,12 @@
 			"versions": [
 				{
 					"version": "2.0.0-p1",
-					"es": {
-						"url": "http://localhost:8888/apogeejs-module-csv/src/CSVComponentModule.js",
-						"demoWorkspaces": [
-							{
-								"url": "http://localhost:8888/apogeejs-module-csv/csvParseWorkspaceLocal.json"
-							}
-						]
-					},
+					"esUrl": "http://localhost:8888/apogeejs-module-csv/src/CSVComponentModule.js",
+					"esDemoWorkspaces": [
+						{
+							"webUrl": "http://localhost:8888/apogeejs-module-csv/csvParseWorkspaceLocal.json"
+						}
+					],
 					"webLink": "https://apogeejs.com",
 					"isLatest": true
 				}
@@ -52,9 +46,7 @@
 			"versions": [
 				{
 					"version": "2.0.0-p1",
-					"es": {
-						"url": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js"
-					},
+					"esUrl": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js",
 					"isLatest": true
 				}
 			]
