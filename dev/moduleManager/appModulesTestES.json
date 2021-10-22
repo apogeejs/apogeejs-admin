@@ -1,0 +1,28 @@
+{
+    "loaded": [
+        {
+            "moduleName": "apogeejs-module-chartjs",
+            "moduleType": "apogee module",
+            "version": "4.0.0-p2",
+            "es": {
+                "url": "http://localhost:8888/apogeejs-module-chartjs/src/ChartJSComponentModule2.js",
+                "demoWorkspaces": [
+                    {
+                        "url": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
+                    }
+                ]
+            },
+            "node": {
+                "url": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v4.0.0-p2/npm/apogeejs-module-chartjs-4.0.0-p1.tgz"
+            },
+            "webLink": "https://apogeejs.com"
+        },
+        {
+            "moduleName": "multi-login-component",
+            "version": "2.0.0-p1",
+            "es": {
+                "url": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js"
+            }
+        }
+    ]
+}

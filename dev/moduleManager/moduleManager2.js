@@ -11,6 +11,7 @@ let _platform = null;
 let _appModules = null;
 let _modulesConfigResponse = null;
 let _modulesConfigArray = null;
+let _refDataArray = null;
 
 //constants
 const STATUS_UNKNOWN = -1;
@@ -281,9 +282,9 @@ function openWebLink(linkUrl) {
 function applyStatus() {
     if((_appModules)&&(_modulesConfigArray)) {
         //create the ref config array that holds themodule status info for the UI
-        let refConfigArray = _moduleConfigArray.map(moduleConfig => { 
+        let refDataArray = _modulesConfigArray.map(moduleConfig => { 
             return {
-                moduleConfig: _cloneDeep(_modulesConfigArray),
+                moduleConfig: _.cloneDeep(moduleConfig),
                 status: {}
             }
         })
@@ -291,38 +292,39 @@ function applyStatus() {
         //populate the status for the loaded and installed modules
         if(_appModules.loaded) {
             _appModules.loaded.forEach(loadedEntry => {
-                let refConfig = lookupLoadedModule(loadedEntry,refConfigArray);
-                if(!refConfig) {
-                    refConfig = insertIntoRefConfigArray(loadedEntry,refConfigArray);
-                    refConfig.status.moduleUnrecognized = true;
+                let refData = lookupLoadedModule(loadedEntry,refDataArray);
+                if(!refData) {
+                    refData = insertIntoRefDataArray(loadedEntry,refDataArray);
+                    refData.status.moduleUnrecognized = true;
                 }
 
-                let refVersionData = lookupLoadedVersionData(loadedEntry,refConfig);
+                let refVersionData = lookupLoadedVersionData(loadedEntry,refData);
                 if(!refVersionData) {
-                    refVersionData = insertIntoLoadedVersionData(loadedEntry,refConfig);
+                    refVersionData = insertIntoLoadedVersionData(loadedEntry,refData);
                 }
-                refConfig.status.loaded = refVersionData.version;
+                refData.status.loaded = refVersionData.version;
             })
         }
 
+        //installed for node only
         if(_appModules.installed) {
             _appModules.installed.forEach(installedEntry => {
-                let refConfig = lookupInstalledModule(installedEntry,refConfigArray);
-                if(!refConfig) {
+                let refData = lookupInstalledModule(installedEntry,refDataArray);
+                if(!refData) {
                     //this is either a non-apogee module or an apogee module for which
                     //we do not know the name. So we will ignore it
                     return;
                 }
 
-                let refVersionData = lookupInstalledVersionData(installedEntry,refConfig);
+                let refVersionData = lookupInstalledVersionData(installedEntry,refData);
                 if(!refVersionData) {
-                    refVersionData = insertIntoInstalledVersionData(installedEntry,refConfig);
+                    refVersionData = insertIntoInstalledVersionData(installedEntry,refData);
                 }
-                refConfig.status.installed = refVersionData.version;
+                refData.status.installed = refVersionData.version;
             })
         }
 
-        _refConfigArray = refConfigArray;
+        _refDataArray = refDataArray;
         ////////////////////////////////////////
         //sort?
         //send to the ui
@@ -332,15 +334,15 @@ function applyStatus() {
 
 /** This function takes an entry from the app loaded modules and looks for the
  * module entry from the reference module config array */
-function lookupLoadedModule(loadedEntry,refConfigArray) {
-    return refConfigArray.find(refConfigEntry => (refConfigEntry.moduleName == loadedEntry.moduleName) );
+function lookupLoadedModule(loadedEntry,refDataArray) {
+    return refDataArray.find(refDataEntry => (refDataEntry.moduleConfig.moduleName == loadedEntry.moduleName) );
 }
 
 /** This function inserts an entry in the referenece module config array to match
  * the given (unrecognized) loadedEntry from the app. The "unrecognized module"
  * status is also set.  The new module entry is returned. */
-function insertIntoRefConfigArray(loadedEntry,refConfigArray) {
-    let refConfig = {
+function insertIntoRefDataArray(loadedEntry,refDataArray) {
+    let refData = {
         moduleConfig: {
             moduleName: loadedEntry.moduleName,
             versions: []
@@ -349,43 +351,49 @@ function insertIntoRefConfigArray(loadedEntry,refConfigArray) {
             moduleUnrecognized: true
         }
     }
-    refConfigArray.modules.push(refConfig);
-    return refConfig;
+    refDataArray.modules.push(refData);
+    return refData;
 }
 
 /** This function takes an entry from the app loaded modules and finds the proper version
  * from the reference module config entry */
-function lookupLoadedVersionData(loadedEntry,refConfig) {
-    return refConfig.versions.find(verionEntry => (versionEntry.version == loadedEntry.version));
+function lookupLoadedVersionData(loadedEntry,refData) {
+    //lookup the version entry with a matching number
+    let refVersionData = refData.moduleConfig.versions.find(versionEntry => (versionEntry.version == loadedEntry.version));
+
+    //verify it has the same source data
+    //if not, we will treat this like a different version
+    
 }
 
 /** This function inserts a version entry in the reference module config entry to match
  * the given (unrecognized) loadedEntry from the app. The "unrecognized module"
  * status is also set. The new version entry is returned.*/
-function insertIntoLoadedVersionData(loadedEntry,refConfig) {
+function insertIntoLoadedVersionData(loadedEntry,refData) {
     let versionEntry = {}
     Object.assign(versionEntry,loadedEntry);
     delete versionEntry.moduleName;
     delete versionEntry.moduleType;
+    //there may be some other extra fields too
 
-    refConfig.versions.push(versionEntry);
+    refData.moduleConfig.versions.push(versionEntry);
     
-    if(!refConfig.status.unrecognizedVersions) refConfig.status.unrecognizedVersions = [];
-    refConfig.status.unrecognizedVersions.push(versionEntry.version);
+    if(!refData.status.unrecognizedVersions) refData.status.unrecognizedVersions = [];
+    refData.status.unrecognizedVersions.push(versionEntry.version);
 
     return versionEntry;
 }
 
 /** This function takes an entry from the app installed modules (only from node platform) and looks for the
  * module entry from the reference module config array */
-function lookupInstalledModule(installedEntry,refConfigArray) {
-    return refConfigArray.find(refConfigEntry => (refConfigEntry.npmName == installedEntry.npmName))
+function lookupInstalledModule(installedEntry,refDataArray) {
+    return refDataArray.find(refDataEntry => (refDataEntry.moduleConfig.npmName == installedEntry.npmName))
 }
 
 /** This function takes an entry from the app installed modules and finds the proper version
  * from the reference module config entry */
-function lookupInstalledVersionData(installedEntry,refConfig) {
-    return refConfig.versions.find(versionEntry => {
+function lookupInstalledVersionData(installedEntry,refData) {
+    return refData.moduleConfig.versions.find(versionEntry => {
         //installed from npm - installed entry will have the proper version number
         if(versionEntry.version == installedEntry.version) return true;
 
@@ -400,7 +408,7 @@ function lookupInstalledVersionData(installedEntry,refConfig) {
 /** This function inserts a version entry in the reference module config entry to match
  * the given (unrecognized) installedEntry from the app. The "unrecognized module"
  * status is also set. The new version entry is returned.*/
-function insertIntoInstalledVersionData(installedEntry,refConfig) {
+function insertIntoInstalledVersionData(installedEntry,refData) {
     let versionEntry = {};
     versionEntry.application = {};
     versionEntry.application.node = {};
@@ -414,10 +422,10 @@ function insertIntoInstalledVersionData(installedEntry,refConfig) {
         versionEntry.application.npm = true;
     }
     
-    refConfig.versions.push(versionEntry);
+    refData.moduleConfig.versions.push(versionEntry);
     
-    if(!refConfig.status.unrecognizedVersions) refConfig.status.unrecognizedVersions = [];
-    refConfig.status.unrecognizedVersions.push(versionEntry.version);
+    if(!refData.status.unrecognizedVersions) refData.status.unrecognizedVersions = [];
+    refData.status.unrecognizedVersions.push(versionEntry.version);
 
     return versionEntry;
 }

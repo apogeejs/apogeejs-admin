@@ -5,6 +5,7 @@
 		{
 			"moduleName": "apogeejs-module-chartjs",
 			"displayName": "Chart.js Module",
+			"npmName": "apogeejs-module-chartjs",
 			"shortDesc": "This modules creates plot using the Chart.js library. It includes Line, Bar and XY Scatter plots.",
 			"versions": [
 				{
@@ -19,6 +20,36 @@
 					},
 					"node": {
 						"url": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v4.0.0-p1/npm/apogeejs-module-chartjs-4.0.0-p1.tgz"
+					},
+					"webLink": "https://apogeejs.com"
+				},
+				{
+					"version": "4.0.0-p2",
+					"es": {
+						"url": "http://localhost:8888/apogeejs-module-chartjs/src/ChartJSComponentModule2.js",
+						"demoWorkspaces": [
+							{
+								"url": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
+							}
+						]
+					},
+					"node": {
+						"url": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v4.0.0-p2/npm/apogeejs-module-chartjs-4.0.0-p1.tgz"
+					},
+					"webLink": "https://apogeejs.com"
+				},
+				{
+					"version": "4.0.0-p3",
+					"es": {
+						"url": "http://localhost:8888/apogeejs-module-chartjs/src/ChartJSComponentModule3.js",
+						"demoWorkspaces": [
+							{
+								"url": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
+							}
+						]
+					},
+					"node": {
+						"url": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v4.0.0-p3/npm/apogeejs-module-chartjs-4.0.0-p1.tgz"
 					},
 					"webLink": "https://apogeejs.com"
 				}
@@ -47,11 +78,12 @@
 			"moduleName": "multi-login-component",
 			"displayName": "Test Multi Component",
 			"shortDesc": "This module is a multicomponent.",
+			"npmName": "multi-login-component",
 			"versions": [
 				{
-					"version": "2.0.0-p1",
-					"es": {
-						"url": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js"
+					"version": "2.0.0",
+					"node": {
+						"url": "http://localhost:8888/multi.tgz"
 					}
 				}
 			]
