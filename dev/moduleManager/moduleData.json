@@ -1,44 +1,41 @@
 {
-	"version": "0.0",
 	"fileType": "moduleData",
+	"fileVersion": "0.0",
+	"source": {
+		"name": "test"
+	},
+	"platform": "es",
 	"modules": [
 		{
-			"moduleName": "apogeejs-module-chartjs",
-			"displayName": "Chart.js Module",
-			"shortDesc": "This modules creates plot using the Chart.js library. It includes Line, Bar and XY Scatter plots.",
+			"name": "apogeejs-module-chartjs",
 			"versions": [
 				{
 					"version": "4.0.0-p1",
-					"es": {
-						"url": "http://localhost:8888/apogeejs-module-chartjs/src/ChartJSComponentModule.js",
-						"demoWorkspaces": [
-							{
-								"url": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
-							}
-						]
-					},
-					"node": {
-						"url": "http://localhost:8888/apogeejs-module-chartjs/releases-dev/v4.0.0-p1/npm/apogeejs-module-chartjs-4.0.0-p1.tgz"
-					},
+					"displayName": "Chart.js Module",
+					"desc": "This modules creates plot using the Chart.js library. It includes Line, Bar and XY Scatter plots.",
+					"url": "http://localhost:8888/apogeejs-module-chartjs/src/ChartJSComponentModule.js",
+					"demoWorkspaces": [
+						{
+							"url": "http://localhost:8888/apogeejs-module-chartjs/chartDemoWorkspaceLocal.json"
+						}
+					],
 					"webLink": "https://apogeejs.com"
 				}
 			]
 		},
 		{
 			"moduleName": "apogeejs-module-csv",
-			"displayName": "CSV Module - Papaparse",
-			"shortDesc": "This module parses CSV text into JSON. It uses the Papaparse CSV library.",
 			"versions": [
 				{
 					"version": "2.0.0-p1",
-					"es": {
-						"url": "http://localhost:8888/apogeejs-module-csv/src/CSVComponentModule.js",
-						"demoWorkspaces": [
-							{
-								"url": "http://localhost:8888/apogeejs-module-csv/csvParseWorkspaceLocal.json"
-							}
-						]
-					},
+					"displayName": "CSV Module - Papaparse",
+					"desc": "This module parses CSV text into JSON. It uses the Papaparse CSV library.",
+					"url": "http://localhost:8888/apogeejs-module-csv/src/CSVComponentModule.js",
+					"demoWorkspaces": [
+						{
+							"url": "http://localhost:8888/apogeejs-module-csv/csvParseWorkspaceLocal.json"
+						}
+					],
 					"webLink": "https://apogeejs.com"
 				}
 			]
@@ -50,9 +47,7 @@
 			"versions": [
 				{
 					"version": "2.0.0-p1",
-					"es": {
-						"url": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js"
-					}
+					"url": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js"
 				}
 			]
 		}

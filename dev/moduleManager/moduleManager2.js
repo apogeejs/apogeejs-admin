@@ -1,3 +1,4 @@
+import { platform } from "os";
 import _ from "/apogeejs-releases/releases/ext/lodash/v4.17.21/lodash.es.js";
 
 //======================
@@ -9,8 +10,7 @@ let _callingUrl = null;
 let _platform = null;
 
 let _appModules = null;
-let _modulesConfigResponse = null;
-let _modulesConfigArray = null;
+let _sourceModulesResponse = null;
 let _refDataArray = null;
 
 //constants
@@ -135,15 +135,8 @@ async function loadModuleConfig() {
 
         if(response.ok) {
             try {
-                _modulesConfigResponse = await response.json();
-
-                if(_modulesConfigResponse.modules) {
-                    _modulesConfigArray = _modulesConfigResponse.modules;
-                    applyStatus();
-                }
-                else {
-                    fatalError("Modules data not found in server response!");
-                }
+                _sourceModulesResponse = await response.json();
+                applyStatus();
             }
             catch(error) {
                 fatalError("Error parsing module data from server: " + error.toString());
@@ -281,13 +274,7 @@ function openWebLink(linkUrl) {
 
 function applyStatus() {
     if((_appModules)&&(_modulesConfigArray)) {
-        //create the ref config array that holds themodule status info for the UI
-        let refDataArray = _modulesConfigArray.map(moduleConfig => { 
-            return {
-                moduleConfig: _.cloneDeep(moduleConfig),
-                status: {}
-            }
-        })
+        let refDataArray = getCompiledModules(_sourceModulesReponse); //throws error on failure
 
         //populate the status for the loaded and installed modules
         if(_appModules.loaded) {
@@ -309,15 +296,10 @@ function applyStatus() {
         //installed for node only
         if(_appModules.installed) {
             _appModules.installed.forEach(installedEntry => {
-                let refData = lookupInstalledModule(installedEntry,refDataArray);
-                if(!refData) {
-                    //this is either a non-apogee module or an apogee module for which
-                    //we do not know the name. So we will ignore it
-                    return;
-                }
+                //here we directly look up the installed version entry, not the module entry
 
-                let refVersionData = lookupInstalledVersionData(installedEntry,refData);
-                if(!refVersionData) {
+                let {refData,refVersionData} = lookupInstalledVersionData(installedEntry,refDataArray);
+                if((refData)&&(!refVersionData)) {
                     refVersionData = insertIntoInstalledVersionData(installedEntry,refData);
                 }
                 refData.status.installed = refVersionData.version;
@@ -332,13 +314,40 @@ function applyStatus() {
     }
 }
 
-/** This function takes an entry from the app loaded modules and looks for the
- * module entry from the reference module config array */
-function lookupLoadedModule(loadedEntry,refDataArray) {
-    return refDataArray.find(refDataEntry => (refDataEntry.moduleConfig.moduleName == loadedEntry.moduleName) );
+/** NOW I AM ONLY HANLDING A SINGLE SOURCE!!! */
+function getCompiledModules(sourceModulesResponse) {
+    let sourceEntry = sourceModulesResponse.source;
+    if(!sourceEntry) throw new Error("Source entry missing from module response.");
+    if(!sourceEntry.modules) throw new Error("modules list missing from modules response.");
+
+    let compiledModules = [];
+    sourceEntry.modules.forEach(sourceModuleEntry => {
+        let moduleEntry = {};
+        moduleEntry.name = sourceModuleEntry.name;
+        if(sourceModuleEntry.versions) {
+            moduleEntry.versions = sourceModuleEntry.versions.map(sourceVersionEntry => {
+                let versionEntry = {};
+                versionEntry.moduleType = "apogee module";
+                versionEntry.platform = "_platform";
+                versionEntry.name = moduleEntry.name;
+                versionEntry.source = sourceEntry;
+                Object.assign(versionEntry,sourceVersionEntry);
+            });
+        }
+        compiledModules.push(moduleEntry);
+        moduleEntry.status = {};
+    })
+
+    return compiledModules;
 }
 
-/** This function inserts an entry in the referenece module config array to match
+/** This function takes an entry from the app loaded modules and looks for the
+ * module entry from the reference module array */
+function lookupLoadedModule(loadedEntry,refDataArray) {
+    return refDataArray.find(refDataEntry => (refDataEntry.moduleName == loadedEntry.moduleName) );
+}
+
+/** This function inserts an entry in the referenece module array to match
  * the given (unrecognized) loadedEntry from the app. The "unrecognized module"
  * status is also set.  The new module entry is returned. */
 function insertIntoRefDataArray(loadedEntry,refDataArray) {
@@ -347,9 +356,8 @@ function insertIntoRefDataArray(loadedEntry,refDataArray) {
             moduleName: loadedEntry.moduleName,
             versions: []
         },
-        status: {
-            moduleUnrecognized: true
-        }
+        status: {},
+        moduleUnrecognized: true
     }
     refDataArray.modules.push(refData);
     return refData;
@@ -359,75 +367,112 @@ function insertIntoRefDataArray(loadedEntry,refDataArray) {
  * from the reference module config entry */
 function lookupLoadedVersionData(loadedEntry,refData) {
     //lookup the version entry with a matching number
-    let refVersionData = refData.moduleConfig.versions.find(versionEntry => (versionEntry.version == loadedEntry.version));
+    let refVersionData = refData.moduleConfig.versions.find(versionEntry => {
+        if(_platform == ES_PLATFORM) {
+            return (loadedEntry.url == refData.url);
+        }
+        else if(_platform == NODE_PLATFORM) {
+            if(loadedEntry.npmName != refData.npmName) return false;
+            if(loadedEntry.npm) {
+                return ((refData.npm)&&(loadedEntry.version == refData.version));
+            }
+            else {
+                return ((!refData.npm)&&(loadedEntry.url == refData.url));
+            }
+        }
+        else {
+            throw new Error("Unkonwn platform: " + _platform);
+        }
+    });
 
-    //verify it has the same source data
-    //if not, we will treat this like a different version
-    
+    return refVersionData;
 }
 
 /** This function inserts a version entry in the reference module config entry to match
  * the given (unrecognized) loadedEntry from the app. The "unrecognized module"
  * status is also set. The new version entry is returned.*/
 function insertIntoLoadedVersionData(loadedEntry,refData) {
-    let versionEntry = {}
-    Object.assign(versionEntry,loadedEntry);
-    delete versionEntry.moduleName;
-    delete versionEntry.moduleType;
-    //there may be some other extra fields too
 
-    refData.moduleConfig.versions.push(versionEntry);
+    refData.versions.push(loadedEntry);
     
-    if(!refData.status.unrecognizedVersions) refData.status.unrecognizedVersions = [];
-    refData.status.unrecognizedVersions.push(versionEntry.version);
+    if(!refData.unrecognizedVersions) refData.status.unrecognizedVersions = [];
+    refData.unrecognizedVersions.push(loadedEntry.version);
 
-    return versionEntry;
-}
-
-/** This function takes an entry from the app installed modules (only from node platform) and looks for the
- * module entry from the reference module config array */
-function lookupInstalledModule(installedEntry,refDataArray) {
-    return refDataArray.find(refDataEntry => (refDataEntry.moduleConfig.npmName == installedEntry.npmName))
+    return loadedEntry;
 }
 
 /** This function takes an entry from the app installed modules and finds the proper version
  * from the reference module config entry */
-function lookupInstalledVersionData(installedEntry,refData) {
-    return refData.moduleConfig.versions.find(versionEntry => {
-        //installed from npm - installed entry will have the proper version number
-        if(versionEntry.version == installedEntry.version) return true;
+function lookupInstalledVersionData(installedEntry,refDataArray) {
+    let refData;
+    let refVersionEntry;
+    for(let i = 0; i < refDataArray.length; i++) {
+        let tempRefData = refDataArray[i];
 
-        //installed by url - installed entry will have a url as the version
-        if((versionEntry.application)&&(versionEntry.application.node)&&(versionEntry.application.node.url == installedEntry.version)) return true;
-        
-        //no match 
-        return false;
-    })
+        //find the matching version entry
+        refVersionEntry = tempRefData.versions.find(tempRefVersionEntry => {
+
+            //look for a npmName match, in case we don't find a verions
+            //we will only save the last, if there are multiple!!!
+            if(installedEntry.npmName == tempRefVersionEntry.npmName) {
+                refData = tempRefData;
+            }
+            else {
+                return false;
+            }
+
+            //installed from npm - installed entry will have the proper version number
+            let installedFromUrl = isNodePackageUrl(installedEntry.npmVersion);
+
+            if(installedFromUrl) {
+                return (installedEntry.npmVersion == tempRefVersionEntry.url);
+            }
+            else {
+                return (installedEntry.npmVersion == tempRefVersionEntry.version);
+            }
+        });
+
+        if(refVersionEntry) break;
+    }
+
+    return {refData, refVersionEntry}
 }
 
 /** This function inserts a version entry in the reference module config entry to match
  * the given (unrecognized) installedEntry from the app. The "unrecognized module"
  * status is also set. The new version entry is returned.*/
 function insertIntoInstalledVersionData(installedEntry,refData) {
-    let versionEntry = {};
-    versionEntry.application = {};
-    versionEntry.application.node = {};
+    let installedFromUrl = isNodePackageUrl(installedEntry.npmVersion);
 
-    if(isNodePackageUrl(installedEntry.version)) {
-        versionEntry.version = "<UNKNOWN VERSION>";
-        vesion.application.url = installedEntry.version;
+    let refVersionEntry = {};
+    refVersionEntry.moduleType = "apogee module";
+    refVersionEntry.platform = _platform;
+    refVersionEntry.moduleName = installedEntry.npmName;
+
+    //create the version entry
+    let versionEntry = {};
+    versionEntry.version = installedEntry.npmVersion; //MAYBE RENMAE THIS FOR URL?
+    versionEntry.npmName = installedEntry.npmName;
+
+    if(installedFromUrl) {
+        vesionEntry.url = installedEntry.version;
     }
     else {
+        versionEntry.npm = true;
         versionEntry.version = installedEntry.version;
-        versionEntry.application.npm = true;
+    }
+    refVersionEntry.versionEntry = versionEntry;
+
+    refVersionEntry.sourceEntry = {
+        name: "Unrecognized Installed Modules"
     }
     
-    refData.moduleConfig.versions.push(versionEntry);
-    
-    if(!refData.status.unrecognizedVersions) refData.status.unrecognizedVersions = [];
-    refData.status.unrecognizedVersions.push(versionEntry.version);
+    //add this version entry
+    refData.versions.push(versionEntry);
+    if(!refData.unrecognizedVersions) refData.unrecognizedVersions = [];
+    refData.unrecognizedVersions.push(versionEntry.version);
 
-    return versionEntry;
+    return refVersionEntry;
 }
 
 /** This returns true if the vesion string represents a url for the package. 
