@@ -1,6 +1,6 @@
 {
-	"fileType": "moduleData",
-	"fileVersion": "0.0",
+	"fileType": "repoModuleList",
+	"fileVersion": "1.0",
 	"source": {
 		"name": "test"
 	},
@@ -10,7 +10,7 @@
 			"name": "apogeejs-module-chartjs",
 			"versions": [
 				{
-					"version": "4.0.0-p1",
+					"version": "4.0.0-p.1",
 					"displayName": "Chart.js Module",
 					"desc": "This modules creates plot using the Chart.js library. It includes Line, Bar and XY Scatter plots.",
 					"url": "http://localhost:8888/apogeejs-module-chartjs/src/ChartJSComponentModule.js",
@@ -24,10 +24,10 @@
 			]
 		},
 		{
-			"moduleName": "apogeejs-module-csv",
+			"name": "apogeejs-module-csv",
 			"versions": [
 				{
-					"version": "2.0.0-p1",
+					"version": "2.0.0-p.1",
 					"displayName": "CSV Module - Papaparse",
 					"desc": "This module parses CSV text into JSON. It uses the Papaparse CSV library.",
 					"url": "http://localhost:8888/apogeejs-module-csv/src/CSVComponentModule.js",
@@ -41,12 +41,10 @@
 			]
 		},
 		{
-			"moduleName": "multi-login-component",
-			"displayName": "Test Multi Component",
-			"shortDesc": "This module is a multicomponent.",
+			"name": "multi-login-component",
 			"versions": [
 				{
-					"version": "2.0.0-p1",
+					"version": "2.0.0-p.1",
 					"url": "http://localhost:8888/apogeejs-admin/dev/moduleCreator/multiComponent/MultiLoginComponentModule.js"
 				}
 			]
