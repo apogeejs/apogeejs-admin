@@ -6,10 +6,12 @@ import _ from "/apogeejs-releases/releases/ext/lodash/v4.17.21/lodash.es.js";
 let _callingWindow = null;
 let _windowId = null;
 let _callingUrl = null;
+
+let _repositoryUrls = null;
 let _platform = null;
 
 let _appModules = null;
-let _sourceModulesResponse = null;
+let _moduleResponseArray = null;
 let _refModuleArray = null;
 
 //constants
@@ -23,7 +25,7 @@ const ES_NOT_LOADED = 3;
 const ES_LOADED = 4;
 
 //const MODULE_REQUEST_URL = "moduleData.json";
-const MODULE_REQUEST_URL = "moduleDataTest.json";
+//const MODULE_REQUEST_URL = "moduleDataTest.json";
 
 const MODULE_TYPE = "apogee module";
 const ES_PLATFORM = "es";
@@ -39,9 +41,8 @@ export async function load() {
         return;
     }
 
-    initUi();
+    //initUi();
     startMessageListener();
-    loadModuleConfig();
 }
 
 //=================
@@ -69,12 +70,6 @@ function loadInputParams() {
         return false;
     }
 
-    _platform = params.get("platform");
-    if(!_platform) {
-        fatalError("Platform not found in input.");
-        return false;
-    }
-
     return true;
 }
 
@@ -94,7 +89,11 @@ function startMessageListener() {
 
 function receiveMessage(event) {
     switch(event.data.message) {
-        case "appModules": 
+        case "initModules": 
+            initModules(event.data.value);
+            break;
+
+        case "appStatus": 
             updateAppModuleData(event.data.value);
             break;
 
@@ -116,6 +115,19 @@ function sendMessage(messageType,commandData) {
     }
 }
 
+function initModules(initData) {
+    _platform = initData.platform;
+    _repositoryUrls = initData.repositoryUrls;
+
+    try {
+        _moduleResponseArray = await Promise.all(_repositoryUrls.map(url => loadModuleConfig(url)));
+        applyStatus();
+    }
+    catch(error) {
+        fatalError("Error loading module data: " + error.toString());
+    }
+}
+
 /** This updates the status for each module entry. */
 function updateAppModuleData(updatedAppModules) {
     _appModules = updatedAppModules; //store this
@@ -126,143 +138,14 @@ function updateAppModuleData(updatedAppModules) {
 // Repository module data request
 //======================
 
-async function loadModuleConfig() {
-    let url = getModuleDataUrl();
-    try {
-        let response = await fetch(url);
+async function loadModuleConfig(url) {
+    let response = await fetch(url);
 
-        if(response.ok) {
-            try {
-                _sourceModulesResponse = await response.json();
-                applyStatus();
-            }
-            catch(error) {
-                fatalError("Error parsing module data from server: " + error.toString());
-            }
-        }
-        else {
-            fatalError(`Error loading module data from server. Status: ${response.status}, Message: ${response.statusText}`);
-        }
-    }
-    catch(error) {
-        fatalError("Error loading module data from server: " + error.toString());
-    }
-}
-
-//==================
-// External Command Functions
-//==================
-function loadEsModule(moduleUrl,moduleName) {
-    let commandData = {
-        moduleIdentifier: moduleUrl,
-        moduleName: moduleName
-    }
-    sendMessage("loadModule",commandData);
-}
-
-function unloadEsModule(moduleUrl) {
-    let commandData = {
-        moduleIdentifier: moduleUrl
-    }
-    sendMessage("unloadModule",commandData);
-}
-
-function updateEsModule(newUrl,oldUrl,moduleName) {
-    let commandData = {
-        newIdentifier: newUrl,
-        oldIdentifier: oldUrl,
-        moduleName: moduleName
-    }
-    sendMessage("updateModule",commandData);
-}
-
-function installNpmModule(moduleName,selectedVersionInfo) {
-    let commandData = {
-        installArg: getNpmInstallArg(moduleName,selectedVersionInfo)
-    }
-    sendMessage("installNpmModule",commandData);
-}
-
-function getNpmInstallArg(moduleName,selectedVersionInfo) {
-    if(selectedVersionInfo.npmUrl) {
-        //url of tgz file
-        return selectedVersionInfo.npmUrl;
-    }
-    else if(selectedVersionInfo.version) {
-        //install the given version
-        return moduleName + "@" + selectedVersionInfo.version;
+    if(response.ok) {
+        return await response.json();
     }
     else {
-        //this shouldn't happen, but it will instsall latest
-        //we might want some different handling
-        return moduleName;
-    }
-}
-
-function installAndLoadNpmModule(moduleName,selectedVersionInfo) {
-    let commandData = {
-        moduleName: moduleName,
-        installArg: getNpmInstallArg(moduleName,selectedVersionInfo)
-    }
-    sendMessage("installAndLoadNpmModule",commandData);
-}
-
-function loadNpmModule(moduleName) {
-    let commandData = {
-        moduleIdentifier: moduleName,
-        moduleName: moduleName
-    }
-    sendMessage("loadModule",commandData);
-}
-
-function uninstallNpmModule(moduleName) {
-    let commandData = {
-        moduleName: moduleName
-    }
-    sendMessage("uninstallNpmModule",commandData);
-}
-
-function unloadModule(moduleName) {
-    let commandData = {
-        moduleIdentifier: moduleName
-    }
-    sendMessage("unloadModule",commandData);
-}
-
-function updateNpmModule(moduleName,selectedVersionInfo) {
-    //same as install
-    installNpmModule(moduleName,selectedVersionInfo)
-}
-
-function openWebWorkspace(workspaceUrl) {
-    if(openLinkFromApp) {
-        //let the app open the workspace
-        let commandData = {
-            workspaceUrl: workspaceUrl
-        }
-        sendMessage("openWorkspace",commandData);
-    }
-    else {
-        //open the workspace in a browser
-        if(callingUrl) {
-            let url = callingUrl + "?url=" + workspaceUrl; 
-            this.openWebLink(url);
-        }
-    }
-}
-
-function openWebLink(linkUrl) {
-    if(openLinkFromApp) {
-        //let the app open the link
-        let commandData = {
-            linkUrl: linkUrl
-        }
-        sendMessage("openLink",commandData);
-    }
-    else {
-        //open the link in a browser
-        window.open(linkUrl)
-        window.opener = null;
+        throw new Error(`Error in server request. Status: ${response.status}, Message: ${response.statusText}`);
     }
 }
 
@@ -271,8 +154,9 @@ function openWebLink(linkUrl) {
 //=================================
 
 function applyStatus() {
-    if((_appModules)&&(_sourceModulesResponse)) {
-        let refModuleArray = getRefModuleArray(_sourceModulesResponse); //throws error on failure
+    if((_appModules)&&(_moduleResponseArray)) {
+        let refModuleArray = createRefModuleArray(_moduleResponseArray); //throws error on failure
+        let statusInfo = {};
 
         //populate the status for the loaded and installed modules
         if(_appModules.loaded) {
@@ -286,7 +170,10 @@ function applyStatus() {
                 if(!refVersionData) {
                     refVersionData = insertIntoLoadedVersionData(loadedEntry,refModuleEntry);
                 }
-                refModuleEntry.status.loaded = refVersionData.versionData.version;
+
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //ADD A STATUS ENTRY FOR THIS LOADED MODULE!!!
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             })
         }
 
@@ -299,46 +186,57 @@ function applyStatus() {
                 if((refData)&&(!refVersionData)) {
                     refVersionData = insertIntoInstalledVersionData(installedEntry,refData);
                 }
-                refData.status.installed = refVersionData.version;
+
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //ADD AN INSTALLED STATUS ENTRY!!!
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             })
         }
 
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //SORT THE MODULE VERSION ENTRIES!!!
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
         _refModuleArray = refModuleArray;
-        ////////////////////////////////////////
-        //sort?
-        //send to the ui
-        /////////////////////////////////////////
+        _statusInfo = statusInfo;
+
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //SEND TO THE UI!!!
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 }
 
 /** NOW I AM ONLY HANLDING A SINGLE SOURCE!!! */
-function getRefModuleArray(sourceModulesResponse) {
-    let sourceEntry = sourceModulesResponse.source;
-    if(!sourceEntry) throw new Error("Source entry missing from module response.");
-    let sourceModules = sourceModulesResponse.modules;
-    if(!sourceModules) throw new Error("modules list missing from modules response.");
+function createRefModuleArray(_moduleResponseArray) {
 
-    let refModuleArray = [];
-    sourceModules.forEach(sourceModuleEntry => {
-        let refModuleEntry = {};
-        refModuleEntry.name = sourceModuleEntry.name;
-        if(sourceModuleEntry.versions) {
-            refModuleEntry.versions = sourceModuleEntry.versions.map(sourceVersionEntry => {
-                let refVersionEntry = {};
-                refVersionEntry.moduleType = "apogee module";
-                refVersionEntry.platform = _platform;
-                refVersionEntry.name = sourceModuleEntry.name;
-                refVersionEntry.sourceData = sourceEntry;
-                refVersionEntry.versionData = sourceVersionEntry;
-                return refVersionEntry;
-            });
-        }
-        refModuleEntry.status = {};
-        refModuleArray.push(refModuleEntry);
-    })
-
-    return refModuleArray;
 }
+// function getRefModuleArray(sourceModulesResponse) {
+//     let sourceEntry = sourceModulesResponse.source;
+//     if(!sourceEntry) throw new Error("Source entry missing from module response.");
+//     let sourceModules = sourceModulesResponse.modules;
+//     if(!sourceModules) throw new Error("modules list missing from modules response.");
+
+//     let refModuleArray = [];
+//     sourceModules.forEach(sourceModuleEntry => {
+//         let refModuleEntry = {};
+//         refModuleEntry.name = sourceModuleEntry.name;
+//         if(sourceModuleEntry.versions) {
+//             refModuleEntry.versions = sourceModuleEntry.versions.map(sourceVersionEntry => {
+//                 let refVersionEntry = {};
+//                 refVersionEntry.moduleType = "apogee module";
+//                 refVersionEntry.platform = _platform;
+//                 refVersionEntry.name = sourceModuleEntry.name;
+//                 refVersionEntry.sourceData = sourceEntry;
+//                 refVersionEntry.versionData = sourceVersionEntry;
+//                 return refVersionEntry;
+//             });
+//         }
+//         refModuleEntry.status = {};
+//         refModuleArray.push(refModuleEntry);
+//     })
+
+//     return refModuleArray;
+// }
 
 /** This function takes an entry from the app loaded modules and looks for the
  * module entry from the reference module array */
@@ -482,15 +380,129 @@ function isNodePackageUrl(versionString) {
 }
 
 
+//==================
+// External Command Functions
+//==================
+function loadEsModule(moduleUrl,moduleName) {
+    let commandData = {
+        moduleIdentifier: moduleUrl,
+        moduleName: moduleName
+    }
+    sendMessage("loadModule",commandData);
+}
+
+function unloadEsModule(moduleUrl) {
+    let commandData = {
+        moduleIdentifier: moduleUrl
+    }
+    sendMessage("unloadModule",commandData);
+}
+
+function updateEsModule(newUrl,oldUrl,moduleName) {
+    let commandData = {
+        newIdentifier: newUrl,
+        oldIdentifier: oldUrl,
+        moduleName: moduleName
+    }
+    sendMessage("updateModule",commandData);
+}
+
+function installNpmModule(moduleName,selectedVersionInfo) {
+    let commandData = {
+        installArg: getNpmInstallArg(moduleName,selectedVersionInfo)
+    }
+    sendMessage("installNpmModule",commandData);
+}
+
+function getNpmInstallArg(moduleName,selectedVersionInfo) {
+    if(selectedVersionInfo.npmUrl) {
+        //url of tgz file
+        return selectedVersionInfo.npmUrl;
+    }
+    else if(selectedVersionInfo.version) {
+        //install the given version
+        return moduleName + "@" + selectedVersionInfo.version;
+    }
+    else {
+        //this shouldn't happen, but it will instsall latest
+        //we might want some different handling
+        return moduleName;
+    }
+}
+
+function installAndLoadNpmModule(moduleName,selectedVersionInfo) {
+    let commandData = {
+        moduleName: moduleName,
+        installArg: getNpmInstallArg(moduleName,selectedVersionInfo)
+    }
+    sendMessage("installAndLoadNpmModule",commandData);
+}
+
+function loadNpmModule(moduleName) {
+    let commandData = {
+        moduleIdentifier: moduleName,
+        moduleName: moduleName
+    }
+    sendMessage("loadModule",commandData);
+}
+
+function uninstallNpmModule(moduleName) {
+    let commandData = {
+        moduleName: moduleName
+    }
+    sendMessage("uninstallNpmModule",commandData);
+}
+
+function unloadModule(moduleName) {
+    let commandData = {
+        moduleIdentifier: moduleName
+    }
+    sendMessage("unloadModule",commandData);
+}
+
+function updateNpmModule(moduleName,selectedVersionInfo) {
+    //same as install
+    installNpmModule(moduleName,selectedVersionInfo)
+}
+
+function openWebWorkspace(workspaceUrl) {
+    if(openLinkFromApp) {
+        //let the app open the workspace
+        let commandData = {
+            workspaceUrl: workspaceUrl
+        }
+        sendMessage("openWorkspace",commandData);
+    }
+    else {
+        //open the workspace in a browser
+        if(callingUrl) {
+            let url = callingUrl + "?url=" + workspaceUrl; 
+            this.openWebLink(url);
+        }
+    }
+}
+
+function openWebLink(linkUrl) {
+    if(openLinkFromApp) {
+        //let the app open the link
+        let commandData = {
+            linkUrl: linkUrl
+        }
+        sendMessage("openLink",commandData);
+    }
+    else {
+        //open the link in a browser
+        window.open(linkUrl)
+        window.opener = null;
+    }
+}
+
+
+
 //=========================
 // Other Internal Functions
 //=========================
 function fatalError(reason) {
     alert("Fatal error opening module manager: " + reason);
     window.close();
-}
-
-//later there will be more stuff in here - at least platform, maybe app version
-function getModuleDataUrl() {
-    return MODULE_REQUEST_URL;
 }

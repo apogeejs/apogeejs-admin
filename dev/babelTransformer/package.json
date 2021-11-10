@@ -1,0 +1,24 @@
+{
+  "name": "babel-transformer",
+  "version": "0.0.0-p.0",
+  "description": "Babel Transformer",
+  "scripts": {
+    "test": "node ./test/app.js",
+    "convert": "rollup --config rollup.config.js"
+  },
+  "XXXdependencies": {
+    "@babel/core": "~7.16.0",
+    "@babel/plugin-transform-react-jsx": "~7.16.0"
+  },
+  "dependencies": {
+    "@babel/standalone": "~7.16.0"
+  },
+  "devDependencies": {
+    "rollup": "^2.44.0",
+    "@rollup/plugin-commonjs": "^18.0.0",
+    "@rollup/plugin-node-resolve": "^11.2.1",
+    "@rollup/plugin-json": "^4.1.0"
+  },
+  "author": "Dave Sutter",
+  "type": "commonjs"
+}
