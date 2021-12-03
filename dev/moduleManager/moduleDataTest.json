@@ -1,13 +1,10 @@
 {
 	"fileType": "repoModuleList",
 	"fileVersion": "1.0",
-	"source": {
-		"name": "test"
-	},
 	"platform": "es",
 	"modules": [
 		{
-			"name": "apogeejs-module-chartjsXXX",
+			"name": "apogeejs-module-chartjs",
 			"versions": [
 				{
 					"version": "4.0.0-p.1",
