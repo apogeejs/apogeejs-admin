@@ -1,5 +1,5 @@
 {
-  "name": "apogeejs-dev-server",
+  "name": "varserver",
   "version": "0.0.1",
   "main": "server.js",
   "scripts": {
