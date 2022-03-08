@@ -1,6 +1,5 @@
 //import ManaualLoginComponentMember from "./ManaualLoginComponentMember.js";
 import ReactElementCellConfig from "./ReactElementCell.js";
-import ReactElementCellViewConfig from "./ReactElementCellView.js";
 
 const ReactElementsModule = {
     initApogeeModule: function() {
@@ -14,10 +13,6 @@ const ReactElementsModule = {
         //-------------------------------
         apogeeapp.componentInfo.registerComponent(ReactElementCellConfig);
 
-        //-------------------------------
-        //register the parse csv component view
-        //-------------------------------
-        apogeeview.registerComponentView(ReactElementCellViewConfig);
     },
 
     removeApogeeModule: function() {
@@ -31,10 +26,6 @@ const ReactElementsModule = {
         //-------------------------------
         apogeeapp.componentInfo.unregisterComponent(ReactElementCellConfig);
 
-        //-------------------------------
-        //register the parse csv component view
-        //-------------------------------
-        apogeeview.unregisterComponentView(ReactElementCellViewConfig);
     }
 }
 

@@ -1,7 +1,8 @@
 import Component from "/apogeejs-app-lib/src/component/Component.js";
 import jsxTransformer from "/apogeejs-admin/dev/babelTransformer/releases/v0.0.0-p.0/jsxTransform.es.js";
-import {doAction} from "/apogeejs-model-lib/src/apogeeModelLib.js";
 import Apogee from "/apogeejs-app-lib/src/Apogee.js";
+
+import {getErrorViewModeEntry,getAppCodeViewModeEntry,getFormulaViewModeEntry} from "/apogeejs-view-lib/src/datasource/standardDataDisplay.js";
 
 /** This method creates the resource. */
 function onJsxCodeUpdate(component,jsxCode) {
@@ -71,7 +72,20 @@ const ReactElementCellConfig = {
 		jsxCode: {
 			fieldChangeHandler: onJsxCodeUpdate 
 		}
-	}
+	},
+
+    viewModes: [
+        getErrorViewModeEntry(),
+        // {
+        //     name: "Display", 
+        //     label: "Display", 
+        //     isActive: true,
+        //     getDataDisplay: (componentView,displayContainer) => componentView.getOutputDataDisplay(displayContainer)
+        // },
+        getAppCodeViewModeEntry("jsxCode",null,"jsxCode","JSX Code",{sourceType: "code", argList:"props", isActive: true /*,textDisplayMode: "ace/mode/js"*/}),
+        getFormulaViewModeEntry("member",{name: "convertedCode", label:"Converted Code"})
+    ],
+    iconResPath: "/icons3/genericCellIcon.png"
 }
 export default ReactElementCellConfig;
 
