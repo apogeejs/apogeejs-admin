@@ -48,6 +48,7 @@ function TabView({frameManager}) {
                 {tabItems.map(tabItem => TabTab({
                         tabId: tabItem.tabId,
                         text: tabItem.text, 
+                        selected: tabItem.tabId == selectedTabId,
                         closeOkCallback: tabItem.closeOkCallback, 
                         doCloseFunction: closeTab,
                         selectTabFunction: selectTab
@@ -64,7 +65,7 @@ function TabView({frameManager}) {
     )
 }
 
-function TabTab({tabId, text, closeOkCallback, doCloseFunction, selectTabFunction}) {
+function TabTab({tabId, text, selected, closeOkCallback, doCloseFunction, selectTabFunction}) {
     function closeClicked() {
         if(closeOkCallback()) {
             doCloseFunction(tabId)
@@ -79,8 +80,12 @@ function TabTab({tabId, text, closeOkCallback, doCloseFunction, selectTabFunctio
         return false;
     }
 
+    let className = "tabView_tab " + (selected ? "tabView_selected" : "tabView_deselected")
+
+    console.log(`tabId: ${tabId} className: ${className} selected: ${selected}`)
+
     return (
-        <div key={tabId} onClick={tabClicked} className="tabView_tab">
+        <div key={tabId} onClick={tabClicked} className={className}>
             <span>{text}</span>
             <img onClick={closeClicked} src="resources/close_gray.png"/>    
         </div>

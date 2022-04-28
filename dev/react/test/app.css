@@ -13,7 +13,7 @@ body {
     left:0;
     right:0;
     top:0;
-    bottom:200;
+    bottom:0;
     padding:0px;
     margin:0px;
     font-family: sans-serif;
@@ -33,6 +33,5 @@ body {
 }
 .appMenuBar {
     flex-grow:0;
-    background-color:lightblue;
-    height: 100px;
+    background-color:rgb(220,220,240);
 }

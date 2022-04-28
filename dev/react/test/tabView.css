@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: maroon;
+    background-color: rgb(234,234,246);
 }
 .tabView_head {
     flex-grow: 0;
@@ -13,11 +13,22 @@
     flex-grow: 1;
 }
 .tabView_tab {
-    display: inline;
+    display: inline-block;
+    padding: 5px;
+}
+.tabView_deselected {
+    background-color: rgb(234,234,246);
+    /*border-bottom: 2px solid rgb(234,234,246);*/
+}
+.tabView_selected {
+    background-color: white;
+    /*border-top: 2px solid rgb(234,234,246);
+    border-right: 2px solid rgb(234,234,246);
+    border-left: 2px solid rgb(234,234,246);*/
 }
 .tabView_frame {
     position: relative;
     height: 100%;
-    background-color: teal;
+    background-color: white;
 
 }
