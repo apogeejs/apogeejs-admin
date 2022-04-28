@@ -1,0 +1,23 @@
+.tabView {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: maroon;
+}
+.tabView_head {
+    flex-grow: 0;
+}
+.tabView_body {
+    position: relative;
+    flex-grow: 1;
+}
+.tabView_tab {
+    display: inline;
+}
+.tabView_frame {
+    position: relative;
+    height: 100%;
+    background-color: teal;
+
+}

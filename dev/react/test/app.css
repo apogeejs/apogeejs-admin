@@ -1,0 +1,38 @@
+html {
+    overflow:hidden;
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    bottom:0;
+    background-color: red;
+}
+body {
+    overflow:hidden;
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    bottom:200;
+    padding:0px;
+    margin:0px;
+    font-family: sans-serif;
+    font-size: 14px;
+    background-color: blue;
+}
+.appContainer {
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    bottom:0;
+    background-color:yellow;
+    display:flex;
+    flex-direction:column;
+    height: 100%;
+}
+.appMenuBar {
+    flex-grow:0;
+    background-color:lightblue;
+    height: 100px;
+}

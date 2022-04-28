@@ -1,0 +1,20 @@
+
+.splitFrame {
+    flex-grow:1;
+    overflow: auto;
+    display: flex;
+    padding: 10px;
+    background-color:lightgray;
+}
+.splitFrame_leftPanel {
+    background-color: cyan;
+    width: 200px; 
+}
+.splitFrame_rightPanel {
+    background-color: cyan; 
+    flex-grow: 1;
+}
+.splitFrame_divider {
+    width: 10px;
+    background-color:lightgray;
+}

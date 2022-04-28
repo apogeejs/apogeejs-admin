@@ -1,46 +1,86 @@
 <html>
-    <head>
-        <style>
-            html {
-                overflow:hidden;
-                position:absolute;
-                left:0;
-                right:0;
-                top:0;
-                bottom:0;
-                background-color: red;
-            }
-            body {
-                overflow:hidden;
-                position:absolute;
-                left:0;
-                right:0;
-                top:0;
-                bottom:200;
-                padding:0px;
-                margin:0px;
-                font-family: sans-serif;
-                font-size: 14px;
-                background-color: blue;
-            }
-            .appContainer {
-                position:absolute;
-                left:0;
-                right:0;
-                top:0;
-                bottom:0;
-                background-color:yellow;
-                display:flex;
-                flex-direction:column;
-                height: 100%;
-            }
-        </style>
+    <head>   
+        <link rel="stylesheet" type="text/css" href="app.css">
+        <link rel="stylesheet" type="text/css" href="selectMenu.css">
+        <link rel="stylesheet" type="text/css" href="splitFrame.css">
+        <link rel="stylesheet" type="text/css" href="treeView.css">
+        <link rel="stylesheet" type="text/css" href="tabView.css">
         <link rel="stylesheet" type="text/css" href="test.css">
         <script src="https://unpkg.com/react@16.12.0/umd/react.development.js"></script>
         <script src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.development.js"></script>
         <script src="https://unpkg.com/@babel/standalone@7.8.3/babel.js"></script>
         <script type="text/babel" src="test.js"></script>
+        <script type="text/babel" src="splitFrame.js"></script>
+        <script type="text/babel" src="selectMenu.js"></script>
+        <script type="text/babel" src="treeView.js"></script>
+        <script type="text/babel" src="tabView.js"></script>
+        <script type="text/babel" src="app.js"></script>
         <script type="text/babel">
+
+//tab management
+let openTab, closeTab,selectTab
+let frameManager = {
+    setTabFunctions(openTabArg,closeTabArg,selectTabArg) {
+        openTab = openTabArg;
+        closeTab = closeTabArg;
+        selectTab = selectTabArg;
+    }
+}
+
+//dummy close ok function
+const dummyCloseOk = () => true
+
+//{text,contentElement,closeOkCallback}
+
+function openNumber1() {
+    openTab({
+        tabId: "number1",
+        text: "Number 1",
+        contentElement: <div>This is the content for number 1</div>,
+        closeOkCallback: dummyCloseOk
+    })
+}
+
+function closeNumber1() {
+    closeTab("number1")
+}
+
+function openNumber2() {
+    openTab({
+        tabId: "number2",
+        text: "Number 2",
+        contentElement: <div>This is the content for number 2</div>,
+        closeOkCallback: dummyCloseOk
+    })
+}
+
+function closeNumber2() {
+    closeTab("number2")
+}
+
+
+const fileItems = [
+    {text: "Open", action: () => alert("Open pressed")},
+    {text: "Save", action: () => alert("Save pressed")},
+    {text: "Save As", action: () => alert("Save As pressed")},
+    {text: "Close", action: () => alert("Close pressed")}
+]
+const number1Items = [
+    {text: "Open/Focus", action: openNumber1},
+    {text: "Close", action: closeNumber1}
+]
+const number2Items = [
+    {text: "Open/Focus", action: openNumber2},
+    {text: "Close", action: closeNumber2}
+]
+const threeDotsItems = [
+    {text: "Edit Properties", action: () => alert("Edit Properties pressed")},
+    {text: "Delete", action: () => alert("Delete pressed")}
+]
+
+console.log("We are here!")
+
+
             ReactDOM.render(<App/>,document.getElementById("container"))
         </script>
     </head>

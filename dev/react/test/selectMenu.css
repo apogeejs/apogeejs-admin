@@ -1,0 +1,54 @@
+/* SelectMenu */
+.selectMenu_wrapper {
+    display: inline;
+    position: relative;
+}
+.selectMenu_label {
+    display: inline;
+    position: relative;
+
+    /* need to set style here and for the menu bar */
+    /*Also, remember we will use this for other inline menus */
+    color: darkblue;
+    font-weight: bold;
+    padding: 5px;
+    line-height: 2.0; /* I had trouble with padding and spacing - this was to help. needs work. */
+}
+.selectMenu_image {
+    display: inline;
+    position: relative;
+
+
+    padding: 5px;
+    vertical-align: middle;
+}
+.selectMenu_select {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    /* This is supposed to hide the element. Need to test it on different platforms */
+    background-color: rgba(0,0,0,0);
+    color: rgba(0,0,0,0);
+    appearance: none;
+    border: none; /* we still get a border for when it has focus. That is ok, but I don't like the look of it too much. */
+
+}
+.selectMenu_option { /* might want to make this specific to select menu */
+    opacity: 1;
+    color: black;
+    background-color: white;
+}
+.selectMenu_select:hover {
+    background-color: rgba(0,0,0,.1);  /* This covers the label text! Just make it with low opacity. */
+}
+.selectMenu_select:active {
+    background-color: rgba(0,0,0,.1);
+}
+.selectMenu_select:focus-visible {
+    /* this modifies the appearance when it has focus */
+    border: none;
+    outline: 1px solid gray;
+}
