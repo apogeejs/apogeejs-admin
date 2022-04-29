@@ -1,99 +1,57 @@
+/** TabView 
+* TabObject functions:
+* - int/string getId() - a unique id for the tab object
+* - string getName() - the name for the tab
+* - element getTabElement() - Returns the tab content element
+*/
 
 const INVALID_TAB_ID = 0
 
-function TabView({frameManager}) {
-
-    //need to set css
-    //need to wire up actions!!!
-
-    const [tabItems,setTabItems] = React.useState([]);
-    const [selectedTabId,setSelectedTabId] = React.useState(INVALID_TAB_ID);  //0 is invalid tab id
-
-    //tab data = {text,contentElement,closeOkCallback}
-    function openTab(tabData,isSelected = true) {
-        //open if not already there
-        if(tabItems.find(tabItem => tabItem.tabId == tabData.tabId) === undefined) {
-            //notify open??? (probabl not necessary)
-            setTabItems(tabItems.concat(tabData))
-        }
-        //select if specified
-        if(isSelected) selectTab(tabData.tabId)
-    }
-
-    function closeTab(tabId) {
-        console.log("Closing tab: " + tabId)
-        //notify close??? (I am not sure if this is the place for it)
-        let newTabItems = tabItems.filter(tabItem => tabItem.tabId != tabId)
-        if(tabId == selectedTabId) {
-            if(newTabItems.length > 0) {
-                selectTab(newTabItems[0].tabId)
-            }
-            else {
-                selectTab(INVALID_TAB_ID)
-            }
-        }
-        setTabItems(newTabItems)
-    }
-
-    function selectTab(tabId) {
-        //need notify show and hide!!!
-        setSelectedTabId(tabId) //I error checked before - but I checked the value too early. Maybe redo? or maybe not
-    }
-
-    frameManager.setTabFunctions(openTab,closeTab,selectTab);
+function TabView({tabObjects, selectedTabId, closeTab, selectTab}) {
 
     return (
         <div className="tabView">
             <div className="tabView_head">
-                {tabItems.map(tabItem => TabTab({
-                        tabId: tabItem.tabId,
-                        text: tabItem.text, 
-                        selected: tabItem.tabId == selectedTabId,
-                        closeOkCallback: tabItem.closeOkCallback, 
-                        doCloseFunction: closeTab,
-                        selectTabFunction: selectTab
+                {tabObjects.map(tabObject => TabTab({
+                        tabObject, 
+                        closeTab, 
+                        selectTab, 
+                        selected: selectedTabId == tabObject.getId()
                     }))}
             </div>
             <div className="tabView_body">
-                {tabItems.map(tabItem => TabFrame({
-                    tabId: tabItem.tabId,
-                    contentElement: tabItem.contentElement,
-                    selected: tabItem.tabId == selectedTabId
+                {tabObjects.map(tabObject => TabFrame({
+                    tabObject,
+                    selected: selectedTabId == tabObject.getId()
                 }))}
             </div>
         </div>
     )
 }
 
-function TabTab({tabId, text, selected, closeOkCallback, doCloseFunction, selectTabFunction}) {
-    function closeClicked() {
-        if(closeOkCallback()) {
-            doCloseFunction(tabId)
-        }
-        //here I want to prevent calling parent - is this right?
-        return false;
+function TabTab({tabObject, closeTab, selectTab, selected}) {
+    function closeClicked(event) {
+        closeTab(tabObject)
+        event.stopPropagation() //prevent click from going to tab
     }
 
-    function tabClicked() {
-        selectTabFunction(tabId)
-        //here I want to prevent calling parent - is this right?
-        return false;
+    function tabClicked(event) {
+        selectTab(tabObject)
+        event.stopPropagation()
     }
 
     let className = "tabView_tab " + (selected ? "tabView_selected" : "tabView_deselected")
 
-    console.log(`tabId: ${tabId} className: ${className} selected: ${selected}`)
-
     return (
-        <div key={tabId} onClick={tabClicked} className={className}>
-            <span>{text}</span>
+        <div key={tabObject.getId()} onClick={tabClicked} className={className}>
+            <span>{tabObject.getName()}</span>
             <img onClick={closeClicked} src="resources/close_gray.png"/>    
         </div>
     )
 }
 
-function TabFrame({tabId, contentElement, selected}) {
+function TabFrame({tabObject, selected}) {
     return (
-        <div key={tabId} style={{display: selected ? '' : "none"}} className="tabView_frame">{contentElement}</div>
+        <div key={tabObject.getId()} style={{display: selected ? '' : "none"}} className="tabView_frame">{tabObject.getTabElement()}</div>
     )
 }

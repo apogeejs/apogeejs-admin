@@ -11,77 +11,151 @@
         <script src="https://unpkg.com/@babel/standalone@7.8.3/babel.js"></script>
         <script type="text/babel" src="test.js"></script>
         <script type="text/babel" src="splitFrame.js"></script>
-        <script type="text/babel" src="selectMenu.js"></script>
         <script type="text/babel" src="treeView.js"></script>
+        <script type="text/babel" src="selectMenu.js"></script>
         <script type="text/babel" src="tabView.js"></script>
         <script type="text/babel" src="app.js"></script>
         <script type="text/babel">
 
-//tab management
-let openTab, closeTab,selectTab
-let frameManager = {
-    setTabFunctions(openTabArg,closeTabArg,selectTabArg) {
-        openTab = openTabArg;
-        closeTab = closeTabArg;
-        selectTab = selectTabArg;
+//===========================
+// Tree Contents
+//===========================
+// treeObject functions:
+// - string getName()
+// - boolean hasChildren()
+// - [treeObject] getChildren()
+// - boolean hasMenu()
+// - [menuItems] getMenuItems()
+// menu items format:
+//  - text: text
+//  - action: function() 
+
+let appObject = {
+    getMenuItems: () => menuItems,
+    getChildren: () => [workspaceObject],
+}
+
+/* Menu Items */
+const menuItems = [
+    {
+        text: "File", 
+        items: [
+            {text: "Open", action: () => alert("Open pressed")},
+            {text: "Save", action: () => alert("Save pressed")},
+            {text: "Save As", action: () => alert("Save As pressed")},
+            {text: "Close", action: () => alert("Close pressed")}
+        ]
+    },
+    {
+        text: "Edit",
+        items: [
+            {text: "Copy", action: () => alert("Copy pressed")},
+            {text: "Cut", action: () => alert("Cut pressed")},
+            {text: "Paste", action: () => alert("Paste pressed")},
+        ]
+    },
+    {
+        text: "About",
+        items: [
+            {text: "Help", action: () => alert("Help pressed")},
+            {text: "About", action: () => alert("About pressed")}
+        ]
     }
-}
-
-//dummy close ok function
-const dummyCloseOk = () => true
-
-//{text,contentElement,closeOkCallback}
-
-function openNumber1() {
-    openTab({
-        tabId: "number1",
-        text: "Number 1",
-        contentElement: <div>This is the content for number 1</div>,
-        closeOkCallback: dummyCloseOk
-    })
-}
-
-function closeNumber1() {
-    closeTab("number1")
-}
-
-function openNumber2() {
-    openTab({
-        tabId: "number2",
-        text: "Number 2",
-        contentElement: <div>This is the content for number 2</div>,
-        closeOkCallback: dummyCloseOk
-    })
-}
-
-function closeNumber2() {
-    closeTab("number2")
-}
-
-
-const fileItems = [
-    {text: "Open", action: () => alert("Open pressed")},
-    {text: "Save", action: () => alert("Save pressed")},
-    {text: "Save As", action: () => alert("Save As pressed")},
-    {text: "Close", action: () => alert("Close pressed")}
-]
-const number1Items = [
-    {text: "Open/Focus", action: openNumber1},
-    {text: "Close", action: closeNumber1}
-]
-const number2Items = [
-    {text: "Open/Focus", action: openNumber2},
-    {text: "Close", action: closeNumber2}
-]
-const threeDotsItems = [
-    {text: "Edit Properties", action: () => alert("Edit Properties pressed")},
-    {text: "Delete", action: () => alert("Delete pressed")}
 ]
 
-console.log("We are here!")
+/* Tree View 
+* Creates a tree from a TreeObject. TreeObject interface:
+* - boolean hasChildren() - returns true if there are 0 children
+* - [TreeObject] getChildren() - returns a list of children.
+* - boolean hasMenu() - returns true if the tree entry has a menu
+* - boolean getMenuItems() - returns the menu items for the menu
+* = boolean hasTab() - returns true if the entry has a tab item
+* TO CLEAN UP
+* - better interface. Do I need all these "has*" functions?
+* - icons! status!
+* - click name action!
+*/
 
+// tabObject functions:
+// - int/string getId() - a unique id for the tab object
+// - string getName() - the name for the tab
+// - element getTabElement() - Returns the tab content element
 
-            ReactDOM.render(<App/>,document.getElementById("container"))
+/* workspace object */
+let workspaceObject = {
+    getId: () => "workspace|1",
+    getName: () => "Workspace",
+
+    //tree interface
+    hasChildren: () => true,
+    getChildren: () => [
+            workspaceChild1,
+            workspaceChild2,
+            workspaceChild3
+        ],
+
+    hasMenu: () => false,
+
+    hasTab: () => false
+}
+
+let workspaceChild1 = {
+    getId: () => "component|2",
+    getName: () => "Tom",
+
+    //tree interface
+    hasChildren: () => false,
+
+    hasMenu: () => true,
+    getMenuItems: () => [
+        {text: "Edit Properties", action: () => alert("Edit properties for Tom clicked")},
+        {text: "Delete", action: () => alert("Delete Tom clicked")}
+    ],
+
+    hasTab: () => true,
+    getTabElement: () => "This is Tom's tab"
+}
+
+let workspaceChild2 = {
+    getId: () => "component|3",
+    getName: () => "Dick",
+
+    //tree interface
+    hasChildren: () => false,
+
+    hasMenu: () => true,
+    getMenuItems: () => [
+        {text: "Edit Properties", action: () => alert("Edit properties for Dick clicked")},
+        {text: "Delete", action: () => alert("Delete Dick clicked")}
+    ],
+
+    hasTab: () => true,
+    getTabElement: () => "This is Dick's tab"
+}
+
+let workspaceChild3 = {
+    getId: () => "component|4",
+    getName: () => "Harry",
+
+    //tree interface
+    hasChildren: () => false,
+
+    hasMenu: () => true,
+    getMenuItems: () => [
+        {text: "Edit Properties", action: () => alert("Edit properties for Harry clicked")},
+        {text: "Delete", action: () => alert("Delete Harry clicked")}
+    ],
+
+    hasTab: () => true,
+    getTabElement: () => (
+        <div style={{padding: "10px"}}>
+            <h1>Harry's Tab</h1>
+            <p>This is Harry's tab.</p>
+        </div>
+    )
+}
+
+            ReactDOM.render(<App appObject={appObject}/>,document.getElementById("container"))
         </script>
     </head>
     <body id="body">

@@ -10,11 +10,11 @@
     background-color:rgb(220,220,240);
 }
 .splitFrame_leftPanel {
-    background-color: cyan;
+    background-color: white;
     width: 200px; 
 }
 .splitFrame_rightPanel {
-    background-color: cyan; 
+    background-color: white; 
     flex-grow: 1;
 }
 .splitFrame_divider {

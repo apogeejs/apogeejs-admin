@@ -24,8 +24,14 @@
 
     return (
         <div className="selectMenu_wrapper">
-            {image ? <img src={image} className="selectMenu_image"/> : ''}
-            {text ? <div className="selectMenu_label">{text}</div> : ''}
+            {image ? 
+                <img src={image} className="selectMenu_image"/> 
+                : 
+                text ? 
+                    <div className="selectMenu_label">{text}</div> 
+                    : 
+                    ''
+            }
             <select ref={selectRef} onChange={changeHandler} className="selectMenu_select" >
                 {items.map(item => <option key={item.text} className="selectMenu_option">{item.text}</option>)}
             </select>
