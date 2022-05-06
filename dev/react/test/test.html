@@ -5,11 +5,13 @@
         <link rel="stylesheet" type="text/css" href="splitFrame.css">
         <link rel="stylesheet" type="text/css" href="treeView.css">
         <link rel="stylesheet" type="text/css" href="tabView.css">
+        <link rel="stylesheet" type="text/css" href="iconWithStatus.css">
         <link rel="stylesheet" type="text/css" href="test.css">
         <script src="https://unpkg.com/react@16.12.0/umd/react.development.js"></script>
         <script src="https://unpkg.com/react-dom@16.12.0/umd/react-dom.development.js"></script>
         <script src="https://unpkg.com/@babel/standalone@7.8.3/babel.js"></script>
         <script type="text/babel" src="test.js"></script>
+        <script type="text/babel" src="iconWithStatus.js"></script>
         <script type="text/babel" src="splitFrame.js"></script>
         <script type="text/babel" src="treeView.js"></script>
         <script type="text/babel" src="selectMenu.js"></script>
@@ -26,6 +28,8 @@
 // - [treeObject] getChildren()
 // - boolean hasMenu()
 // - [menuItems] getMenuItems()
+// - string(url) getIconUrl()
+// - string(status) getStatus()
 // menu items format:
 //  - text: text
 //  - action: function() 
@@ -85,6 +89,8 @@ const menuItems = [
 let workspaceObject = {
     getId: () => "workspace|1",
     getName: () => "Workspace",
+    getStatus: () => "normal",
+    getIconUrl: () => "resources/shortLogo16.png",
 
     //tree interface
     hasChildren: () => true,
@@ -102,6 +108,8 @@ let workspaceObject = {
 let workspaceChild1 = {
     getId: () => "component|2",
     getName: () => "Tom",
+    getStatus: () => "error",
+    getIconUrl: () => "resources/icons3/jsonCellIcon.png",
 
     //tree interface
     hasChildren: () => false,
@@ -119,6 +127,8 @@ let workspaceChild1 = {
 let workspaceChild2 = {
     getId: () => "component|3",
     getName: () => "Dick",
+    getStatus: () => "invalid",
+    getIconUrl: () => "resources/icons3/pageIcon.png",
 
     //tree interface
     hasChildren: () => false,
@@ -136,6 +146,8 @@ let workspaceChild2 = {
 let workspaceChild3 = {
     getId: () => "component|4",
     getName: () => "Harry",
+    getStatus: () => "pending",
+    getIconUrl: () => "resources/icons3/functionCellIcon.png",
 
     //tree interface
     hasChildren: () => false,

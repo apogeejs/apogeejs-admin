@@ -44,8 +44,9 @@ function TabTab({tabObject, closeTab, selectTab, selected}) {
 
     return (
         <div key={tabObject.getId()} onClick={tabClicked} className={className}>
+            <IconWithStatus treeObject={tabObject} />
             <span>{tabObject.getName()}</span>
-            <img onClick={closeClicked} src="resources/close_gray.png"/>    
+            <input type="image" onClick={closeClicked} src="resources/close_gray.png"/>    
         </div>
     )
 }

@@ -13,7 +13,7 @@
 */
 function TreeView({treeObject, openTab}) {
     return (
-        <ul>
+        <ul className="treeView_list">
             {treeObject.getChildren().map(childObject => <TreeEntry key={childObject.getId()} treeObject={childObject} openTab={openTab} />)}
         </ul>
     )
@@ -41,8 +41,9 @@ function TreeEntry({treeObject, openTab}) {
     }
 
     return (
-        <li>
+        <li className="treeView_item">
             <img src={controlImage} onClick={controlClicked} className="workspaceTree_control"/>
+            <IconWithStatus treeObject={treeObject} />
             <span>{treeObject.getName()}</span>
             {getMenu(treeObject)}
             { (opened && treeObject.hasChildren()) ? <TreeView treeObject={treeObject} openTab={openTab}/> : ''}

@@ -1,0 +1,12 @@
+.iconWithStatus_wrapper {
+    display: inline-block;
+    position: relative;
+}
+.iconWithStatus_icon {
+    position: relative;
+}
+.iconWithStatus_status {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
