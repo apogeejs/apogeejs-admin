@@ -5,11 +5,10 @@
 * - [TreeObject] getChildren() - returns a list of children.
 * - boolean hasMenu() - returns true if the tree entry has a menu
 * - boolean getMenuItems() - returns the menu items for the menu
-* = boolean hasTab() - returns true if the entry has a tab item
+* - boolean hasTab() - returns true if the entry has a tab item
 * TO CLEAN UP
-* - better interface. Do I need all these "has*" functions?
-* - icons! status!
 * - click name action!
+* - add open parent action (as in for child components)
 */
 function TreeView({treeObject, openTab}) {
     return (
@@ -43,7 +42,7 @@ function TreeEntry({treeObject, openTab}) {
     return (
         <li className="treeView_item">
             <img src={controlImage} onClick={controlClicked} className="workspaceTree_control"/>
-            <IconWithStatus treeObject={treeObject} />
+            <IconWithStatus iconObject={treeObject} />
             <span>{treeObject.getName()}</span>
             {getMenu(treeObject)}
             { (opened && treeObject.hasChildren()) ? <TreeView treeObject={treeObject} openTab={openTab}/> : ''}

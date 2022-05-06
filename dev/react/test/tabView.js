@@ -7,7 +7,9 @@
 
 const INVALID_TAB_ID = 0
 
-function TabView({tabObjects, selectedTabId, closeTab, selectTab}) {
+function TabView({appObject, tabObjectIds, selectedTabId, closeTab, selectTab}) {
+
+    let tabObjects = tabObjectIds.map(tabId => appObject.getTabObject(tabId))
 
     return (
         <div className="tabView">
@@ -44,7 +46,7 @@ function TabTab({tabObject, closeTab, selectTab, selected}) {
 
     return (
         <div key={tabObject.getId()} onClick={tabClicked} className={className}>
-            <IconWithStatus treeObject={tabObject} />
+            <IconWithStatus iconObject={tabObject} />
             <span>{tabObject.getName()}</span>
             <input type="image" onClick={closeClicked} src="resources/close_gray.png"/>    
         </div>

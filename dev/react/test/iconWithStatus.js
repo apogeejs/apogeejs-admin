@@ -1,8 +1,8 @@
-function IconWithStatus({treeObject}) {
+function IconWithStatus({iconObject}) {
 
-    const iconImageSrc = treeObject.getIconUrl();
+    const iconImageSrc = iconObject.getIconUrl();
     
-    const status = treeObject.getStatus();
+    const status = iconObject.getStatus();
     let statusImageSrc;
     switch(status) {
         case "normal":

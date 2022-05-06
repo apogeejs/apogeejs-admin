@@ -11,27 +11,22 @@ const INVALID_ID = 0
 function App({appObject}) {
     //Tab State
     //tab data = {text,contentElement,closeOkCallback}
-    const [tabObjects,setTabObjects] = React.useState([])
+    const [tabObjectIds,setTabObjectIds] = React.useState([])
     const [selectedTabId,setSelectedTabId] = React.useState(INVALID_TAB_ID)   //0 is invalid tab id
 
     function openTab(tabObject,isSelected = true) {
         //open if not already there
-        if(tabObjects.find(existingTabObject => tabObject.getId() == existingTabObject.getId()) === undefined) {
+        if(tabObjectIds.find(existingTabObjectId => tabObject.getId() == existingTabObjectId) === undefined) {
             //notify open??? (probabl not necessary)
-            setTabObjects(tabObjects.concat(tabObject))
+            setTabObjectIds(tabObjectIds.concat(tabObject.getId()))
         }
         //select if specified
-        if(isSelected) selectTab(tabObject)
+        if(isSelected) selectTabId(tabObject.getId())
     }
 
-    function selectTab(tabObject) {
+    function selectTabId(tabObjectId) {
         //need notify show and hide!!!
-        if(tabObject) {
-            setSelectedTabId(tabObject.getId())
-        }
-        else {
-            setSelectedTabId(INVALID_ID)
-        }
+        setSelectedTabId(tabObjectId)
     }
 
     function closeTab(tabObject) {
@@ -41,16 +36,16 @@ function App({appObject}) {
         }
 
         //notify close??? (I am not sure if this is the place for it)
-        let newTabItems = tabObjects.filter(existingTabObject => existingTabObject.getId() != tabObject.getId())
+        let newTabObjectIds = tabObjectIds.filter(existingTabObjectId => existingTabObjectId != tabObject.getId())
         if(tabObject.getId() == selectedTabId) {
-            if(newTabItems.length > 0) { //if we close the active tab, make the first tab active
-                selectTab(newTabItems[0])
+            if(newTabObjectIds.length > 0) { //if we close the active tab, make the first tab active
+                selectTabId(newTabObjectIds[0])
             }
             else {
-                selectTab(null)
+                selectTabId(INVALID_ID)
             }
         }
-        setTabObjects(newTabItems)
+        setTabObjectIds(newTabObjectIds)
     }
 
     return (
@@ -58,7 +53,7 @@ function App({appObject}) {
             <MenuBar appObject={appObject} />
             <SplitFrame
                 leftContent={<TreeView treeObject={appObject} openTab={openTab}/>}
-                rightContent={<TabView tabObjects={tabObjects} selectedTabId={selectedTabId} closeTab={closeTab} selectTab={selectTab}/>} 
+                rightContent={<TabView appObject={appObject} tabObjectIds={tabObjectIds} selectedTabId={selectedTabId} closeTab={closeTab} selectTabId={selectTabId}/>} 
             />
         </>
     )

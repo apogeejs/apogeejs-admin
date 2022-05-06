@@ -33,10 +33,14 @@
 // menu items format:
 //  - text: text
 //  - action: function() 
+let tabObjects = {};
 
 let appObject = {
     getMenuItems: () => menuItems,
     getChildren: () => [workspaceObject],
+    getTabObject: tabObjectId => {
+        return tabObjects[tabObjectId];
+    }
 }
 
 /* Menu Items */
@@ -166,6 +170,11 @@ let workspaceChild3 = {
         </div>
     )
 }
+
+//add tab objects to tab objects
+tabObjects[workspaceChild1.getId()] = workspaceChild1
+tabObjects[workspaceChild2.getId()] = workspaceChild2
+tabObjects[workspaceChild3.getId()] = workspaceChild3
 
             ReactDOM.render(<App appObject={appObject}/>,document.getElementById("container"))
         </script>
