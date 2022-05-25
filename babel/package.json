@@ -1,0 +1,12 @@
+{
+    "name": "bundle-compile",
+    "version": "0.0.0",
+    "scripts": {
+        "compile": "./node_modules/.bin/babel ../../apogeejs-app-bundle/srcPrecompile --out-dir ../../apogeejs-app-bundle/src"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.17.10",
+        "@babel/core": "^7.18.0",
+        "@babel/preset-react": "^7.17.12"
+    }
+}
