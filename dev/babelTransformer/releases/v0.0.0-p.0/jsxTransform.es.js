@@ -113963,7 +113963,7 @@ var babel = createCommonjsModule(function (module, exports) {
 })));
 });
 
-const plugins = [["transform-react-jsx"/*"transform-react-jsx-development"*/ , {
+const plugins = [["transform-react-jsx", {
     //importSource: importSource,
     //pragma: pragma,
     //pragmaFrag: pragmaFrag,
@@ -113986,11 +113986,20 @@ const babelOptions = {
 };
 
 
-function transform(jsxBody) {
+function transformFunctionBody(jsxBody) {
     //return babel.transformSync(jsxBody,babelOptions);
-    return babel.transform(jsxBody,babelOptions);
+
+    let jsxCode = `const y = function() {
+        ${jsxBody}
+    }`;
+
+    const transformedJsxCode = babel.transform(jsxCode,babelOptions);
+
+    const functionBody = transformedJsxCode.code.slice(23,-2);
+
+    return functionBody;
 }
 
-var jsxTransform = transform;
+var jsxTransform = transformFunctionBody;
 
 export { jsxTransform as default };

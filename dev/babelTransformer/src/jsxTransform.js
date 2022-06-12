@@ -42,9 +42,18 @@ const babelOptions = {
 }
 
 
-function transform(jsxBody) {
+function transformFunctionBody(jsxBody) {
     //return babel.transformSync(jsxBody,babelOptions);
-    return babel.transform(jsxBody,babelOptions);
+
+    let jsxCode = `const y = function() {
+        ${jsxBody}
+    }`
+
+    const transformedJsxCode = babel.transform(jsxCode,babelOptions);
+
+    const functionBody = transformedJsxCode.code.slice(23,-2)
+
+    return functionBody;
 }
 
-module.exports = transform
+module.exports = transformFunctionBody
